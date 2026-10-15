@@ -50,12 +50,12 @@
 Из корня репозитория:
 
 ```sh
-npm ci --prefix ctt
-node --test ctt/google-docs/tests/*.test.mjs
-python3 ctt/google-docs/build.py
+npm ci --ignore-scripts
+node --test google-docs/tests/*.test.mjs
+python3 google-docs/build.py
 ```
 
-Архив появится в `ctt/google-docs/dist/`. В CI он прикладывается как артефакт `compare-these-texts-google-docs-prototype`.
+Архив появится в `google-docs/dist/`. В CI он прикладывается как артефакт `compare-these-texts-google-docs-prototype`.
 
 ## Короткий ручной тест
 

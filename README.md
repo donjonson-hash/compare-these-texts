@@ -1,9 +1,17 @@
 # Compare These Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.34.2**.
+Current CTT website and offline Chrome/Firefox extension source: **0.35.0**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparethesetexts.com/.
+
+## Review amounts and percentages
+
+In **Compare documents**, open **Amounts & percentages** below the review
+controls. It lists changed currency amounts and percentages in text, Word and
+supported PDF comparisons, links to their locations and lets you mark them
+checked. Decisions are saved with the comparison and invalidated when the
+relevant text changes. Spreadsheet comparisons use their own review controls.
 
 ## Fill printed PDF forms
 
@@ -11,10 +19,17 @@ In **Edit & export**, open a text-based PDF. Detected printed blanks are immedia
 
 ## Source and release ownership
 
-Use this directory for future CTT changes. The root `extension/` and
-`static/reconciliation/` directories preserve the older 0.18.1 implementation
-and its tests; they are not the source of current CTT releases. The Telegram
-bot and `scout/` are independent products.
+This standalone source tree contains the website, browser extensions and
+[LibreOffice Writer](libreoffice/README.md) and
+[Google Docs](google-docs/README-RU.md) prototypes. Application source is in
+`src/`; release metadata is in `release.json`.
+
+The Git history was extracted from the `ctt/` directory of
+[donjonson-hash/kristina-revolutionary](https://github.com/donjonson-hash/kristina-revolutionary)
+at commit `7ec380657bf61f9c153e6139722ae77df4095480` (CTT 0.35.0).
+Extracted commits have new identifiers because their paths and trees changed.
+The older `extension/` and `static/reconciliation/` implementations, Telegram
+bot and Scout remain separate and are not included in this repository.
 
 This import preserves the application assets from saved Site version 34,
 source commit `60ad3bcea23c6539242a953f4591cd2fc5f4470e`. `provenance.json`
@@ -32,8 +47,9 @@ current application with an earlier UI.
 
 Requires Node.js 24.15+ (24.x) or 26+, and Python 3.11 or newer, plus Git for revision metadata.
 
+Run from the repository root:
+
 ```sh
-cd ctt
 npm ci --ignore-scripts
 npm run build
 npm test
@@ -43,8 +59,8 @@ npm run check
 Outputs:
 
 - `dist/`: static website, including extension downloads.
-- `dist/downloads/ctt-chrome-0.34.2.zip`: load the extracted directory in Chrome.
-- `dist/downloads/ctt-firefox-0.34.2.zip`: temporary Firefox installation.
+- `dist/downloads/ctt-chrome-0.35.0.zip`: load the extracted directory in Chrome.
+- `dist/downloads/ctt-firefox-0.35.0.zip`: temporary Firefox installation.
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 
@@ -65,7 +81,7 @@ The lockfile includes the native canvas test dependency. PDF rendering tests
 must not silently disappear because that dependency is missing. Tests use
 synthetic fixtures and do not require private user documents or API keys.
 
-The import preserves the behavior of the saved release. It does not certify
+The extraction preserves the application behavior of CTT 0.35.0. It does not certify
 that every spreadsheet layout can be compared or every PDF can retain its
 layout. In particular, merged/formula worksheets supported by the single-file
 editor must not be described as supported by two-file comparison without a

@@ -4,7 +4,7 @@ Edit one selected passage directly in Writer, preview removed/added text, then a
 
 ## Install and use
 
-1. Install `dist/compare-these-texts-writer-0.1.0.oxt` through **Tools → Extension Manager → Add**. Restart LibreOffice completely.
+1. Install `libreoffice/dist/compare-these-texts-writer-0.1.0.oxt` through **Tools → Extension Manager → Add**. Restart LibreOffice completely.
 2. On Ubuntu, LibreOffice's Python component support must be installed. If missing: `sudo apt install python3-uno libreoffice-script-provider-python`.
 3. Open a Writer document and select text within one paragraph.
 4. Choose **Compare These Texts → Edit selected text…** (Russian: **Редактировать выделенный текст…**), or use the added toolbar command.
@@ -22,10 +22,12 @@ This is a native dialog prototype, not a permanent sidebar. Existing browser sty
 
 ## Build and verify
 
-`python3 ctt/libreoffice/build.py`
+Run these commands from the repository root.
+
+`python3 libreoffice/build.py`
 
 Native integration tests require `libreoffice-writer`, `python3-uno`, `libreoffice-script-provider-python`, `xvfb`, and `xauth`:
 
-`xvfb-run -a /usr/bin/python3 ctt/libreoffice/tests/smoke.py`
+`xvfb-run -a /usr/bin/python3 libreoffice/tests/smoke.py`
 
 The test installs the actual OXT in an isolated disposable profile, checks dispatch registration, edits real Writer documents, checks untouched styles, Undo/Redo, stale text and unsupported content. The desktop user profile is never used.

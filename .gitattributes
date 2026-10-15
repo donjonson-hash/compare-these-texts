@@ -1,0 +1,5 @@
+* text=auto eol=lf
+
+# Keep audited browser bundles and fonts as ordinary Git blobs.
+src/*-vendor.mjs -diff -merge
+src/*font*.mjs -diff -merge

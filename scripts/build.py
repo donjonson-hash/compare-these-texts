@@ -18,7 +18,7 @@ def sha256(path):
 def build():
     # OUTPUT is a fixed, generated directory; never write into the source tree.
     if OUTPUT.is_symlink():
-        raise RuntimeError("Refusing to replace a symlink at ctt/dist")
+        raise RuntimeError("Refusing to replace a symlink at dist")
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     shutil.copytree(SOURCE, OUTPUT)
@@ -32,7 +32,7 @@ def build():
         "version": release["version"],
         "source_commit": revision,
         "source_dirty": dirty,
-        "build_command": "cd ctt && npm ci --ignore-scripts && npm run build",
+        "build_command": "npm ci --ignore-scripts && npm run build",
         "source_files_sha256": {str(p.relative_to(SOURCE)): sha256(p) for p in sorted(SOURCE.rglob("*")) if p.is_file()},
         "archives_sha256": {p.name: sha256(p) for p in sorted((OUTPUT / "downloads").glob("*.zip"))},
     }
