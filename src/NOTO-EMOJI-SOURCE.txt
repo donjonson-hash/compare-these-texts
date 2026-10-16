@@ -5,3 +5,10 @@ Original SHA256: de6c18832938afc99caf132b39d6a30a19bac7f2e812e28db2535b4608d2755
 Derived with fontTools.varLib.instancer.instantiateVariableFont(font, {"wght": 400}).
 Bundled TTF SHA256: d7dc093084fc7673a47e678ea0ea19fcd976a0895963eaabfb2feea7893f8939
 License: SIL Open Font License 1.1; see NOTO-EMOJI-LICENSE.txt.
+
+Verified reproduction on 2026-10-16 (original tool version not recorded):
+Google Fonts commit: b979dba422e445492b0eb9951ac52ee0b4d648c3
+Tool: fontTools 4.61.1, Python 3.12.
+TTFont(recalcTimestamp=False); static weight 400; head.modified=3873751297.
+The timestamp is preserved from the shipped TTF. All font/module bytes match.
+See docs/FONT-REPRODUCTION.md and scripts/reproduce_fonts.py.
