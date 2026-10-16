@@ -16,11 +16,13 @@ def build():
     target = ROOT / 'dist' / 'compare-these-texts-google-docs-0.1.0.zip'
     target.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(target, 'w') as archive:
-        for name in ('Code.gs', 'Sidebar.html', 'appsscript.json', 'README.md', 'README-RU.md'):
+        files = {name: ROOT / name for name in ('Code.gs', 'Sidebar.html', 'appsscript.json', 'README.md', 'README-RU.md')}
+        files['LICENSE.txt'] = ROOT.parent / 'LICENSE'
+        for name, source in files.items():
             info = zipfile.ZipInfo(name, (2026, 1, 1, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o100644 << 16
-            archive.writestr(info, (ROOT / name).read_bytes())
+            archive.writestr(info, source.read_bytes())
     print(target)
     return target
 

@@ -1,6 +1,6 @@
 # Compare These Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.35.2**.
+Current CTT website and offline Chrome/Firefox extension source: **0.35.3**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparethesetexts.com/.
@@ -59,8 +59,8 @@ npm run check
 Outputs:
 
 - `dist/`: static website, including extension downloads.
-- `dist/downloads/ctt-chrome-0.35.2.zip`: load the extracted directory in Chrome.
-- `dist/downloads/ctt-firefox-0.35.2.zip`: temporary Firefox installation.
+- `dist/downloads/ctt-chrome-0.35.3.zip`: load the extracted directory in Chrome.
+- `dist/downloads/ctt-firefox-0.35.3.zip`: temporary Firefox installation.
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 
@@ -89,8 +89,18 @@ separate verified change to that comparison path.
 
 ## License and security
 
-The original project source has no open-source license selected (`UNLICENSED`).
-See [LICENSE](LICENSE). Bundled third-party licenses remain with their assets.
+The original CTT software is proprietary. [LICENSE](LICENSE) permits free personal
+and internal business use, including processing client documents and installing
+the supplied integrations. Redistribution, sale and modification of the original
+code require permission except where the license or applicable law permits them.
+Your documents and exported results are not subject to the software license.
+Bundled third-party licenses remain with their assets.
+
+The build renders `/terms/` and packages `terms.html` and `LICENSE.txt` for offline
+use from the canonical root LICENSE. Writer and Google Docs packages also include
+that exact LICENSE.txt. Update the root file when changing terms; do not maintain
+separate copies. Release 0.35.3 introduces these terms; earlier releases are not
+retroactively relicensed.
 Security reporting: [SECURITY.md](SECURITY.md). Contribution and test workflow:
 [CONTRIBUTING.md](CONTRIBUTING.md). Hosting requirements: [docs/HOSTING.md](docs/HOSTING.md).
 

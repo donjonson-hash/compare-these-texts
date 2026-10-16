@@ -4,6 +4,8 @@ Edit one selected passage directly in Writer, preview removed/added text, then a
 
 ## Install and use
 
+This proprietary prototype is free for personal and internal work use. Installing and building the unmodified prototype is permitted. Distribution, sale, and code modifications require permission except as allowed by applicable law or third-party licenses. See the full [license](../LICENSE), included as `LICENSE.txt` in the OXT archive.
+
 1. Install `libreoffice/dist/compare-these-texts-writer-0.1.0.oxt` through **Tools → Extension Manager → Add**. Restart LibreOffice completely.
 2. On Ubuntu, LibreOffice's Python component support must be installed. If missing: `sudo apt install python3-uno libreoffice-script-provider-python`.
 3. Open a Writer document and select text within one paragraph.

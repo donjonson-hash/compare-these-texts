@@ -1,10 +1,51 @@
-License status of the original Compare These Texts source
+Compare These Texts - Proprietary License and Terms of Use
 
-No open-source license has been selected for the original project source.
-This repository does not grant an additional license to copy, modify or
-redistribute that source. Contact the repository owner to discuss permission.
-The npm metadata therefore uses UNLICENSED, not the Unlicense.
+Version 1.0 - October 16, 2026
 
-Third-party libraries and fonts retain their own licenses. Their license and
-source notices are included beside the corresponding files in src/. This
-notice does not replace or restrict those third-party licenses.
+Copyright (c) 2026 the respective copyright holders of the original Compare These Texts software. All rights reserved except as expressly granted below. Project maintainer: GitHub account donjonson-hash, https://github.com/donjonson-hash/compare-these-texts.
+
+1. Scope
+
+These terms apply to the original Compare These Texts (CTT) software and accompanying original documentation distributed with this license, including the website application, browser extensions and Writer and Google Docs integrations (the Software). The licensors are the respective copyright holders, each granting rights only to the material they are entitled to license. Third-party components and your documents are treated separately below. This is a proprietary license, not an open-source license.
+
+2. Permitted use
+
+Subject to these terms, you receive a non-exclusive, worldwide, royalty-free license to install and run this release for personal use and internal business or professional work. You may process documents for your employer or clients, including in paid professional services. You may use, edit, print, share and commercially use your resulting documents, subject to rights in their underlying content.
+
+You may download, make backup copies, compile unmodified source and install the Software on devices or accounts you control or administer for your organization. You may make the copies needed for those installations within your organization. This includes copying the supplied Google Docs prototype into Apps Script and configuring it for your own or your organization's documents, and installing the Writer prototype. Installation settings and build outputs necessary for these permitted uses are allowed. These permissions do not authorize offering the Software itself as a service to third parties.
+
+You may inspect the source and test your own authorized installation for security and compatibility. Report security issues through the process at https://github.com/donjonson-hash/compare-these-texts/blob/main/SECURITY.md. This does not authorize access to other people's systems or data.
+
+3. Restrictions on the original Software
+
+Except as expressly permitted above, by a separate written permission from the applicable copyright holder, or by applicable law, you may not redistribute, publish, sell, sublicense or rent the original Software or copies of it; distribute modified versions; modify or incorporate its original code into another product; or host the Software for use by third parties. Do not remove its copyright or license notices. You may share links to the official website and official distribution pages.
+
+No trademark license or permission to imply endorsement is granted. These restrictions apply to protected material in the original Software, not to your documents, general ideas or independently written implementations. Nothing in these terms restricts rights that applicable law does not allow to be excluded, including any applicable rights relating to interoperability, security research or reverse engineering.
+
+4. Third-party software, fonts and platform rights
+
+Bundled third-party libraries, fonts and other components remain subject to their own licenses and notices. Those licenses govern those components and take precedence over conflicting provisions here. The notices are supplied alongside the assets, including PDF-LICENSES.txt, PDF-READER-LICENSE.txt, SHEETJS-LICENSE.txt, XMLDOM-LICENSE.txt and NOTO-EMOJI-LICENSE.txt in the browser distribution. In the source repository they are in src/. Not every integration includes every component.
+
+These terms do not withdraw rights separately granted under GitHub's terms for viewing and forking a public repository within GitHub, or rights granted under applicable distribution-platform terms. Such platform rights do not by themselves grant an unrestricted license to redistribute or commercialize the original Software elsewhere.
+
+5. Your documents and privacy
+
+These terms do not transfer ownership of, or grant the maintainer rights to reuse, your input documents, edits or exported results. You remain responsible for having permission to process and share the underlying content. Exported documents do not become subject to this proprietary software license merely because CTT processed them. Any embedded third-party material retains its applicable license.
+
+The privacy policy supplied with the browser application explains its data handling. Writer and Google Docs integrations have separate documentation describing their host environments; Google Docs operates through Google services. These terms do not authorize additional document collection or change those documented data practices.
+
+6. Availability, review and warranties
+
+This release is provided without a license fee. Future paid features or services, if offered, require separate disclosed terms; no payment obligation is created by these terms. No continued hosting, future update, support response time or compatibility with every document format is promised. Review edits and exported results before relying on them and retain copies of important source documents.
+
+To the extent permitted by applicable law, the Software is provided as is and as available, without express or implied warranties, including warranties of merchantability, fitness for a particular purpose or non-infringement. The copyright holders are not liable for indirect or consequential losses, lost profits or lost data arising from use of the Software, to the extent such liability may lawfully be excluded. Nothing here excludes or limits liability or consumer rights that cannot legally be excluded or limited.
+
+7. Duration and future versions
+
+The permissions for a copy supplied under these terms continue without a fixed end date while you comply with these terms. If you materially breach them, the applicable licensor may terminate these permissions by written notice if you fail to remedy the breach within 30 days after notice. On termination, stop using and delete the original Software covered by the terminated permission, except as otherwise permitted by law. Your documents and third-party license rights are unaffected.
+
+Future releases may carry different terms, disclosed with those releases. Publishing new terms does not retroactively replace the terms supplied with a copy you already received or remove rights previously granted for that copy. These terms do not purport to revoke any rights separately granted for earlier releases.
+
+8. Contact and additional permissions
+
+For licensing questions or requests for additional permissions, contact the project maintainer through https://github.com/donjonson-hash/compare-these-texts/issues. Public issues are visible to others; do not include confidential documents or personal information. For vulnerabilities, follow https://github.com/donjonson-hash/compare-these-texts/blob/main/SECURITY.md instead of posting technical details publicly.
