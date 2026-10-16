@@ -1,6 +1,6 @@
 # Compare These Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.35.3**.
+Current CTT website and offline Chrome/Firefox extension source: **0.35.4**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparethesetexts.com/.
@@ -59,8 +59,8 @@ npm run check
 Outputs:
 
 - `dist/`: static website, including extension downloads.
-- `dist/downloads/ctt-chrome-0.35.3.zip`: load the extracted directory in Chrome.
-- `dist/downloads/ctt-firefox-0.35.3.zip`: temporary Firefox installation.
+- `dist/downloads/ctt-chrome-0.35.4.zip`: load the extracted directory in Chrome.
+- `dist/downloads/ctt-firefox-0.35.4.zip`: temporary Firefox installation.
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 
@@ -108,3 +108,13 @@ Security reporting: [SECURITY.md](SECURITY.md). Contribution and test workflow:
 also verifies release version consistency, first-party browser API restrictions
 and pinned vendor/font checksums. These are regression guards, not a substitute
 for a dependency or security review. Acorn is used by the browser API guard.
+
+## Chrome store metadata
+
+Chrome 0.35.4 includes localized names, summaries and toolbar titles for 19 additional
+languages (21 regional variants), with English fallback. The editor UI remains
+English; each translated summary states this explicitly. See
+[the complete copy and publishing notes](docs/CWS-LOCALIZATIONS.md).
+Canonical copy lives in `extension-package/store/localizations.json`; the build
+validates it and generates `_locales` only in the Chrome ZIP. Full listing
+descriptions and screenshots still require separate work in the store dashboard.

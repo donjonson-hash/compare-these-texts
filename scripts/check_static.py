@@ -2,8 +2,10 @@ from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlparse
 import json,zipfile,subprocess,re
+from store_metadata import message_files
 root=Path(__file__).resolve().parents[1]/'dist'
 release=json.loads((root.parent/'release.json').read_text())
+localized_files=message_files()
 for relative in ('package.json', 'extension-package/chrome-manifest.json', 'extension-package/firefox-manifest.json'):
  assert json.loads((root.parent/relative).read_text())['version']==release['version'], ('version mismatch',relative)
 lock=json.loads((root.parent/'package-lock.json').read_text())
@@ -37,6 +39,22 @@ for target in ('chrome','firefox'):
 for p in (root/'downloads').glob('*.zip'):
  with zipfile.ZipFile(p) as z:
   manifest=json.loads(z.read('manifest.json'))
+  is_chrome=p.name.startswith('ctt-chrome-')
+  if is_chrome:
+   assert manifest['default_locale']=='en'
+   for field,key in (('name','extensionName'),('description','extensionDescription')):
+    assert manifest[field]=='__MSG_'+key+'__'
+   assert manifest['action']['default_title']=='__MSG_actionTitle__'
+   for name,data in localized_files.items():assert z.read(name)==data,(p,name,'localized text mismatch')
+   messages=json.loads(z.read('_locales/en/messages.json'))
+   # Validate the resolved English fallback against the existing package contract.
+   manifest['name']=messages['extensionName']['message']
+   manifest['description']=messages['extensionDescription']['message']
+   manifest['action']['default_title']=messages['actionTitle']['message']
+  else:
+   assert 'default_locale' not in manifest
+   assert not any(name.startswith('_locales/') for name in z.namelist())
+  assert manifest['description']==release['description']
   assert manifest['homepage_url']=='https://comparethesetexts.com/'
   assert manifest['version']==re.search(r'-(\d+\.\d+\.\d+)\.zip$',p.name).group(1)
   if p.name.startswith('ctt-'):
@@ -52,6 +70,7 @@ for p in (root/'downloads').glob('*.zip'):
      assert u.path in z.namelist(),(p,ref)
   if p.name in (f"ctt-chrome-{release['version']}.zip",f"ctt-firefox-{release['version']}.zip"):
    expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html'}
+   if is_chrome:expected.update(localized_files)
    assert set(z.namelist())==expected,(p,'asset closure')
    for f in root.iterdir():
     if f.is_file() and f.name not in ('index.html','robots.txt','_headers'):assert z.read(f.name)==f.read_bytes(),(p,f.name)
