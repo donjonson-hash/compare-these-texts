@@ -1,5 +1,6 @@
 /* One local review, with transaction-level ownership across extension tabs. */
 const DB_NAME = 'kristina-review-session', STORE = 'session', KEY = 'current';
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_SOURCE_BYTES = 2 * 1024 * 1024, MAX_PAYLOAD_BYTES = 32 * 1024 * 1024;
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const failure = (code, message, details = {}) => Object.assign(new Error(message), {code, ...details});
@@ -74,7 +75,7 @@ function checkedRow(row, validatePayload = validateSessionPayload) {
   return {token, payload: row.payload, updatedAt: row.updatedAt};
 }
 
-export async function openSessionStore({indexedDB = globalThis.indexedDB, dbName = DB_NAME, validatePayload = validateSessionPayload} = {}) {
+export async function openSessionStore({indexedDB = globalThis.indexedDB, dbName = DB_NAME, validatePayload = validateSessionPayload, now = Date.now} = {}) {
   if (!indexedDB?.open) throw failure('unavailable', "Your browser does not allow saving work on this device.");
   const db = await new Promise((resolve, reject) => {
     let request, settled = false;
@@ -102,9 +103,29 @@ export async function openSessionStore({indexedDB = globalThis.indexedDB, dbName
       try { action(tx.objectStore(STORE), value => { result = value; }, abort); } catch (error) { abort(error); }
     });
   }
-  async function read() {
-    const row = await transaction('readonly', (store, done) => { const request = store.get(KEY); request.onsuccess = () => done(request.result); });
-    return checkedRow(row, validatePayload);
+  function read() {
+    // Expire only while loading saved work, never on a timer in an open editor.
+    // The same transaction protects another tab's more recent save from deletion.
+    return transaction('readwrite', (store, done, abort) => {
+      const request = store.get(KEY);
+      request.onsuccess = () => {
+        try {
+          const saved = request.result;
+          if (saved === undefined) { done(empty()); return; }
+          const currentTime = now();
+          if (object(saved) && tokenOf(saved) && Number.isSafeInteger(saved.expiresAt) && saved.expiresAt >= 0 && currentTime >= saved.expiresAt) {
+            const cleared = {token: globalThis.crypto.randomUUID(), payload: null, updatedAt: currentTime};
+            store.put(cleared, KEY); done(cleared); return;
+          }
+          const row = checkedRow(saved, validatePayload);
+          if (saved.expiresAt !== undefined && (!Number.isSafeInteger(saved.expiresAt) || saved.expiresAt < 0)) throw failure('corrupt', "Could not read the saved work. You can delete it.", {token: row.token});
+          // Loading a valid draft counts as activity. Legacy drafts get a full
+          // grace period on their first load; malformed drafts are never rewritten.
+          if (row.payload !== null) store.put({...saved, expiresAt: currentTime + SESSION_TTL_MS}, KEY);
+          done(row);
+        } catch (error) { abort(error); }
+      };
+    });
   }
   function replace(payload, expectedToken) {
     if (expectedToken !== null && typeof expectedToken !== 'string') return Promise.reject(failure('conflict', "This work changed in another window. Reopen the saved version."));
@@ -113,8 +134,10 @@ export async function openSessionStore({indexedDB = globalThis.indexedDB, dbName
       request.onsuccess = () => {
         try {
           if (tokenOf(request.result) !== expectedToken) { abort(failure('conflict', "This work changed in another window. Reopen the saved version.")); return; }
-          const row = {token: globalThis.crypto.randomUUID(), payload, updatedAt: Date.now()};
-          store.put(row, KEY); done(row);
+          const updatedAt = now();
+          const row = {token: globalThis.crypto.randomUUID(), payload, updatedAt};
+          if (payload !== null) row.expiresAt = updatedAt + SESSION_TTL_MS;
+          store.put(row, KEY); done({token: row.token, payload: row.payload, updatedAt: row.updatedAt});
         } catch (error) { abort(error); }
       };
     });

@@ -121,6 +121,13 @@ class SelectionEdit:
         patches = changes(self.original, edited)
         if not patches:
             return False
+        # The freshly verified paragraph snapshot already contains each text
+        # portion's style. A uniform paragraph needs no per-character UNO reads.
+        # Keep the existing boundary/style checks for mixed or incomplete runs.
+        records = self.before[1]
+        uniform_style = (records[0][1] if records and
+                         "".join(text for text, _ in records) == self.before[0] and
+                         all(style == records[0][1] for _, style in records) else None)
         prepared = []
         for start, end, replacement in patches:
             region = span(self.anchor, self.original, start, end)
@@ -128,7 +135,7 @@ class SelectionEdit:
             style = properties(span(self.anchor, self.original, sample, sample + 1))
             # A replacement spanning multiple styles needs an explicit mapping;
             # do not silently flatten such a range in the initial prototype.
-            if replacement and end > start:
+            if replacement and end > start and uniform_style != style:
                 for offset in range(start, end):
                     if properties(span(self.anchor, self.original, offset, offset + 1)) != style:
                         raise ValueError("One replacement crosses different text formatting. Make smaller edits within each formatted part.")

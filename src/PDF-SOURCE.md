@@ -19,7 +19,7 @@ Generated for the extension on 2026-09-25. Runtime performs no downloads.
 Use an empty temporary directory outside the repository:
 
 ```sh
-npm install --prefix /tmp/kristina-pdf-vendor --no-audit --no-fund --save-exact pdf-lib@1.17.1 @pdf-lib/fontkit@1.1.1 esbuild@0.25.10
+npm install --prefix /tmp/kristina-pdf-vendor --ignore-scripts --no-audit --no-fund --save-exact pdf-lib@1.17.1 @pdf-lib/fontkit@1.1.1 esbuild@0.25.10
 ```
 
 Copy `node_modules/@pdf-lib/fontkit/dist/fontkit.es.js` to `fontkit-csp.mjs` in that directory, applying exactly one replacement:
@@ -43,7 +43,7 @@ export {default as fontkit} from './fontkit-csp.mjs';
 From the repository root:
 
 ```sh
-/tmp/kristina-pdf-vendor/node_modules/.bin/esbuild /tmp/kristina-pdf-vendor/entry.mjs --bundle --platform=browser --format=esm --target=es2022 --minify --legal-comments=none --outfile=extension/pdf-vendor.mjs
+/tmp/kristina-pdf-vendor/node_modules/.bin/esbuild /tmp/kristina-pdf-vendor/entry.mjs --bundle --platform=browser --format=esm --target=es2022 --minify --legal-comments=none --outfile=src/pdf-vendor.mjs
 ```
 
 Font: unmodified DejaVuSans.ttf, from `/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf`, upstream https://dejavu-fonts.github.io/. Font license is Bitstream Vera, with DejaVu changes in the public domain. The original font SHA-256 is `ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280`. The original bytes are standard base64 in `pdf-font.mjs`:
@@ -52,7 +52,7 @@ Font: unmodified DejaVuSans.ttf, from `/usr/share/fonts/truetype/dejavu/DejaVuSa
 from pathlib import Path
 import base64
 font = Path('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf').read_bytes()
-Path('extension/pdf-font.mjs').write_text('// Unmodified DejaVu Sans. License and provenance: PDF-LICENSES.txt / PDF-SOURCE.md\nexport default "' + base64.b64encode(font).decode() + '";\n')
+Path('src/pdf-font.mjs').write_text('// Unmodified DejaVu Sans. License and provenance: PDF-LICENSES.txt / PDF-SOURCE.md\nexport default "' + base64.b64encode(font).decode() + '";\n')
 ```
 
 Subsetting occurs per generated PDF. Unsupported glyphs and control characters use explicit readable escapes; JSON retains original text. There is no replacement font fetched at runtime.
@@ -66,3 +66,10 @@ Subsetting occurs per generated PDF. Unsupported glyphs and control characters u
 The report module limits serialized evidence to 16 MiB, rendered text to 1,000,000 UTF-16 code units (also checked after escape expansion), pages to 200, and final PDF to 16 MiB. Limits reject the whole export; no partial document is returned.
 
 Word PDF export also bundles unmodified DejaVuSans-Bold.ttf as word-font-bold.mjs. It uses the same DejaVu license recorded in PDF-LICENSES.txt.
+
+The final module hashes and decoded font hashes are additionally checked by
+`python3 scripts/verify_vendor.py` against `vendor-assets.json`. The decoded
+DejaVu Sans Bold TTF SHA-256 is
+`5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895`.
+This records the shipped bytes; the original OS package/archive version for the
+DejaVu fonts was not retained, so it is not claimed as pinned upstream provenance.

@@ -1,0 +1,10 @@
+License status of the original Compare These Texts source
+
+No open-source license has been selected for the original project source.
+This repository does not grant an additional license to copy, modify or
+redistribute that source. Contact the repository owner to discuss permission.
+The npm metadata therefore uses UNLICENSED, not the Unlicense.
+
+Third-party libraries and fonts retain their own licenses. Their license and
+source notices are included beside the corresponding files in src/. This
+notice does not replace or restrict those third-party licenses.

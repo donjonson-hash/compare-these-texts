@@ -9,7 +9,7 @@ for target in ['chrome','firefox']:
  manifest.update({key:release[key] for key in ('name','version','description','homepage_url')})
  manifest['action']['default_title']='CTT — Compare & Edit'
  # Preserve the Firefox ID and permission-free offline CSP.
- files={p.name:p.read_bytes() for p in dist.iterdir() if p.is_file() and p.name!='robots.txt'}
+ files={p.name:p.read_bytes() for p in dist.iterdir() if p.is_file() and p.name not in ('robots.txt','_headers')}
  html=files['index.html'].decode().replace('href="/"','href="index.html"').replace('href="/site.css"','href="site.css"').replace('href="/favicon.svg"','href="favicon.svg"')
  html=html.replace('href="/extension/"','href="https://comparethesetexts.com/extension/"').replace('href="/privacy/"','href="privacy.html"').replace('href="/support/"','href="support.html"')
  html=html.replace('>Extension</a>','>Website</a>').replace('href="https://comparethesetexts.com/extension/">Website','href="https://comparethesetexts.com/">Website')

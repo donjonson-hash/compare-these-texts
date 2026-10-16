@@ -1,6 +1,6 @@
 # Compare These Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.35.1**.
+Current CTT website and offline Chrome/Firefox extension source: **0.35.2**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparethesetexts.com/.
@@ -32,7 +32,7 @@ The older `extension/` and `static/reconciliation/` implementations, Telegram
 bot and Scout remain separate and are not included in this repository.
 
 This import preserves the application assets from saved Site version 34,
-source commit `60ad3bcea23c6539242a953f4591cd2fc5f4470e`. `provenance.json`
+source commit `60ad3bcea23c6539242a953f4591cd2fc5f4470e`. [`docs/history/import-0.33.6-provenance.json`](docs/history/import-0.33.6-provenance.json)
 records every imported asset and the original published ZIP checksums.
 It is a historical import record, not a claim about future deployments.
 Importing code here does not change the deployed website.
@@ -59,8 +59,8 @@ npm run check
 Outputs:
 
 - `dist/`: static website, including extension downloads.
-- `dist/downloads/ctt-chrome-0.35.1.zip`: load the extracted directory in Chrome.
-- `dist/downloads/ctt-firefox-0.35.1.zip`: temporary Firefox installation.
+- `dist/downloads/ctt-chrome-0.35.2.zip`: load the extracted directory in Chrome.
+- `dist/downloads/ctt-firefox-0.35.2.zip`: temporary Firefox installation.
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 
@@ -86,3 +86,15 @@ that every spreadsheet layout can be compared or every PDF can retain its
 layout. In particular, merged/formula worksheets supported by the single-file
 editor must not be described as supported by two-file comparison without a
 separate verified change to that comparison path.
+
+## License and security
+
+The original project source has no open-source license selected (`UNLICENSED`).
+See [LICENSE](LICENSE). Bundled third-party licenses remain with their assets.
+Security reporting: [SECURITY.md](SECURITY.md). Contribution and test workflow:
+[CONTRIBUTING.md](CONTRIBUTING.md). Hosting requirements: [docs/HOSTING.md](docs/HOSTING.md).
+
+`npm test` builds first and discovers every `tests/*.test.mjs` file. `npm run check`
+also verifies release version consistency, first-party browser API restrictions
+and pinned vendor/font checksums. These are regression guards, not a substitute
+for a dependency or security review. Acorn is used by the browser API guard.

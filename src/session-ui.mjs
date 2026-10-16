@@ -14,11 +14,12 @@ export async function mountSessionUI(root, {onResume, onFinish, onOperating = ()
   root.className = 'session-panel'; root.hidden = true;
   const info = node('div', '', 'session-info'), title = node('strong'), names = node('p', '', 'session-names');
   const status = node('p', '', 'session-status'); status.setAttribute('role', 'status');
+  const retention = node('p', 'Saved for 7 days after opening or saving. Download files you want to keep.', 'hint');
   const actions = node('div', '', 'session-actions');
   const resume = button(single ? "Continue editing" : "Continue →", resumeSaved, 'button primary'); resume.id = (single ? 'single-' : '') + 'session-resume';
   const remove = button(single ? "Delete saved work" : "Finish and delete", finish); remove.id = (single ? 'single-' : '') + 'session-delete';
   const retry = button("Retry saving", retrySave); retry.hidden = true; retry.id = (single ? 'single-' : '') + 'session-retry';
-  status.id = (single ? 'single-' : '') + 'session-status'; info.append(title, names, status); actions.append(resume, retry, remove); root.append(info, actions);
+  status.id = (single ? 'single-' : '') + 'session-status'; info.append(title, names, status, retention); actions.append(resume, retry, remove); root.append(info, actions);
   let store, row = {token: null, payload: null}, getPayload = null, pending = null, lastPayload = null;
   let running = null, busy = false, operating = false, failed = null, corrupt = false, disposed = false, loaded = false;
   const active = () => !!getPayload;
