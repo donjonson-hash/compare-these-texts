@@ -28,9 +28,9 @@ the build must never automatically regenerate the manifest.
 | Noto Emoji, static weight 400 | `src/NOTO-EMOJI-SOURCE.txt` and `src/NOTO-EMOJI-LICENSE.txt`; variable-font source and derived TTF hashes |
 
 The PDF.js and SheetJS builders were independently run on 2026-10-16 and
-reproduced the committed runtime modules byte for byte. The other historical
+reproduced the committed runtime modules byte for byte. All three embedded font
+modules were subsequently reproduced byte for byte
+using the pinned inputs and tool version in `docs/FONT-REPRODUCTION.md`; run
+`scripts/reproduce_fonts.py` to verify them independently. This closes the font
+reproduction gap without changing shipped fonts. The other historical vendor
 build instructions have not been independently reproduced as part of this audit.
-The Noto record does not pin a Google Fonts commit or the fontTools version, and
-the DejaVu record does not pin an upstream archive. Their shipped bytes are checked,
-but a fully reproducible source-to-font pipeline is not yet established. No missing
-upstream release identifiers or tool versions have been inferred from checksums.

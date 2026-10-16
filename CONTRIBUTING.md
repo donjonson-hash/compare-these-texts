@@ -1,8 +1,9 @@
 # Contributing
 
-Discuss substantive changes in an issue first. Original source is currently
-UNLICENSED; no contributor agreement or open-source grant is implied. Agree
-on licensing with the owner before submitting original contributions.
+Discuss substantive changes in an issue first. Original CTT code is proprietary;
+see LICENSE for the permitted uses. No contributor agreement or open-source
+grant is implied. Agree on permission to modify code and on contribution licensing
+with the owner before submitting original contributions.
 
 Use Node.js 24.15+ (24.x) or 26+, Python 3.11+, and a Git checkout.
 

@@ -22,6 +22,10 @@ def build():
                 info.compress_type = zipfile.ZIP_DEFLATED
                 info.external_attr = 0o100644 << 16
                 archive.writestr(info, file.read_bytes())
+        info = zipfile.ZipInfo('LICENSE.txt', (2026, 1, 1, 0, 0, 0))
+        info.compress_type = zipfile.ZIP_DEFLATED
+        info.external_attr = 0o100644 << 16
+        archive.writestr(info, (ROOT.parent / 'LICENSE').read_bytes())
     print(target)
     return target
 
