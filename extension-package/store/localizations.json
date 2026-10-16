@@ -8,19 +8,19 @@
     "description": "Texte und Dokumente vergleichen, Unterschiede erkennen und direkt bearbeiten. Lokal auf deinem Gerät. Oberfläche auf Englisch."
   },
   "fr": {
-    "name": "Compare These Texts — Comparer et modifier des textes",
+    "name": "Compare These Texts — Comparateur de texte et éditeur",
     "description": "Comparez et modifiez vos textes et documents sur votre appareil. Repérez les différences. Interface en anglais."
   },
   "es": {
-    "name": "Compare These Texts — Comparar y editar textos",
+    "name": "Compare These Texts — Comparar textos y editar",
     "description": "Compara y edita textos y documentos en tu dispositivo. Detecta las diferencias. Interfaz en inglés."
   },
   "es_419": {
-    "name": "Compare These Texts — Compara y edita textos",
+    "name": "Compare These Texts — Comparar textos y editar",
     "description": "Compara y edita textos y documentos en tu dispositivo. Encuentra las diferencias. Interfaz en inglés."
   },
   "it": {
-    "name": "Compare These Texts — Confronta e modifica testi",
+    "name": "Compare These Texts — Confronta testi e modifica",
     "description": "Confronta e modifica testi e documenti sul tuo dispositivo. Individua le differenze. Interfaccia in inglese."
   },
   "nl": {
@@ -52,15 +52,15 @@
     "description": "Bandingkan teks dan dokumen berdampingan, lihat perbedaan, lalu edit. Pemrosesan di perangkat Anda. Antarmuka bahasa Inggris."
   },
   "ru": {
-    "name": "Compare These Texts — Сравнение и правка текстов",
+    "name": "Compare These Texts — Сравнение текстов и правка",
     "description": "Сравнивайте тексты и документы рядом, находите отличия и вносите правки. Обработка на устройстве. Интерфейс на английском."
   },
   "pt_BR": {
-    "name": "Compare These Texts — Compare e edite textos",
+    "name": "Compare These Texts — Comparar textos e editar",
     "description": "Compare e edite textos e documentos no seu dispositivo. Identifique as diferenças. Interface em inglês."
   },
   "pt_PT": {
-    "name": "Compare These Texts — Comparar e editar textos",
+    "name": "Compare These Texts — Comparar textos e editar",
     "description": "Compare e edite textos e documentos no seu dispositivo. Veja as diferenças. Interface em inglês."
   },
   "ja": {
@@ -72,7 +72,7 @@
     "description": "Paghambingin ang teksto at dokumento, tingnan ang pagkakaiba at i-edit. Sa device mo ang pagproseso. Ingles ang interface."
   },
   "vi": {
-    "name": "Compare These Texts — So sánh và chỉnh sửa văn bản",
+    "name": "Compare These Texts — So sánh văn bản và chỉnh sửa",
     "description": "So sánh văn bản, tài liệu cạnh nhau, xem khác biệt và chỉnh sửa. Xử lý trên thiết bị của bạn. Giao diện tiếng Anh."
   },
   "tr": {
