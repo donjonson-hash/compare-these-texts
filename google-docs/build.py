@@ -16,7 +16,7 @@ def build():
     target = ROOT / 'dist' / 'compare-these-texts-google-docs-0.1.0.zip'
     target.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(target, 'w') as archive:
-        for name in ('Code.gs', 'Sidebar.html', 'appsscript.json', 'README-RU.md'):
+        for name in ('Code.gs', 'Sidebar.html', 'appsscript.json', 'README.md', 'README-RU.md'):
             info = zipfile.ZipInfo(name, (2026, 1, 1, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o100644 << 16

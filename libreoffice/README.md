@@ -16,6 +16,8 @@ Save the document normally in Writer. This extension does not save it automatica
 
 Up to 4,000 selected characters in one main-body paragraph. Unchanged text retains its formatting. Inserted text inherits the first replaced character's formatting (or adjacent text for insertion). A replacement crossing different formatting is rejected; edit each styled fragment separately.
 
+For paragraphs with uniform formatting, the editor reuses the verified paragraph style snapshot instead of checking every replaced character through UNO. Mixed-format paragraphs retain per-character checks and can take longer for large replacements. The diff still uses exact character matching with `autojunk=False`, bounded by the 4,000-character selection limit.
+
 Tables, frames, headers/footers, fields, hyperlinks, bookmarks, comments, recorded changes, protected text and paragraph-break insertion are outside this prototype. Non-text portions anywhere in the selected paragraph are rejected. Character boundaries that cannot be verified are rejected before changes. The original paragraph and its formatting are checked again before applying.
 
 This is a native dialog prototype, not a permanent sidebar. Existing browser style suggestions have not yet been ported. Test on a copy of a document before using the prototype for daily work. Windows/macOS installation is not verified by the Linux smoke test.

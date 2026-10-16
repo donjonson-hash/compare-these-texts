@@ -107,7 +107,7 @@ export async function renderPdf(report) {
   }
   const sections = contents(report);
   const pdf = await PDFDocument.create();
-  pdf.setTitle("Compare These Texts — comparison report"); pdf.setProducer('Kristina offline reconciliation');
+  pdf.setTitle("Compare These Texts — comparison report"); pdf.setProducer('Compare These Texts');
   pdf.registerFontkit(fontkit);
   const bytes = Uint8Array.from(atob(fontBase64), character => character.charCodeAt(0));
   const font = await pdf.embedFont(bytes, {subset: true, features: {liga: false}});

@@ -13,6 +13,7 @@ import path from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {Worker as NodeWorker} from 'node:worker_threads';
 import {setTimeout as delay} from 'node:timers/promises';
+const releaseVersion = JSON.parse(readFileSync(new URL('../release.json', import.meta.url), 'utf8')).version;
 const require = createRequire(new URL('../package.json', import.meta.url));
 const {JSDOM,requestInterceptor,VirtualConsole} = require('jsdom');
 async function until(condition, details = () => '') {
@@ -417,10 +418,10 @@ test('resetting review decisions autosaves even when Keep B left both documents 
  assert.ok(saved.review.items.every(([,decision])=>decision===null));assert.match(root.querySelector('.review-flow-progress').textContent,/Reviewed 0 of 1/);
 });
 
-for (const browser of ['chrome','firefox']) test(`${browser} 0.35.1 archive: Word review, cell repair, Keep B and DOCX download`,async t=>{
+for (const browser of ['chrome','firefox']) test(`${browser} ${releaseVersion} archive: Word review, cell repair, Keep B and DOCX download`,async t=>{
  const directory=mkdtempSync(path.join(tmpdir(),'ctt-release-'));
  t.after(()=>rmSync(directory,{recursive:true,force:true}));
- const archive=fileURLToPath(new URL(`../dist/downloads/ctt-${browser}-0.35.1.zip`,import.meta.url));
+ const archive=fileURLToPath(new URL(`../dist/downloads/ctt-${browser}-${releaseVersion}.zip`,import.meta.url));
  execFileSync('python3',['-m','zipfile','-e',archive,directory]);
  const p=await page(t,directory,false,true);p.$('demo').click();await p.result();
  const root=p.$('visual-review'),q=s=>root.querySelector(s),action=name=>q(`[data-review-action="${name}"]`);

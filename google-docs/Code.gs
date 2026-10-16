@@ -56,7 +56,9 @@ function cttParagraph_(paragraph) {
 }
 
 // A body-position alone is ambiguous when identical paragraphs are inserted/removed.
-// Retain only a digest of the surrounding body, never its text in the client/cache.
+// The body fingerprint retains only a digest. Separately, loadSelection caches
+// the selected text and the full selected paragraph (including formatting).
+// The rest of the body text is not retained in the cache or sent to the sidebar.
 function cttBodyFingerprint_(body) {
   const count = body.getNumChildren();
   if (count > 1000) throw new Error('This document tab is too large for the prototype (maximum 1,000 body elements).');
@@ -94,6 +96,10 @@ function loadSelection() {
   if (index < 0) throw new Error('Select text in the active document tab.');
   const bodyFingerprint = cttBodyFingerprint_(body);
   const token = Utilities.getUuid();
+  // User-scoped Google Apps Script cache, requested lifetime 15 minutes:
+  // original is plaintext selection (<=4,000 UTF-16 units); signature includes
+  // the full plaintext paragraph (<=12,000 units) and its formatting. This is
+  // server-side Google storage, not browser-only/local processing.
   const snapshot = JSON.stringify({docId: doc.getId(), tabId: tab.getId(), index: index, bodyFingerprint: bodyFingerprint,
     start: start, end: end, original: original, signature: before.signature, expires: Date.now() + CTT_TTL * 1000});
   // Cache entries are limited to 100 KB; leave ample room for UTF-8 encoding.

@@ -16,12 +16,13 @@ Published package integrity:
 sha512-ZHjSVpDa3D6izMq8/04lvkhkATUmL9px6ChPaXc1k6nU2Mrhlg1/7F0bdUqCwUjw3NsPTfPZsMDUU6ZIcRaeQw==
 ```
 
-The build verifies both upstream source SHA-256 checksums and the dependency versions:
+The build verifies the dependency versions and the following distinct SHA-256 stages.
+The pre-0.33.4 hash is an intermediate result, not the shipped bundle:
 
 ```text
 build/pdf.mjs         495588717f62303a839e91a5343deebf1b41f52e2f9f6361e73dee6ea6a4355e
 build/pdf.worker.mjs  f2870db902eaff8397442c912b69459980ac91f6f4b5ed827167b12cf7057930
-pdf-reader-vendor.mjs dcd3cd61840406b08cef5c57dcd6552de5ee3be67e80e2c6314ecb427ac512aa
+pre-0.33.4 bundle     dcd3cd61840406b08cef5c57dcd6552de5ee3be67e80e2c6314ecb427ac512aa
 ```
 
 ## Rebuild
@@ -29,9 +30,17 @@ pdf-reader-vendor.mjs dcd3cd61840406b08cef5c57dcd6552de5ee3be67e80e2c6314ecb427a
 From the repository root, with Node.js 24:
 
 ```sh
-npm install --prefix /tmp/kristina-pdf-reader --ignore-scripts --no-audit --no-fund pdfjs-dist@6.3.289 esbuild@0.25.12
-node scripts/build_pdf_reader_vendor.mjs /tmp/kristina-pdf-reader
+npm install --prefix /tmp/ctt-pdf-reader --ignore-scripts --no-audit --no-fund pdfjs-dist@6.3.289 esbuild@0.25.12
+node scripts/build_pdf_reader_vendor.mjs /tmp/ctt-pdf-reader --check
 ```
+
+The `--check` command rebuilds in memory and verifies the committed bundle and license
+without changing them. Omit `--check` to write the verified result into `src/`.
+The restored script originated in the parent repository at commit
+`7c481db` (`scripts/build_pdf_reader_vendor.mjs`); it was omitted when `ctt/`
+was extracted. The standalone version additionally applies and verifies the exact
+0.33.4 post-bundle patch described below. Both intermediate and final hashes must
+match before any asset is written.
 
 The script bundles only `getDocument` and its local worker handler; no maps, fonts,
 WASM, canvas packages, source maps or runtime downloads are included.

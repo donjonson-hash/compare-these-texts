@@ -29,7 +29,7 @@ export async function validateZip(raw) {
   const names = new Set(), ranges = [];
   for (let n = 0; n < count; n++) {
     if (cursor + 46 > end || u32(cursor) !== 0x02014b50) bad();
-    const flags = u16(cursor + 8), method = u16(cursor + 10), compressed = u32(cursor + 20), size = u32(cursor + 24);
+    const flags = u16(cursor + 8), method = u16(cursor + 10), compressed = u32(cursor + 20), size = u32(cursor + 24), checksum = u32(cursor + 16);
     const nameLength = u16(cursor + 28), extra = u16(cursor + 30), comment = u16(cursor + 32), local = u32(cursor + 42);
     if (cursor + 46 + nameLength + extra + comment > end || flags & ~0x080e || ![0, 8].includes(method) || u16(cursor + 34)) bad();
     const name = decoder.decode(raw.subarray(cursor + 46, cursor + 46 + nameLength));
@@ -40,8 +40,15 @@ export async function validateZip(raw) {
     if (local + 30 > start || u32(local) !== 0x04034b50 || u16(local + 6) !== flags || u16(local + 8) !== method || u16(local + 26) !== nameLength) bad();
     const dataStart = local + 30 + nameLength + u16(local + 28), dataEnd = dataStart + compressed;
     if (dataEnd > start || decoder.decode(raw.subarray(local + 30, local + 30 + nameLength)) !== name) bad();
-    if (!(flags & 8) && (u32(local + 18) !== compressed || u32(local + 22) !== size)) bad();
-    ranges.push([local, dataEnd]);
+    if (!(flags & 8) && (u32(local + 14) !== checksum || u32(local + 18) !== compressed || u32(local + 22) !== size)) bad();
+    let rangeEnd = dataEnd;
+    if (flags & 8) {
+      let descriptor = dataEnd;
+      if (descriptor + 4 <= start && u32(descriptor) === 0x08074b50) descriptor += 4;
+      if (descriptor + 12 > start || u32(descriptor) !== checksum || u32(descriptor + 4) !== compressed || u32(descriptor + 8) !== size) bad();
+      rangeEnd = descriptor + 12;
+    }
+    ranges.push([local, rangeEnd]);
     let actual = 0, crc = 0xffffffff;
     if (method === 0) { actual = compressed; crc = crcUpdate(crc, raw.subarray(dataStart, dataEnd)); }
     else {
@@ -55,7 +62,7 @@ export async function validateZip(raw) {
           if (actual > size || total + actual > LIMIT) { await reader.cancel(); bad(); }
           crc = crcUpdate(crc, value);
         }
-      } finally { reader.releaseLock(); }
+      } catch { bad(); } finally { reader.releaseLock(); }
     }
     if (actual !== size || ((crc ^ 0xffffffff) >>> 0) !== u32(cursor + 16)) bad();
     total += actual;

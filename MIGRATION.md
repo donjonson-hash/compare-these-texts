@@ -10,7 +10,7 @@ The extracted tip before migration adjustments is
 `11ed97cac7933af3d133a947e55df02998adcae6`; its tree exactly matches the original
 `ctt/` tree `d27f8d61d4742a2d7f726dd0c8bc9952e302303d`.
 Earlier development before the source import remains referenced in `HISTORY.md`
-and `provenance.json`, with the original repository retaining its full history.
+and `docs/history/import-0.33.6-provenance.json`, with the original repository retaining its full history.
 GitHub issues, pull requests and Actions run records remain in that repository.
 
 ## Release continuity

@@ -129,6 +129,18 @@ def run():
                 assert document.Text.String == original
                 document.close(True)
             print("PASS: Cyrillic, emoji, combining marks, ZWJ, boundary insertions, deletion", flush=True)
+            document = doc("a" * extension.LIMIT)
+            whole = select(document)
+            whole.CharFontName, whole.CharHeight = "Liberation Serif", 14
+            edit = extension.SelectionEdit(document)
+            assert edit.apply("b" * extension.LIMIT)
+            assert document.Text.String == "b" * extension.LIMIT
+            whole = select(document)
+            assert whole.CharFontName == "Liberation Serif" and whole.CharHeight == 14
+            document.getUndoManager().undo()
+            assert document.Text.String == "a" * extension.LIMIT
+            document.close(True)
+            print("PASS: full-limit uniform-style replacement preserves font and Undo", flush=True)
             for original, edited in [("A 😀 stone", "A 😃 stone"), ("A 👩‍💻 stone", "A stone"), ("Cafe\u0301", "Cafe")]:
                 document = doc(original)
                 select(document)

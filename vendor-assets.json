@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "assets": {
+    "src/NOTO-EMOJI-LICENSE.txt": {
+      "bytes": 4330,
+      "sha256": "500bb1ccf43df7bbb522112f9133a52b16e1c35e809632f5d8609b179152de5b"
+    },
+    "src/PDF-LICENSES.txt": {
+      "bytes": 37305,
+      "sha256": "d590910e039dff59c4d82536810470fae1bbaded6eb9794fec8ebffeb728aefb"
+    },
+    "src/PDF-READER-LICENSE.txt": {
+      "bytes": 10174,
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    "src/SHEETJS-LICENSE.txt": {
+      "bytes": 11355,
+      "sha256": "4d2a38ac35cda06a555c84074a819d413339cd3691b822cae50f8f322fe01f64"
+    },
+    "src/XMLDOM-LICENSE.txt": {
+      "bytes": 1298,
+      "sha256": "4da724fc305d81606b245b324d4d2586916b9d248b23d82183df753ace0fdf71"
+    },
+    "src/pdf-font.mjs": {
+      "bytes": 1013063,
+      "sha256": "04258f500ddb395dd8ea591988991a9547661da72aeb5a7d9b1870c01a44a30b",
+      "decoded_font_sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "src/pdf-reader-vendor.mjs": {
+      "bytes": 1640867,
+      "sha256": "599b1521b3c10f542ef254afee75ba2d9cbda0bb8d92ca4c27eef5d7fd977da7"
+    },
+    "src/pdf-vendor.mjs": {
+      "bytes": 1369522,
+      "sha256": "9a5b8b110c5e5d980d07a032616f1bf4bcd1228caf5696943507be4829182828"
+    },
+    "src/sheet-emoji-font.mjs": {
+      "bytes": 1182266,
+      "sha256": "b3943771a22df8a102b40b7e23eb9d0faf4100c39ce8642f8424264a0dd2908e",
+      "decoded_font_sha256": "d7dc093084fc7673a47e678ea0ea19fcd976a0895963eaabfb2feea7893f8939"
+    },
+    "src/word-font-bold.mjs": {
+      "bytes": 945320,
+      "sha256": "3eaef82f0e7f18f72c029b018961533c88f0ff793264918abcaf7a2a4da593a1",
+      "decoded_font_sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895"
+    },
+    "src/xlsx-vendor.mjs": {
+      "bytes": 1008396,
+      "sha256": "af7252a481b500eafd61da653362b96f6bb5c84441c1d651bdc40903d9f8bf96"
+    },
+    "src/xml-vendor.mjs": {
+      "bytes": 93711,
+      "sha256": "11b7d8958a1f9e3758c861c7a40efd2dc55dedea62d427ec9ed1dd8bac27555c"
+    }
+  }
+}
