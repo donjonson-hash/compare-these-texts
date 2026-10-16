@@ -1,0 +1,26 @@
+Con Compare These Texts confronta testi e documenti affiancati, individua le differenze e modifica il risultato. Controlla un documento revisionato, verifica il foglio di calcolo di un fornitore o compila uno spazio destinato alla scrittura in un PDF supportato. Poi scarica o stampa il tuo lavoro.
+
+CONFRONTA, MODIFICA, SALVA
+1. Apri l'estensione e scegli due file da confrontare, oppure usa Edit & export per un singolo file.
+2. Esamina le differenze evidenziate e apporta le modifiche.
+3. Scarica il risultato o stampalo con le opzioni disponibili per quel formato.
+
+COSA PUOI FARE
+- Confrontare il testo di file TXT e Word DOCX, PDF con testo selezionabile e tabelle CSV/TSV o Excel XLSX.
+- Visualizzare due versioni affiancate, passare da una differenza all'altra e modificare il testo nell'area di confronto.
+- Per i fogli di calcolo, scegliere un foglio, abbinare le righe tramite un identificativo e selezionare le colonne da controllare. Modificare i valori delle celle e copiare una riga mancante da A a B.
+- Esaminare le variazioni degli importi monetari e delle percentuali nei confronti di testi, file Word e PDF supportati con Amounts & percentages.
+- Lavorare su un singolo documento in Edit & export. Nei PDF supportati con livello di testo, fare clic sugli spazi da compilare rilevati per inserire i dati, oppure usare Add text per posizionare una voce. La dimensione del testo si adatta allo spazio disponibile; Format offre controlli manuali.
+
+ELABORAZIONE LOCALE
+I documenti vengono elaborati sul tuo dispositivo. L'estensione funziona offline e non carica i documenti su un server per confrontarli o modificarli. Le bozze del sito e dell'estensione vengono salvate separatamente, senza sincronizzazione automatica. Scarica una copia del lavoro completato.
+
+PRIMA DI INIZIARE
+- L'interfaccia dell'editor è attualmente in inglese. Le descrizioni tradotte nello store non cambiano la lingua dell'editor.
+- Ogni file in ingresso può avere una dimensione massima di 2 MiB.
+- I PDF devono contenere un livello di testo: le immagini scansionate prive di testo non sono supportate e non è disponibile il riconoscimento ottico dei caratteri (OCR). Gli spazi previsti per la compilazione a mano sono diversi dai campi interattivi dei moduli PDF. I campi interattivi e i commenti PDF non sono supportati.
+- Le immagini e la formattazione non vengono confrontate. Il mantenimento dell'impaginazione PDF dipende dal documento; le impaginazioni complesse possono richiedere l'esportazione del solo testo. L'impaginazione dei file Word può differire da quella di Microsoft Word.
+- Prima di importare un DOCX, sposta le note a piè di pagina, le note di chiusura e i commenti nei paragrafi principali di una copia del documento.
+- Il confronto di due file di fogli di calcolo richiede una sola riga di intestazione, nessuna cella unita e valori al posto delle formule.
+
+Inizia dall'esempio di documento o di CSV / Excel integrato per provare il flusso di lavoro prima di aprire i tuoi file.

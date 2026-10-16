@@ -1,0 +1,26 @@
+Mit Compare These Texts kannst du Texte vergleichen, Unterschiede erkennen und Dokumente direkt nebeneinander bearbeiten. Prüfe eine überarbeitete Fassung oder die Tabelle eines Lieferanten, oder fülle eine gedruckte Leerzeile in einer unterstützten PDF-Datei aus. Anschließend kannst du das Ergebnis herunterladen oder drucken.
+
+VERGLEICHEN, BEARBEITEN, SPEICHERN
+1. Öffne die Erweiterung und wähle zwei Dateien zum Vergleichen oder nutze Edit & export für eine einzelne Datei.
+2. Prüfe die markierten Unterschiede und nimm deine Änderungen vor.
+3. Lade das Ergebnis herunter oder drucke es mit den für das jeweilige Format verfügbaren Optionen.
+
+FUNKTIONEN
+- Vergleiche Texte in TXT- und Word-DOCX-Dateien, PDFs mit auswählbarem Text sowie Tabellen in CSV, TSV oder Excel XLSX.
+- Sieh dir zwei Versionen nebeneinander an, springe zwischen Unterschieden und bearbeite den Text direkt im Vergleichsbereich.
+- Wähle bei Tabellen ein Tabellenblatt, ordne Zeilen anhand einer Kennung zu und lege fest, welche Spalten geprüft werden. Bearbeite Zellwerte und kopiere eine fehlende Zeile von A nach B.
+- Prüfe geänderte Geldbeträge und Prozentangaben beim Vergleich von Texten, Word-Dateien und unterstützten PDFs mit Amounts & percentages.
+- Bearbeite mit Edit & export ein einzelnes Dokument. Klicke in unterstützten PDFs mit Textebene auf erkannte gedruckte Leerstellen, um Angaben einzutragen, oder platziere einen Eintrag mit Add text. Die Schriftgröße passt sich dem verfügbaren Platz an; unter Format findest du manuelle Einstellungen.
+
+LOKALE VERARBEITUNG
+Die Dokumente werden auf deinem Gerät verarbeitet. Die Erweiterung funktioniert offline und lädt deine Dokumente zum Vergleichen oder Bearbeiten nicht auf einen Server hoch. Entwürfe auf der Website und in der Erweiterung werden getrennt gespeichert und nicht automatisch synchronisiert. Lade eine Kopie deiner fertigen Arbeit herunter.
+
+BEVOR DU BEGINNST
+- Die Benutzeroberfläche des Editors ist derzeit auf Englisch. Übersetzte Beschreibungen im Store ändern die Sprache des Editors nicht.
+- Eingabedateien dürfen jeweils bis zu 2 MiB groß sein.
+- PDFs benötigen eine Textebene: Gescannte Bilder ohne Text werden nicht unterstützt, eine Texterkennung (OCR) ist nicht enthalten. Gedruckte Leerstellen sind keine interaktiven PDF-Formularfelder. Interaktive Felder und PDF-Kommentare werden nicht unterstützt.
+- Bilder und Formatierungen werden nicht verglichen. Ob das PDF-Layout erhalten bleibt, hängt vom Dokument ab. Bei komplexen Layouts kann ein reiner Textexport nötig sein. Das Layout von Word-Dateien kann von der Darstellung in Microsoft Word abweichen.
+- Fußnoten, Endnoten und Kommentare in DOCX-Dateien müssen vor dem Import in einer Kopie in die normalen Textabsätze verschoben werden.
+- Für den Vergleich zweier Tabellendateien brauchst du eine einzelne Kopfzeile, keine verbundenen Zellen und Werte statt Formeln.
+
+Probiere den Ablauf zunächst mit dem integrierten Dokument- oder CSV-/Excel-Beispiel aus, bevor du eigene Dateien öffnest.

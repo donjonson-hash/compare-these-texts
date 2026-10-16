@@ -1,0 +1,26 @@
+Compare These Texts te permite comparar textos y documentos en paralelo, encontrar diferencias y editar el resultado. Revisa un documento modificado, comprueba la hoja de cálculo de un proveedor o rellena un espacio destinado a la escritura en un PDF compatible. Después, descarga o imprime tu trabajo.
+
+COMPARA, EDITA Y GUARDA
+1. Abre la extensión y elige dos archivos para compararlos, o utiliza Edit & export para trabajar con un solo archivo.
+2. Revisa las diferencias resaltadas y realiza tus cambios.
+3. Descarga el resultado o imprímelo con las opciones disponibles para ese formato.
+
+QUÉ PUEDES HACER
+- Comparar texto de archivos TXT y Word DOCX, PDF con texto seleccionable y tablas CSV/TSV o Excel XLSX.
+- Ver dos versiones en paralelo, desplazarte entre las diferencias y editar el texto en el espacio de comparación.
+- En hojas de cálculo, elegir una hoja, emparejar filas mediante un identificador y seleccionar las columnas que quieres comprobar. Editar valores de celdas y copiar una fila que falta de A a B.
+- Revisar cambios en importes monetarios y porcentajes al comparar textos, archivos Word y PDF compatibles con Amounts & percentages.
+- Trabajar con un solo documento en Edit & export. En los PDF compatibles con capa de texto, hacer clic en los espacios para rellenar que se hayan detectado para introducir datos, o utilizar Add text para colocar una entrada. El tamaño del texto se adapta al espacio disponible; Format ofrece controles manuales.
+
+PROCESAMIENTO LOCAL
+Los documentos se procesan en tu dispositivo. La extensión funciona sin conexión y no sube tus documentos a un servidor para compararlos o editarlos. Los borradores del sitio web y de la extensión se guardan por separado, sin sincronización automática. Descarga una copia de tu trabajo terminado.
+
+ANTES DE EMPEZAR
+- La interfaz del editor está actualmente en inglés. Las descripciones traducidas de la tienda no cambian el idioma del editor.
+- Cada archivo de entrada puede tener un tamaño máximo de 2 MiB.
+- Los PDF necesitan una capa de texto: las imágenes escaneadas sin texto no son compatibles y no hay reconocimiento óptico de caracteres (OCR). Los espacios previstos para escribir a mano no son campos interactivos de formulario PDF. No se admiten campos interactivos ni comentarios PDF.
+- No se comparan imágenes ni formatos. La conservación de la maquetación del PDF depende del documento; las maquetaciones complejas pueden requerir una exportación de solo texto. La presentación de los archivos Word puede diferir de la de Microsoft Word.
+- Antes de importar un DOCX, mueve las notas al pie, las notas al final y los comentarios a los párrafos principales de una copia del documento.
+- Para comparar dos archivos de hoja de cálculo, se necesita una única fila de encabezado, sin celdas combinadas y con valores en lugar de fórmulas.
+
+Empieza con el ejemplo de documento o de CSV / Excel incluido para probar el proceso antes de abrir tus propios archivos.

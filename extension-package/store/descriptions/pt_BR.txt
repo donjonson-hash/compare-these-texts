@@ -1,0 +1,26 @@
+Compare These Texts permite comparar textos e documentos lado a lado, encontrar diferenças e editar o resultado. Confira um documento revisado, analise a planilha de um fornecedor ou preencha um espaço destinado à escrita em um PDF compatível. Depois, baixe ou imprima seu trabalho.
+
+COMPARE, EDITE E SALVE
+1. Abra a extensão e escolha dois arquivos para comparar, ou use Edit & export para trabalhar com um único arquivo.
+2. Confira as diferenças destacadas e faça suas alterações.
+3. Baixe o resultado ou imprima com as opções disponíveis para esse formato.
+
+O QUE VOCÊ PODE FAZER
+- Comparar textos de arquivos TXT e Word DOCX, PDFs com texto selecionável e tabelas CSV/TSV ou Excel XLSX.
+- Ver duas versões lado a lado, navegar entre as diferenças e editar o texto na área de comparação.
+- Para planilhas, escolher uma aba, associar linhas por um identificador e selecionar as colunas que deseja conferir. Editar valores das células e copiar uma linha ausente de A para B.
+- Conferir alterações em valores monetários e porcentagens nas comparações de textos, arquivos Word e PDFs compatíveis com Amounts & percentages.
+- Trabalhar com um único documento em Edit & export. Nos PDFs compatíveis com camada de texto, clicar nos espaços para preenchimento detectados para inserir informações, ou usar Add text para posicionar uma entrada. O tamanho do texto se ajusta ao espaço disponível; Format oferece controles manuais.
+
+PROCESSAMENTO LOCAL
+Os documentos são processados no seu dispositivo. A extensão funciona offline e não envia seus documentos a um servidor para comparar ou editar. Os rascunhos do site e da extensão são salvos separadamente, sem sincronização automática. Baixe uma cópia do trabalho concluído.
+
+ANTES DE COMEÇAR
+- A interface do editor está atualmente em inglês. As descrições traduzidas na loja não alteram o idioma do editor.
+- Cada arquivo de entrada pode ter até 2 MiB.
+- Os PDFs precisam de uma camada de texto: imagens digitalizadas sem texto não são compatíveis e não há reconhecimento óptico de caracteres (OCR). Espaços destinados ao preenchimento à mão são diferentes dos campos interativos de formulários PDF. Campos interativos e comentários em PDF não são compatíveis.
+- Imagens e formatação não são comparadas. A preservação do layout do PDF depende do documento; layouts complexos podem exigir uma exportação somente de texto. O layout de arquivos Word pode ser diferente do exibido no Microsoft Word.
+- Antes de importar um DOCX, mova as notas de rodapé, notas de fim e comentários para os parágrafos principais de uma cópia do documento.
+- A comparação de dois arquivos de planilha exige uma única linha de cabeçalho, nenhuma célula mesclada e valores no lugar de fórmulas.
+
+Comece pelo exemplo de documento ou de CSV / Excel incluído para experimentar o fluxo de trabalho antes de abrir seus próprios arquivos.

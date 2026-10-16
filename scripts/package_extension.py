@@ -1,15 +1,21 @@
 """Package the site's English offline engine for Chrome and Firefox."""
 from pathlib import Path
 import json,zipfile,re
+from store_metadata import message_files
 root=Path(__file__).resolve().parents[1];dist=root/'dist';sources=root/'extension-package'
 release=json.loads((root/'release.json').read_text())
 version=release['version']
+localized_files=message_files()
 for target in ['chrome','firefox']:
  manifest=json.loads((sources/(target+'-manifest.json')).read_text())
  manifest.update({key:release[key] for key in ('name','version','description','homepage_url')})
  manifest['action']['default_title']='CTT — Compare & Edit'
+ if target=='chrome':
+  manifest.update(name='__MSG_extensionName__',description='__MSG_extensionDescription__',default_locale='en')
+  manifest['action']['default_title']='__MSG_actionTitle__'
  # Preserve the Firefox ID and permission-free offline CSP.
  files={p.name:p.read_bytes() for p in dist.iterdir() if p.is_file() and p.name not in ('robots.txt','_headers')}
+ if target=='chrome':files.update(localized_files)
  html=files['index.html'].decode().replace('href="/"','href="index.html"').replace('href="/site.css"','href="site.css"').replace('href="/favicon.svg"','href="favicon.svg"')
  html=html.replace('href="/extension/"','href="https://comparethesetexts.com/extension/"').replace('href="/privacy/"','href="privacy.html"').replace('href="/support/"','href="support.html"').replace('href="/terms/"','href="terms.html"')
  html=html.replace('>Extension</a>','>Website</a>').replace('href="https://comparethesetexts.com/extension/">Website','href="https://comparethesetexts.com/">Website')

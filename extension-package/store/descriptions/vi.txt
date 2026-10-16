@@ -1,0 +1,26 @@
+Compare These Texts giúp bạn so sánh văn bản và tài liệu cạnh nhau, tìm điểm khác biệt và chỉnh sửa kết quả. Kiểm tra tài liệu đã chỉnh sửa, xem lại bảng tính của nhà cung cấp hoặc điền vào chỗ trống in sẵn trong PDF được hỗ trợ — sau đó tải xuống hoặc in thành quả của bạn.
+
+SO SÁNH, CHỈNH SỬA, LƯU
+1. Mở tiện ích và chọn hai tệp để so sánh, hoặc dùng Edit & export cho một tệp.
+2. Xem các điểm khác biệt được tô nổi bật và thực hiện chỉnh sửa.
+3. Tải xuống hoặc in kết quả bằng các tùy chọn dành cho định dạng đó.
+
+BẠN CÓ THỂ LÀM GÌ?
+- So sánh văn bản TXT và Word DOCX, PDF có văn bản chọn được, cùng bảng CSV/TSV hoặc Excel XLSX.
+- Xem hai phiên bản cạnh nhau, chuyển qua các điểm khác biệt và chỉnh sửa văn bản ngay trong không gian so sánh.
+- Với bảng tính, chọn trang tính, ghép các hàng theo mã định danh và chọn những cột cần kiểm tra. Chỉnh sửa giá trị ô và sao chép hàng còn thiếu từ A sang B.
+- Xem những thay đổi về số tiền và tỷ lệ phần trăm khi so sánh văn bản, Word và PDF được hỗ trợ bằng Amounts & percentages.
+- Làm việc với một tài liệu trong Edit & export. Với PDF dạng văn bản được hỗ trợ, nhấp vào chỗ trống in sẵn đã được nhận diện để điền thông tin, hoặc dùng Add text để đặt nội dung vào vị trí mong muốn. Cỡ chữ tự điều chỉnh theo khoảng trống có sẵn; Format cung cấp các tùy chọn điều chỉnh thủ công.
+
+XỬ LÝ TRÊN THIẾT BỊ
+Tài liệu được xử lý trên thiết bị của bạn. Tiện ích hoạt động ngoại tuyến và không tải tài liệu lên máy chủ để so sánh hoặc chỉnh sửa. Bản nháp trên trang web và trong tiện ích được lưu riêng, không tự động đồng bộ. Hãy tải xuống một bản sao khi hoàn thành công việc.
+
+TRƯỚC KHI BẮT ĐẦU
+- Giao diện trình chỉnh sửa hiện bằng tiếng Anh. Bản dịch mô tả trên cửa hàng không thay đổi ngôn ngữ của trình chỉnh sửa.
+- Mỗi tệp đầu vào có thể có dung lượng tối đa 2 MiB.
+- PDF cần có lớp văn bản: không hỗ trợ ảnh quét không có văn bản và không có OCR. Chỗ trống in sẵn khác với trường biểu mẫu PDF tương tác; không hỗ trợ trường tương tác và chú thích trong PDF.
+- Không so sánh hình ảnh và định dạng. Khả năng giữ nguyên bố cục PDF phụ thuộc vào tài liệu; bố cục phức tạp có thể cần xuất dưới dạng chỉ có văn bản. Bố cục Word có thể khác với khi xem trong Microsoft Word.
+- Trước khi nhập DOCX, cần chuyển chú thích cuối trang, chú thích cuối tài liệu và bình luận vào các đoạn văn chính trong một bản sao của tài liệu.
+- So sánh bảng tính từ hai tệp yêu cầu một hàng tiêu đề duy nhất, không có ô gộp và dùng giá trị thay cho công thức.
+
+Bắt đầu với ví dụ tài liệu hoặc CSV / Excel có sẵn để thử quy trình trước khi mở tệp của bạn.

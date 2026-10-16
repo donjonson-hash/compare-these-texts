@@ -1,0 +1,26 @@
+Compare These Texts permite comparar textos e documentos lado a lado, encontrar diferenças e editar o resultado. Verifique um documento revisto, analise a folha de cálculo de um fornecedor ou preencha um espaço destinado à escrita num PDF compatível. Depois, descarregue ou imprima o seu trabalho.
+
+COMPARE, EDITE E GUARDE
+1. Abra a extensão e escolha dois ficheiros para comparar, ou utilize Edit & export para trabalhar com um único ficheiro.
+2. Verifique as diferenças realçadas e faça as suas alterações.
+3. Descarregue o resultado ou imprima-o com as opções disponíveis para esse formato.
+
+O QUE PODE FAZER
+- Comparar textos de ficheiros TXT e Word DOCX, PDFs com texto selecionável e tabelas CSV/TSV ou Excel XLSX.
+- Ver duas versões lado a lado, navegar entre as diferenças e editar o texto na área de comparação.
+- Para folhas de cálculo, escolher uma folha, associar linhas através de um identificador e selecionar as colunas a verificar. Editar valores das células e copiar uma linha em falta de A para B.
+- Verificar alterações em valores monetários e percentagens nas comparações de textos, ficheiros Word e PDFs compatíveis com Amounts & percentages.
+- Trabalhar com um único documento em Edit & export. Nos PDFs compatíveis com camada de texto, clicar nos espaços para preenchimento detetados para introduzir informações, ou utilizar Add text para posicionar uma entrada. O tamanho do texto ajusta-se ao espaço disponível; Format oferece controlos manuais.
+
+PROCESSAMENTO LOCAL
+Os documentos são processados no seu dispositivo. A extensão funciona offline e não envia os seus documentos para um servidor para os comparar ou editar. Os rascunhos do site e da extensão são guardados separadamente, sem sincronização automática. Descarregue uma cópia do trabalho concluído.
+
+ANTES DE COMEÇAR
+- A interface do editor está atualmente em inglês. As descrições traduzidas na loja não alteram o idioma do editor.
+- Cada ficheiro de entrada pode ter até 2 MiB.
+- Os PDFs precisam de uma camada de texto: imagens digitalizadas sem texto não são compatíveis e não existe reconhecimento ótico de carateres (OCR). Espaços destinados ao preenchimento à mão são diferentes dos campos interativos de formulários PDF. Campos interativos e comentários em PDF não são compatíveis.
+- As imagens e a formatação não são comparadas. A preservação da disposição do PDF depende do documento; disposições complexas podem exigir uma exportação apenas de texto. A disposição de ficheiros Word pode ser diferente da apresentada no Microsoft Word.
+- Antes de importar um DOCX, mova as notas de rodapé, notas de fim e comentários para os parágrafos principais de uma cópia do documento.
+- A comparação de dois ficheiros de folha de cálculo exige uma única linha de cabeçalho, nenhuma célula unida e valores em vez de fórmulas.
+
+Comece pelo exemplo de documento ou de CSV / Excel incluído para experimentar o processo antes de abrir os seus próprios ficheiros.
