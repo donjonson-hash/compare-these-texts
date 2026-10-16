@@ -129,9 +129,25 @@ def run():
                 assert document.Text.String == original
                 document.close(True)
             print("PASS: Cyrillic, emoji, combining marks, ZWJ, boundary insertions, deletion", flush=True)
-            document = doc("a" * extension.LIMIT)
+            # Keep this maximum-length performance fixture on one page: a
+            # smaller page can introduce a SoftPageBreak text portion, which
+            # the prototype deliberately rejects before checking style runs.
+            document = doc("")
+            cursor = document.Text.createTextCursor()
+            page = document.getStyleFamilies().getByName("PageStyles").getByName(cursor.PageStyleName)
+            page.Width, page.Height = 30000, 50000
+            document.Text.String = "a" * extension.LIMIT
             whole = select(document)
             whole.CharFontName, whole.CharHeight = "Liberation Serif", 14
+            portions = document.Text.createEnumeration().nextElement().createEnumeration()
+            unexpected_types = []
+            while portions.hasMoreElements():
+                part = portions.nextElement()
+                if part.TextPortionType != "Text":
+                    unexpected_types.append(str(part.TextPortionType))
+                if part.getPropertyValue("HyperLinkURL"):
+                    unexpected_types.append("Hyperlink")
+            assert not unexpected_types, ("Unexpected full-limit fixture portions", unexpected_types)
             edit = extension.SelectionEdit(document)
             assert edit.apply("b" * extension.LIMIT)
             assert document.Text.String == "b" * extension.LIMIT
