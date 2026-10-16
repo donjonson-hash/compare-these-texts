@@ -1,6 +1,6 @@
 # Compare These Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.35.0**.
+Current CTT website and offline Chrome/Firefox extension source: **0.35.1**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparethesetexts.com/.
@@ -59,8 +59,8 @@ npm run check
 Outputs:
 
 - `dist/`: static website, including extension downloads.
-- `dist/downloads/ctt-chrome-0.35.0.zip`: load the extracted directory in Chrome.
-- `dist/downloads/ctt-firefox-0.35.0.zip`: temporary Firefox installation.
+- `dist/downloads/ctt-chrome-0.35.1.zip`: load the extracted directory in Chrome.
+- `dist/downloads/ctt-firefox-0.35.1.zip`: temporary Firefox installation.
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 
