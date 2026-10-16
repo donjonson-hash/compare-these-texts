@@ -1,0 +1,26 @@
+Compare These Texts membantu Anda membandingkan teks dan dokumen berdampingan, menemukan perbedaan, dan mengedit hasilnya. Periksa revisi dokumen, tinjau spreadsheet dari pemasok, atau isi bagian kosong tercetak pada PDF yang didukung — lalu unduh atau cetak pekerjaan Anda.
+
+BANDINGKAN, EDIT, SIMPAN
+1. Buka ekstensi dan pilih dua file untuk dibandingkan, atau gunakan Edit & export untuk satu file.
+2. Tinjau perbedaan yang disorot dan lakukan perubahan.
+3. Unduh hasilnya atau cetak dengan opsi yang tersedia untuk format tersebut.
+
+YANG DAPAT ANDA LAKUKAN
+- Membandingkan teks TXT dan Word DOCX, PDF dengan teks yang dapat dipilih, serta tabel CSV/TSV atau Excel XLSX.
+- Melihat dua versi berdampingan, berpindah antarperbedaan, dan mengedit teks di ruang kerja perbandingan.
+- Untuk spreadsheet, pilih lembar, cocokkan baris berdasarkan pengenal, dan pilih kolom yang ingin diperiksa. Edit nilai sel dan salin baris yang belum ada dari A ke B.
+- Meninjau perubahan jumlah uang dan persentase dalam perbandingan teks, Word, dan PDF yang didukung melalui Amounts & percentages.
+- Mengerjakan satu dokumen di Edit & export. Pada PDF berbasis teks yang didukung, klik bagian kosong tercetak yang terdeteksi untuk memasukkan informasi, atau gunakan Add text untuk menempatkan isian. Ukuran teks menyesuaikan ruang yang tersedia; Format menyediakan kontrol manual.
+
+PEMROSESAN LOKAL
+Dokumen diproses di perangkat Anda. Ekstensi bekerja secara offline dan tidak mengunggah dokumen Anda ke server untuk dibandingkan atau diedit. Draf di situs web dan ekstensi disimpan secara terpisah, tanpa sinkronisasi otomatis. Unduh salinan pekerjaan Anda setelah selesai.
+
+SEBELUM MEMULAI
+- Antarmuka editor saat ini menggunakan bahasa Inggris. Terjemahan deskripsi toko tidak mengubah bahasa editor.
+- Ukuran setiap file masukan maksimal 2 MiB.
+- PDF harus memiliki lapisan teks: gambar hasil pemindaian tanpa teks tidak didukung dan OCR tidak tersedia. Bagian kosong tercetak berbeda dari kolom formulir PDF interaktif; kolom interaktif dan komentar PDF tidak didukung.
+- Gambar dan pemformatan tidak dibandingkan. Kemampuan mempertahankan tata letak PDF bergantung pada dokumennya; tata letak yang rumit mungkin memerlukan ekspor teks saja. Tata letak Word mungkin berbeda dari tampilan di Microsoft Word.
+- Sebelum impor, pindahkan catatan kaki, catatan akhir, dan komentar DOCX ke paragraf utama dalam salinan dokumen.
+- Perbandingan spreadsheet dari dua file memerlukan satu baris header, tanpa sel gabungan, dan nilai sebagai pengganti rumus.
+
+Mulailah dengan contoh dokumen atau CSV / Excel bawaan untuk mencoba alur kerja sebelum membuka file Anda sendiri.

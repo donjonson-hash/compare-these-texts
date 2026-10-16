@@ -1,0 +1,26 @@
+Compare These Texts auttaa vertaamaan tekstejä ja asiakirjoja rinnakkain, löytämään erot ja muokkaamaan lopputulosta. Tarkista asiakirjan päivitetty versio, käy läpi toimittajan laskentataulukko tai täytä tuetussa PDF-tiedostossa oleva painettu tyhjä kohta. Lataa tai tulosta sitten työsi.
+
+VERTAA, MUOKKAA, TALLENNA
+1. Avaa laajennus ja valitse kaksi vertailtavaa tiedostoa tai käsittele yhtä tiedostoa Edit & export -tilassa.
+2. Tarkista korostetut erot ja tee muutokset.
+3. Lataa lopputulos tai tulosta se tiedostomuodolle käytettävissä olevilla vaihtoehdoilla.
+
+MITÄ VOIT TEHDÄ
+- Vertaa TXT- ja Word DOCX -tekstejä, valittavaa tekstiä sisältäviä PDF-tiedostoja sekä CSV/TSV- tai Excel XLSX -taulukoita.
+- Tarkastele kahta versiota rinnakkain, siirry erosta toiseen ja muokkaa tekstiä vertailunäkymässä.
+- Valitse laskentataulukoista välilehti, kohdista rivit tunnisteen avulla ja valitse tarkistettavat sarakkeet. Muokkaa solujen arvoja ja kopioi puuttuva rivi A:sta B:hen.
+- Tarkista muuttuneet rahamäärät ja prosentit teksti-, Word- ja tuettujen PDF-tiedostojen vertailuissa Amounts & percentages -toiminnolla.
+- Käsittele yhtä asiakirjaa Edit & export -tilassa. Tuetuissa tekstipohjaisissa PDF-tiedostoissa voit napsauttaa tunnistettuja painettuja tyhjiä kohtia ja täyttää ne tai sijoittaa tekstiä Add text -toiminnolla. Tekstin koko mukautuu käytettävissä olevaan tilaan. Format tarjoaa manuaaliset säätömahdollisuudet.
+
+PAIKALLINEN KÄSITTELY
+Asiakirjat käsitellään omalla laitteellasi. Laajennus toimii ilman verkkoyhteyttä eikä lähetä asiakirjojasi palvelimelle vertailua tai muokkausta varten. Verkkosivuston ja laajennuksen luonnokset tallennetaan erikseen, eikä niitä synkronoida automaattisesti. Lataa kopio valmiista työstäsi.
+
+ENNEN KUIN ALOITAT
+- Muokkaustyökalun käyttöliittymä on toistaiseksi englanniksi. Käännetyt kauppakuvaukset eivät muuta työkalun kieltä.
+- Kukin avattava tiedosto saa olla enintään 2 MiB.
+- PDF-tiedostoissa on oltava tekstikerros: skannattuja kuvia ilman tekstiä ei tueta, eikä OCR-tekstintunnistusta ole. Painetut tyhjät kohdat ovat eri asia kuin interaktiiviset PDF-lomakekentät. Interaktiivisia kenttiä ja PDF-kommentteja ei tueta.
+- Kuvia ja muotoiluja ei verrata. PDF-asettelun säilyminen riippuu asiakirjasta; monimutkainen asettelu voi vaatia viennin pelkkänä tekstinä. Word-asettelu voi poiketa Microsoft Wordin asettelusta.
+- DOCX-tiedoston alaviitteet, loppuviitteet ja kommentit on siirrettävä asiakirjan kopiossa leipätekstin kappaleisiin ennen tuontia.
+- Kahden laskentataulukkotiedoston vertailu edellyttää yhtä otsikkoriviä, erillisiä soluja ilman yhdistämisiä ja arvoja kaavojen sijaan.
+
+Aloita sisäänrakennetusta asiakirja- tai CSV-/Excel-esimerkistä ja kokeile työnkulkua ennen omien tiedostojesi avaamista.

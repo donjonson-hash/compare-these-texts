@@ -1,0 +1,26 @@
+Compare These Texts hjälper dig att jämföra texter och dokument sida vid sida, hitta skillnader och redigera resultatet. Granska en uppdaterad version av ett dokument, kontrollera en leverantörs kalkylblad eller fyll i en tryckt tomrad i en PDF som stöds. Ladda sedan ned eller skriv ut ditt arbete.
+
+JÄMFÖR, REDIGERA, SPARA
+1. Öppna tillägget och välj två filer att jämföra, eller använd Edit & export för en fil.
+2. Granska de markerade skillnaderna och gör dina ändringar.
+3. Ladda ned resultatet eller skriv ut det med de alternativ som finns för formatet.
+
+DET HÄR KAN DU GÖRA
+- Jämför text i TXT och Word DOCX, PDF-filer med markerbar text samt tabeller i CSV/TSV eller Excel XLSX.
+- Se två versioner bredvid varandra, gå mellan skillnaderna och redigera text i jämförelsevyn.
+- För kalkylblad kan du välja blad, matcha rader med hjälp av en identifierare och välja vilka kolumner som ska kontrolleras. Redigera cellvärden och kopiera en saknad rad från A till B.
+- Granska ändrade valutabelopp och procentsatser i jämförelser av text, Word och PDF-filer som stöds med Amounts & percentages.
+- Arbeta med ett enskilt dokument i Edit & export. I textbaserade PDF-filer som stöds kan du klicka på identifierade tryckta tomrader för att fylla i uppgifter, eller använda Add text för att placera text. Textstorleken anpassas till det tillgängliga utrymmet; i Format kan du justera den manuellt.
+
+LOKAL BEARBETNING
+Dokumenten bearbetas på din enhet. Tillägget fungerar offline och laddar inte upp dina dokument till en server för jämförelse eller redigering. Utkast på webbplatsen och i tillägget lagras separat, utan automatisk synkronisering. Ladda ned en kopia av ditt färdiga arbete.
+
+INNAN DU BÖRJAR
+- Redigerarens gränssnitt är för närvarande på engelska. Översatta beskrivningar i butiken ändrar inte redigerarens språk.
+- Varje indatafil får vara högst 2 MiB.
+- PDF-filer måste ha ett textlager: skannade bilder utan text stöds inte, och OCR saknas. Tryckta tomrader är inte samma sak som interaktiva PDF-formulärfält; interaktiva fält och PDF-kommentarer stöds inte.
+- Bilder och formatering jämförs inte. Om PDF-layouten kan bevaras beror på dokumentet; komplexa layouter kan kräva export som enbart text. Word-layouten kan skilja sig från Microsoft Word.
+- Fotnoter, slutnoter och kommentarer i DOCX måste flyttas till huvudtextens stycken i en kopia före import.
+- För att jämföra två kalkylbladsfiler krävs en enda rubrikrad, inga sammanfogade celler och värden i stället för formler.
+
+Börja med det inbyggda dokumentexemplet eller CSV-/Excel-exemplet för att prova arbetsflödet innan du öppnar dina egna filer.

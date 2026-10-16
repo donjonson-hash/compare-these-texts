@@ -116,5 +116,6 @@ languages (21 regional variants), with English fallback. The editor UI remains
 English; each translated summary states this explicitly. See
 [the complete copy and publishing notes](docs/CWS-LOCALIZATIONS.md).
 Canonical copy lives in `extension-package/store/localizations.json`; the build
-validates it and generates `_locales` only in the Chrome ZIP. Full listing
-descriptions and screenshots still require separate work in the store dashboard.
+validates it and generates `_locales` only in the Chrome ZIP. Ready-to-paste [full descriptions](extension-package/store/descriptions/README.md)
+cover the same locales. Paste each text into its store dashboard locale; these
+files are not bundled into the extension. Localized screenshots remain separate.

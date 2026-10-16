@@ -1,0 +1,26 @@
+Compare These Texts ile metin karşılaştırma ve belge düzenleme işlemlerini yan yana görünümde yapın. Farkları bulun, düzenlenmiş bir belgeyi kontrol edin, tedarikçinizin elektronik tablosunu inceleyin veya desteklenen bir PDF'deki basılı boşluğu doldurun. Ardından çalışmanızı indirin ya da yazdırın.
+
+KARŞILAŞTIRIN, DÜZENLEYİN, KAYDEDİN
+1. Uzantıyı açıp karşılaştırmak için iki dosya seçin veya tek bir dosya için Edit & export seçeneğini kullanın.
+2. Vurgulanan farkları inceleyip değişikliklerinizi yapın.
+3. İlgili biçim için sunulan seçeneklerle sonucu indirin veya yazdırın.
+
+NELER YAPABİLİRSİNİZ?
+- TXT ve Word DOCX metinlerini, seçilebilir metin içeren PDF'leri, CSV/TSV veya Excel XLSX tablolarını karşılaştırın.
+- İki sürümü yan yana görüntüleyin, farklar arasında gezinin ve karşılaştırma alanında metni düzenleyin.
+- Elektronik tablolar için çalışma sayfasını seçin, satırları bir tanımlayıcıya göre eşleştirin ve kontrol edilecek sütunları belirleyin. Hücre değerlerini düzenleyin ve eksik bir satırı A'dan B'ye kopyalayın.
+- Metin, Word ve desteklenen PDF karşılaştırmalarında değişen para tutarlarını ve yüzdeleri Amounts & percentages ile inceleyin.
+- Edit & export ile tek bir belge üzerinde çalışın. Desteklenen metin tabanlı PDF'lerde algılanan basılı boşluklara tıklayarak bilgi girin veya Add text ile istediğiniz yere metin yerleştirin. Metin boyutu kullanılabilir alana göre ayarlanır; Format ile elle ayarlama yapabilirsiniz.
+
+CİHAZINIZDA İŞLEME
+Belgeler cihazınızda işlenir. Uzantı çevrimdışı çalışır ve karşılaştırma ya da düzenleme için belgelerinizi bir sunucuya yüklemez. Web sitesindeki ve uzantıdaki taslaklar ayrı saklanır; otomatik olarak eşitlenmez. Tamamladığınız çalışmanın bir kopyasını indirin.
+
+BAŞLAMADAN ÖNCE
+- Düzenleyicinin arayüzü şu anda İngilizcedir. Çevrilmiş mağaza açıklamaları düzenleyicinin dilini değiştirmez.
+- Her giriş dosyası en fazla 2 MiB olabilir.
+- PDF'lerde metin katmanı bulunmalıdır: metin içermeyen taranmış görüntüler desteklenmez ve OCR yoktur. Basılı boşluklar, etkileşimli PDF form alanlarından farklıdır; etkileşimli alanlar ve PDF yorumları desteklenmez.
+- Görüntüler ve biçimlendirme karşılaştırılmaz. PDF düzeninin korunması belgeye bağlıdır; karmaşık düzenlerde yalnızca metin olarak dışa aktarma gerekebilir. Word düzeni, Microsoft Word'deki görünümden farklı olabilir.
+- DOCX dipnotlarını, sonnotlarını ve yorumlarını içe aktarmadan önce belgenin bir kopyasında ana metindeki paragraflara taşıyın.
+- İki elektronik tablo dosyasını karşılaştırmak için tek bir başlık satırı, birleştirilmemiş hücreler ve formüller yerine değerler gerekir.
+
+Kendi dosyalarınızı açmadan önce iş akışını denemek için yerleşik belge veya CSV / Excel örneğiyle başlayın.
