@@ -6,6 +6,8 @@ This is a document-bound Apps Script prototype, not a published Google Workspace
 
 ## Install for a first test
 
+This proprietary prototype is free for personal and internal work use. Installation by copying the unmodified files into Apps Script and making the necessary project settings is permitted. Distribution, sale, and code modifications require permission except as allowed by applicable law or third-party licenses. See the full [license](../LICENSE), included as `LICENSE.txt` in the ZIP archive.
+
 1. Extract `compare-these-texts-google-docs-0.1.0.zip`.
 2. Open an editable test copy of a native Google Doc in a desktop browser. Convert a DOCX copy to Google Docs format first if needed.
 3. Choose **Extensions → Apps Script**. Replace the default `Code.gs` with the packaged file.

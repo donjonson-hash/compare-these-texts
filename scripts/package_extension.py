@@ -11,15 +11,17 @@ for target in ['chrome','firefox']:
  # Preserve the Firefox ID and permission-free offline CSP.
  files={p.name:p.read_bytes() for p in dist.iterdir() if p.is_file() and p.name not in ('robots.txt','_headers')}
  html=files['index.html'].decode().replace('href="/"','href="index.html"').replace('href="/site.css"','href="site.css"').replace('href="/favicon.svg"','href="favicon.svg"')
- html=html.replace('href="/extension/"','href="https://comparethesetexts.com/extension/"').replace('href="/privacy/"','href="privacy.html"').replace('href="/support/"','href="support.html"')
+ html=html.replace('href="/extension/"','href="https://comparethesetexts.com/extension/"').replace('href="/privacy/"','href="privacy.html"').replace('href="/support/"','href="support.html"').replace('href="/terms/"','href="terms.html"')
  html=html.replace('>Extension</a>','>Website</a>').replace('href="https://comparethesetexts.com/extension/">Website','href="https://comparethesetexts.com/">Website')
  html=re.sub(r'<a href="(https://[^"]+)"',r'<a href="\1" target="_blank" rel="noopener noreferrer"',html)
  files['index.html']=html.encode();files['manifest.json']=(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n').encode()
- for page in ['privacy','support']:
+ for page in ['privacy','support','terms']:
   content=(dist/page/'index.html').read_text()
-  for before,after in {'/':'index.html','/style.css':'style.css','/site.css':'site.css','/favicon.svg':'favicon.svg','/privacy/':'privacy.html','/support/':'support.html','/extension/':'https://comparethesetexts.com/extension/'}.items():
+  for before,after in {'/':'index.html','/style.css':'style.css','/site.css':'site.css','/favicon.svg':'favicon.svg','/privacy/':'privacy.html','/support/':'support.html','/terms/':'terms.html','/LICENSE.txt':'LICENSE.txt','/extension/':'https://comparethesetexts.com/extension/'}.items():
    content=content.replace('href="'+before+'"','href="'+after+'"')
   files[page+'.html']=content.encode()
+ # License notices are sibling files in the offline package.
+ files['terms.html']=re.sub(rb'href="/([^/"<>]+\.txt)"',rb'href="\1"',files['terms.html'])
  for name in ['launcher.html','launcher.css','launcher.js']:files[name]=(sources/name).read_bytes()
  archive=dist/'downloads'/f'ctt-{target}-{version}.zip'
  with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:

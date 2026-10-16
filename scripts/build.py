@@ -1,6 +1,7 @@
 """Build the static website and both offline extensions from tracked CTT source."""
 from pathlib import Path
 import hashlib
+import html
 import json
 import shutil
 import subprocess
@@ -22,6 +23,20 @@ def build():
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     shutil.copytree(SOURCE, OUTPUT)
+    # One authoritative license supplies the website and every downloadable copy.
+    license_text = (ROOT / "LICENSE").read_text()
+    shutil.copyfile(ROOT / "LICENSE", OUTPUT / "LICENSE.txt")
+    terms_page = OUTPUT / "terms/index.html"
+    template = terms_page.read_text()
+    marker = "<!-- CTT-LICENSE -->"
+    if template.count(marker) != 1:
+        raise RuntimeError("Terms page must contain one license insertion marker")
+    paragraphs = []
+    for block in license_text.strip().split("\n\n"):
+        text = " ".join(block.splitlines())
+        tag = "h2" if text.partition(". ")[0].isdigit() else "p"
+        paragraphs.append(f"<{tag}>{html.escape(text)}</{tag}>")
+    terms_page.write_text(template.replace(marker, "\n".join(paragraphs)))
     (OUTPUT / "downloads").mkdir()
     subprocess.run([sys.executable, str(ROOT / "scripts/package_extension.py")], check=True)
     release = json.loads((ROOT / "release.json").read_text())
@@ -34,6 +49,7 @@ def build():
         "source_dirty": dirty,
         "build_command": "npm ci --ignore-scripts && npm run build",
         "source_files_sha256": {str(p.relative_to(SOURCE)): sha256(p) for p in sorted(SOURCE.rglob("*")) if p.is_file()},
+        "license_sha256": sha256(ROOT / "LICENSE"),
         "archives_sha256": {p.name: sha256(p) for p in sorted((OUTPUT / "downloads").glob("*.zip"))},
     }
     (OUTPUT / "release").mkdir()

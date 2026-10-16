@@ -8,6 +8,9 @@ for relative in ('package.json', 'extension-package/chrome-manifest.json', 'exte
  assert json.loads((root.parent/relative).read_text())['version']==release['version'], ('version mismatch',relative)
 lock=json.loads((root.parent/'package-lock.json').read_text())
 assert lock['version']==lock['packages']['']['version']==release['version'], 'lockfile version mismatch'
+assert lock['packages']['']['license']==json.loads((root.parent/'package.json').read_text())['license']=='SEE LICENSE IN LICENSE'
+assert (root/'LICENSE.txt').read_bytes()==(root.parent/'LICENSE').read_bytes(), 'shipped license differs from canonical source'
+assert '<!-- CTT-LICENSE -->' not in (root/'terms/index.html').read_text(), 'license was not rendered'
 subprocess.run(['node',str(root.parent/'scripts/check_source_policy.mjs')],check=True)
 subprocess.run(['python3',str(root.parent/'scripts/verify_vendor.py')],check=True)
 class Parser(HTMLParser):
@@ -48,14 +51,14 @@ for p in (root/'downloads').glob('*.zip'):
      assert not u.path.startswith('/'),(p,ref)
      assert u.path in z.namelist(),(p,ref)
   if p.name in (f"ctt-chrome-{release['version']}.zip",f"ctt-firefox-{release['version']}.zip"):
-   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html'}
+   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html'}
    assert set(z.namelist())==expected,(p,'asset closure')
    for f in root.iterdir():
     if f.is_file() and f.name not in ('index.html','robots.txt','_headers'):assert z.read(f.name)==f.read_bytes(),(p,f.name)
    parser=Parser();parser.feed(z.read('index.html').decode())
    assert manifest['content_security_policy']['extension_pages']==parser.csp
    assert manifest['name']==release['name']
-   for name in ('privacy.html','support.html'):
+   for name in ('privacy.html','support.html','terms.html'):
     parser=Parser();parser.feed(z.read(name).decode())
     for ref in parser.refs:
      u=urlparse(ref)
