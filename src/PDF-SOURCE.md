@@ -71,5 +71,7 @@ The final module hashes and decoded font hashes are additionally checked by
 `python3 scripts/verify_vendor.py` against `vendor-assets.json`. The decoded
 DejaVu Sans Bold TTF SHA-256 is
 `5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895`.
-This records the shipped bytes; the original OS package/archive version for the
-DejaVu fonts was not retained, so it is not claimed as pinned upstream provenance.
+The original OS package/archive version was not retained. On 2026-10-16, the
+downloaded Ubuntu `fonts-dejavu-core_2.37-8_all.deb` independently reproduced
+both embedded fonts and their modules exactly. The archive URL and SHA-256,
+reproduction script and commands are in `docs/FONT-REPRODUCTION.md`.

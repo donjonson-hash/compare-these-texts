@@ -36,3 +36,11 @@ The audit environment received HTTP 403 from both live origins on 2026-10-16,
 so production headers could not be verified here. Keep the hosting portion of
 the audit open until a successful browser/network response confirms the headers.
 This is not a claim that the live site currently has anti-framing protection.
+
+After publication of 0.35.2 on 2026-10-16, all eight URLs above again returned
+HTTP 403 to this environment. Those error responses contained
+`X-Frame-Options: SAMEORIGIN` and `Referrer-Policy: same-origin`, not the policies
+in `_headers`. These are error-page observations; they do not establish which
+headers a successful application response receives. Check from an unrestricted
+client and retain the status code as well as headers; a 403 is not a passing
+hosting verification result.
