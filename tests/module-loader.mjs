@@ -20,5 +20,5 @@ export function moduleLoader(dom, directory, {failVisualOnce = false} = {}) {
   const operation=(async()=>{const module=get(url);if(module.status==='unlinked')await module.link((specifier,ref)=>get(new URL(specifier,ref.identifier).href));if(module.status==='linked')await module.evaluate();return module;})();
   operations.set(url,operation);return operation;
  }
- return script=>new vm.Script(readFileSync(fileURLToPath(script.src),'utf8'),{filename:script.src,importModuleDynamically:specifier=>load(new URL(specifier,script.src).href)}).runInContext(context);
+ return script=>script.type==='module' ? load(script.src) : new vm.Script(readFileSync(fileURLToPath(script.src),'utf8'),{filename:script.src,importModuleDynamically:specifier=>load(new URL(specifier,script.src).href)}).runInContext(context);
 }

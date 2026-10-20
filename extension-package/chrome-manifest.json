@@ -26,5 +26,8 @@
     "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'"
   },
   "minimum_chrome_version": "120",
-  "default_locale": "en"
+  "default_locale": "en",
+  "background": {
+    "service_worker": "background.js"
+  }
 }

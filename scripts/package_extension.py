@@ -20,6 +20,8 @@ for target in ['chrome','firefox']:
  html=html.replace('href="/extension/"','href="https://comparethesetexts.com/extension/"').replace('href="/privacy/"','href="privacy.html"').replace('href="/support/"','href="support.html"').replace('href="/terms/"','href="terms.html"')
  html=html.replace('>Extension</a>','>Website</a>').replace('href="https://comparethesetexts.com/extension/">Website','href="https://comparethesetexts.com/">Website')
  html=re.sub(r'<a href="(https://[^"]+)"',r'<a href="\1" target="_blank" rel="noopener noreferrer"',html)
+ html=html.replace('</head>', '<script type="module" src="welcome-entry.mjs"></script></head>')
+ html=html.replace('<nav aria-label="Footer navigation">', '<nav aria-label="Footer navigation"><a id="getting-started" href="welcome.html" target="_blank" rel="noopener noreferrer">Getting started</a>')
  files['index.html']=html.encode();files['manifest.json']=(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n').encode()
  for page in ['privacy','support','terms']:
   content=(dist/page/'index.html').read_text()
@@ -28,7 +30,7 @@ for target in ['chrome','firefox']:
   files[page+'.html']=content.encode()
  # License notices are sibling files in the offline package.
  files['terms.html']=re.sub(rb'href="/([^/"<>]+\.txt)"',rb'href="\1"',files['terms.html'])
- for name in ['launcher.html','launcher.css','launcher.js']:files[name]=(sources/name).read_bytes()
+ for name in ['launcher.html','launcher.css','launcher.js','welcome.html','welcome.css','welcome-entry.mjs','background.js']:files[name]=(sources/name).read_bytes()
  archive=dist/'downloads'/f'ctt-{target}-{version}.zip'
  with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:
   for name,content in sorted(files.items()):

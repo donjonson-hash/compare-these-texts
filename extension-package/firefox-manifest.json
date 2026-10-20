@@ -35,5 +35,10 @@
         ]
       }
     }
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
   }
 }

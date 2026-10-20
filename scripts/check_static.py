@@ -61,7 +61,7 @@ for p in (root/'downloads').glob('*.zip'):
    assert manifest['name'] in ('Compare These Texts — Compare & Edit',release['name'])
    assert '<html lang="en">' in z.read('index.html').decode()
    assert manifest['action']['default_title']=='CTT — Compare & Edit'
-   for name in ['index.html','launcher.html']:
+   for name in ['index.html','launcher.html','welcome.html']:
     parser=Parser();parser.feed(z.read(name).decode())
     for ref in parser.refs:
      u=urlparse(ref)
@@ -69,7 +69,7 @@ for p in (root/'downloads').glob('*.zip'):
      assert not u.path.startswith('/'),(p,ref)
      assert u.path in z.namelist(),(p,ref)
   if p.name in (f"ctt-chrome-{release['version']}.zip",f"ctt-firefox-{release['version']}.zip"):
-   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html'}
+   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
    if is_chrome:expected.update(localized_files)
    assert set(z.namelist())==expected,(p,'asset closure')
    for f in root.iterdir():
@@ -77,6 +77,10 @@ for p in (root/'downloads').glob('*.zip'):
    parser=Parser();parser.feed(z.read('index.html').decode())
    assert manifest['content_security_policy']['extension_pages']==parser.csp
    assert manifest['name']==release['name']
+   assert 'id="getting-started"' in z.read('index.html').decode()
+   assert manifest['background']==({'service_worker':'background.js'} if is_chrome else {'scripts':['background.js']})
+   for name in ('welcome.html','welcome.css','background.js','welcome-entry.mjs'):
+    assert z.read(name)==(root.parent/'extension-package'/name).read_bytes(),(p,name,'welcome payload mismatch')
    for name in ('privacy.html','support.html','terms.html'):
     parser=Parser();parser.feed(z.read(name).decode())
     for ref in parser.refs:

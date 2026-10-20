@@ -111,7 +111,8 @@ async function page(t, target, browserCompatibility = false, realModules = false
   if (realModules) {
     const run=moduleLoader(dom,directory,{failVisualOnce:realModules === 'fail-first-visual'});
     for (const script of dom.window.document.querySelectorAll('script[src]')) {
-      Object.defineProperty(dom.window.document,'currentScript',{configurable:true,value:script});run(script);
+      Object.defineProperty(dom.window.document,'currentScript',{configurable:true,value:script});
+      if (script.type==='module') await run(script); else run(script);
     }
     Object.defineProperty(dom.window.document,'currentScript',{configurable:true,value:null});
   }

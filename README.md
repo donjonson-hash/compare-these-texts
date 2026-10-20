@@ -5,6 +5,26 @@ The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparethesetexts.com/.
 
+## Extension welcome and store kit
+
+The 0.35.4 candidate opens a local welcome page on first installation. Updates
+leave existing tabs alone. **Getting started** in the extension footer opens
+the guide separately; **Try an example** leaves an existing saved comparison
+available to resume. The editor and welcome page remain English.
+
+The Chrome package includes 22 localized metadata catalogs. Full store
+descriptions, five icon sizes, three actual screenshots, two promotional images
+and Russian submission instructions are assembled with `npm run package:store`
+after building. The result is `artifacts/ctt-0.35.4-store-kit.zip`; unpack it
+before uploading its inner Chrome ZIP. Firefox is supplied for temporary
+testing; its metadata remains English. This preparation does not publish either
+store listing or deploy the website.
+
+To refresh synthetic screenshots, run `npx playwright install chromium` and
+`npm run store:assets` after a build. The focused installed-extension check is
+`REQUIRE_EXTENSION=1 npm run check:extension`; CI installs the browser and runs
+this gate. Playwright is a development dependency, not shipped in the extension.
+
 ## Review amounts and percentages
 
 In **Compare documents**, open **Amounts & percentages** below the review
@@ -64,7 +84,7 @@ Outputs:
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 
-`dist/`, installed dependencies and historical ZIPs are not committed. The
+`dist/`, `artifacts/`, installed dependencies and historical ZIPs are not committed. The
 dedicated CTT GitHub Actions job builds and tests from a clean checkout and
 uploads the generated website and extensions. Store publishing and website
 deployment are separate actions; a successful CI run does not publish them.
