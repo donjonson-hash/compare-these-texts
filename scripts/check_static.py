@@ -2,8 +2,10 @@ from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlparse
 import json,zipfile,subprocess,re
+from store_metadata import message_files
 root=Path(__file__).resolve().parents[1]/'dist'
 release=json.loads((root.parent/'release.json').read_text())
+localized_files=message_files()
 for relative in ('package.json', 'extension-package/chrome-manifest.json', 'extension-package/firefox-manifest.json'):
  assert json.loads((root.parent/relative).read_text())['version']==release['version'], ('version mismatch',relative)
 lock=json.loads((root.parent/'package-lock.json').read_text())
@@ -37,13 +39,29 @@ for target in ('chrome','firefox'):
 for p in (root/'downloads').glob('*.zip'):
  with zipfile.ZipFile(p) as z:
   manifest=json.loads(z.read('manifest.json'))
+  is_chrome=p.name.startswith('ctt-chrome-')
+  if is_chrome:
+   assert manifest['default_locale']=='en'
+   for field,key in (('name','extensionName'),('description','extensionDescription')):
+    assert manifest[field]=='__MSG_'+key+'__'
+   assert manifest['action']['default_title']=='__MSG_actionTitle__'
+   for name,data in localized_files.items():assert z.read(name)==data,(p,name,'localized text mismatch')
+   messages=json.loads(z.read('_locales/en/messages.json'))
+   # Validate the resolved English fallback against the existing package contract.
+   manifest['name']=messages['extensionName']['message']
+   manifest['description']=messages['extensionDescription']['message']
+   manifest['action']['default_title']=messages['actionTitle']['message']
+  else:
+   assert 'default_locale' not in manifest
+   assert not any(name.startswith('_locales/') for name in z.namelist())
+  assert manifest['description']==release['description']
   assert manifest['homepage_url']=='https://comparethesetexts.com/'
   assert manifest['version']==re.search(r'-(\d+\.\d+\.\d+)\.zip$',p.name).group(1)
   if p.name.startswith('ctt-'):
    assert manifest['name'] in ('Compare These Texts — Compare & Edit',release['name'])
    assert '<html lang="en">' in z.read('index.html').decode()
    assert manifest['action']['default_title']=='CTT — Compare & Edit'
-   for name in ['index.html','launcher.html']:
+   for name in ['index.html','launcher.html','welcome.html']:
     parser=Parser();parser.feed(z.read(name).decode())
     for ref in parser.refs:
      u=urlparse(ref)
@@ -51,13 +69,18 @@ for p in (root/'downloads').glob('*.zip'):
      assert not u.path.startswith('/'),(p,ref)
      assert u.path in z.namelist(),(p,ref)
   if p.name in (f"ctt-chrome-{release['version']}.zip",f"ctt-firefox-{release['version']}.zip"):
-   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html'}
+   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
+   if is_chrome:expected.update(localized_files)
    assert set(z.namelist())==expected,(p,'asset closure')
    for f in root.iterdir():
     if f.is_file() and f.name not in ('index.html','robots.txt','_headers'):assert z.read(f.name)==f.read_bytes(),(p,f.name)
    parser=Parser();parser.feed(z.read('index.html').decode())
    assert manifest['content_security_policy']['extension_pages']==parser.csp
    assert manifest['name']==release['name']
+   assert 'id="getting-started"' in z.read('index.html').decode()
+   assert manifest['background']==({'service_worker':'background.js'} if is_chrome else {'scripts':['background.js']})
+   for name in ('welcome.html','welcome.css','background.js','welcome-entry.mjs'):
+    assert z.read(name)==(root.parent/'extension-package'/name).read_bytes(),(p,name,'welcome payload mismatch')
    for name in ('privacy.html','support.html','terms.html'):
     parser=Parser();parser.feed(z.read(name).decode())
     for ref in parser.refs:

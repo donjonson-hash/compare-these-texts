@@ -1,0 +1,26 @@
+Compare These Texts hjelper deg med å sammenligne tekster og dokumenter side om side, finne forskjeller og redigere resultatet. Se gjennom en revidert versjon av et dokument, kontroller regnearket fra en leverandør eller fyll inn en trykt, tom linje i en støttet PDF. Last deretter ned eller skriv ut arbeidet ditt.
+
+SAMMENLIGN, REDIGER, LAGRE
+1. Åpne utvidelsen og velg to filer som skal sammenlignes, eller bruk Edit & export for én fil.
+2. Se gjennom de markerte forskjellene og gjør endringene dine.
+3. Last ned resultatet eller skriv det ut med alternativene som er tilgjengelige for formatet.
+
+DETTE KAN DU GJØRE
+- Sammenlign tekst i TXT og Word DOCX, PDF-filer med tekst som kan markeres, og tabeller i CSV/TSV eller Excel XLSX.
+- Se to versjoner ved siden av hverandre, gå mellom forskjellene og rediger tekst i sammenligningsområdet.
+- For regneark kan du velge ark, koble sammen rader ved hjelp av en identifikator og velge hvilke kolonner som skal kontrolleres. Rediger celleverdier og kopier en manglende rad fra A til B.
+- Se gjennom endrede valutabeløp og prosenter i sammenligninger av tekst, Word og støttede PDF-filer med Amounts & percentages.
+- Arbeid med ett dokument i Edit & export. I støttede tekstbaserte PDF-filer kan du klikke på oppdagede trykte, tomme linjer for å fylle inn opplysninger, eller bruke Add text til å plassere tekst. Tekststørrelsen tilpasses den tilgjengelige plassen; Format gir deg manuelle justeringsmuligheter.
+
+LOKAL BEHANDLING
+Dokumentene behandles på enheten din. Utvidelsen fungerer uten internett og laster ikke opp dokumentene dine til en server for sammenligning eller redigering. Utkast på nettstedet og i utvidelsen lagres separat, uten automatisk synkronisering. Last ned en kopi av det ferdige arbeidet ditt.
+
+FØR DU BEGYNNER
+- Redigeringsgrensesnittet er foreløpig på engelsk. Oversatte butikkbeskrivelser endrer ikke språket i redigeringsverktøyet.
+- Hver inndatafil kan være opptil 2 MiB.
+- PDF-filer må ha et tekstlag: skannede bilder uten tekst støttes ikke, og det finnes ingen OCR. Trykte, tomme linjer er ikke det samme som interaktive PDF-skjemafelt; interaktive felt og PDF-kommentarer støttes ikke.
+- Bilder og formatering sammenlignes ikke. Om PDF-oppsettet kan bevares, avhenger av dokumentet; komplekse oppsett kan kreve eksport som ren tekst. Word-oppsettet kan avvike fra Microsoft Word.
+- Fotnoter, sluttnoter og kommentarer i DOCX må flyttes til avsnittene i hovedteksten i en kopi før import.
+- Sammenligning av to regnearkfiler krever én overskriftsrad, ingen sammenslåtte celler og verdier i stedet for formler.
+
+Begynn med det innebygde dokumenteksemplet eller CSV-/Excel-eksemplet for å prøve arbeidsflyten før du åpner dine egne filer.

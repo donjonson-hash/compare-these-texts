@@ -1,0 +1,26 @@
+Compare These Texts est un comparateur de texte qui permet d'afficher deux documents côte à côte, de repérer leurs différences et de modifier le résultat. Vérifiez un document révisé, examinez le tableau d'un fournisseur ou remplissez un espace prévu pour l'écriture sur un PDF compatible, puis téléchargez ou imprimez votre travail.
+
+COMPARER, MODIFIER, ENREGISTRER
+1. Ouvrez l'extension et choisissez deux fichiers à comparer, ou utilisez Edit & export pour un seul fichier.
+2. Examinez les différences surlignées et apportez vos modifications.
+3. Téléchargez le résultat ou imprimez-le avec les options disponibles pour le format concerné.
+
+FONCTIONNALITÉS
+- Comparez le texte de fichiers TXT et Word DOCX, des PDF dont le texte est sélectionnable, ainsi que des tableaux CSV/TSV ou Excel XLSX.
+- Affichez deux versions côte à côte, passez d'une différence à l'autre et modifiez le texte dans l'espace de comparaison.
+- Pour les feuilles de calcul, choisissez une feuille, associez les lignes à l'aide d'un identifiant et sélectionnez les colonnes à vérifier. Modifiez les valeurs des cellules et copiez une ligne manquante de A vers B.
+- Vérifiez les montants monétaires et les pourcentages modifiés dans les comparaisons de texte, de fichiers Word et de PDF compatibles avec Amounts & percentages.
+- Travaillez sur un seul document avec Edit & export. Dans les PDF compatibles dotés d'une couche de texte, cliquez sur les espaces à remplir détectés pour saisir vos informations, ou utilisez Add text pour placer une saisie. La taille du texte s'adapte à l'espace disponible ; Format propose des réglages manuels.
+
+TRAITEMENT LOCAL
+Les documents sont traités sur votre appareil. L'extension fonctionne hors connexion et ne transfère pas vos documents vers un serveur pour les comparer ou les modifier. Les brouillons du site et de l'extension sont enregistrés séparément, sans synchronisation automatique. Téléchargez une copie de votre travail terminé.
+
+AVANT DE COMMENCER
+- L'interface de l'éditeur est actuellement en anglais. Les descriptions traduites dans la boutique ne changent pas la langue de l'éditeur.
+- Chaque fichier importé peut peser jusqu'à 2 Mio (2 MiB).
+- Les PDF doivent contenir une couche de texte : les images numérisées sans texte ne sont pas prises en charge et aucune reconnaissance optique de caractères (OCR) n'est proposée. Les espaces prévus pour être remplis à la main sont différents des champs interactifs de formulaire PDF. Les champs interactifs et les commentaires PDF ne sont pas pris en charge.
+- Les images et la mise en forme ne sont pas comparées. La conservation de la mise en page PDF dépend du document ; les mises en page complexes peuvent nécessiter un export en texte seul. La mise en page des fichiers Word peut différer de celle de Microsoft Word.
+- Avant l'importation d'un DOCX, déplacez les notes de bas de page, les notes de fin et les commentaires dans les paragraphes principaux d'une copie du document.
+- La comparaison de deux fichiers de tableur nécessite une seule ligne d'en-tête, aucune cellule fusionnée et des valeurs à la place des formules.
+
+Commencez avec l'exemple de document ou de tableau CSV / Excel intégré pour essayer le fonctionnement avant d'ouvrir vos propres fichiers.

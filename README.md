@@ -1,9 +1,29 @@
 # Compare These Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.35.3**.
+Current CTT website and offline Chrome/Firefox extension source: **0.35.4**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparethesetexts.com/.
+
+## Extension welcome and store kit
+
+The 0.35.4 candidate opens a local welcome page on first installation. Updates
+leave existing tabs alone. **Getting started** in the extension footer opens
+the guide separately; **Try an example** leaves an existing saved comparison
+available to resume. The editor and welcome page remain English.
+
+The Chrome package includes 22 localized metadata catalogs. Full store
+descriptions, five icon sizes, three actual screenshots, two promotional images
+and Russian submission instructions are assembled with `npm run package:store`
+after building. The result is `artifacts/ctt-0.35.4-store-kit.zip`; unpack it
+before uploading its inner Chrome ZIP. Firefox is supplied for temporary
+testing; its metadata remains English. This preparation does not publish either
+store listing or deploy the website.
+
+To refresh synthetic screenshots, run `npx playwright install chromium` and
+`npm run store:assets` after a build. The focused installed-extension check is
+`REQUIRE_EXTENSION=1 npm run check:extension`; CI installs the browser and runs
+this gate. Playwright is a development dependency, not shipped in the extension.
 
 ## Review amounts and percentages
 
@@ -59,12 +79,12 @@ npm run check
 Outputs:
 
 - `dist/`: static website, including extension downloads.
-- `dist/downloads/ctt-chrome-0.35.3.zip`: load the extracted directory in Chrome.
-- `dist/downloads/ctt-firefox-0.35.3.zip`: temporary Firefox installation.
+- `dist/downloads/ctt-chrome-0.35.4.zip`: load the extracted directory in Chrome.
+- `dist/downloads/ctt-firefox-0.35.4.zip`: temporary Firefox installation.
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 
-`dist/`, installed dependencies and historical ZIPs are not committed. The
+`dist/`, `artifacts/`, installed dependencies and historical ZIPs are not committed. The
 dedicated CTT GitHub Actions job builds and tests from a clean checkout and
 uploads the generated website and extensions. Store publishing and website
 deployment are separate actions; a successful CI run does not publish them.
@@ -108,3 +128,14 @@ Security reporting: [SECURITY.md](SECURITY.md). Contribution and test workflow:
 also verifies release version consistency, first-party browser API restrictions
 and pinned vendor/font checksums. These are regression guards, not a substitute
 for a dependency or security review. Acorn is used by the browser API guard.
+
+## Chrome store metadata
+
+Chrome 0.35.4 includes localized names, summaries and toolbar titles for 19 additional
+languages (21 regional variants), with English fallback. The editor UI remains
+English; each translated summary states this explicitly. See
+[the complete copy and publishing notes](docs/CWS-LOCALIZATIONS.md).
+Canonical copy lives in `extension-package/store/localizations.json`; the build
+validates it and generates `_locales` only in the Chrome ZIP. Ready-to-paste [full descriptions](extension-package/store/descriptions/README.md)
+cover the same locales. Paste each text into its store dashboard locale; these
+files are not bundled into the extension. Localized screenshots remain separate.
