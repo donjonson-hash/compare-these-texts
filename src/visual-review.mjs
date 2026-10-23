@@ -149,14 +149,20 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   const back = button('↑', () => jump(-1)), next = button("Next difference ↓", () => jump(1)); back.setAttribute('aria-label', "Previous difference");
   navigation.append(back, next);
   const all = button("Make B match A", () => act('right', draft => draft.replaceAll(drafts.left.entries(), {rowPlan: drafts.left.rowPlan?.(), content: models.left?.content}))); all.dataset.action = 'copy-all-right';
-  const tools = el('details', undefined, 'visual-more'); tools.append(el('summary', "More"));
-  tools.append(button("Make A match B", () => act('left', draft => draft.replaceAll(drafts.right.entries(), {rowPlan: drafts.right.rowPlan?.(), content: models.right?.content}))));
-  tools.append(button("Restore original documents", () => { if (!alive()) return; for (const side of sides) drafts[side].reset(); reviewQueue.reset(); numberReview?.reset(); reviewHistory = []; refresh(); stateChanged(); }));
+  const tools = el('details', undefined, 'visual-more compact-review-tools'); tools.append(el('summary', "More"));
+  const toolsContent = el('div', undefined, 'visual-tools-content'); tools.append(toolsContent);
+  toolsContent.addEventListener('click', event => {
+    const action = event.target.closest('button');
+    if (action) tools.open = false;
+  });
+  toolsContent.append(all, button("Make A match B", () => act('left', draft => draft.replaceAll(drafts.right.entries(), {rowPlan: drafts.right.rowPlan?.(), content: models.right?.content}))));
+  toolsContent.append(button("Restore original documents", () => { if (!alive()) return; for (const side of sides) drafts[side].reset(); reviewQueue.reset(); numberReview?.reset(); reviewHistory = []; refresh(); stateChanged(); }));
   const saveNote = el('p', "Click any text to edit it. Highlights show text differences.", 'visual-instruction');
+  const help = el('details', undefined, 'visual-help'); help.append(el('summary', 'How to review'), saveNote); toolsContent.append(help);
   const zoom = el('select'); zoom.setAttribute('aria-label', "Document zoom");
   for (const [value, label] of [['0', "Fit to width"], ['794', '100%'], ['1191', '150%']]) { const option = el('option', label); option.value = value; zoom.append(option); }
   zoom.addEventListener('change', () => { if (!alive()) return; root.style.setProperty('--sheet-min-width', zoom.value + 'px'); stateChanged(); });
-  toolbar.append(progress, navigation, all, zoom, tools); if(single){navigation.hidden=all.hidden=tools.hidden=true;saveNote.textContent="Click any text to edit it. Download when you are ready.";} root.append(toolbar, saveNote);
+  toolbar.append(progress, navigation, zoom, tools); if(single){navigation.hidden=all.hidden=tools.hidden=true;saveNote.textContent="Click any text to edit it. Download when you are ready.";} root.append(toolbar); if(single)root.append(saveNote);
   const findHost=el('div',undefined,'document-find');root.append(findHost);
   const status = el('p', '', 'visual-notice'); status.hidden = true; status.setAttribute('role', 'status'); root.append(status);
   if (loadMessages.length) message(loadMessages.join('\n'));
@@ -168,6 +174,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   const reviewHint = el('p', 'Choose what to keep, one difference at a time.', 'review-flow-hint');
   reviewBar.append(reviewProgress, reviewNext, reviewUndo, reviewHint);
   const finalCheck = createFinalCheck(reviewBar, {beforeCheck: () => {if (!alive()) return false; for (const side of sides) drafts[side].endEdit(); changed(); return true;}, onGo: () => {reviewStarted = true; void advanceReview();}, scope: 'Current text, text order and supported Word table structure are checked. Images, fonts and page appearance are not compared.'});
+  if (!single) toolsContent.insertBefore(reviewBar.querySelector('[data-review-action="check"]'), help);
   reviewBar.append(reviewDownload); root.append(reviewBar); if(single)reviewBar.hidden=true;
   const numberHost = el('div'); if (!single) root.append(numberHost);
   const structureReview = el('section', undefined, 'review-structure'); structureReview.hidden = true;
@@ -213,10 +220,11 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     }
     panel.append(heading); if(single){panel.hidden=side==='right';heading.querySelector('.letter').hidden=true;menu.hidden=true;}
     if (models[side]?.headersFooters?.length) {
-      const note=el('p','Only the main body is compared and edited. Headers and footers are kept unchanged in Word downloads. PDF export is unavailable for this document.','docx-coverage-note');
+      const note=el('p','Body text only. Headers/footers kept unchanged, not compared. Word download only.','docx-coverage-note');
       note.dataset.docxPeripheralNote=side;
       const details=el('details',undefined,'docx-peripheral-parts');details.dataset.docxPeripheral=side;
       details.append(el('summary','Headers and footers — read-only, not compared'));
+      details.append(el('p','Only the main body is compared and edited. Headers and footers are kept unchanged in Word downloads. PDF export is unavailable for this document.'));
       const counts={header:0,footer:0};
       for(const part of models[side].headersFooters){
         details.append(el('strong',`${part.kind==='header'?'Header':'Footer'} ${++counts[part.kind]}`));
@@ -517,6 +525,8 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     const remaining = reviewItems.filter(item => item.differs).length;
     reviewBar.classList.toggle('is-complete', complete);
     reviewHint.textContent = complete ? (remaining ? 'All differences reviewed. Your chosen differences remain. Check again to finish.' : 'All differences reviewed. Check again, then download your updated document.') : 'Choose Use A or Keep B. You can also edit either version.';
+    reviewHint.hidden = !complete;
+    if (complete) reviewHint.textContent = remaining ? 'All differences reviewed. Chosen differences remain. More → Check again.' : 'All differences reviewed. More → Check again, then download B.';
     reviewNext.textContent = reviewStarted ? 'Next to review' : 'Start review'; reviewNext.disabled = !progress.pending;
     reviewUndo.disabled = !reviewHistory.length || reviewHistory.at(-1).copied && !drafts.right.canUndo;
     reviewDownload.hidden = !complete; reviewDownload.disabled = exporting.right || pdfChecking.right || ui.right.save.disabled;
@@ -1034,6 +1044,8 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     },
     highlight:(matches,side,active)=>{const keys=new Set(matches.map(m=>m.key));for(const s of sides)for(const node of ui[s].scroll.querySelectorAll('[data-group]')){node.classList.toggle('has-search-match',s===side&&keys.has(node.dataset.group));node.classList.toggle('is-search-current',s===side&&matches.length>0&&node.dataset.group===active?.key);}}
   });
+  // Keep search beside navigation while its editing panel stays in normal flow.
+  if (!single) toolbar.insertBefore(findHost.querySelector(':scope > button'), tools);
   if(wording){const host=el('div');findHost.before(host);styleReview=mountStyleReview(host,{
     kept:restoredState?.styleKept,onChange:stateChanged,
     entries:()=>drafts.left.entries(),revision:()=>drafts.left.revision,

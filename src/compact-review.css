@@ -1,0 +1,47 @@
+/* Compact comparison controls; document text and active warnings keep their space. */
+.visual-review:not(.single-review) .visual-toolbar {
+  gap: 8px;
+  padding: 6px 0 8px;
+}
+.visual-review:not(.single-review) .visual-progress { font-size: 17px; }
+.visual-review:not(.single-review) .visual-toolbar .button { min-height: 38px; padding: 7px 11px; font-size: 13px; }
+.visual-review:not(.single-review) > .document-find { margin: 0; }
+.visual-review:not(.single-review) > .document-find:has(.find-replace-panel:not([hidden])) { margin-bottom: 12px; }
+.visual-review:not(.single-review) .review-flow {
+  gap: 8px;
+  padding: 7px 0 9px;
+  margin-bottom: 8px;
+  border: 0;
+  border-bottom: 1px solid #dce5df;
+  border-radius: 0;
+  background: transparent;
+}
+.visual-review:not(.single-review) .review-flow-progress { font-size: 14px; font-weight: 500; }
+.visual-review:not(.single-review) .review-flow > .button { min-height: 36px; padding: 6px 10px; font-size: 13px; }
+.visual-review:not(.single-review) .review-flow-hint { font-size: 12px; }
+.visual-review .compact-review-tools { position: relative; }
+.visual-review .compact-review-tools > summary { border: 1px solid #d5ded9; border-radius: 7px; background: white; padding: 8px 11px; }
+.visual-review .compact-review-tools[open] > .visual-tools-content {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 5px);
+  width: min(330px, calc(100vw - 48px));
+  max-height: 65vh;
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid #cbd9d0;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 8px 24px #22352a22;
+  z-index: 12;
+}
+.visual-review .visual-tools-content > .button { display: block; width: 100%; text-align: left; margin: 0 0 6px; white-space: normal; }
+.visual-review .visual-help { margin-top: 7px; border-top: 1px solid #e2e8e4; }
+.visual-review .visual-help > summary { font-weight: 600; }
+.visual-review .visual-help .visual-instruction { margin: 4px 8px 8px; font-size: 13px; line-height: 1.5; }
+.visual-review .docx-coverage-note { padding: 6px 12px; font-size: 12px; }
+.visual-review .docx-peripheral-parts { padding: 6px 12px; font-size: 12px; }
+@media (max-width: 700px) {
+  .visual-review:not(.single-review) .review-flow-progress { flex-basis: auto; }
+  .visual-review:not(.single-review) .visual-progress { width: 100%; }
+}

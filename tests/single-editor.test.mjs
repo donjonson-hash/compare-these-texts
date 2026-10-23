@@ -129,7 +129,7 @@ test('inline name fitting retains flattened artwork, text layer, selection, rest
 
 
 function findUI(root){
- root.querySelector('.document-find>button').click();const panel=root.querySelector('.find-replace-panel');return {panel,query:panel.querySelector('[data-find-field="query"]'),replacement:panel.querySelector('[data-find-field="replacement"]'),button:label=>[...panel.querySelectorAll('button')].find(b=>b.textContent===label),async search(text){this.query.value=text;this.query.dispatchEvent(new window.Event('input'));await until(()=>!this.button('Replace').disabled);},setReplacement(text){this.replacement.value=text;this.replacement.dispatchEvent(new window.Event('input'));}};
+ [...root.querySelectorAll('button')].find(button=>button.textContent==='Find & replace').click();const panel=root.querySelector('.find-replace-panel');return {panel,query:panel.querySelector('[data-find-field="query"]'),replacement:panel.querySelector('[data-find-field="replacement"]'),button:label=>[...panel.querySelectorAll('button')].find(b=>b.textContent===label),async search(text){this.query.value=text;this.query.dispatchEvent(new window.Event('input'));await until(()=>!this.button('Replace').disabled);},setReplacement(text){this.replacement.value=text;this.replacement.dispatchEvent(new window.Event('input'));}};
 }
 test('Word find/replace preserves inserted table rows and autosaves one undoable batch',async t=>{
  const {root,downloads}=setup(t),demo=await readFile(new URL('../dist/document-demo.js',import.meta.url),'utf8'),src=JSON.parse(demo.slice(demo.indexOf('Object.freeze(')+14,demo.lastIndexOf(');'))).right;let saved,view;view=await mountSingleEditor(root,{source:src,onStateChange:()=>{saved=view.snapshot();}});t.after(()=>view.dispose());

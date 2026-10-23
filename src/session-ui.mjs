@@ -19,12 +19,18 @@ export async function mountSessionUI(root, {onResume, onFinish, onOperating = ()
   const resume = button(single ? "Continue editing" : "Continue →", resumeSaved, 'button primary'); resume.id = (single ? 'single-' : '') + 'session-resume';
   const remove = button(single ? "Delete saved work" : "Finish and delete", finish); remove.id = (single ? 'single-' : '') + 'session-delete';
   const retry = button("Retry saving", retrySave); retry.hidden = true; retry.id = (single ? 'single-' : '') + 'session-retry';
-  status.id = (single ? 'single-' : '') + 'session-status'; info.append(title, names, status, retention); actions.append(resume, retry, remove); root.append(info, actions);
+  const savedDetails = node('details', '', 'session-details');
+  const savedSummary = node('summary', 'Saved work');
+  const savedBody = node('div', '', 'session-details-body');
+  savedBody.append(retention, remove); savedDetails.append(savedSummary, savedBody);
+  status.id = (single ? 'single-' : '') + 'session-status'; info.append(title, names, status); actions.append(resume, retry, savedDetails); root.append(info, actions);
   let store, row = {token: null, payload: null}, getPayload = null, pending = null, lastPayload = null;
   let running = null, busy = false, operating = false, failed = null, corrupt = false, disposed = false, loaded = false;
   const active = () => !!getPayload;
   function paint() {
     root.hidden = !active() && !row.payload && !failed && !corrupt;
+    root.classList.toggle('session-active', active());
+    title.hidden = active();
     title.textContent = single ? (active() ? "Your document" : "Continue editing your document") : active() ? "Your work will be saved here" : "Continue working on documents";
     const sources = active() ? lastPayload?.sources : row.payload?.sources;
     names.textContent = single ? (active() ? lastPayload?.source?.name : row.payload?.source?.name) || '' : sources ? `A · ${sources.left.name}   ↔   B · ${sources.right.name}` : '';
