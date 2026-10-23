@@ -12,9 +12,10 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
   abort(signal);
   if(!model?.blocks?.length||!model.page)fail('The Word document could not be prepared. Download DOCX to keep editing.');
   if(model.pdfUnsupported?.length)fail(model.pdfUnsupported[0]);
+  if(model.headersFooters?.length&&!model.peripherals)fail('The headers and footers could not be prepared. Download DOCX to preserve them.');
   const pageWidth=model.page.width*.75,pageHeight=model.page.height*.75;
   const margins=Object.fromEntries(['Left','Right','Top','Bottom'].map(k=>[k.toLowerCase(),model.page['margin'+k]*.75]));
-  const usable=pageWidth-margins.left-margins.right,bodyHeight=pageHeight-margins.top-margins.bottom;
+  const usable=pageWidth-margins.left-margins.right;let bodyHeight=pageHeight-margins.top-margins.bottom;
   if(![pageWidth,pageHeight,usable,bodyHeight].every(n=>Number.isFinite(n)&&n>24))fail('The page margins leave too little room for a PDF.');
   const pdf=await PDFDocument.create();pdf.registerFontkit(fontkit);
   const fonts={regular:await pdf.embedFont(decode(regularBytes),{subset:true,features:{liga:false}}),bold:await pdf.embedFont(decode(boldBytes),{subset:true,features:{liga:false}})};
@@ -27,7 +28,7 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
     if(!pictures.has(image.src)){const match=/^data:image\/(png|jpeg);base64,([A-Za-z\d+/=]+)$/.exec(image.src);if(!match)fail('An image could not be included in the PDF.');const bytes=decode(match[2]);pictures.set(image.src,await(match[1]==='png'?pdf.embedPng(bytes):pdf.embedJpg(bytes)));}
     return pictures.get(image.src);
   }
-  async function paragraph(block,width){
+  async function paragraph(block,width,fields){
     if(!block)fail('A paragraph is missing from the Word document.');
     const style=block.style||{},base=typography(style,block.heading),left=block.list?Math.max(0,block.list.indent?.left??(block.list.level+1)*36):pt(style.paddingLeft),right=pt(style.paddingRight);
     const indent=block.list?0:pt(style.textIndent),available=width-left-right;
@@ -51,7 +52,7 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
     for(const run of block.runs||[{text:block.text,style:{}}]){
       if(run.pageBreak&&run.text==='\n'){flush();forced=true;continue;}
       if(run.image){const image=await imageFor(run.image),w=run.image.width*.75,h=run.image.height*.75,scale=Math.min(1,available/w,(bodyHeight-20)/h);if(!(w>0&&h>0&&scale>0))fail('An image has invalid dimensions.');if(used+w*scale>room())flush();items.push({image,width:w*scale,height:h*scale,x:used});used+=w*scale;}
-      else addText(run.text,typography({...style,...run.style},block.heading));
+      else {const format=typography({...style,...run.style},block.heading);let text=run.text;if(run.field){if(!fields)fail('A page-number field is outside its header or footer.');text=fields.measure?Array.from('0123456789').sort((a,b)=>format.font.widthOfTextAtSize(b,format.size)-format.font.widthOfTextAtSize(a,format.size))[0].repeat(7):String(fields[run.field]);}addText(text,format);}
       await cooperate();
     }
     flush(!fragments.length||forced);
@@ -59,17 +60,29 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
     if(fragments.length){fragments[0].before=before;fragments[0].breakBefore ||= block.pageBreakBefore;fragments.at(-1).after=after;}
     return fragments;
   }
+  // Reserve space for the largest active header/footer before paginating the
+  // body. Page counts are resolved after pagination, never copied from Word's
+  // stale cached field results. The body may reflow, but no text is discarded.
+  const peripheral=model.peripherals||{},distances={header:(model.page.headerDistance??48)*.75,footer:(model.page.footerDistance??48)*.75};
+  const activeTypes=['default',...(peripheral.firstPage?['first']:[]),...(peripheral.evenPages?['even']:[])];
+  async function peripheralLines(blocks,fields){const lines=[];for(const block of blocks||[])lines.push(...await paragraph(block,usable,fields));if(lines.some(line=>line.breakBefore))fail('A page break inside a header or footer cannot be exported. Download DOCX to preserve it.');let height=0;for(const line of lines){height+=line.before||0;line.top=height;height+=line.height+(line.after||0);}return {lines,height};}
+  for(const kind of ['header','footer']){
+    let height=0;for(const type of activeTypes)height=Math.max(height,(await peripheralLines(peripheral[kind]?.[type],{measure:true})).height);
+    if(height){const edge=kind==='header'?'top':'bottom';margins[edge]=Math.max(margins[edge],distances[kind]+height+6);}
+  }
+  bodyHeight=pageHeight-margins.top-margins.bottom;
+  if(!Number.isFinite(bodyHeight)||bodyHeight<=24)fail('The headers and footers leave too little room for the PDF body. Download DOCX to adjust the page margins.');
   let page,y;
   function newPage(){abort(signal);if(pdf.getPageCount()>=500)fail('The PDF would exceed 500 pages. Shorten the document.');page=pdf.addPage([pageWidth,pageHeight]);y=margins.top;}
   newPage();
-  function drawFragment(fragment,x,top){
+  function drawFragment(fragment,x,top,{pageNumber=pdf.getPageCount(),region='body'}={}){
     for(const item of fragment.items){
       if(item.image){page.drawImage(item.image,{x:x+item.x,y:pageHeight-top-fragment.height,width:item.width,height:item.height});continue;}
       const baseline=pageHeight-top-fragment.height+item.size*.24;
       page.drawText(item.text,{x:x+item.x,y:baseline,font:item.font,size:item.size,color:item.color,...(item.italic?{xSkew:{type:'degrees',angle:12}}:{})});
       for(const [kind,offset]of [['underline',-.1],['line-through',.3]])if(item.decoration.includes(kind))page.drawLine({start:{x:x+item.x,y:baseline+item.size*offset},end:{x:x+item.x+item.width,y:baseline+item.size*offset},thickness:Math.max(.4,item.size*.05),color:item.color});
     }
-    layout.push({page:pdf.getPageCount(),key:fragment.key,record:fragment.record,x,y:top,width:usable,height:fragment.height});
+    layout.push({page:pageNumber,region,key:fragment.key,record:fragment.record,x,y:top,width:usable,height:fragment.height});
   }
   async function flowParagraph(block){const lines=await paragraph(block,usable);for(const line of lines){if(line.breakBefore&&y>margins.top)newPage();const before=line.before||0;if(y+before+line.height>pageHeight-margins.bottom)newPage();if(line.height>bodyHeight)fail('A text line is taller than the PDF page.');y+=before;drawFragment(line,margins.left,y);y+=line.height+(line.after||0);}}
   const blocks=new Map(model.blocks.map(b=>[b.record,b]));
@@ -110,5 +123,15 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
   }
   if(model.hasTables){for(const item of model.content){if(item.type==='table')await table(item);else await flowParagraph(blocks.get(item.record));await cooperate();}}
   else for(const block of model.blocks){await flowParagraph(block);await cooperate();}
+  const pages=pdf.getPages(),pageStart=peripheral.pageStart||1;
+  for(let index=0;index<pages.length;index++){
+    page=pages[index];const number=index+pageStart,fields={PAGE:number,NUMPAGES:pages.length,SECTIONPAGES:pages.length};
+    const type=index===0&&peripheral.firstPage?'first':peripheral.evenPages&&number%2===0?'even':'default';
+    for(const kind of ['header','footer']){
+      const result=await peripheralLines(peripheral[kind]?.[type],fields),top=kind==='header'?distances.header:pageHeight-distances.footer-result.height;
+      for(const line of result.lines)drawFragment(line,margins.left,top+line.top,{pageNumber:index+1,region:kind});
+    }
+    await cooperate();
+  }
   abort(signal);pdf.setCreator('Compare These Texts');const bytes=await pdf.save();abort(signal);if(bytes.length>32*1024*1024)fail('The PDF is too large. Reduce image sizes in the Word document.');onLayout?.(layout);return bytes;
 }

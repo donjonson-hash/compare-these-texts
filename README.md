@@ -1,6 +1,6 @@
 # Compare These Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.35.7**.
+Current CTT website and offline Chrome/Firefox extension source: **0.35.8**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparethesetexts.com/.
@@ -14,16 +14,19 @@ stay with each document; save errors and document scope limitations remain visib
 `npm run check:compact` checks keyboard focus, reading area, review/undo/download,
 mode switching, mobile layout, saved-work restoration and file replacement.
 
-**Home** returns to the task menu without reloading or clearing the open documents,
-edits or Undo history. Continue comparison/editing returns to the same workspace.
+**Home** opens a start screen with file inputs for a new A/B pair. The current
+documents, edits and Undo history stay available through Continue comparison/editing.
+A new comparison reads both replacement files before replacing the current work;
+cancelling the replacement keeps the current documents intact.
 For Word conversion, open a `.docx`, select PDF, choose **Preview PDF**, then
 **Download PDF** in the preview. Legacy `.doc` files must first be saved as `.docx`
-in Word or LibreOffice. Documents with unsupported page layouts or headers/footers
-remain downloadable as Word; PDF export does not silently discard those parts.
+in Word or LibreOffice; changing the filename extension is not conversion.
+Supported text headers/footers and page numbers are included in the PDF. Complex
+page layouts remain restricted; PDF export does not silently discard those parts.
 
 ## Extension welcome and store kit
 
-The 0.35.7 candidate opens a local welcome page on first installation. Updates
+The 0.35.8 candidate opens a local welcome page on first installation. Updates
 leave existing tabs alone. **Getting started** in the extension footer opens
 the guide separately; **Try an example** leaves an existing saved comparison
 available to resume. The editor and welcome page remain English.
@@ -31,7 +34,7 @@ available to resume. The editor and welcome page remain English.
 The Chrome package includes 22 localized metadata catalogs. Full store
 descriptions, five icon sizes, three actual screenshots, two promotional images
 and Russian submission instructions are assembled with `npm run package:store`
-after building. The result is `artifacts/ctt-0.35.7-store-kit.zip`; unpack it
+after building. The result is `artifacts/ctt-0.35.8-store-kit.zip`; unpack it
 before uploading its inner Chrome ZIP. Firefox is supplied for temporary
 testing; its metadata remains English. This preparation does not publish either
 store listing or deploy the website.
@@ -95,8 +98,8 @@ npm run check
 Outputs:
 
 - `dist/`: static website, including extension downloads.
-- `dist/downloads/ctt-chrome-0.35.7.zip`: load the extracted directory in Chrome.
-- `dist/downloads/ctt-firefox-0.35.7.zip`: temporary Firefox installation.
+- `dist/downloads/ctt-chrome-0.35.8.zip`: load the extracted directory in Chrome.
+- `dist/downloads/ctt-firefox-0.35.8.zip`: temporary Firefox installation.
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 
@@ -147,7 +150,7 @@ for a dependency or security review. Acorn is used by the browser API guard.
 
 ## Chrome store metadata
 
-Chrome 0.35.7 includes localized names, summaries and toolbar titles for 19 additional
+Chrome 0.35.8 includes localized names, summaries and toolbar titles for 19 additional
 languages (21 regional variants), with English fallback. The editor UI remains
 English; each translated summary states this explicitly. See
 [the complete copy and publishing notes](docs/CWS-LOCALIZATIONS.md).

@@ -852,6 +852,34 @@
     else if (visualReview) mountWorkspaceTools(visualReview);
   });
   document.addEventListener('ctt:home', () => restoreWorkspaceTools());
+  document.addEventListener('ctt:new-comparison', event => {
+    const {files, complete} = event.detail || {};
+    if (typeof complete !== 'function') return;
+    void (async () => {
+      if (state.busy) return {ok:false, message:'Wait for the current operation to finish, then try again.'};
+      busy(true);
+      try {
+        if (!window.KristinaTransport) throw new Error('The comparison engine could not load. Refresh the page and try again.');
+        const next = {};
+        for (const side of ['left', 'right']) {
+          const file = files?.[side];
+          if (!file || !/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.test(file.name)) throw new Error('Choose two supported files. Old .doc files must first be saved as .docx in Word or LibreOffice.');
+          if (file.size > MAX_FILE_BYTES) throw new Error('Choose files up to 2 MB each.');
+          next[side] = {name:file.name, data:encode(new Uint8Array(await file.arrayBuffer()))};
+        }
+        // Parse both files before replacing anything. An invalid new document
+        // must not destroy the previous comparison, its saved draft or Undo.
+        await window.KristinaTransport.request('/api/prepare', {...next, delimiter:'auto'});
+        if ((state.report || state.sources.left || state.sources.right) && !window.confirm('Replace the previous comparison and its saved draft? Download your edited files first if you want to keep them.')) return {ok:false};
+        loads.left++; loads.right++; clearResult(); state.sources = next;
+        for (const side of ['left', 'right']) { showSheets(side); $(side + '-file').value = ''; sourceLabel(side, next[side]); }
+        $('delimiter').value = 'auto'; $('settings').open = false;
+        busy(false); await prepare();
+        return {ok:true};
+      } catch (error) { return {ok:false, message:error.message || 'Could not open the new files. Your previous work is still open.'}; }
+      finally { busy(false); }
+    })().then(complete);
+  });
   $('office-draft').addEventListener('input', () => { $('office-draft-status').textContent = "Draft edited. Review it before sending."; });
   officeEnable(); exportEnable();
   const sessionReady = window.KristinaTransport ? (async () => {

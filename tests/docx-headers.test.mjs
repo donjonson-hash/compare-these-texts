@@ -26,7 +26,7 @@ test('DOCX imports the body, discloses peripheral coverage and preserves every o
  const beforeParts=await unzipDocument(Buffer.from(src.data,'base64')),afterParts=await unzipDocument(bytes);assert.deepEqual([...afterParts.keys()].sort(),[...beforeParts.keys()].sort());
  for(const [path,content] of beforeParts)if(path!=='word/document.xml')assert.deepEqual(afterParts.get(path),content,path);
  assert.deepEqual((await readDocxVisual(source(bytes))).headersFooters,model.headersFooters);
- await assert.rejects(()=>renderDocxPdf(model),/headers or footers/);
+ assert.equal(new TextDecoder().decode((await renderDocxPdf(model)).slice(0,5)),'%PDF-');
  const {report}=await handleRequest('/api/compare',{left:src,right:fixture({header:'Different title'})});assert.equal(report.changed.length,0);assert.equal(report.sources.left.coverage,'main_body_only');
 });
 test('DOCX rejects missing references, active header fields, unsupported objects and unhandled notes',async()=>{
@@ -39,7 +39,7 @@ test('inherited list-level hints do not prevent importing unnumbered styled para
  assert.equal((await readTextSource(fixture({body,extra:{'word/styles.xml':styles}}))).blocks[0].text,'Heading text');
  await assert.rejects(()=>readTextSource(fixture({body:body.replace('<w:pStyle w:val="Heading"/>','<w:numPr><w:ilvl w:val="1"/></w:numPr>')})),/without a numbering definition/);
 });
-test('single and comparison views disclose read-only headers and disable incomplete PDF export',async t=>{
+test('single and comparison views disclose read-only headers and allow PDF export',async t=>{
  const dom=new JSDOM('<main></main>',{pretendToBeVisual:true});Object.assign(globalThis,{window:dom.window,document:dom.window.document});window.KristinaTextEditor=editor;window.Element.prototype.scrollIntoView=()=>{};
  t.after(()=>{dom.window.close();delete globalThis.window;delete globalThis.document;});
  const root=document.querySelector('main'),sources={left:fixture(),right:fixture({header:'Other title'})};
@@ -48,7 +48,7 @@ test('single and comparison views disclose read-only headers and disable incompl
   try{for(const side of single?['left']:['left','right']){
    const details=root.querySelector(`[data-docx-peripheral="${side}"]`);assert.match(details.textContent,/read-only, not compared/);assert.match(details.textContent,/\[Page number\]/);assert.equal(details.querySelector('input,textarea,[contenteditable]'),null);
    assert.match(root.querySelector(`[data-docx-peripheral-note="${side}"]`).textContent,/kept unchanged/);
-   const select=root.querySelector(`[data-download-format="${side}"]`);assert.equal(select.value,'docx');assert.equal(select.querySelector('[value="pdf"]').disabled,true);
+   const select=root.querySelector(`[data-download-format="${side}"]`);assert.equal(select.value,'docx');assert.equal(select.querySelector('[value="pdf"]').disabled,false);
   }}finally{view.dispose();root.replaceChildren();}
  }
 });

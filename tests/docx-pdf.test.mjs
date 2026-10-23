@@ -12,6 +12,7 @@ import {mountVisualReview} from '../dist/visual-review.mjs';
 import editor from '../dist/text-editor.js';
 import {createDocxRowEditor} from '../dist/docx-row-editor.mjs';
 import {tableSource} from './fixtures/table-fixture.mjs';
+import {peripheralFixture} from './fixtures/docx-headers-fixture.mjs';
 import {docx,W} from './fixtures/text-fixture.mjs';
 const require=createRequire(import.meta.url),{JSDOM}=require('jsdom');const native=require('@napi-rs/canvas');
 const source=(name,data)=>({name,data:Buffer.from(data).toString('base64')});
@@ -31,6 +32,30 @@ test('Word PDF retains merged tables, edited text, page breaks and all lines acr
  const reverse=projectDocxVisual(bm,sequence(bm).reverse());reverse.blocks.forEach(b=>{b.pageBreakBefore=false;b.runs=b.runs.filter(r=>!r.pageBreak);});const reversed=(await extracted(await renderDocxPdf(reverse))).join(' ');assert.ok(reversed.indexOf('Third page')<reversed.indexOf('First page'));
  await assert.rejects(()=>renderDocxPdf({...model,pdfUnsupported:['Unsupported layout']}),/Unsupported layout/);
  const abort=new AbortController();abort.abort();await assert.rejects(()=>renderDocxPdf(model,{signal:abort.signal}),{name:'AbortError'});
+});
+
+
+test('Word PDF retains text headers/footers, updates page fields and respects first/even/default selection',async()=>{
+ for(const differentPages of [false,true]){
+  const model=await readDocxVisual(peripheralFixture({differentPages})),seq=sequence(model);seq[0].text='Edited first body';let layout;
+  const pdf=await renderDocxPdf(projectDocxVisual(model,seq),{onLayout:x=>layout=x}),pages=await extracted(pdf);assert.equal(pages.length,3);
+  for(let i=0;i<pages.length;i++){
+   const type=differentPages?['first','even','default'][i]:'default';
+   assert.match(pages[i],new RegExp(type+' header'));assert.match(pages[i],new RegExp(type+' footer — Page '+(i+1)+' of 3'));
+   assert.doesNotMatch(pages[i],/\b98\b|\b99\b|\[Page/);
+   const body=layout.filter(x=>x.page===i+1&&x.region==='body'),header=layout.filter(x=>x.page===i+1&&x.region==='header'),footer=layout.filter(x=>x.page===i+1&&x.region==='footer');
+   assert.ok(Math.max(...header.map(x=>x.y+x.height))<Math.min(...body.map(x=>x.y)));
+   assert.ok(Math.max(...body.map(x=>x.y+x.height))<Math.min(...footer.map(x=>x.y)));
+  }
+  assert.match(pages[0],/Edited first body/);assert.match(pages[1],/Body page 2/);assert.match(pages[2],/Body page 3/);
+  await artifact(differentPages?'word-page-variants.pdf':'word-headers.pdf',pdf);
+ }
+ const tall=await readDocxVisual(peripheralFixture({largeHeader:true}));let layout;
+ const pdf=await renderDocxPdf(tall,{onLayout:x=>layout=x});assert.equal((await extracted(pdf)).length,3);
+ for(let page=1;page<=3;page++)assert.ok(Math.max(...layout.filter(x=>x.page===page&&x.region==='header').map(x=>x.y+x.height))<Math.min(...layout.filter(x=>x.page===page&&x.region==='body').map(x=>x.y)));
+ const numbered=await extracted(await renderDocxPdf(await readDocxVisual(peripheralFixture({sectionExtra:'<w:pgNumType w:start="7"/>'}))));assert.match(numbered[0],/Page 7 of 3/);assert.match(numbered[2],/Page 9 of 3/);
+ for(const sectionExtra of ['<w:pgNumType w:fmt="upperRoman"/>','<w:pgNumType w:chapStyle="1" w:chapSep="hyphen"/>']) { const unsupported=await readDocxVisual(peripheralFixture({sectionExtra})); await assert.rejects(()=>renderDocxPdf(unsupported),/page-number format/); }
+ const multi=await readDocxVisual(peripheralFixture({bodyExtra:'<w:p><w:pPr><w:sectPr/></w:pPr></w:p>'}));await assert.rejects(()=>renderDocxPdf(multi),/multiple page layouts/);
 });
 
 test('Word PDF preview downloads edited text and image, rejects stale revisions and leaves drafts unchanged',{skip:!native},async t=>{
