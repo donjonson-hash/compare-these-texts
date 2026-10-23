@@ -10,7 +10,8 @@
     "store:assets": "node scripts/store-assets.mjs",
     "build": "python3 scripts/build.py",
     "pretest": "npm run build",
-    "check:vendors": "python3 scripts/verify_vendor.py"
+    "check:vendors": "python3 scripts/verify_vendor.py",
+    "check:compact": "node scripts/check_compact_browser.mjs"
   },
   "devDependencies": {
     "@napi-rs/canvas": "1.0.11",
@@ -18,7 +19,7 @@
     "jsdom": "30.1.2",
     "playwright": "1.62.1"
   },
-  "version": "0.35.4",
+  "version": "0.35.5",
   "engines": {
     "node": "^24.15.0 || >=26.0.0"
   },

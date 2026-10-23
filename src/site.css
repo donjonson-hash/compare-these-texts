@@ -52,3 +52,20 @@
 @media(max-width:650px){.single-options{align-items:stretch;flex-direction:column}.single-review .visual-column-heading .visual-file-name{flex-basis:100%}.work-mode-switch .button{flex:1;padding:12px 8px}.single-review .visual-inspector{position:static}}
 
 .document-pdf-stage.is-zoomed canvas{width:auto;max-width:none}.document-pdf-nav{flex-wrap:wrap}
+
+/* Keep the active comparison above the fold; secondary details stay available. */
+.session-panel.session-active{padding:6px 0;margin:0 0 6px;gap:12px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;align-items:center}
+.session-panel .session-status{font-size:13px;margin:0}
+.session-panel.session-error{padding:10px 14px;background:#fff1df;border:1px solid #e6c897;border-radius:8px}
+.session-details{position:relative;font-size:13px}.session-details>summary{padding:7px 4px;white-space:nowrap}
+.session-details-body{position:absolute;right:0;z-index:20;background:white;border:1px solid var(--line);border-radius:8px;padding:14px;width:min(320px,80vw);box-shadow:0 4px 18px #203b2520}
+.session-details-body .hint{margin:0 0 12px}.session-details-body .button{width:100%}
+.source-picker>summary{display:none}.visual-mode .source-picker>summary{display:list-item;font-size:13px;font-weight:600;padding:6px 0;cursor:pointer}
+.visual-mode .source-picker[open] .sources{margin-top:8px}.visual-mode #source-privacy{display:none}
+.review-mode .hero{display:none}.review-mode .topbar{padding-block:8px}.review-mode .brand small{display:none}
+.review-mode .work-mode-switch{justify-content:flex-start;margin:10px 0;gap:6px}
+.review-mode .work-mode-switch .button{font-size:14px;padding:7px 12px}
+.visual-mode .results{margin-top:8px}.visual-mode .result-heading{margin-bottom:0;min-height:0;justify-content:flex-end}
+.visual-mode .result-heading h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.visual-mode .result-heading .downloads{gap:6px}.visual-mode .result-heading .downloads .button{padding:6px 10px}
+@media(max-width:650px){.session-panel.session-active{flex-direction:row;align-items:flex-start;flex-wrap:wrap}.session-panel.session-active .session-actions{margin-left:auto}.review-mode main,.review-mode .topbar{padding-inline:14px}.review-mode .work-mode-switch .button{flex:initial}.review-mode .topbar nav{width:auto}.session-details-body{max-width:calc(100vw - 32px)}}

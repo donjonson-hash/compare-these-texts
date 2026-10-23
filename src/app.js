@@ -185,6 +185,7 @@
     $('compare').textContent = value ? "Processing…" : "Apply settings";
   }
   function clearResult() {
+    $('source-picker').open = true;
     sessionUI?.deactivate();
     visualController?.abort(); visualController = null; visualReview?.dispose(); visualReview = null;
     document.body.classList.remove('visual-mode'); $('visual-review').replaceChildren(); $('visual-review').className = ''; $('visual-review').hidden = true;
@@ -475,6 +476,7 @@
       if (abort.signal.aborted) review.dispose();
       else {
         visualReview = review;
+        $('source-picker').open = false;
         await sessionReady;
         if (!abort.signal.aborted) sessionUI?.activate(() => ({version: 1, sources, report, review: review.snapshot()}));
       }
