@@ -356,6 +356,7 @@
   }
   async function loadFile(side, file) {
     if (!file || state.busy) return;
+    if (/\.doc$/i.test(file.name)) { visualReview?.closeWorkspaceTools?.(); notice('Old Word files (.doc) are not supported. Open the file in Word or LibreOffice and save it as .docx, then try again.', true); $('notice').scrollIntoView({block: 'nearest'}); return; }
     const version = ++loads[side]; clearResult(); state.sources[side] = null; state.metadata = null;
     showSheets(side); $('settings').hidden = textSourcesSelected();
     $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
@@ -850,6 +851,7 @@
     if (button.dataset.workMode === 'single') restoreWorkspaceTools();
     else if (visualReview) mountWorkspaceTools(visualReview);
   });
+  document.addEventListener('ctt:home', () => restoreWorkspaceTools());
   $('office-draft').addEventListener('input', () => { $('office-draft-status').textContent = "Draft edited. Review it before sending."; });
   officeEnable(); exportEnable();
   const sessionReady = window.KristinaTransport ? (async () => {
