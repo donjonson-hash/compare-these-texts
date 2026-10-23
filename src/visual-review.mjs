@@ -153,7 +153,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   const toolsContent = el('div', undefined, 'visual-tools-content'); tools.append(toolsContent);
   toolsContent.addEventListener('click', event => {
     const action = event.target.closest('button');
-    if (action && !action.disabled) tools.open = false;
+    if (action) tools.open = false;
   });
   toolsContent.append(all, button("Make A match B", () => act('left', draft => draft.replaceAll(drafts.right.entries(), {rowPlan: drafts.right.rowPlan?.(), content: models.right?.content}))));
   toolsContent.append(button("Restore original documents", () => { if (!alive()) return; for (const side of sides) drafts[side].reset(); reviewQueue.reset(); numberReview?.reset(); reviewHistory = []; refresh(); stateChanged(); }));

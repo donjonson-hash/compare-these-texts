@@ -81,7 +81,7 @@ try {
 
     await more.locator(':scope > summary').click();
     await page.locator('[data-action="copy-all-right"]').click();
-    await more.locator(':scope > summary').click();
+    assert.equal(await more.evaluate(element => element.open), false, 'More closes after applying an action');
     await saved();
     assert.notDeepEqual(await downloadB(), original, 'the relocated transfer action edits the downloaded document');
     await page.getByRole('button',{name:'Undo edit in B',exact:true}).click();
