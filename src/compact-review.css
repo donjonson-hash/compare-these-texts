@@ -45,3 +45,51 @@
   .visual-review:not(.single-review) .review-flow-progress { flex-basis: auto; }
   .visual-review:not(.single-review) .visual-progress { width: 100%; }
 }
+
+/* Keep secondary workspace controls off the document canvas. */
+.workspace-tools-dialog {
+  box-sizing: border-box;
+  width: min(760px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 20px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid #cbd9d0;
+  border-radius: 16px;
+  color: #243b30;
+  background: #fff;
+  box-shadow: 0 20px 70px #102c3055;
+}
+.workspace-tools-dialog::backdrop { background: #102c3066; }
+.workspace-tools-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.workspace-tools-heading h2 { margin: 0; font: 650 22px system-ui, sans-serif; }
+.workspace-tools-heading .button { flex-shrink: 0; }
+.workspace-controls-host { display: grid; gap: 12px; }
+.workspace-tool-actions { display: flex; align-items: end; flex-wrap: wrap; gap: 10px; padding: 16px 0; }
+.workspace-tool-actions > label { display: grid; gap: 5px; font-size: 13px; }
+.workspace-tool-actions select { padding: 9px; border: 1px solid #d5ded9; border-radius: 8px; background: white; color: #345243; }
+.workspace-tools-dialog .compact-review-tools { flex-basis: 100%; }
+.workspace-tools-dialog .compact-review-tools[open] > .visual-tools-content {
+  position: static; box-sizing: border-box; width: 100%; max-height: none;
+  margin-top: 6px; box-shadow: none;
+}
+.workspace-tools-dialog .session-panel { margin: 0; padding: 10px 0; }
+.workspace-tools-dialog .session-details[open] .session-details-body {
+  position: static; width: auto; max-width: 100%; margin-top: 8px; box-shadow: none;
+}
+.workspace-tools-dialog .work-mode-switch { margin: 0; }
+.workspace-tools-dialog .source-picker { margin: 0; }
+.workspace-tools-dialog .downloads { justify-content: flex-start; margin: 0; }
+.workspace-tools-dialog .number-review { margin-bottom: 0; }
+body.popup-mode #results > .result-heading { display: none; }
+body.popup-mode .results { margin-top: 0; }
+body.popup-mode .visual-toolbar { padding-top: 8px; }
+@media (max-width: 700px) {
+  .workspace-tools-dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); padding: 14px; }
+  .workspace-tools-heading h2 { font-size: 20px; }
+  .workspace-tools-dialog .sources { grid-template-columns: 1fr; }
+  .workspace-tools-dialog .source-card { padding: 12px; }
+  .visual-review:not(.single-review) .visual-toolbar .visual-progress { width: auto; flex: 1 0 100%; }
+}

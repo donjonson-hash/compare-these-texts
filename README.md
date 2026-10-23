@@ -1,21 +1,22 @@
 # Compare These Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.35.5**.
+Current CTT website and offline Chrome/Firefox extension source: **0.35.6**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparethesetexts.com/.
 
 ## Compact comparison workspace
 
-After comparison, filenames and downloads stay with each document. Use **Change
-files** to replace the inputs and **Saved work** for retention and deletion.
-Detailed editing guidance lives in **More**; save errors and document scope
-limitations remain visible. `npm run check:compact` checks the desktop reading
-area, review/undo/download actions, mobile layout and saved-work restoration.
+After document comparison, the main toolbar shows the difference count, navigation
+and **Tools & info**. This window contains saved work, mode switching, **Change
+files**, reports, search, zoom, guided review and amounts. Filenames and downloads
+stay with each document; save errors and document scope limitations remain visible.
+`npm run check:compact` checks keyboard focus, reading area, review/undo/download,
+mode switching, mobile layout, saved-work restoration and file replacement.
 
 ## Extension welcome and store kit
 
-The 0.35.5 candidate opens a local welcome page on first installation. Updates
+The 0.35.6 candidate opens a local welcome page on first installation. Updates
 leave existing tabs alone. **Getting started** in the extension footer opens
 the guide separately; **Try an example** leaves an existing saved comparison
 available to resume. The editor and welcome page remain English.
@@ -23,7 +24,7 @@ available to resume. The editor and welcome page remain English.
 The Chrome package includes 22 localized metadata catalogs. Full store
 descriptions, five icon sizes, three actual screenshots, two promotional images
 and Russian submission instructions are assembled with `npm run package:store`
-after building. The result is `artifacts/ctt-0.35.5-store-kit.zip`; unpack it
+after building. The result is `artifacts/ctt-0.35.6-store-kit.zip`; unpack it
 before uploading its inner Chrome ZIP. Firefox is supplied for temporary
 testing; its metadata remains English. This preparation does not publish either
 store listing or deploy the website.
@@ -87,8 +88,8 @@ npm run check
 Outputs:
 
 - `dist/`: static website, including extension downloads.
-- `dist/downloads/ctt-chrome-0.35.5.zip`: load the extracted directory in Chrome.
-- `dist/downloads/ctt-firefox-0.35.5.zip`: temporary Firefox installation.
+- `dist/downloads/ctt-chrome-0.35.6.zip`: load the extracted directory in Chrome.
+- `dist/downloads/ctt-firefox-0.35.6.zip`: temporary Firefox installation.
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 
@@ -139,7 +140,7 @@ for a dependency or security review. Acorn is used by the browser API guard.
 
 ## Chrome store metadata
 
-Chrome 0.35.5 includes localized names, summaries and toolbar titles for 19 additional
+Chrome 0.35.6 includes localized names, summaries and toolbar titles for 19 additional
 languages (21 regional variants), with English fallback. The editor UI remains
 English; each translated summary states this explicitly. See
 [the complete copy and publishing notes](docs/CWS-LOCALIZATIONS.md).

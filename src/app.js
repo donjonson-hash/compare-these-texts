@@ -8,6 +8,34 @@
   const textReportModuleURL = new URL('text-report.mjs', document.currentScript.src);
   let visualController = null, visualReview = null;
   let sessionUI = null;
+  let restoreWorkspaceTools = () => {};
+  function mountWorkspaceTools(review) {
+    restoreWorkspaceTools();
+    if (!review?.workspaceControlsHost) return;
+    const host = review.workspaceControlsHost;
+    const nodes = [$('saved-session'), document.querySelector('.work-mode-switch'), $('source-picker'), $('results').querySelector('.result-heading .downloads')].filter(Boolean);
+    const homes = nodes.map(node => {
+      const marker = document.createComment('workspace control home');
+      node.before(marker); host.append(node); return {node, marker};
+    });
+    document.body.classList.add('popup-mode');
+    // A failed autosave must remain visible even while the tools window is closed.
+    const saved = homes.find(({node}) => node.id === 'saved-session');
+    const showSaveError = () => {
+      if (!saved) return;
+      if (saved.node.classList.contains('session-error')) saved.marker.after(saved.node);
+      else if (saved.node.parentNode !== host) host.prepend(saved.node);
+    };
+    const observer = new MutationObserver(showSaveError);
+    if (saved) observer.observe(saved.node, {attributes: true, attributeFilter: ['class']});
+    showSaveError();
+    restoreWorkspaceTools = () => {
+      observer.disconnect(); review.closeWorkspaceTools?.();
+      for (const {node, marker} of homes) { marker.replaceWith(node); }
+      document.body.classList.remove('popup-mode');
+      restoreWorkspaceTools = () => {};
+    };
+  }
   const MAX_FILE_BYTES = 2 * 1024 * 1024, PAGE_SIZE = 25;
   const state = {sources: {left: null, right: null}, metadata: null, suggested: [], delimiter: ',',
     report: null, html: null, records: [], editor: null, busy: false, revision: 0, filter: 'all', page: 0, active: -1};
@@ -31,11 +59,12 @@
   let officeDraftGeneration = 0, officeContext = null;
   function officeToggle(open, focus = true) {
     open = open && officeAvailable();
+    if (open) visualReview?.closeWorkspaceTools?.();
     $('office-sidebar').hidden = !open;
     $('comparison-layout').classList.toggle('assistant-open', open);
     $('office-open').setAttribute('aria-expanded', String(open));
     if (focus) {
-      const target = $(open ? 'office-title' : 'office-open');
+      const target = open ? $('office-title') : document.querySelector('[data-workspace-tools-open]') || $('office-open');
       target.focus({preventScroll: true});
       if (open) target.scrollIntoView({behavior: 'smooth', block: 'nearest'});
     }
@@ -185,6 +214,7 @@
     $('compare').textContent = value ? "Processing…" : "Apply settings";
   }
   function clearResult() {
+    restoreWorkspaceTools();
     $('source-picker').open = true;
     sessionUI?.deactivate();
     visualController?.abort(); visualController = null; visualReview?.dispose(); visualReview = null;
@@ -454,6 +484,7 @@
     if (window.KristinaTransport) return startVisualReview(report, restoredState);
   }
   async function startVisualReview(report, restoredState) {
+    restoreWorkspaceTools();
     visualController?.abort(); visualReview?.dispose(); visualReview = null;
     $('visual-load-error').hidden = true;
     const abort = new AbortController(); visualController = abort;
@@ -478,10 +509,14 @@
         visualReview = review;
         $('source-picker').open = false;
         await sessionReady;
-        if (!abort.signal.aborted) sessionUI?.activate(() => ({version: 1, sources, report, review: review.snapshot()}));
+        if (!abort.signal.aborted) {
+          sessionUI?.activate(() => ({version: 1, sources, report, review: review.snapshot()}));
+          if (!document.body.classList.contains('single-mode')) mountWorkspaceTools(review);
+        }
       }
     } catch (error) {
       if (!abort.signal.aborted) {
+        restoreWorkspaceTools();
         abort.abort(); $('visual-review').replaceChildren(); $('visual-review').className = ''; $('visual-review').hidden = true;
         officeUpdateContext(null);
         if (restoredState) throw error;
@@ -811,6 +846,10 @@
   $('office-sidebar').addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); officeToggle(false); } });
   $('office-show').addEventListener('click', () => { if (officeContext?.selected) officeJump({key: officeContext.selected.key}, state.revision); });
   $('office-copy').addEventListener('click', officeCopy); $('office-download').addEventListener('click', officeDownload);
+  for (const button of document.querySelectorAll('[data-work-mode]')) button.addEventListener('click', () => {
+    if (button.dataset.workMode === 'single') restoreWorkspaceTools();
+    else if (visualReview) mountWorkspaceTools(visualReview);
+  });
   $('office-draft').addEventListener('input', () => { $('office-draft-status').textContent = "Draft edited. Review it before sending."; });
   officeEnable(); exportEnable();
   const sessionReady = window.KristinaTransport ? (async () => {
