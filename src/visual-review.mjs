@@ -238,7 +238,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     const undo = button('↶', () => act(side, draft => draft.undo())); undo.setAttribute('aria-label', single ? "Undo edit" : `Undo edit in ${letter(side)}`);
     const save = button(single ? "Download" : `Download ${letter(side)}`, () => saveSide(side), 'button primary'); save.dataset.saveSide = side;
     let outputFormat;
-    if(report.sources[side].format==='docx'){outputFormat=el('select',undefined,'document-download-format');outputFormat.setAttribute('aria-label',single ? "Download format" : `Download format for ${letter(side)}`);outputFormat.dataset.downloadFormat=side;for(const [value,label]of [['docx','Word (.docx)'],['pdf','PDF (.pdf)']]){const option=el('option',label);option.value=value;if(value==='pdf'&&models[side]?.headersFooters?.length){option.disabled=true;option.textContent='PDF (headers/footers not supported)';}outputFormat.append(option);}}
+    if(report.sources[side].format==='docx'){outputFormat=el('select',undefined,'document-download-format');outputFormat.setAttribute('aria-label',single ? "Download format" : `Download format for ${letter(side)}`);outputFormat.dataset.downloadFormat=side;for(const [value,label]of [['docx','Word (.docx)'],['pdf','PDF (.pdf)']]){const option=el('option',label);option.value=value;if(value==='pdf'&&models[side]?.headersFooters?.length){option.disabled=true;option.textContent='PDF (headers/footers not supported)';}outputFormat.append(option);}outputFormat.addEventListener('change',()=>{save.textContent=outputFormat.value==='pdf'?(single?'Preview PDF':`Preview PDF ${letter(side)}`):(single?'Download':`Download ${letter(side)}`);if(!single&&side==='right')reviewDownload.textContent=outputFormat.value==='pdf'?'Preview updated B as PDF':'Download updated B';});}
     const menu = el('details', undefined, 'visual-more'); menu.append(el('summary', '⋯'));
     if(report.sources[side].format==='pdf'){const textPdf=button('Download text-only PDF',()=>saveSide(side,{textOnly:true}));textPdf.dataset.pdfTextOnly=side;menu.append(textPdf,el('p','Text-only PDF and TXT downloads do not include images or page formatting.','pdf-export-hint'));}
     menu.append(button(`Download ${letter(side)} as TXT`, () => download(drafts[side].exportText(), filename(side, 'txt'), 'text/plain;charset=utf-8')));
@@ -371,7 +371,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     ui[side].save.disabled = exporting[side] || pdfChecking[side] || !!failure;
     if(ui[side].print)ui[side].print.disabled=ui[side].save.disabled||!!printJob;
     updatePdfControls(side);
-    reviewDownload.textContent = 'Download updated B';
+    reviewDownload.textContent = ui.right.outputFormat?.value === 'pdf' ? 'Preview updated B as PDF' : 'Download updated B';
     if (side === 'right') reviewDownload.disabled = ui[side].save.disabled;
   }
   function filename(side, ext) { return sources[side].name.replace(/\.[^.]*$/, '') + (single ? `-edited.${ext}` : `-version-${letter(side)}.${ext}`); }
@@ -561,7 +561,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     reviewNext.textContent = reviewStarted ? 'Next to review' : 'Start review'; reviewNext.disabled = !progress.pending;
     reviewUndo.disabled = !reviewHistory.length || reviewHistory.at(-1).copied && !drafts.right.canUndo;
     reviewDownload.hidden = !complete; reviewDownload.disabled = exporting.right || pdfChecking.right || ui.right.save.disabled;
-    reviewDownload.textContent = 'Download updated B';
+    reviewDownload.textContent = ui.right.outputFormat?.value === 'pdf' ? 'Preview updated B as PDF' : 'Download updated B';
     if (complete && previewFailures.right?.revision === drafts.right.revision) reviewHint.textContent = 'Text review complete. Check the saving options in version B.';
     structureReview.hidden = !reviewingStructure || !reviewQueue.pending().includes(STRUCTURE_KEY);
     const tracked = selected && reviewQueue.has(selected), pending = tracked && !reviewQueue.reviewed(selected);
@@ -1012,6 +1012,9 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   }
   async function saveSide(side, {textOnly=false}={}) {
     if (!alive() || exporting[side] || !textOnly && ui[side].save.disabled || (inlineFill?.dirty && !await flushFill())) return;
+    // The PDF preview is outside the native tools dialog. Close the dialog first
+    // so it cannot leave the preview inert or intercept its download button.
+    closeWorkspaceTools();
     if (single && side === 'left' && hasFill()) {
       if (textOnly) {message('Added fields belong to the page layout. Choose Download PDF to include them.');return;}
       if (!fillCurrent()) {message('The document changed. Click each added text area to check its position, then Save before printing or downloading.');return;}

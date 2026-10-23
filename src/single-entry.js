@@ -40,6 +40,7 @@
   await install({source:candidate,sheet:$('single-sheet').value||null,delimiter:$('single-delimiter').value});
  }
  async function load(file){
+  if(file&&/\.doc$/i.test(file.name)){note('Old Word files (.doc) are not supported. Open the file in Word or LibreOffice and save it as .docx, then try again.',true);return;}
   if(!file||busy||operating)return;const ticket=++generation;candidate=null;$('single-options').hidden=true;setBusy(true);
   try{
    if(file.size>2097152)throw Error('Choose a file up to 2 MB.');note('Reading your file…');

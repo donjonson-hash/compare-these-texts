@@ -1,6 +1,6 @@
 # Compare These Texts — English store listing
 
-Version 0.35.6 candidate, prepared 20 October 2026. The fields below preserve
+Version 0.35.7 candidate, prepared 20 October 2026. The fields below preserve
 the approved locale catalog and full description from 16 October. This file
 is a convenient copy reference; `localizations.json` and `descriptions/en.txt`
 remain the authoritative inputs. It does not claim a published store listing.

@@ -53,6 +53,15 @@
 
 .document-pdf-stage.is-zoomed canvas{width:auto;max-width:none}.document-pdf-nav{flex-wrap:wrap}
 
+.topbar .home-link{border:0;background:transparent;color:var(--green);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;padding:8px 0}
+.topbar .home-link:focus-visible{outline:2px solid var(--green);outline-offset:4px}
+.review-mode .topbar,.single-mode .topbar{position:sticky;top:0;z-index:30;background:var(--paper)}
+.start-menu{padding:52px 0;max-width:760px;margin:auto;text-align:center}
+.start-menu h1{font-size:clamp(26px,4vw,38px);margin-bottom:14px}
+.start-menu p{color:var(--muted);margin-bottom:24px}
+.start-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.home-mode .hero,.home-mode .work-mode-switch,.home-mode #compare-workspace,.home-mode #single-workspace,.home-mode #saved-session,.home-mode #single-session{display:none!important}
+
 /* Keep the active comparison above the fold; secondary details stay available. */
 .session-panel.session-active{padding:6px 0;margin:0 0 6px;gap:12px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;align-items:center}
 .session-panel .session-status{font-size:13px;margin:0}

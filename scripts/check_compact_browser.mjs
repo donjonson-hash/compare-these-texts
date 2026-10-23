@@ -104,7 +104,15 @@ try {
     await tools.waitFor({state:'hidden'});
     assert.equal(await more.evaluate(element => element.open), false, 'More closes after applying an action');
     await saved();
-    assert.notDeepEqual(await downloadB(), original, 'the relocated transfer action edits the downloaded document');
+    const edited = await downloadB();
+    assert.notDeepEqual(edited, original, 'the relocated transfer action edits the downloaded document');
+    await page.locator('#workspace-home').click();
+    await page.locator('#start-menu').waitFor({state:'visible'});
+    assert.ok(await page.locator('#compare-workspace').isHidden(), 'Home shows the start menu instead of the editor');
+    await page.screenshot({path:path.join(output,'home-menu.png'),animations:'disabled'});
+    await page.locator('#start-compare').click();
+    await ready();
+    assert.deepEqual(await downloadB(), edited, 'Home and Continue preserve edited comparison bytes');
     await page.getByRole('button',{name:'Undo edit in B',exact:true}).click();
     await saved();
     assert.deepEqual(await downloadB(), original, 'document Undo remains available');
@@ -132,6 +140,29 @@ try {
     await page.locator('#session-resume').click();
     await ready(); await saved();
     assert.deepEqual(await downloadB(), original, 'saved work resumes after the session controls are compacted');
+    // A native Tools dialog used to stay open over the PDF preview launched
+    // from the completed review, leaving its Download PDF button inert.
+    await page.locator('[data-download-format="right"]').selectOption('pdf');
+    assert.equal(await page.locator('[data-save-side="right"]').innerText(), 'Preview PDF B');
+    await openTools();
+    await page.locator('[data-review-action="start"]').click();
+    for (let index = 0; index < 4; index++) {
+      await page.locator('[data-review-action="keep"]:not([disabled])').waitFor({state:'visible'});
+      await page.locator('[data-review-action="keep"]').click();
+    }
+    await tools.waitFor({state:'visible'});
+    assert.match(await page.locator('.review-flow-progress').innerText(), /Reviewed 4 of 4/);
+    assert.equal(await page.locator('[data-review-action="download"]').innerText(), 'Preview updated B as PDF');
+    await page.locator('[data-review-action="download"]').click();
+    await tools.waitFor({state:'hidden'});
+    const pdfSave = page.locator('.document-pdf-dialog .primary:not([disabled])');
+    await pdfSave.waitFor({state:'visible'});
+    const [pdfDownload] = await Promise.all([page.waitForEvent('download'), pdfSave.click()]);
+    assert.match(pdfDownload.suggestedFilename(), /\.pdf$/);
+    assert.match((await readFile(await pdfDownload.path())).subarray(0,8).toString(), /^%PDF-/);
+    await page.getByRole('button', {name:'Back to editing', exact:true}).click();
+    await page.locator('[data-download-format="right"]').selectOption('docx');
+    assert.deepEqual(await downloadB(), original, 'PDF conversion preserves the editable Word document');
     // Replacing a source destroys the old review. Its relocated file controls
     // must survive, then join the new tools window without duplicate IDs.
     await openTools();
@@ -142,6 +173,38 @@ try {
     assert.equal(await page.locator('#source-picker').count(), 1, 'source controls survive replacement exactly once');
     assert.equal(await page.locator('#saved-session').count(), 1, 'session controls survive replacement exactly once');
     assert.equal((await downloadB()).toString(), replacement, 'replacing a source through the tools window loads the new document');
+
+    // Home must also preserve the standalone editor and its undo history.
+    await page.locator('#workspace-home').click();
+    await page.locator('#start-edit').click();
+    await page.locator('#single-file').setInputFiles({name:'single-home.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:original});
+    const single = page.locator('#single-editor-host');
+    await single.locator('[data-save-side="left"]').waitFor({state:'visible'});
+    await single.locator('.visual-paragraph').filter({hasText:'Warranty: 12 months.'}).first().click();
+    await single.locator('[data-edit-side="left"]').fill('Warranty: 18 months.');
+    await single.getByRole('button',{name:'Done ✓',exact:true}).click();
+    const downloadSingle = async () => {
+      const [download] = await Promise.all([page.waitForEvent('download'), single.locator('[data-save-side="left"]').click()]);
+      return readFile(await download.path());
+    };
+    const singleEdited = await downloadSingle();
+    assert.notDeepEqual(singleEdited, original, 'standalone edit changes the document');
+    await page.locator('#workspace-home').click();
+    await page.locator('#start-menu').waitFor({state:'visible'});
+    await page.locator('#start-edit').click();
+    assert.deepEqual(await downloadSingle(), singleEdited, 'Home and Continue preserve standalone edits');
+    await page.locator('#single-file').setInputFiles({name:'legacy.doc',mimeType:'application/msword',buffer:Buffer.from('unsupported legacy file')});
+    assert.match(await page.locator('#single-notice').innerText(), /\.doc.*not supported/);
+    assert.deepEqual(await downloadSingle(), singleEdited, 'rejecting legacy DOC preserves the open document');
+    await single.getByRole('button',{name:'Undo edit',exact:true}).click();
+    assert.deepEqual(await downloadSingle(), original, 'standalone Undo survives Home navigation');
+    await single.locator('[data-download-format="left"]').selectOption('pdf');
+    assert.equal(await single.locator('[data-save-side="left"]').innerText(), 'Preview PDF');
+    await single.locator('[data-save-side="left"]').click();
+    const singlePdfSave = single.locator('.document-pdf-dialog .primary:not([disabled])');
+    await singlePdfSave.waitFor({state:'visible'});
+    const [singlePdf] = await Promise.all([page.waitForEvent('download'), singlePdfSave.click()]);
+    assert.match((await readFile(await singlePdf.path())).subarray(0,8).toString(), /^%PDF-/);
 
   }
   assert.deepEqual(errors, [], 'no uncaught page errors');
