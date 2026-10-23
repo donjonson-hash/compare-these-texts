@@ -103,6 +103,7 @@ try {
   });
   assert.equal(new URL(page.url()).search, '', 'example launch is consumed once');
   const original = await downloadB(page);
+  await page.locator('[data-workspace-tools-open]').click();
   await page.locator('.compact-review-tools > summary').click();
   await page.locator('[data-action="copy-all-right"]').click();
   await page.waitForFunction(() => !document.querySelector('[aria-label="Undo edit in B"]').disabled);

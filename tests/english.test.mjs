@@ -99,6 +99,13 @@ async function page(t, target, browserCompatibility = false, realModules = false
       }});
       window.open = url => { navigations.push(String(url)); return null; };
       window.Element.prototype.scrollIntoView = () => {};
+      // JSDOM does not implement native dialog methods. Adapt their open state
+      // so focus assertions remain meaningful; browser tests cover modal behavior.
+      window.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
+      window.HTMLDialogElement.prototype.close = function () {
+        this.open = false;
+        this.dispatchEvent(new window.Event('close'));
+      };
       const blobs = new Map();
       window.URL.createObjectURL = blob => { const id = `blob:test-${blobs.size}`; blobs.set(id, blob); return id; };
       window.URL.revokeObjectURL = id => blobs.delete(id);
