@@ -7,6 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {createServer} from 'node:http';
 import {peripheralFixture} from '../tests/fixtures/docx-headers-fixture.mjs';
 import {docx} from '../tests/fixtures/text-fixture.mjs';
+import {unzipDocument} from '../src/text-zip.mjs';
 
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -323,7 +324,8 @@ try {
     await page.locator('#home-right-file').setInputFiles(emojiFile);
     await page.locator('#start-new-compare').click();await ready();
     const emojiDocx=await downloadB();
-    assert.deepEqual(emojiDocx,emojiFile.buffer,'unchanged DOCX download is byte-identical');
+    // The exporter recompresses the ZIP; compare every decompressed package part.
+    assert.deepEqual(await unzipDocument(emojiDocx),await unzipDocument(emojiFile.buffer),'DOCX download preserves every package part');
     await page.locator('#visual-review [data-download-format="right"]').selectOption('pdf');
     await page.locator('#visual-review [data-save-side="right"]').click();
     const emojiDialog=page.locator('#visual-review .document-pdf-dialog');
