@@ -15,7 +15,7 @@ import {docx} from './fixtures/text-fixture.mjs';
 const source=(name,bytes)=>({name,data:Buffer.from(bytes).toString('base64')});
 const until=async fn=>{for(let i=0;i<150;i++){if(fn())return;await delay(10);}assert.fail('UI did not settle');};
 function setup(t,html='<main></main>'){
- const dom=new JSDOM(html,{url:'https://ctt.example/',pretendToBeVisual:true,runScripts:'outside-only'});Object.assign(globalThis,{window:dom.window,document:dom.window.document});window.KristinaTextEditor=editor;window.Element.prototype.scrollIntoView=()=>{};
+ const dom=new JSDOM(html,{url:'https://ctt.example/',pretendToBeVisual:true,runScripts:'outside-only'});Object.assign(globalThis,{window:dom.window,document:dom.window.document});window.KristinaTextEditor=editor;window.Element.prototype.scrollIntoView=()=>{};window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};window.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new window.Event('close'));};
  const downloads=[],oldCreate=URL.createObjectURL,oldRevoke=URL.revokeObjectURL;URL.createObjectURL=b=>{downloads.push(b);return 'blob:wording';};URL.revokeObjectURL=()=>{};window.HTMLAnchorElement.prototype.click=()=>{};
  t.after(()=>{dom.window.close();URL.createObjectURL=oldCreate;URL.revokeObjectURL=oldRevoke;delete globalThis.window;delete globalThis.document;});return {dom,downloads};
 }
@@ -48,7 +48,7 @@ test('stale wording is blocked after selection changes, typing and paragraph swi
 test('Edit & export opens pasted Unicode text through the real entry flow',async t=>{
  const {dom,downloads}=setup(t,await readFile(new URL('../dist/index.html',import.meta.url),'utf8'));Object.defineProperty(document,'currentScript',{value:{src:'https://ctt.example/single-entry.js'},configurable:true});
  const script=new Script(await readFile(new URL('../dist/single-entry.js',import.meta.url),'utf8'),{importModuleDynamically:specifier=>specifier.endsWith('single-session.mjs')?import('../dist/single-session.mjs'):import('../dist/single-editor.mjs')});script.runInContext(dom.getInternalVMContext());
- document.querySelector('[data-work-mode="single"]').click();document.getElementById('single-paste').open=true;document.getElementById('single-paste-text').value='We utilize 25 units.\nПривет 👋';document.getElementById('single-paste-open').click();await until(()=>document.querySelector('[data-save-side="left"]'));assert.equal(document.getElementById('single-current').textContent,'pasted-text.txt');assert.equal(document.getElementById('single-paste').open,false);assert.match(document.querySelector('[data-wording-review]').textContent,/1 matching expression/);assert.equal(document.activeElement,document.querySelector('[data-style-review] h3'));
+ document.querySelector('[data-work-mode="single"]').click();document.getElementById('single-paste').open=true;document.getElementById('single-paste-text').value='We utilize 25 units.\nПривет 👋';document.getElementById('single-paste-open').click();await until(()=>document.querySelector('[data-save-side="left"]'));assert.equal(document.getElementById('single-current').textContent,'pasted-text.txt');assert.equal(document.getElementById('single-paste').open,false);assert.match(document.querySelector('[data-wording-review]').textContent,/1 matching expression/);assert.equal(document.activeElement,document.getElementById('single-current'));assert.equal(document.querySelector('.wording-review-dialog').open,false);
  document.querySelector('[data-save-side="left"]').click();await until(()=>downloads.length===1);assert.equal(await downloads[0].text(),'We utilize 25 units.\nПривет 👋\n');window.dispatchEvent(new window.Event('pagehide'));
 });
 
@@ -77,10 +77,10 @@ test('style rules group repeated constructions with Unicode boundaries and parag
 });
 test('style observations keep text intact, jump to passages, refresh after editing and undo',async t=>{
  setup(t);const original='Не в конце пути, а в каждом шаге.\nНе в результате, а в процессе.',root=document.querySelector('main'),view=await mountSingleEditor(root,{source:source('style.txt',original)});t.after(()=>view.dispose());
- const panel=root.querySelector('[data-style-review]');assert.match(panel.textContent,/2 occurrences/);
+ const panel=root.querySelector('[data-style-review]'),dialog=panel.closest('dialog');assert.equal(dialog.open,false);assert.match(panel.textContent,/2 occurrences/);root.querySelector('[data-wording-review-open]').click();assert.equal(dialog.open,true);
  panel.querySelector('[data-style-keep]').click();assert.equal(panel.querySelector('ol').hidden,true);assert.equal(view.drafts.left.text(),original);
  panel.querySelector('[data-style-keep]').click();panel.querySelectorAll('[data-style-edit]')[1].click();await until(()=>root.querySelector('[data-edit-side="left"]').selectionEnd===29);
- const field=root.querySelector('[data-edit-side="left"]');assert.equal(field.value.slice(field.selectionStart,field.selectionEnd),'Не в результате, а в процессе');
+ const field=root.querySelector('[data-edit-side="left"]');assert.equal(field.value.slice(field.selectionStart,field.selectionEnd),'Не в результате, а в процессе');assert.equal(dialog.open,false);assert.equal(document.activeElement,field);
  field.value='Смысл в процессе.';field.dispatchEvent(new window.Event('input'));await until(()=>/No repeated wording/.test(panel.textContent));
  assert.equal(view.drafts.right.text(),original);root.querySelector('[aria-label="Undo edit"]').click();await until(()=>panel.querySelectorAll('[data-style-edit]').length===2);assert.equal(view.drafts.left.text(),original);
 });
@@ -114,7 +114,7 @@ test('saved style choices survive reopening and unrelated edits, then reset on r
  try{
   const keep=root.querySelector('[data-style-kind=phrase] [data-style-keep]');keep.click();assert.equal(updates>0,true);
   const saved=view.snapshot();assert.equal(saved.styleKept.length,1);view.dispose();view=await mountSingleEditor(root,{source:src,restoredState:saved});
-  assert.equal(root.querySelector('[data-style-keep]').getAttribute('aria-pressed'),'true');
+  assert.equal(root.querySelector('[data-style-keep]').getAttribute('aria-pressed'),'true');assert.equal(root.querySelector('.wording-review-dialog').open,false);
   await view.select('text:2');let field=root.querySelector('[data-edit-side=left]');field.value='Birds sang.';field.dispatchEvent(new window.Event('input'));assert.deepEqual(view.snapshot().styleKept,saved.styleKept);
   await view.select('text:1');field=root.querySelector('[data-edit-side=left]');field.value='We found a cold stone. She lifted a cold stone.';field.dispatchEvent(new window.Event('input'));assert.deepEqual(view.snapshot().styleKept,[]);assert.equal(root.querySelector('[data-style-keep]').getAttribute('aria-pressed'),'false');
   root.querySelectorAll('[data-style-edit]')[1].click();await until(()=>field.selectionStart===34);assert.equal(field.value.slice(field.selectionStart,field.selectionEnd),'a cold stone');

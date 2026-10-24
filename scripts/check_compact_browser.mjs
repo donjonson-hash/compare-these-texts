@@ -352,6 +352,44 @@ try {
     await page.locator('#start-new-compare').click();await ready();
     assert.ok(await page.getByText('Texts match ✓',{exact:true}).isVisible(),'downloaded DOCX reopens and matches');
 
+    // Repeated wording must never displace the document when opening Edit & export.
+    const reviewText='We found a cold stone. She touched a cold stone.';
+    const reviewFile={name:'document-first.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from(docx([reviewText,'The final paragraph.']))};
+    await page.locator('#workspace-home').click();
+    await page.locator('#header-edit').click();
+    await page.locator('#single-file').setInputFiles(reviewFile);
+    await page.waitForFunction(()=>document.activeElement?.id==='single-current'&&document.getElementById('single-current').textContent==='document-first.docx');
+    const reviewDialog=single.locator('.wording-review-dialog');
+    assert.ok(await reviewDialog.isHidden(),'analysis stays closed when a document opens');
+    const firstParagraph=single.locator('.visual-paragraph').filter({hasText:reviewText}).first();
+    const box=await firstParagraph.boundingBox();
+    assert.ok(box&&box.y>=0&&box.y<900,'the document is on screen without scrolling through suggestions');
+    await single.locator('[data-wording-review-open]').click();
+    await reviewDialog.waitFor({state:'visible'});
+    assert.ok(await reviewDialog.locator('[data-style-edit]').count()>0,'optional analysis remains available');
+    await page.keyboard.press('Escape');
+    assert.ok(await reviewDialog.isHidden(),'Escape returns to the document');
+    await single.locator('[data-wording-review-open]').click();
+    await reviewDialog.locator('[data-style-edit]').first().click();
+    await page.waitForFunction(()=>document.activeElement?.matches('[data-edit-side="left"]'));
+    assert.ok(await reviewDialog.isHidden(),'choosing a passage closes the modal before editing');
+    assert.equal(await single.locator('[data-edit-side="left"]').inputValue(),reviewText);
+    await single.locator('[data-edit-side="left"]').fill('We found a smooth stone. She touched a cold stone.');
+    await single.getByRole('button',{name:'Done ✓',exact:true}).click();
+    const reviewedDocx=await downloadSingle();
+    assert.notDeepEqual(await unzipDocument(reviewedDocx),await unzipDocument(reviewFile.buffer),'the edited DOCX contains the change');
+    await single.getByRole('button',{name:'Undo edit',exact:true}).click();
+    assert.deepEqual(await unzipDocument(await downloadSingle()),await unzipDocument(reviewFile.buffer),'Undo restores the original DOCX');
+    await page.waitForFunction(()=>document.getElementById('single-session-status')?.textContent.includes('Saved in this browser'));
+    await single.locator('[data-wording-review-open]').click();
+    await page.reload();
+    await page.locator('#header-edit').click();
+    await page.locator('#single-session-resume').click();
+    await single.locator('[data-save-side="left"]').waitFor({state:'visible'});
+    assert.ok(await reviewDialog.isHidden(),'restoring a draft starts with the analysis closed');
+    assert.deepEqual(await unzipDocument(await downloadSingle()),await unzipDocument(reviewFile.buffer),'restoring retains the exact document');
+    await page.screenshot({path:path.join(output,'document-first-editor.png'),animations:'disabled'});
+
 
   }
   assert.deepEqual(errors, [], 'no uncaught page errors');
