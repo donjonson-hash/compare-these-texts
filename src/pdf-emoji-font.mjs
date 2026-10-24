@@ -1,11 +1,11 @@
-import {PDFName,PDFHexString,fontkit,pushGraphicsState,popGraphicsState,beginText,endText,setFontAndSize,setTextMatrix,setFillingRgbColor,showText} from './pdf-vendor.mjs';
+import {PDFName,PDFHexString,fontkit,pushGraphicsState,popGraphicsState,beginText,endText,setFontAndSize,setTextMatrix,setFillingRgbColor,setTextRenderingMode,showText} from './pdf-vendor.mjs';
 
 /** Embed an unchanged TrueType font with sequence-specific CIDs.
  * PDF 1.7 §5.6.4/5.9: CIDToGIDMap selects the outline; ToUnicode preserves
  * the complete UTF-16BE sequence, including ZWJ, variation and skin modifiers.
  * Two sequences may share an outline without sharing their extracted text.
  */
-export async function createEmojiPdfFont(pdf,bytes){
+export async function createEmojiPdfFont(pdf,bytes,{colorImages=new Map()}={}){
  const shaped=fontkit.create(bytes),chars=new Set(shaped.characterSet);
  const segmenter=new Intl.Segmenter('en',{granularity:'grapheme'}),entries=new Map();
  const base=await pdf.embedFont(bytes,{subset:false});await base.embed();
@@ -40,7 +40,14 @@ export async function createEmojiPdfFont(pdf,bytes){
    let key=pageKeys.get(page);if(!key){key=page.node.newFontDictionary('CTTEmoji',ref);pageKeys.set(page,key);}
    const skew=xSkew?Math.tan(xSkew.angle*(xSkew.type==='degrees'?Math.PI/180:1)):0;
    if(![x,y,size,skew].every(Number.isFinite)||size<=0)throw Error('Invalid PDF emoji position.');
-   page.pushOperators(pushGraphicsState(),beginText(),setFillingRgbColor(color.red,color.green,color.blue),setFontAndSize(key,size),setTextMatrix(1,0,skew,1,x,y),showText(PDFHexString.of(values.map(e=>hex(e.cid)).join(''))),endText(),popGraphicsState());
+   for(const value of values){
+    const picture=colorImages.get(value.text),advance=value.width*size/1000;
+    // Invisible searchable text carries the exact Unicode sequence. Color artwork
+    // is a bundled image at the same position, independent of the OS emoji font.
+    page.pushOperators(pushGraphicsState(),beginText(),setTextRenderingMode(picture?3:0),setFillingRgbColor(color.red,color.green,color.blue),setFontAndSize(key,size),setTextMatrix(1,0,skew,1,x,y),showText(PDFHexString.of(hex(value.cid))),endText(),popGraphicsState());
+    if(picture)page.drawImage(picture.image,{x:x+picture.left*advance,y:y+picture.bottom*advance,width:picture.width*advance,height:picture.height*advance});
+    x+=advance;
+   }
   },
   finalize(){
    if(finalized)return;finalized=true;

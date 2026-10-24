@@ -3,6 +3,7 @@ import {PDFDocument, fontkit, rgb} from './pdf-vendor.mjs';
 import regularBytes from './pdf-font.mjs';
 import boldBytes from './word-font-bold.mjs';
 import {sheetPdfFont} from './sheet-pdf-font.mjs';
+import {wantsColorEmoji} from './pdf-emoji-style.mjs';
 const decode=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const pt=(s,fallback=0)=>typeof s==='number'?s:typeof s==='string'&&/^\d+(?:\.\d+)?(?:pt|px)?$/.test(s)?parseFloat(s)*(s.endsWith('px')?.75:1):fallback;
 const color=(s,fallback='#202820')=>{const value=/^#[a-f\d]{6}$/i.test(s||'')?s:fallback;return rgb(...[1,3,5].map(i=>parseInt(value.slice(i,i+2),16)/255));};
@@ -38,14 +39,18 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
   const pdf=await PDFDocument.create();pdf.registerFontkit(fontkit);
   const baseFonts={regular:await pdf.embedFont(decode(regularBytes),{subset:true,features:{liga:false}}),bold:await pdf.embedFont(decode(boldBytes),{subset:true,features:{liga:false}})};
   const regularChars=new Set(baseFonts.regular.getCharacterSet()),boldChars=new Set(baseFonts.bold.getCharacterSet());
-  const needsFallback=text=>Array.from(text||'').some(c=>!/[\s\p{Default_Ignorable_Code_Point}]/u.test(c)&&(!regularChars.has(c.codePointAt(0))||!boldChars.has(c.codePointAt(0))))||(/\p{Extended_Pictographic}/u.test(text||'')&&/[\u200d\ufe0f]/u.test(text||''));
+  const emojiSegments=new Intl.Segmenter('en',{granularity:'grapheme'});
+  const needsFallback=text=>Array.from(emojiSegments.segment(text||''),s=>s.segment).some(wantsColorEmoji)||Array.from(text||'').some(c=>!/[\s\p{Default_Ignorable_Code_Point}]/u.test(c)&&(!regularChars.has(c.codePointAt(0))||!boldChars.has(c.codePointAt(0))))||(/\p{Extended_Pictographic}/u.test(text||'')&&/[\u200d\ufe0f]/u.test(text||''));
   let emoji=baseFonts.regular;
-  if([...model.blocks,...(model.headersFooters||[])].some(b=>needsFallback(b.text)||b.runs?.some(r=>needsFallback(r.text)))){
+  const allText=[...model.blocks,...(model.headersFooters||[])].flatMap(b=>[b.text||'',(b.runs||[]).map(r=>r.text||'').join(''),b.list?.label||'']);
+  if(allText.some(needsFallback)){
     const {default:emojiBytes}=await import('./sheet-emoji-font.mjs');
     const {createEmojiPdfFont}=await import('./pdf-emoji-font.mjs');
-    emoji=await createEmojiPdfFont(pdf,decode(emojiBytes));
+    const {prepareColorEmoji}=await import('./pdf-color-emoji.mjs');
+    const colorImages=await prepareColorEmoji(pdf,allText,{signal});abort(signal);
+    emoji=await createEmojiPdfFont(pdf,decode(emojiBytes),{colorImages});
   }
-  const fontOptions={errorMessage:'This document contains a character that the PDF fonts cannot display. Download DOCX to preserve it.'};
+  const fontOptions={errorMessage:'This document contains a character that the PDF fonts cannot display. Download DOCX to preserve it.',preferFallback:wantsColorEmoji};
   const fonts=Object.fromEntries(Object.entries(baseFonts).map(([key,font])=>[key,sheetPdfFont(font,emoji,fontOptions)]));
   let symbolFont;
   async function markerFont(label,preferred){

@@ -1,5 +1,5 @@
 /** Use one measurement/drawing path for ordinary text and bundled emoji glyphs. */
-export function sheetPdfFont(primary,fallback,{errorMessage='A character in this table cannot be displayed in PDF. Download the spreadsheet to preserve it.'}={}){
+export function sheetPdfFont(primary,fallback,{errorMessage='A character in this table cannot be displayed in PDF. Download the spreadsheet to preserve it.',preferFallback=()=>false}={}){
  const sets=new Map([primary,fallback].map(f=>[f,new Set(f.getCharacterSet())]));
  const segmenter=new Intl.Segmenter('en',{granularity:'grapheme'}),cache=new Map();
  const visible=char=>!/[\p{Default_Ignorable_Code_Point}]/u.test(char);
@@ -8,7 +8,7 @@ export function sheetPdfFont(primary,fallback,{errorMessage='A character in this
   if(cache.has(text))return cache.get(text);const result=[];
   for(const {segment}of segmenter.segment(text)){
    const emojiSequence=/\p{Extended_Pictographic}/u.test(segment)&&/[\u200d\ufe0f]/u.test(segment);
-   const font=emojiSequence&&supports(fallback,segment)?fallback:supports(primary,segment)?primary:supports(fallback,segment)?fallback:null;
+   const font=(emojiSequence||preferFallback(segment))&&supports(fallback,segment)?fallback:supports(primary,segment)?primary:supports(fallback,segment)?fallback:null;
    if(!font)throw Error(errorMessage);
    if(result.at(-1)?.font===font)result.at(-1).text+=segment;else result.push({font,text:segment});
   }

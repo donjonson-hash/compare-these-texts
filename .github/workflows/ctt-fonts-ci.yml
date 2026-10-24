@@ -6,6 +6,8 @@ on:
     paths:
       - '.github/workflows/ctt-fonts-ci.yml'
       - 'scripts/reproduce_fonts.py'
+      - 'scripts/reproduce_color_emoji.py'
+      - 'src/emoji-color-vendor.mjs'
       - 'vendor-assets.json'
       - 'src/*font*.mjs'
       - 'docs/FONT-REPRODUCTION.md'
@@ -14,6 +16,8 @@ on:
     paths:
       - '.github/workflows/ctt-fonts-ci.yml'
       - 'scripts/reproduce_fonts.py'
+      - 'scripts/reproduce_color_emoji.py'
+      - 'src/emoji-color-vendor.mjs'
       - 'vendor-assets.json'
       - 'src/*font*.mjs'
       - 'docs/FONT-REPRODUCTION.md'
@@ -37,6 +41,15 @@ jobs:
         run: |
           curl --fail --location --retry 2 'https://archive.ubuntu.com/ubuntu/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.37-8_all.deb' -o "$RUNNER_TEMP/ctt-dejavu.deb"
           curl --fail --location --retry 2 'https://raw.githubusercontent.com/google/fonts/b979dba422e445492b0eb9951ac52ee0b4d648c3/ofl/notoemoji/NotoEmoji%5Bwght%5D.ttf' -o "$RUNNER_TEMP/ctt-noto.ttf"
+          curl --fail --location --retry 2 'https://raw.githubusercontent.com/googlefonts/noto-emoji/8998f5dd683424a73e2314a8c1f1e359c19e8742/fonts/NotoColorEmoji.ttf' -o "$RUNNER_TEMP/ctt-color-emoji.ttf"
+          curl --fail --location --retry 2 'https://raw.githubusercontent.com/unicode-org/unicodetools/48afe632bf194a20bcd27c3488b49dc23274b684/unicodetools/data/emoji/17.0/emoji-test.txt' -o "$RUNNER_TEMP/ctt-emoji-test.txt"
       - name: Verify inputs and reproduce every font module
         run: python scripts/reproduce_fonts.py --dejavu-deb "$RUNNER_TEMP/ctt-dejavu.deb" --noto-variable "$RUNNER_TEMP/ctt-noto.ttf"
+      # HarfBuzz changes fontTools' optional OpenType repacker. Install it only
+      # after reproducing the existing outline fonts with their original toolchain.
+      - run: python -m pip install 'Pillow==12.3.0' 'uharfbuzz==0.52.0'
+      - name: Reproduce offline color emoji artwork
+        run: |
+          python scripts/reproduce_color_emoji.py --font "$RUNNER_TEMP/ctt-color-emoji.ttf" --emoji-test "$RUNNER_TEMP/ctt-emoji-test.txt" --size 72 --output "$RUNNER_TEMP/emoji-color-vendor.mjs"
+          cmp src/emoji-color-vendor.mjs "$RUNNER_TEMP/emoji-color-vendor.mjs"
       - run: python scripts/verify_vendor.py
