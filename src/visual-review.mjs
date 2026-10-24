@@ -56,7 +56,8 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   const viewers = {}, models = {}, pages = {left: 1, right: 1}, generations = {left: 0, right: 0}, ui = {};
   const row = (group, side) => group?.[side] || (group?.category === `only_${side}` ? group.row : null);
   const sourceBlocks = side => originalGroups.flatMap(group => { const block = row(group, side); return block ? (block.source_blocks || [block]).map(part=>({...part,key:group.key})) : []; }).sort((a, b) => a.record - b.record);
-  let finder = null, wording = null, wordingReview = null, styleReview = null;
+  let finder = null, wording = null, wordingReview = null, styleReview = null, wordingDialog = null;
+  const closeWordingReview = () => { if (wordingDialog?.open) wordingDialog.close(); };
   let disposed = false, selected = null, selectionGeneration = 0, blockDialog = null, documentPdfDialog = null;
   let inlineFill = null, fillMode = single && report.sources.left.format === 'pdf', fillOpening = false, fillState = null, fillCache = null;
   const fillAreasCache = new Map();
@@ -1091,14 +1092,26 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     findHost.addEventListener('click', restoreSearchFocus);
     findHost.addEventListener('keydown', event => { if (event.key === 'Escape') restoreSearchFocus(); });
   }
-  if(wording){const host=el('div');findHost.before(host);styleReview=mountStyleReview(host,{
+  if(wording){
+    wordingDialog=el('dialog',undefined,'workspace-tools-dialog wording-review-dialog');
+    wordingDialog.setAttribute('aria-label','Wording & style');
+    const toggle=button('Wording & style',()=>{styleReview?.refresh();wordingReview?.refresh();wordingDialog.showModal?.();});
+    toggle.dataset.wordingReviewOpen='';toggle.setAttribute('aria-haspopup','dialog');toolbar.append(toggle);
+    const heading=el('div',undefined,'workspace-tools-heading');
+    heading.append(el('h2','Wording & style'),button('Back to document',closeWordingReview));wordingDialog.append(heading);
+    wordingDialog.addEventListener('click',event=>{
+      if(event.target!==wordingDialog)return;const rect=wordingDialog.getBoundingClientRect();
+      if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)closeWordingReview();
+    });
+    root.append(wordingDialog);
+    const host=el('div');wordingDialog.append(host);styleReview=mountStyleReview(host,{
     kept:restoredState?.styleKept,onChange:stateChanged,
     entries:()=>drafts.left.entries(),revision:()=>drafts.left.revision,
-    choose:async(hit,revision)=>{await select(hit.key);if(!alive()||selected!==hit.key||drafts.left.revision!==revision||input.left.value!==hit.text)throw Error('Text changed. Choose an updated passage.');input.left.focus({preventScroll:true});input.left.setSelectionRange(hit.start,hit.end);input.left.scrollIntoView?.({block:'center'});}
+    choose:async(hit,revision)=>{closeWordingReview();await select(hit.key);if(!alive()||selected!==hit.key||drafts.left.revision!==revision||input.left.value!==hit.text)throw Error('Text changed. Choose an updated passage.');input.left.focus({preventScroll:true});input.left.setSelectionRange(hit.start,hit.end);input.left.scrollIntoView?.({block:'center'});}
   });}
-  if(wording){const host=el('div');findHost.before(host);wordingReview=mountWordingReview(host,{
+  if(wording){const host=el('div');wordingDialog.append(host);wordingReview=mountWordingReview(host,{
     entries:()=>drafts.left.entries(),revision:()=>drafts.left.revision,
-    choose:async(hit,revision)=>{await select(hit.key);if(!alive()||selected!==hit.key||drafts.left.revision!==revision||input.left.value!==hit.text)throw Error('Text changed. Choose an updated suggestion.');input.left.focus({preventScroll:true});input.left.setSelectionRange(hit.start,hit.end);wording.open();input.left.scrollIntoView?.({block:'center'});}
+    choose:async(hit,revision)=>{closeWordingReview();await select(hit.key);if(!alive()||selected!==hit.key||drafts.left.revision!==revision||input.left.value!==hit.text)throw Error('Text changed. Choose an updated suggestion.');input.left.focus({preventScroll:true});input.left.setSelectionRange(hit.start,hit.end);wording.open();input.left.scrollIntoView?.({block:'center'});}
   });}
   if (!single) numberReview = mountNumberReview(numberHost, {
     queue: numberQueue, open: restoredState?.numberReview?.started ?? false, onChange: stateChanged,
@@ -1129,7 +1142,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       input[side].focus({preventScroll: true}); inspector.scrollIntoView({behavior: 'smooth', block: 'nearest'});
     },
   });
-  const dispose = () => { if (disposed) return; closeWorkspaceTools(); disposed = true; clearDownloadOffer(); numberReview?.dispose(); styleReview?.dispose(); wordingReview?.dispose(); wording?.dispose(); finder?.dispose(); inlineFill?.dispose(); printJob?.close(); blockDialog?.close(); documentPdfDialog?.close(); for (const side of sides) clearPdfPreview(side); selectionGeneration++; for (const timer of Object.values(typingTimers)) clearTimeout(timer); for (const viewer of Object.values(viewers)) void viewer.dispose().catch(() => {}); root.replaceChildren(); };
+  const dispose = () => { if (disposed) return; closeWorkspaceTools(); closeWordingReview(); disposed = true; clearDownloadOffer(); numberReview?.dispose(); styleReview?.dispose(); wordingReview?.dispose(); wording?.dispose(); finder?.dispose(); inlineFill?.dispose(); printJob?.close(); blockDialog?.close(); documentPdfDialog?.close(); for (const side of sides) clearPdfPreview(side); selectionGeneration++; for (const timer of Object.values(typingTimers)) clearTimeout(timer); for (const viewer of Object.values(viewers)) void viewer.dispose().catch(() => {}); root.replaceChildren(); };
   signal?.addEventListener('abort', dispose, {once: true});
   if (alive()) {
     if (!single && Object.values(models).some(model => model.hasTables)) saveNote.textContent += sides.every(side => drafts[side].copyRowFrom) ? " New row: add → fill in → copy to the adjacent version. Undo with ↶." : " New row: add → fill in. Undo with ↶.";
