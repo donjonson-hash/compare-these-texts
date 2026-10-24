@@ -1,6 +1,7 @@
 /** Offline Word list resolution. Values are serializable; marker text is never editable body text.
  * Rules: ISO 29500 §17.9 (Microsoft Open XML SDK LevelRestart, LevelText,
- * StartNumberingValue, NumberingProperties). Symbol mappings: MS-VSDX §2.4.4.44.
+ * StartNumberingValue, NumberingProperties). Symbol mappings: MS-VSDX §2.4.4.44;
+ * Unicode WG2 N4363, IDs 1108 and 1232 (https://www.unicode.org/wg2/docs/n4363.pdf).
  */
 const W = new Set(['http://schemas.openxmlformats.org/wordprocessingml/2006/main','http://purl.oclc.org/ooxml/wordprocessingml/main']);
 const elements = n => Array.from(n?.childNodes || []).filter(n => n.nodeType === 1);
@@ -47,9 +48,14 @@ function styleChain(info,p) {
 }
 function bullet(text,font) {
   // Word's symbol-font bytes are commonly encoded in the F000 private-use block.
-  const map=font.toLowerCase()==='symbol'?{183:'•'}:font.toLowerCase()==='wingdings'?{167:'▪',113:'□',118:'❖',216:'➢',252:'✓'}:null;
+  // Map only verified glyphs, in the display model; never rewrite source XML.
+  // 0x6C is MEDIUM BLACK CIRCLE; 0xE8 is WIDE-HEADED RIGHTWARDS HEAVY BARB ARROW.
+  const family=font.trim().toLowerCase();
+  const map=family==='symbol'?{183:'•'}:family==='wingdings'?{108:'\u26AB',167:'▪',113:'□',118:'❖',216:'➢',232:'\u{1F87A}',252:'✓'}:null;
   if(map&&[...text].length===1) {let c=text.codePointAt(0);if(c>=0xf000&&c<=0xf0ff)c-=0xf000;if(map[c])return map[c];fail("this list bullet symbol is not yet supported.");}
-  if(/(?:wingdings|webdings|symbol)/i.test(font)||/[\uE000-\uF8FF]/u.test(text))fail("this list bullet symbol is not yet supported.");
+  // OpenSymbol uses Unicode; its name does not make its ordinary characters
+  // legacy Symbol bytes. Private-use glyphs still need an explicit mapping.
+  if((family!=='opensymbol'&&/(?:wingdings|webdings|symbol)/i.test(family))||/[\uE000-\uF8FF]/u.test(text))fail("this list bullet symbol is not yet supported.");
   return text;
 }
 function levelDefinition(n,index) {

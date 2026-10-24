@@ -2,6 +2,7 @@
 import {PDFDocument, fontkit, rgb} from './pdf-vendor.mjs';
 import regularBytes from './pdf-font.mjs';
 import boldBytes from './word-font-bold.mjs';
+import {sheetPdfFont} from './sheet-pdf-font.mjs';
 const decode=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const pt=(s,fallback=0)=>typeof s==='number'?s:typeof s==='string'&&/^\d+(?:\.\d+)?(?:pt|px)?$/.test(s)?parseFloat(s)*(s.endsWith('px')?.75:1):fallback;
 const color=(s,fallback='#202820')=>{const value=/^#[a-f\d]{6}$/i.test(s||'')?s:fallback;return rgb(...[1,3,5].map(i=>parseInt(value.slice(i,i+2),16)/255));};
@@ -18,12 +19,34 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
   const usable=pageWidth-margins.left-margins.right;let bodyHeight=pageHeight-margins.top-margins.bottom;
   if(![pageWidth,pageHeight,usable,bodyHeight].every(n=>Number.isFinite(n)&&n>24))fail('The page margins leave too little room for a PDF.');
   const pdf=await PDFDocument.create();pdf.registerFontkit(fontkit);
-  const fonts={regular:await pdf.embedFont(decode(regularBytes),{subset:true,features:{liga:false}}),bold:await pdf.embedFont(decode(boldBytes),{subset:true,features:{liga:false}})};
-  const supported=new Map(Object.values(fonts).map(f=>[f,new Set(f.getCharacterSet())]));
+  // The monochrome fallback font's full-font cmap cannot retain some emoji
+  // ligatures/modifiers. Refuse them before producing a misleading PDF.
+  const emojiSegments=new Intl.Segmenter('en',{granularity:'grapheme'});
+  const checkEmoji=text=>{for(const {segment} of emojiSegments.segment(text||''))if(/\p{Extended_Pictographic}/u.test(segment)&&/[\u200d\u{1F3FB}-\u{1F3FF}]/u.test(segment))fail('This emoji sequence cannot yet be preserved in PDF. Download DOCX to keep it unchanged.');};
+  for(const block of [...model.blocks,...(model.headersFooters||[])]){checkEmoji(block.text);for(const run of block.runs||[])checkEmoji(run.text);}
+  const baseFonts={regular:await pdf.embedFont(decode(regularBytes),{subset:true,features:{liga:false}}),bold:await pdf.embedFont(decode(boldBytes),{subset:true,features:{liga:false}})};
+  const regularChars=new Set(baseFonts.regular.getCharacterSet()),boldChars=new Set(baseFonts.bold.getCharacterSet());
+  const needsFallback=text=>Array.from(text||'').some(c=>!/[\s\p{Default_Ignorable_Code_Point}]/u.test(c)&&(!regularChars.has(c.codePointAt(0))||!boldChars.has(c.codePointAt(0))))||(/\p{Extended_Pictographic}/u.test(text||'')&&/[\u200d\ufe0f]/u.test(text||''));
+  let emoji=baseFonts.regular;
+  if([...model.blocks,...(model.headersFooters||[])].some(b=>needsFallback(b.text)||b.runs?.some(r=>needsFallback(r.text)))){
+    const {default:emojiBytes}=await import('./sheet-emoji-font.mjs');
+    // As in spreadsheet export, preserve outlines by embedding the static font intact.
+    emoji=await pdf.embedFont(decode(emojiBytes),{subset:false});
+  }
+  const fontOptions={errorMessage:'This document contains a character that the PDF fonts cannot display. Download DOCX to preserve it.'};
+  const fonts=Object.fromEntries(Object.entries(baseFonts).map(([key,font])=>[key,sheetPdfFont(font,emoji,fontOptions)]));
+  let symbolFont;
+  async function markerFont(label,preferred){
+    // Exact supplementary Wingdings mapping, with an offline subset font.
+    // Do not replace unknown markers or silently drop unsupported characters.
+    if(label!=='\u{1F87A}')return preferred;
+    if(!symbolFont){const {default:bytes}=await import('./word-symbol-font.mjs');const font=await pdf.embedFont(decode(bytes),{subset:true,features:{liga:false}});symbolFont=sheetPdfFont(font,font,fontOptions);}
+    return symbolFont;
+  }
   const pictures=new Map(),layout=[];let work=0;
   const cooperate=async()=>{if(++work%20===0){await new Promise(r=>setTimeout(r,0));abort(signal);}};
   function typography(style={},heading){return {font:style.fontWeight==='bold'||!style.fontWeight&&heading?fonts.bold:fonts.regular,size:pt(style.fontSize,heading?Math.max(12,24-heading*2):11),color:color(style.color),italic:style.fontStyle==='italic',decoration:style.textDecoration||''};}
-  function checkText(text,font){for(const c of text)if(!supported.get(font).has(c.codePointAt(0)))fail('This document contains a character that the PDF fonts cannot display. Download DOCX to preserve it.');}
+  function checkText(text,font){font.check(text);}
   async function imageFor(image){
     if(!pictures.has(image.src)){const match=/^data:image\/(png|jpeg);base64,([A-Za-z\d+/=]+)$/.exec(image.src);if(!match)fail('An image could not be included in the PDF.');const bytes=decode(match[2]);pictures.set(image.src,await(match[1]==='png'?pdf.embedPng(bytes):pdf.embedJpg(bytes)));}
     return pictures.get(image.src);
@@ -45,7 +68,7 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
         if(used+tokenWidth>room()&&items.length){flush();if(space)continue;}
         if(tokenWidth<=room()){items.push({...format,text:token,x:used,width:tokenWidth});used+=tokenWidth;continue;}
         // Long unbroken identifiers must wrap too, never get clipped at a cell edge.
-        let chunk='';for(const c of token){const next=chunk+c,w=format.font.widthOfTextAtSize(next,format.size);if(w>room()&&chunk){const cw=format.font.widthOfTextAtSize(chunk,format.size);items.push({...format,text:chunk,x:0,width:cw});used=cw;flush();chunk=c;}else chunk=next;if(format.font.widthOfTextAtSize(c,format.size)>room())fail('A character is wider than its table cell. Download DOCX to widen the column.');}
+        let chunk='';for(const c of format.font.graphemes(token)){const next=chunk+c,w=format.font.widthOfTextAtSize(next,format.size);if(w>room()&&chunk){const cw=format.font.widthOfTextAtSize(chunk,format.size);items.push({...format,text:chunk,x:0,width:cw});used=cw;flush();chunk=c;}else chunk=next;if(format.font.widthOfTextAtSize(c,format.size)>room())fail('A character is wider than its table cell. Download DOCX to widen the column.');}
         if(chunk){const cw=format.font.widthOfTextAtSize(chunk,format.size);items.push({...format,text:chunk,x:used,width:cw});used+=cw;}
       }
     }
@@ -56,7 +79,7 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
       await cooperate();
     }
     flush(!fragments.length||forced);
-    if(block.list&&fragments.length){const fmt=typography({...style,...block.list.markerStyle}),label=block.list.label;checkText(label,fmt.font);const w=fmt.font.widthOfTextAtSize(label,fmt.size);fragments[0].items.unshift({...fmt,text:label,x:Math.max(0,left-w-5),width:w});}
+    if(block.list&&fragments.length){const fmt=typography({...style,...block.list.markerStyle}),label=block.list.label;fmt.font=await markerFont(label,fmt.font);checkText(label,fmt.font);const w=fmt.font.widthOfTextAtSize(label,fmt.size);fragments[0].items.unshift({...fmt,text:label,x:Math.max(0,left-w-5),width:w});}
     if(fragments.length){fragments[0].before=before;fragments[0].breakBefore ||= block.pageBreakBefore;fragments.at(-1).after=after;}
     return fragments;
   }
@@ -79,7 +102,7 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
     for(const item of fragment.items){
       if(item.image){page.drawImage(item.image,{x:x+item.x,y:pageHeight-top-fragment.height,width:item.width,height:item.height});continue;}
       const baseline=pageHeight-top-fragment.height+item.size*.24;
-      page.drawText(item.text,{x:x+item.x,y:baseline,font:item.font,size:item.size,color:item.color,...(item.italic?{xSkew:{type:'degrees',angle:12}}:{})});
+      item.font.drawText(page,item.text,{x:x+item.x,y:baseline,size:item.size,color:item.color,...(item.italic?{xSkew:{type:'degrees',angle:12}}:{})});
       for(const [kind,offset]of [['underline',-.1],['line-through',.3]])if(item.decoration.includes(kind))page.drawLine({start:{x:x+item.x,y:baseline+item.size*offset},end:{x:x+item.x+item.width,y:baseline+item.size*offset},thickness:Math.max(.4,item.size*.05),color:item.color});
     }
     layout.push({page:pageNumber,region,key:fragment.key,record:fragment.record,x,y:top,width:usable,height:fragment.height});

@@ -43,6 +43,7 @@ h1 span{color:var(--green)}
 .file-meta{font-size:11px;color:var(--muted)}
 .privacy{font-size:11px;color:var(--muted);margin:12px 0 18px;line-height:1.7}
 .visual-paragraph.visual-list-item{display:grid;grid-template-columns:minmax(var(--list-marker-width,18pt),max-content) minmax(0,1fr);column-gap:var(--list-gap,0px)}
+@font-face{font-family:"CTT List Symbols";src:url("./word-symbol-font.ttf") format("truetype");font-style:normal;font-weight:400;unicode-range:U+1F87A;font-display:swap}
 .visual-list-marker{white-space:pre;overflow-wrap:normal;font-variant-numeric:tabular-nums}.visual-list-content{min-width:0}
 .session-panel{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 20px;padding:18px 20px;border:1px solid #c6d6bd;border-radius:12px;background:#eaf2e6}
 .session-info{min-width:0;line-height:1.5}.session-info strong{font-size:15px}.session-names{font-size:13px;overflow-wrap:anywhere;margin-top:5px}.session-status{font-size:12px;color:var(--green);margin-top:4px}

@@ -880,6 +880,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
             marker.style.textAlign = list.align;
             if (list.fontFamily) marker.style.fontFamily = list.fontFamily;
             style(marker, list.markerStyle);
+            if (list.label === '\u{1F87A}') marker.style.fontFamily = '"CTT List Symbols", sans-serif';
             p.append(marker, content);
           }
           if (entry.runs) for (const run of entry.runs) {

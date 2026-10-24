@@ -5,6 +5,10 @@
       "bytes": 4330,
       "sha256": "500bb1ccf43df7bbb522112f9133a52b16e1c35e809632f5d8609b179152de5b"
     },
+    "src/NOTO-SYMBOLS-LICENSE.txt": {
+      "bytes": 4383,
+      "sha256": "b118dd41337806a5d4797052c77caf3bd096aed783e5eb21b4d11154351e1ac0"
+    },
     "src/PDF-LICENSES.txt": {
       "bytes": 37305,
       "sha256": "d590910e039dff59c4d82536810470fae1bbaded6eb9794fec8ebffeb728aefb"
@@ -43,6 +47,15 @@
       "bytes": 945320,
       "sha256": "3eaef82f0e7f18f72c029b018961533c88f0ff793264918abcaf7a2a4da593a1",
       "decoded_font_sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895"
+    },
+    "src/word-symbol-font.mjs": {
+      "bytes": 2471,
+      "sha256": "21e129653d58859aad4df2a18382fdf92f1784f628ab0c3b5347089c9365a25a",
+      "decoded_font_sha256": "2ca3623ba52b707b1f257254ba8164fc758e7f7bd5584b54bb763ef234576634"
+    },
+    "src/word-symbol-font.ttf": {
+      "bytes": 1744,
+      "sha256": "2ca3623ba52b707b1f257254ba8164fc758e7f7bd5584b54bb763ef234576634"
     },
     "src/xlsx-vendor.mjs": {
       "bytes": 1008396,
