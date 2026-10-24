@@ -194,6 +194,8 @@ test('English UI: real demo Worker, suggested questions, TXT source preservation
  await p.file('right','Поставка товара.\nГарантия 24 месяца.','b.txt');await p.result();
  assert.match(p.$('result-rows').textContent,/Гарантия/);
  assert.equal(p.$('office-sidebar').hidden,true,'A new comparison closes the old assistant');
+ // Explicitly accept replacing the current comparison; cancellation has its own Home tests.
+ p.dom.window.confirm=()=>true;
  delete p.dom.window.KristinaTransport;p.$('demo-tables').click();
  await until(()=>/Could not load|Couldn't load/.test(p.$('notice').textContent),()=>p.$('notice').textContent);
  noRussian(p.$('notice').textContent);
@@ -357,6 +359,7 @@ test('download freezes the clicked Word revision while newer text and rows remai
  assert.ok(second.blocks.some(b=>b.text==='Desk lamp - latest revision'));assert.equal(second.content.find(x=>x.type==='table').rows.length,4);
  assert.doesNotMatch(root.querySelector('.visual-notice').textContent,/Download again/);
  q('[aria-label="Undo edit in B"]').click();assert.equal(right().querySelectorAll('tr').length,3,'Downloading must preserve undo history');
+ p.dom.window.confirm=()=>true; // Accept intentional example replacement.
  q('[data-save-side="right"]').click();p.$('demo-tables').click();await p.result();
  assert.equal(p.downloads.length,2,'Switching comparisons cancels the pending download');
  assert.equal(p.$('visual-review').hidden,false);assert.ok(p.$('visual-review').classList.contains('sheet-review'));
