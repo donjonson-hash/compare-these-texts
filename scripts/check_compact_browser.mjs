@@ -46,6 +46,11 @@ try {
     return readFile(await download.path());
   };
   await page.goto(origin + '/');
+  if (!baseline) {
+    await page.locator('#start-menu').waitFor({state:'visible'});
+    assert.ok(await page.locator('#start-new-compare').isDisabled(), 'fresh home requires both inputs');
+    await page.locator('#home-help-open').click();
+  }
   await page.locator('#demo').click();
   await ready(); await saved();
   await page.evaluate(async () => {await document.fonts.ready; window.scrollTo(0,0);});
@@ -199,7 +204,7 @@ try {
 
     // Home must also preserve the standalone editor and its undo history.
     await page.locator('#workspace-home').click();
-    await page.locator('#start-edit').click();
+    await page.locator('#header-edit').click();
     await page.locator('#single-file').setInputFiles({name:'single-home.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:original});
     const single = page.locator('#single-editor-host');
     await single.locator('[data-save-side="left"]').waitFor({state:'visible'});
@@ -214,7 +219,7 @@ try {
     assert.notDeepEqual(singleEdited, original, 'standalone edit changes the document');
     await page.locator('#workspace-home').click();
     await page.locator('#start-menu').waitFor({state:'visible'});
-    await page.locator('#start-edit').click();
+    await page.locator('#header-edit').click();
     assert.deepEqual(await downloadSingle(), singleEdited, 'Home and Continue preserve standalone edits');
     await page.locator('#single-file').setInputFiles({name:'legacy.doc',mimeType:'application/msword',buffer:Buffer.from('unsupported legacy file')});
     assert.match(await page.locator('#single-notice').innerText(), /\.doc.*not supported/);
@@ -235,7 +240,7 @@ try {
     await page.locator('#workspace-home').click();
     await page.locator('#home-left-file').setInputFiles({name:'new-A.txt',mimeType:'text/plain',buffer:Buffer.from(newA)});
     await page.locator('#home-right-file').setInputFiles({name:'new-B.txt',mimeType:'text/plain',buffer:Buffer.from(newB)});
-    await page.locator('#start-edit').click();
+    await page.locator('#header-edit').click();
     await page.locator('#workspace-home').click();
     await page.locator('#start-new-compare').click();
     await ready(); await saved();
@@ -244,7 +249,7 @@ try {
     assert.equal((await readFile(await newADownload.path())).toString(), newA, 'both sides come from the staged new pair');
     assert.ok(await page.locator('#start-menu').isHidden(), 'successful new comparison leaves Home');
     await page.locator('#workspace-home').click();
-    await page.locator('#start-edit').click();
+    await page.locator('#header-edit').click();
     assert.deepEqual(await downloadSingle(), original, 'starting a new comparison preserves the separate single-document workspace');
     // Reproduce the reported Word export restriction with real header/footer parts.
     const headerFile = {name:'with-headers.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from(peripheralFixture().data,'base64')};
@@ -290,6 +295,24 @@ try {
     await page.locator('#start-new-compare').click();
     await ready();
     await checkHeaderPdf(page.locator('#visual-review'),'right','word-headers-comparison-preview.png');
+
+    // The new paste-first entry must use the full document engine, preserve
+    // literal markup and produce the same TXT bytes through its real export.
+    await page.locator('#workspace-home').click();
+    await page.locator('#home-left-paste').click();
+    await page.locator('#home-right-paste').click();
+    const pastedA = '<script>do not execute</script>\nAmount: $10\n';
+    const pastedB = '<script>do not execute</script>\nAmount: $12\n';
+    await page.locator('#home-left-text').fill(pastedA);
+    await page.locator('#home-right-text').fill(pastedB);
+    await page.locator('#start-new-compare').click();
+    await ready(); await saved();
+    assert.equal((await downloadB()).toString(), pastedB, 'pasted B uses the complete editor and exact TXT download');
+    await page.locator('#workspace-home').click();
+    assert.equal(await page.locator('#home-left-text').inputValue(), pastedA, 'returning Home retains the original pasted A');
+    assert.equal(await page.locator('#home-right-text').inputValue(), pastedB, 'returning Home retains the original pasted B');
+    await page.locator('#start-compare').click(); await ready();
+    assert.equal((await downloadB()).toString(), pastedB, 'Continue keeps the existing comparison');
 
 
   }

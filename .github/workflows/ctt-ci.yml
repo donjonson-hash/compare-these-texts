@@ -39,6 +39,8 @@ jobs:
           REQUIRE_EXTENSION: '1'
       - name: Check compact comparison workspace
         run: npm run check:compact
+      - name: Capture current store images after UI checks
+        run: npm run store:assets
       - run: npm run package:store
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

@@ -133,5 +133,5 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
     }
     await cooperate();
   }
-  abort(signal);pdf.setCreator('Compare These Texts');const bytes=await pdf.save();abort(signal);if(bytes.length>32*1024*1024)fail('The PDF is too large. Reduce image sizes in the Word document.');onLayout?.(layout);return bytes;
+  abort(signal);pdf.setCreator('Compare Two Texts');const bytes=await pdf.save();abort(signal);if(bytes.length>32*1024*1024)fail('The PDF is too large. Reduce image sizes in the Word document.');onLayout?.(layout);return bytes;
 }

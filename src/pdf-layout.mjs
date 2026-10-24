@@ -93,6 +93,6 @@ export async function renderPreservedPdf(source,entries,{blocks,signal,onLayout}
    }
   }finally{canvas.width=canvas.height=0;}
  }
- output.setCreator('Compare These Texts');abort(signal);const data=await output.save();abort(signal);onLayout?.(layout);return data;
+ output.setCreator('Compare Two Texts');abort(signal);const data=await output.save();abort(signal);onLayout?.(layout);return data;
  }finally{await viewer.dispose();}
 }

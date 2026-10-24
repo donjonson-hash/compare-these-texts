@@ -21,7 +21,7 @@ function* sourceRows(report, side) {
 }
 
 function* summaryRows(report) {
-  yield ["Compare These Texts — comparison results", "Value", 'A', 'B', "Change B − A", "Source A", "Source B"];
+  yield ["Compare Two Texts — comparison results", "Value", 'A', 'B', "Change B − A", "Source A", "Source B"];
   yield ["Comparison scope", "Selected fields are compared. Original values are on the Data A and Data B sheets."];
   for (const [side, label] of [['left', 'A'], ['right', 'B']]) {
     yield [`File ${label}`, report.sources[side].name];
@@ -95,7 +95,7 @@ export function renderXlsx(report) {
     }
   }
   const book = utils.book_new();
-  book.Props = {Title: "Compare These Texts — comparison results", Subject: "Saved values without formulas", Author: "Compare These Texts"};
+  book.Props = {Title: "Compare Two Texts — comparison results", Subject: "Saved values without formulas", Author: "Compare Two Texts"};
   for (const [name, generate, widths, filter] of sheets) {
     const sheet = {}, colNames = widths.map((_, i) => utils.encode_col(i));
     let count = 0, columns = 0;

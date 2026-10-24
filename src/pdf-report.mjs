@@ -21,7 +21,7 @@ function contents(report) {
     sections.push({segments, size: 10.5, gap: 4, context: currentContext, ...options});
   }
   const heading = text => { currentContext = text; add(text, {size: 14, heading: true, gap: 10}); };
-  add("Compare These Texts · comparison report", {size: 21, gap: 13});
+  add("Compare Two Texts · comparison report", {size: 21, gap: 13});
   add(report.kind === 'text' ? "Text is compared; formatting and images are not checked." : "Selected fields are compared.", {muted: true});
   add(`Changed: ${report.summary.changed}; only in A: ${report.summary.only_left}; only in B: ${report.summary.only_right}; matched: ${report.summary.matched}.`);
   if (report.kind === 'text' && (report.moved?.length || report.reflow?.length)) {
@@ -107,7 +107,7 @@ export async function renderPdf(report) {
   }
   const sections = contents(report);
   const pdf = await PDFDocument.create();
-  pdf.setTitle("Compare These Texts — comparison report"); pdf.setProducer('Compare These Texts');
+  pdf.setTitle("Compare Two Texts — comparison report"); pdf.setProducer('Compare Two Texts');
   pdf.registerFontkit(fontkit);
   const bytes = Uint8Array.from(atob(fontBase64), character => character.charCodeAt(0));
   const font = await pdf.embedFont(bytes, {subset: true, features: {liga: false}});

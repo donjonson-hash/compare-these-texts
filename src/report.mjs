@@ -96,7 +96,7 @@ export function renderHtml(report) {
   const output = new ReportBuffer('HTML'), complete = report.status === 'complete';
   const title = complete ? "Comparison complete" : "Clarification needed — comparison not performed";
   const append = text => output.append(text);
-  append(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; connect-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><title>${title} — Compare These Texts</title><style>${STYLE}</style></head><body><main><h1>${title}</h1><p>Changes are highlighted: A on the left, B on the right.</p>`);
+  append(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; connect-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><title>${title} — Compare Two Texts</title><style>${STYLE}</style></head><body><main><h1>${title}</h1><p>Changes are highlighted: A on the left, B on the right.</p>`);
   append(`<p>A · ${escape(report.sources.left.name)}<br>B · ${escape(report.sources.right.name)}</p>`);
   if (!complete) {
     append("<h2>Clarifications</h2><ul>");

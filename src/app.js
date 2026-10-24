@@ -246,6 +246,7 @@
     throw new Error("Couldn't load the comparison. Refresh the page and try again.");
   }
   function sourceLabel(side, file) {
+    $(side + '-filename').dataset.sourceLoaded = String(!!file);
     $(side + '-filename').textContent = file ? file.name : "Choose a file or drop it here";
     $(side + '-meta').textContent = file ? "File selected · click to replace" : (window.KristinaTransport ? "XLSX, CSV, TXT, DOCX, PDF · up to 2 MiB" : "CSV · UTF-8 · up to 2 MiB");
   }

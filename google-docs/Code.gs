@@ -4,13 +4,13 @@ const CTT_LIMIT = 4000;
 const CTT_TTL = 900;
 
 function onOpen() {
-  DocumentApp.getUi().createMenu('Compare These Texts')
+  DocumentApp.getUi().createMenu('Compare Two Texts')
     .addItem('Edit selected text', 'showEditor').addToUi();
 }
 
 function showEditor() {
   DocumentApp.getUi().showSidebar(HtmlService.createHtmlOutputFromFile('Sidebar')
-    .setTitle('Compare These Texts'));
+    .setTitle('Compare Two Texts'));
 }
 
 function cttAttributes_(attributes) {

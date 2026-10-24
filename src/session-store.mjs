@@ -10,7 +10,7 @@ const empty = () => ({token: null, payload: null, updatedAt: null});
 /** Validate and detach the snapshot before an asynchronous write can start. */
 export function validateSessionPayload(payload) {
   if (!object(payload)) throw failure('invalid', "Could not save your work: invalid data.");
-  if (payload.version !== 1) throw failure('incompatible', "This work was saved by a different version of Compare These Texts.");
+  if (payload.version !== 1) throw failure('incompatible', "This work was saved by a different version of Compare Two Texts.");
   const invalid = () => { throw failure('invalid', "Could not save your work: invalid data."); };
   if (!object(payload.sources) || !object(payload.review) || !object(payload.report)) invalid();
   for (const side of ['left', 'right']) {
@@ -82,7 +82,7 @@ export async function openSessionStore({indexedDB = globalThis.indexedDB, dbName
     try { request = indexedDB.open(dbName, 1); } catch (error) { reject(error); return; }
     request.onupgradeneeded = () => { if (!request.result.objectStoreNames.contains(STORE)) request.result.createObjectStore(STORE); };
     request.onerror = () => { settled = true; reject(request.error); };
-    request.onblocked = () => { settled = true; reject(failure('blocked', "Close other Compare These Texts windows and try again.")); };
+    request.onblocked = () => { settled = true; reject(failure('blocked', "Close other Compare Two Texts windows and try again.")); };
     request.onsuccess = () => { if (settled) request.result.close(); else { settled = true; resolve(request.result); } };
   });
   let closed = false;
@@ -92,7 +92,7 @@ export async function openSessionStore({indexedDB = globalThis.indexedDB, dbName
 
   function transaction(mode, action) {
     return new Promise((resolve, reject) => {
-      if (closed) { reject(failure('unavailable', "Saving is unavailable. Reopen Compare These Texts.")); return; }
+      if (closed) { reject(failure('unavailable', "Saving is unavailable. Reopen Compare Two Texts.")); return; }
       let tx, result, reason;
       try { tx = db.transaction(STORE, mode); } catch (error) { reject(error); return; }
       const abort = error => { reason = error; try { tx.abort(); } catch { reject(error); } };

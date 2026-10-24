@@ -1,4 +1,4 @@
-Con Compare These Texts confronta testi e documenti affiancati, individua le differenze e modifica il risultato. Controlla un documento revisionato, verifica il foglio di calcolo di un fornitore o compila uno spazio destinato alla scrittura in un PDF supportato. Poi scarica o stampa il tuo lavoro.
+Con Compare Two Texts confronta testi e documenti affiancati, individua le differenze e modifica il risultato. Controlla un documento revisionato, verifica il foglio di calcolo di un fornitore o compila uno spazio destinato alla scrittura in un PDF supportato. Poi scarica o stampa il tuo lavoro.
 
 CONFRONTA, MODIFICA, SALVA
 1. Apri l'estensione e scegli due file da confrontare, oppure usa Edit & export per un singolo file.

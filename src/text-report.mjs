@@ -15,7 +15,7 @@ export function renderTextHtml(report) {
     if (bytes > MAX_REPORT_BYTES - size) throw new RangeError('HTML report exceeds 16 MiB; split the input documents');
     size += bytes; parts.push(text);
   }
-  append(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; connect-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><title>Text comparison — Compare These Texts</title><style>${style}</style></head><body><main><h1>Document comparison</h1><p>Changes are highlighted: A on the left, B on the right.</p><p class="note">Text is compared; formatting and images are not checked.</p>`);
+  append(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; connect-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><title>Text comparison — Compare Two Texts</title><style>${style}</style></head><body><main><h1>Document comparison</h1><p>Changes are highlighted: A on the left, B on the right.</p><p class="note">Text is compared; formatting and images are not checked.</p>`);
   append(`<p>A · ${escape(report.sources.left.name)}<br>B · ${escape(report.sources.right.name)}</p>`);
   append('<div class="totals">');
   for (const [category, label] of Object.entries(labels)) {

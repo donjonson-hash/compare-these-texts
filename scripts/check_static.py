@@ -58,7 +58,7 @@ for p in (root/'downloads').glob('*.zip'):
   assert manifest['homepage_url']=='https://comparethesetexts.com/'
   assert manifest['version']==re.search(r'-(\d+\.\d+\.\d+)\.zip$',p.name).group(1)
   if p.name.startswith('ctt-'):
-   assert manifest['name'] in ('Compare These Texts — Compare & Edit',release['name'])
+   assert manifest['name'] in ('Compare Two Texts — Compare & Edit',release['name'])
    assert '<html lang="en">' in z.read('index.html').decode()
    assert manifest['action']['default_title']=='CTT — Compare & Edit'
    for name in ['index.html','launcher.html','welcome.html']:

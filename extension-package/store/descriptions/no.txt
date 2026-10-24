@@ -1,4 +1,4 @@
-Compare These Texts hjelper deg med å sammenligne tekster og dokumenter side om side, finne forskjeller og redigere resultatet. Se gjennom en revidert versjon av et dokument, kontroller regnearket fra en leverandør eller fyll inn en trykt, tom linje i en støttet PDF. Last deretter ned eller skriv ut arbeidet ditt.
+Compare Two Texts hjelper deg med å sammenligne tekster og dokumenter side om side, finne forskjeller og redigere resultatet. Se gjennom en revidert versjon av et dokument, kontroller regnearket fra en leverandør eller fyll inn en trykt, tom linje i en støttet PDF. Last deretter ned eller skriv ut arbeidet ditt.
 
 SAMMENLIGN, REDIGER, LAGRE
 1. Åpne utvidelsen og velg to filer som skal sammenlignes, eller bruk Edit & export for én fil.

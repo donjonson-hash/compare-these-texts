@@ -1,4 +1,4 @@
-Compare These Texts giúp bạn so sánh văn bản và tài liệu cạnh nhau, tìm điểm khác biệt và chỉnh sửa kết quả. Kiểm tra tài liệu đã chỉnh sửa, xem lại bảng tính của nhà cung cấp hoặc điền vào chỗ trống in sẵn trong PDF được hỗ trợ — sau đó tải xuống hoặc in thành quả của bạn.
+Compare Two Texts giúp bạn so sánh văn bản và tài liệu cạnh nhau, tìm điểm khác biệt và chỉnh sửa kết quả. Kiểm tra tài liệu đã chỉnh sửa, xem lại bảng tính của nhà cung cấp hoặc điền vào chỗ trống in sẵn trong PDF được hỗ trợ — sau đó tải xuống hoặc in thành quả của bạn.
 
 SO SÁNH, CHỈNH SỬA, LƯU
 1. Mở tiện ích và chọn hai tệp để so sánh, hoặc dùng Edit & export cho một tệp.

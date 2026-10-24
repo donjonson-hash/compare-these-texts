@@ -1,4 +1,4 @@
-Compare These Texts est un comparateur de texte qui permet d'afficher deux documents côte à côte, de repérer leurs différences et de modifier le résultat. Vérifiez un document révisé, examinez le tableau d'un fournisseur ou remplissez un espace prévu pour l'écriture sur un PDF compatible, puis téléchargez ou imprimez votre travail.
+Compare Two Texts est un comparateur de texte qui permet d'afficher deux documents côte à côte, de repérer leurs différences et de modifier le résultat. Vérifiez un document révisé, examinez le tableau d'un fournisseur ou remplissez un espace prévu pour l'écriture sur un PDF compatible, puis téléchargez ou imprimez votre travail.
 
 COMPARER, MODIFIER, ENREGISTRER
 1. Ouvrez l'extension et choisissez deux fichiers à comparer, ou utilisez Edit & export pour un seul fichier.
