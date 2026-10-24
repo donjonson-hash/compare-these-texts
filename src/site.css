@@ -90,7 +90,7 @@
 
 /* Compare Two Texts: immediate input, with the full document workspace below. */
 body.home-mode{background:#f8faf9}
-.topbar .brand-icon{width:31px;height:31px;border-radius:7px;font:700 24px ui-monospace,monospace;letter-spacing:0}
+.topbar .brand-icon{display:block;width:36px;height:36px;flex:0 0 36px;border-radius:8px;object-fit:contain}
 .topbar .brand{font-size:20px;letter-spacing:-.55px}
 .topbar .home-link{font-size:14px;font-weight:500;min-height:38px}
 .home-mode .topbar{padding:21px 38px;background:#fff;position:static}
@@ -140,3 +140,6 @@ body.home-mode{background:#f8faf9}
 
 .single-document-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-left:auto}
 @media(max-width:650px){.single-document-actions{width:100%}.single-document-actions .button{flex:1}}
+
+/* Informational pages share readable list spacing. */
+.privacy-copy ul{padding-left:22px;margin-top:14px;font-size:15px;line-height:1.8}.privacy-copy li+li{margin-top:8px}
