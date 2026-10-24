@@ -118,10 +118,10 @@ test('Word PDF keeps mixed bold and normal Latin, Cyrillic and simple emoji sear
  }finally{await loading.destroy();}
 });
 
-test('Word PDF rejects unsupported composed emoji before producing a truncated or altered export',async()=>{
- for(const emoji of ['👩‍💻','👆🏻']){
-  const src=source(docx([`Before ${emoji} after`])),model=await readDocxVisual(src);
-  assert.equal(model.blocks[0].text,`Before ${emoji} after`,'DOCX import retains the composed emoji');
-  await assert.rejects(()=>renderDocxPdf(model),/emoji sequence.*Download DOCX/i);
- }
+test('Word PDF preserves composed emoji and distinct sequences sharing one monochrome outline',async()=>{
+ const expected='Before 👩‍💻 👆 👆🏻 👆🏿 🇺🇸 👨‍👩‍👧‍👦 1️⃣ 🏳️‍🌈 after';
+ const model=await readDocxVisual(source(docx([expected])));
+ const bytes=await renderDocxPdf(model);
+ const task=getDocument({data:bytes,useSystemFonts:false,disableFontFace:true,useWorkerFetch:false,useWasm:false,stopAtErrors:true,isEvalSupported:false,verbosity:0});
+ try{const pdf=await task.promise,page=await pdf.getPage(1),text=(await page.getTextContent()).items.map(i=>i.str).join('');assert.equal(text,expected);}finally{await task.destroy();}
 });

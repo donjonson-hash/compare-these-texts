@@ -8,6 +8,23 @@ const pt=(s,fallback=0)=>typeof s==='number'?s:typeof s==='string'&&/^\d+(?:\.\d
 const color=(s,fallback='#202820')=>{const value=/^#[a-f\d]{6}$/i.test(s||'')?s:fallback;return rgb(...[1,3,5].map(i=>parseInt(value.slice(i,i+2),16)/255));};
 const fail=message=>{throw new Error(message);};
 const abort=signal=>{if(signal?.aborted)throw new DOMException('Canceled','AbortError');};
+// Word can split a single emoji across runs. A grapheme keeps the style of its
+// first code point; surrounding text retains its own run's style.
+function graphemeRuns(runs){
+ const result=[],segmenter=new Intl.Segmenter('en',{granularity:'grapheme'});let pending=[];
+ function flush(){
+  if(!pending.length)return;let text='',spans=[];
+  for(const run of pending){spans.push({start:text.length,run});text+=run.text||'';}
+  let index=0,last=-1;
+  for(const part of segmenter.segment(text)){
+   while(index+1<spans.length&&spans[index+1].start<=part.index)index++;
+   if(last===index)result.at(-1).text+=part.segment;else{result.push({...spans[index].run,text:part.segment});last=index;}
+  }
+  pending=[];
+ }
+ for(const run of runs){if(run.image||run.field||run.pageBreak){flush();result.push(run);}else pending.push(run);}
+ flush();return result;
+}
 
 export async function renderDocxPdf(model,{signal,onLayout}={}) {
   abort(signal);
@@ -19,19 +36,14 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
   const usable=pageWidth-margins.left-margins.right;let bodyHeight=pageHeight-margins.top-margins.bottom;
   if(![pageWidth,pageHeight,usable,bodyHeight].every(n=>Number.isFinite(n)&&n>24))fail('The page margins leave too little room for a PDF.');
   const pdf=await PDFDocument.create();pdf.registerFontkit(fontkit);
-  // The monochrome fallback font's full-font cmap cannot retain some emoji
-  // ligatures/modifiers. Refuse them before producing a misleading PDF.
-  const emojiSegments=new Intl.Segmenter('en',{granularity:'grapheme'});
-  const checkEmoji=text=>{for(const {segment} of emojiSegments.segment(text||''))if(/\p{Extended_Pictographic}/u.test(segment)&&/[\u200d\u{1F3FB}-\u{1F3FF}]/u.test(segment))fail('This emoji sequence cannot yet be preserved in PDF. Download DOCX to keep it unchanged.');};
-  for(const block of [...model.blocks,...(model.headersFooters||[])]){checkEmoji(block.text);for(const run of block.runs||[])checkEmoji(run.text);}
   const baseFonts={regular:await pdf.embedFont(decode(regularBytes),{subset:true,features:{liga:false}}),bold:await pdf.embedFont(decode(boldBytes),{subset:true,features:{liga:false}})};
   const regularChars=new Set(baseFonts.regular.getCharacterSet()),boldChars=new Set(baseFonts.bold.getCharacterSet());
   const needsFallback=text=>Array.from(text||'').some(c=>!/[\s\p{Default_Ignorable_Code_Point}]/u.test(c)&&(!regularChars.has(c.codePointAt(0))||!boldChars.has(c.codePointAt(0))))||(/\p{Extended_Pictographic}/u.test(text||'')&&/[\u200d\ufe0f]/u.test(text||''));
   let emoji=baseFonts.regular;
   if([...model.blocks,...(model.headersFooters||[])].some(b=>needsFallback(b.text)||b.runs?.some(r=>needsFallback(r.text)))){
     const {default:emojiBytes}=await import('./sheet-emoji-font.mjs');
-    // As in spreadsheet export, preserve outlines by embedding the static font intact.
-    emoji=await pdf.embedFont(decode(emojiBytes),{subset:false});
+    const {createEmojiPdfFont}=await import('./pdf-emoji-font.mjs');
+    emoji=await createEmojiPdfFont(pdf,decode(emojiBytes));
   }
   const fontOptions={errorMessage:'This document contains a character that the PDF fonts cannot display. Download DOCX to preserve it.'};
   const fonts=Object.fromEntries(Object.entries(baseFonts).map(([key,font])=>[key,sheetPdfFont(font,emoji,fontOptions)]));
@@ -72,7 +84,7 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
         if(chunk){const cw=format.font.widthOfTextAtSize(chunk,format.size);items.push({...format,text:chunk,x:used,width:cw});used+=cw;}
       }
     }
-    for(const run of block.runs||[{text:block.text,style:{}}]){
+    for(const run of graphemeRuns(block.runs||[{text:block.text,style:{}}])){
       if(run.pageBreak&&run.text==='\n'){flush();forced=true;continue;}
       if(run.image){const image=await imageFor(run.image),w=run.image.width*.75,h=run.image.height*.75,scale=Math.min(1,available/w,(bodyHeight-20)/h);if(!(w>0&&h>0&&scale>0))fail('An image has invalid dimensions.');if(used+w*scale>room())flush();items.push({image,width:w*scale,height:h*scale,x:used});used+=w*scale;}
       else {const format=typography({...style,...run.style},block.heading);let text=run.text;if(run.field){if(!fields)fail('A page-number field is outside its header or footer.');text=fields.measure?Array.from('0123456789').sort((a,b)=>format.font.widthOfTextAtSize(b,format.size)-format.font.widthOfTextAtSize(a,format.size))[0].repeat(7):String(fields[run.field]);}addText(text,format);}
@@ -156,5 +168,5 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
     }
     await cooperate();
   }
-  abort(signal);pdf.setCreator('Compare Two Texts');const bytes=await pdf.save();abort(signal);if(bytes.length>32*1024*1024)fail('The PDF is too large. Reduce image sizes in the Word document.');onLayout?.(layout);return bytes;
+  abort(signal);emoji.finalize?.();pdf.setCreator('Compare Two Texts');const bytes=await pdf.save();abort(signal);if(bytes.length>32*1024*1024)fail('The PDF is too large. Reduce image sizes in the Word document.');onLayout?.(layout);return bytes;
 }

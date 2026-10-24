@@ -18,6 +18,6 @@ export function sheetPdfFont(primary,fallback,{errorMessage='A character in this
   check:text=>{for(const line of text.split('\n'))runs(line);},
   graphemes:text=>Array.from(segmenter.segment(text),entry=>entry.segment),
   widthOfTextAtSize:(text,size)=>runs(text).reduce((width,run)=>width+run.font.widthOfTextAtSize(run.text,size),0),
-  drawText(page,text,options){let x=options.x;for(const run of runs(text)){page.drawText(run.text,{...options,x,font:run.font});x+=run.font.widthOfTextAtSize(run.text,options.size);}}
+  drawText(page,text,options){let x=options.x;for(const run of runs(text)){if(run.font.drawText)run.font.drawText(page,run.text,{...options,x});else page.drawText(run.text,{...options,x,font:run.font});x+=run.font.widthOfTextAtSize(run.text,options.size);}}
  };
 }
