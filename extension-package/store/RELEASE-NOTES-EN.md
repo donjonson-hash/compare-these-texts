@@ -1,9 +1,19 @@
-# Compare Two Texts 0.37.3 — submission notes
+# Compare Two Texts 0.37.4 — submission notes
 
 This package prepares the current extension for Chrome Web Store review. It is
 not a claim that the listing is published or approved.
 
-## Changes in 0.37.3
+## Changes in 0.37.4
+
+- Encrypt saved comparison and single-document drafts locally with AES-GCM-256.
+  Document names, source files, edits, undo history and reports are encrypted.
+- Keep a non-extractable key in the local browser profile. No account, password
+  or external service is needed; ordinary document downloads are unchanged.
+- Migrate valid older drafts on load without discarding their work. Failed
+  encryption or storage operations do not fall back to plaintext saves.
+- Preserve seven-day retention, deletion, restore and cross-tab ownership.
+
+## Retained from 0.37.3
 
 - Added a shared, font-independent CTT logo to the home, privacy, help, terms
   and extension pages, with fixed dimensions and padding inside its frame.
@@ -46,4 +56,4 @@ files must be saved as `.docx` first. No OCR or remote AI service is included.
 
 See `VERIFICATION.md` and the packaged checksums for the final build's audit
 results. This note lists features included in the candidate; it does not imply
-that every feature was introduced by the 0.37.3 patch alone.
+that every feature was introduced by the 0.37.4 patch alone.
