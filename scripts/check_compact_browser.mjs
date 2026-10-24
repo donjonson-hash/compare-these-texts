@@ -417,11 +417,27 @@ try {
     await openNewSingle(notesFile);
     await page.waitForFunction(()=>document.getElementById('single-current').textContent==='word-template.docx');
     assert.deepEqual(await unzipDocument(await downloadSingle()),await unzipDocument(notesFile.buffer),'Word boilerplate notes survive a real new-document upload and download');
-    const textboxFile={name:'word-textboxes.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from(textboxFixture().data,'base64')};
+    const textboxFile={name:'word-textboxes.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from(textboxFixture({geometry:true}).data,'base64')};
     await openNewSingle(textboxFile);
     await page.waitForFunction(()=>document.getElementById('single-current').textContent==='word-textboxes.docx');
-    assert.ok(await single.locator('[data-download-format="left"] option[value="pdf"]').isDisabled(),'complex header layout explains unavailable PDF instead of dropping it');
+    assert.equal(await single.locator('[data-download-format="left"] option[value="pdf"]').isDisabled(),false,'supported header textboxes can be exported as PDF');
     assert.deepEqual(await unzipDocument(await downloadSingle()),await unzipDocument(textboxFile.buffer),'supported Word template parts survive a new-document upload and download');
+    await single.locator('[data-download-format="left"]').selectOption('pdf');
+    await single.locator('[data-save-side="left"]').click();
+    const textboxDialog=single.locator('.document-pdf-dialog');
+    await textboxDialog.locator('.primary:not([disabled])').waitFor({state:'visible'});
+    const [textboxDownload]=await Promise.all([page.waitForEvent('download'),textboxDialog.getByRole('button',{name:'Download PDF',exact:true}).click()]);
+    const textboxPdf=await readFile(await textboxDownload.path());
+    const textboxText=await page.evaluate(async bytes=>{
+      const {getDocument}=await import('/pdf-reader-vendor.mjs');
+      const task=getDocument({data:new Uint8Array(bytes),stopAtErrors:true,isEvalSupported:false});
+      try{const pdf=await task.promise;return(await(await pdf.getPage(1)).getTextContent()).items.map(i=>i.str).join(' ');}finally{await task.destroy();}
+    },[...textboxPdf]);
+    assert.match(textboxText,/Sample header/);assert.match(textboxText,/Original body/);
+    await page.screenshot({path:path.join(output,'word-textbox-pdf-preview.png'),animations:'disabled'});
+    await textboxDialog.getByRole('button',{name:'Back to editing',exact:true}).click();
+    await single.locator('[data-download-format="left"]').selectOption('docx');
+
     await openNewSingle({name:'new-table.csv',mimeType:'text/csv',buffer:Buffer.from('Item;Quantity\nApple;3')});
     await page.locator('#single-options').waitFor({state:'visible'});
     assert.ok(await page.locator('#single-source-panel').isVisible(),'the direct file picker reveals required CSV settings');

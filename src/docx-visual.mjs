@@ -55,13 +55,57 @@ async function load(source) {
   return readDocxPackage(Uint8Array.from(atob(source.data),c=>c.charCodeAt(0)));
 }
 function base64(bytes) { let result=''; for(let i=0;i<bytes.length;i+=32768) result+=String.fromCharCode(...bytes.subarray(i,i+32768)); return btoa(result); }
+// Coordinates in these bounded legacy-shape models are PDF points (page remains CSS px).
+const SHAPE_NS={mc:'http://schemas.openxmlformats.org/markup-compatibility/2006',wp:'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing',a:'http://schemas.openxmlformats.org/drawingml/2006/main',wps:'http://schemas.microsoft.com/office/word/2010/wordprocessingShape',v:'urn:schemas-microsoft-com:vml',o:'urn:schemas-microsoft-com:office:office'};
+const shapeIs=(node,ns,name)=>node?.namespaceURI===SHAPE_NS[ns]&&node.localName===name;
+const shapeChild=(node,ns,name)=>elements(node).find(n=>shapeIs(n,ns,name));
+const shapeFind=(node,ns,name)=>all(node).filter(n=>shapeIs(n,ns,name));
+function legacyRule(pict) {
+  const rect=shapeChild(pict,'v','rect');if(!rect)return null;
+  const styles=Object.fromEntries((rect.getAttribute('style')||'').split(';').filter(Boolean).map(s=>s.split(':').map(v=>v.trim())));
+  const points=value=>{const match=/^(\d+(?:\.\d+)?)(pt|px)?$/.exec(value||'');return match&&(!Number(match[1])||match[2])?Number(match[1])*(match[2]==='px'?.75:1):NaN;};
+  const width=points(styles.width),height=points(styles.height),align=rect.getAttributeNS(SHAPE_NS.o,'hralign')||'center';
+  const rawColor=rect.getAttribute('fillcolor')||'',colors={black:'#000000',white:'#ffffff',gray:'#808080',grey:'#808080',silver:'#c0c0c0'};
+  const color=colors[rawColor.toLowerCase()]||(/^#[a-f\d]{6}$/i.test(rawColor)?rawColor:null);
+  if(!Number.isFinite(width)||width<0||width>1584||!Number.isFinite(height)||height<=0||height>12||!color||!['left','center','right'].includes(align)||!['f','false','0'].includes(rect.getAttribute('stroked'))||!['t','true','1'].includes(rect.getAttributeNS(SHAPE_NS.o,'hrnoshade')))return null;
+  return {width:width||null,height,color,align};
+}
+function peripheralTextbox(alternate,page,visualParagraph) {
+  const fail=()=>{throw new Error('Unsupported textbox geometry.');};
+  const choice=shapeChild(alternate,'mc','Choice'),anchors=shapeFind(choice,'wp','anchor'),shapes=shapeFind(choice,'wps','wsp');
+  if(anchors.length!==1||shapes.length!==1)return fail();
+  const anchor=anchors[0],shape=shapes[0],extent=shapeChild(anchor,'wp','extent'),props=shapeChild(shape,'wps','spPr'),body=shapeChild(shape,'wps','bodyPr'),transform=shapeChild(props,'a','xfrm');
+  if(!body||!props||!transform||!['0','false'].includes(anchor.getAttribute('simplePos')||'0')||!shapeChild(anchor,'wp','wrapNone'))return fail();
+  const number=(node,name,min,max,fallback)=>{const raw=node?.getAttribute(name);if(raw===null||raw===undefined||raw===''){if(fallback!==undefined)return fallback;return fail();}if(!finite(raw,min,max))return fail();return Number(raw);};
+  const emu=(node,name,min,max,fallback)=>number(node,name,min*12700,max*12700,fallback===undefined?undefined:fallback*12700)/12700;
+  const width=emu(extent,'cx',1,1584),height=emu(extent,'cy',1,1584),ext=shapeChild(transform,'a','ext'),off=shapeChild(transform,'a','off');
+  if(number(transform,'rot',0,0,0)!==0||!['0','false'].includes(transform.getAttribute('flipH')||'0')||!['0','false'].includes(transform.getAttribute('flipV')||'0')||emu(off,'x',0,0)!==0||emu(off,'y',0,0)!==0||emu(ext,'cx',1,1584)!==width||emu(ext,'cy',1,1584)!==height)return fail();
+  if(!shapeChild(props,'a','noFill')||!shapeChild(shapeChild(props,'a','ln'),'a','noFill')||shapeChild(props,'a','prstGeom')?.getAttribute('prst')!=='rect')return fail();
+  if(number(body,'rot',0,0,0)!==0||(body.getAttribute('vert')||'horz')!=='horz'||number(body,'numCol',1,1,1)!==1||!['0','false'].includes(body.getAttribute('rtlCol')||'0')||!['0','false'].includes(body.getAttribute('anchorCtr')||'0')||!['0','false'].includes(body.getAttribute('spcFirstLastPara')||'0')||!['0','false'].includes(body.getAttribute('fromWordArt')||'0')||(body.getAttribute('anchor')||'t')!=='t'||!['none','square'].includes(body.getAttribute('wrap')||'square'))return fail();
+  const insets={left:emu(body,'lIns',0,1584,7.2),right:emu(body,'rIns',0,1584,7.2),top:emu(body,'tIns',0,1584,3.6),bottom:emu(body,'bIns',0,1584,3.6)};
+  if(insets.left+insets.right>=width||insets.top+insets.bottom>=height)return fail();
+  const position=(name,size,pageSize,before,after,alignments)=>{
+    const node=shapeChild(anchor,'wp',name),relative=node?.getAttribute('relativeFrom');if(!['page','margin'].includes(relative))return fail();
+    const origin=relative==='margin'?before:0,available=relative==='margin'?pageSize-before-after:pageSize;
+    const offset=shapeChild(node,'wp','posOffset'),align=shapeChild(node,'wp','align');if(!!offset===!!align)return fail();
+    if(offset){if(!/^-?\d+$/.test(offset.textContent))return fail();return origin+Number(offset.textContent)/12700;}
+    const index=alignments.indexOf(align.textContent);if(index<0)return fail();return origin+(available-size)*index/2;
+  };
+  const x=position('positionH',width,page.width*.75,page.marginLeft*.75,page.marginRight*.75,['left','center','right']);
+  const y=position('positionV',height,page.height*.75,page.marginTop*.75,page.marginBottom*.75,['top','center','bottom']);
+  if(!Number.isFinite(x)||!Number.isFinite(y)||x<0||y<0||x+width>page.width*.75||y+height>page.height*.75)return fail();
+  const contents=all(shape).filter(n=>is(n,'txbxContent'));if(contents.length!==1)return fail();
+  const blocks=elements(contents[0]).map(p=>visualParagraph(p));
+  return {x,y,width,height,insets,verticalAlign:'top',wrap:body.getAttribute('wrap')||'square',autoFit:shapeChild(body,'a','spAutoFit')&&(shapeChild(shapeChild(anchor,'wp','positionH'),'wp','posOffset')||shapeChild(shapeChild(anchor,'wp','positionH'),'wp','align')?.textContent==='left')?'shape':'none',blocks};
+}
 export async function readDocxVisual(source) {
   const checked=await load(source), formatting=stylesFor(checked), body=child(checked.doc.documentElement,'body');
   const lists=renderDocxNumbering(checked.listData);
-  const imageSources=new Map();
+  const imageSources=new Map(),pdfUnsupported=[];
   function visualParagraph(p,{record,text,list}={}){
     const runs=[];
     function visit(node,style={}) {
+      if(shapeIs(node,'mc','AlternateContent')) return;
       if (is(node,'r')) style={...style,...formatting.run(node)};
       if (is(node,'fldSimple')) { const field=/^\s*(PAGE|NUMPAGES|SECTIONPAGES)\b/i.exec(attr(node,'instr')||'')?.[1]?.toUpperCase(); if(field){runs.push({field,text:'',style:{...style,...formatting.run(child(node,'r'))}});return;} }
       if (textual(node)) { runs.push({text:textOf(node),style,...(is(node,'br')&&attr(node,'type')==='page'?{pageBreak:true}:{})}); return; }
@@ -70,15 +114,15 @@ export async function readDocxVisual(source) {
       for(const c of elements(node)) visit(c,style);
     }
     visit(p);
-    return {record,text,...formatting.paragraph(p),runs,list,hasHorizontalRule:all(p).some(n=>is(n,'pict')),pageBreakBefore:!!enabled(child(child(p,'pPr'),'pageBreakBefore'))};
+    const pictures=all(p).filter(n=>is(n,'pict')&&!all(n).some(c=>is(c,'txbxContent'))),horizontalRules=pictures.map(legacyRule);
+    if(pictures.length&&(horizontalRules.some(rule=>!rule)||runs.some(run=>run.image||run.field||run.text?.trim())))pdfUnsupported.push('PDF export is unavailable for this legacy horizontal rule layout. Download Word (.docx) to preserve it.');
+    return {record,text,horizontalRules:horizontalRules.filter(Boolean),...formatting.paragraph(p),runs,list,hasHorizontalRule:all(p).some(n=>is(n,'pict')),pageBreakBefore:!!enabled(child(child(p,'pPr'),'pageBreakBefore'))};
   }
   const blocks=checked.structure.paragraphs.map((p,i)=>visualParagraph(p,{record:i+1,text:checked.texts[i],list:lists[i]}));
   const section=child(body,'sectPr'),size=child(section,'pgSz'),margin=child(section,'pgMar');
   const px=(node,name,fallback,min,max)=>finite(attr(node,name),min,max)?Number(attr(node,name))/15:fallback;
   const page={width:px(size,'w',794,1440,31680),height:px(size,'h',1123,1440,31680),marginTop:px(margin,'top',72,0,4320),marginRight:px(margin,'right',72,0,4320),marginBottom:px(margin,'bottom',72,0,4320),marginLeft:px(margin,'left',72,0,4320),headerDistance:px(margin,'header',48,0,4320),footerDistance:px(margin,'footer',48,0,4320)};
-  const pdfUnsupported=[];
-  if(checked.horizontalRules)pdfUnsupported.push('PDF export is unavailable for legacy horizontal rules. Download Word (.docx) to preserve them.');
-  if(checked.headersFooters.some(part=>part.complexLayout))pdfUnsupported.push('PDF export is unavailable for text boxes in headers or footers. Download Word (.docx) to preserve their layout.');
+  const peripheralTextboxes={header:{},footer:{}};
   const pageNumber=child(section,'pgNumType'),pageStart=attr(pageNumber,'start');
   if(pageNumber&&(attr(pageNumber,'chapStyle')!==null||attr(pageNumber,'chapSep')!==null||![null,'decimal'].includes(attr(pageNumber,'fmt'))||pageStart!==null&&(!finite(pageStart,1,999999)||!Number.isInteger(Number(pageStart)))))pdfUnsupported.push('This page-number format cannot be exported yet. Download Word (.docx) to preserve it.');
   const peripherals={header:{},footer:{},firstPage:!!enabled(child(section,'titlePg')),evenPages:!!enabled(child(checked.docs.get('word/settings.xml')?.documentElement,'evenAndOddHeaders')),pageStart:finite(pageStart,1,999999)?Number(pageStart):1};
@@ -89,10 +133,24 @@ export async function readDocxVisual(source) {
     const relationship=relationships.find(rel=>rel.getAttribute('Id')===id),part=checked.docs.get('word/'+relationship?.getAttribute('Target'));
     if(peripherals[kind][type])pdfUnsupported.push('This document has duplicate header or footer references. Download DOCX to preserve its layout.');
     const coverage=checked.headersFooters.find(item=>item.path==='word/'+relationship?.getAttribute('Target'));
-    if(!coverage?.complexLayout)peripherals[kind][type]=elements(part?.documentElement).map(p=>visualParagraph(p));
+    const paragraphs=elements(part?.documentElement);
+    if(!coverage?.complexLayout)peripherals[kind][type]=paragraphs.map(p=>visualParagraph(p));
+    else {
+      const boxes=[];peripherals[kind][type]=[];
+      try {
+        for(const p of paragraphs){
+          const alternates=shapeFind(p,'mc','AlternateContent');
+          for(const alternate of alternates)boxes.push(peripheralTextbox(alternate,page,visualParagraph));
+          const block=visualParagraph(p);
+          // A floating object's empty anchor is not a second visible paragraph.
+          if(!alternates.length||block.runs.length)peripherals[kind][type].push(block);
+        }
+        peripheralTextboxes[kind][type]=boxes;
+      } catch {pdfUnsupported.push('PDF export is unavailable for unsupported text boxes in headers or footers. Download Word (.docx) to preserve their layout.');}
+    }
   }
   if(all(body).filter(n=>is(n,'sectPr')).length>1||all(body).some(n=>is(n,'cols')&&Number(attr(n,'num')||1)>1||is(n,'br')&&attr(n,'type')==='column'))pdfUnsupported.push('This document uses multiple page layouts or text columns. Download DOCX to preserve them.');
-  return {format:'docx',headersFooters:checked.headersFooters,peripherals,blocks,page,content:checked.structure.content,hasTables:checked.structure.hasTables,listData:checked.listData,pdfUnsupported,notes:["Headings, tables, lists, text styles, and embedded photos are preserved. Page breaks in the browser may differ from Word."]};
+  return {format:'docx',headersFooters:checked.headersFooters,peripherals,peripheralTextboxes,blocks,page,content:checked.structure.content,hasTables:checked.structure.hasTables,listData:checked.listData,pdfUnsupported,notes:["Headings, tables, lists, text styles, and embedded photos are preserved. Page breaks in the browser may differ from Word."]};
 }
 
 function validateText(text) {
@@ -153,7 +211,7 @@ export function projectDocxVisual(model,sequence,{rowPlan}={}) {
     const text=validateText(item.text);chars+=[...text].length;
     if(chars>MAX_TEXT_CHARS||blocks.length>=MAX_TEXT_BLOCKS)throw new Error("The DOCX version exceeds the text size limit.");
     const original=originals.get(item.record),rowTemplate=originals.get(layout?.templates[item.record]),template=original||rowTemplate||blocks.at(-1)||model.blocks[0];
-    blocks.push({record:item.record,sourceRecord:item.record,key:item.key,text,heading:template?.heading||null,style:{...template?.style},runs:original?revisedRuns(original.runs,text):rowTemplate?(text?[{text,style:{...rowTemplate.runs.find(run=>!run.image)?.style}}]:[]):[{text,style:{}}],list:template?.list||null,pageBreakBefore:!!original?.pageBreakBefore,hasHorizontalRule:!!original?.hasHorizontalRule});
+    blocks.push({record:item.record,sourceRecord:item.record,key:item.key,text,heading:template?.heading||null,style:{...template?.style},runs:original?revisedRuns(original.runs,text):rowTemplate?(text?[{text,style:{...rowTemplate.runs.find(run=>!run.image)?.style}}]:[]):[{text,style:{}}],list:template?.list||null,pageBreakBefore:!!original?.pageBreakBefore,hasHorizontalRule:!!original?.hasHorizontalRule,horizontalRules:original?.horizontalRules?.map(rule=>({...rule}))||[]});
   }
   for(const original of model.blocks)if(!layout&&!seen.has(original.record)&&(original.hasHorizontalRule||original.runs.some(run=>run.image))){
     const next=blocks.findIndex(block=>block.sourceRecord>original.record);
@@ -164,7 +222,9 @@ export function projectDocxVisual(model,sequence,{rowPlan}={}) {
   // whose text was removed while its photograph was retained.
   const lists=renderDocxNumbering(model.listData,blocks.map(block=>block.list));
   for(let i=0;i<blocks.length;i++)blocks[i].list=lists[i];
-  return {...model,blocks,...(layout?{content:layout.content}: {})};
+  const pdfUnsupported=[...(model.pdfUnsupported||[])];
+  if(blocks.some(block=>block.horizontalRules?.length&&block.text?.trim()))pdfUnsupported.push('PDF export is unavailable for text mixed with a legacy horizontal rule. Download Word (.docx) to preserve it.');
+  return {...model,blocks,pdfUnsupported,...(layout?{content:layout.content}: {})};
 }
 
 const encoder=new TextEncoder();

@@ -76,6 +76,20 @@
     "src/xml-vendor.mjs": {
       "bytes": 93711,
       "sha256": "11b7d8958a1f9e3758c861c7a40efd2dc55dedea62d427ec9ed1dd8bac27555c"
+    },
+    "src/word-calibri-regular-font.mjs": {
+      "bytes": 848110,
+      "sha256": "601eed404c2d7524101a9460f922249d1f984853eb52db29c5d269d5d61124f8",
+      "decoded_font_sha256": "b4ff23ba370cc95a3c349336b73f9c28514a1371210f89832efc85c4b1ea7131"
+    },
+    "src/word-calibri-bold-font.mjs": {
+      "bytes": 920799,
+      "sha256": "03ce3a55eb2dde870d66777e46f08fb8c80225a7191426c116c0163c4ae1cde1",
+      "decoded_font_sha256": "0f62ab34ad5d079a0a28fac01bcf7c7a724a4db4d6cb99cab9cabff382fbb80f"
+    },
+    "src/CARLITO-LICENSE.txt": {
+      "bytes": 4391,
+      "sha256": "efe9b9e0c49fd209bfd9a1a8f3515057f339eb9223ee4d475daa7770596c07d6"
     }
   }
 }

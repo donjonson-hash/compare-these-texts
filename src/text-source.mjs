@@ -354,7 +354,7 @@ export async function readTextSource(item) {
     if (checked.structure.hasTables) notes.push("Table text is read by row and cell. Merged cells and formatting are preserved in the DOCX; cell content is compared.");
     if (checked.emptyBibliography) notes.push("The empty bibliography template is not compared; it contains no user entries.");
     if (checked.listData.paragraphs.some(Boolean)) notes.push("List numbers and bullets are preserved in the document; only the item text is compared, without automatic numbering.");
-    if (checked.horizontalRules) notes.push("Legacy horizontal rules are preserved in DOCX downloads but are not displayed or compared. PDF export is unavailable for this layout.");
+    if (checked.horizontalRules) notes.push("Legacy horizontal rules are preserved in DOCX downloads and supported PDF layouts; they are not displayed in the editor or compared.");
     if (checked.links) notes.push("Only the visible hyperlink text is compared; URLs are not opened or compared.");
   }
   if (texts.length > MAX_TEXT_BLOCKS) fail("The document contains more than 2,000 text blocks. Split it into smaller files.");
