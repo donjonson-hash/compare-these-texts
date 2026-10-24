@@ -7,15 +7,26 @@
   document.body.classList.toggle('single-mode',next==='single');$('single-workspace').hidden=next!=='single';$('compare-workspace').hidden=next!=='compare';
   for(const button of document.querySelectorAll('[data-work-mode]'))button.setAttribute('aria-pressed',String(button.dataset.workMode===next));if(next==='single')view?.restoreViewport?.();
  }
- function controls(){ $('single-open').disabled=$('single-file').disabled=busy||operating;if($('single-paste-open'))$('single-paste-open').disabled=busy||operating;$('single-editor-host').inert=busy||operating; }
+ function sourcePanel(open){
+  $('single-source-panel').hidden=!!view&&!open;
+  $('single-document-bar').hidden=!view;
+  document.body.classList.toggle('single-document-open',!!view);
+  document.body.classList.toggle('single-source-open',!!view&&open);
+  $('single-source-toggle').setAttribute('aria-expanded',String(!!view&&open));
+ }
+ $('single-source-toggle').addEventListener('click',()=>{
+  const open=$('single-source-panel').hidden;sourcePanel(open);
+  const target=open?$('single-file'):$('single-current');target.focus({preventScroll:true});target.scrollIntoView?.({block:'center'});
+ });
+ function controls(){ $('single-source-toggle').disabled=busy||operating;$('single-open').disabled=$('single-file').disabled=busy||operating;if($('single-paste-open'))$('single-paste-open').disabled=busy||operating;$('single-editor-host').inert=busy||operating; }
  function setBusy(value){busy=value;session?.setBusy(value);controls();}
  function closeDocument(){
   generation++;controller?.abort();view?.dispose();controller=null;view=null;candidate=null;
-  $('single-editor-host').replaceChildren();$('single-options').hidden=true;$('single-current').textContent='';$('single-current').hidden=true;note('');
+  $('single-editor-host').replaceChildren();$('single-options').hidden=true;$('single-current').textContent='';$('single-current').hidden=true;note('');sourcePanel(true);
  }
  const ready=import(sessionURL.href).then(({mountSingleSession})=>mountSingleSession($('single-session'),{
-  onResume:async payload=>{await install(payload,true);chooseMode('single');},onFinish:closeDocument,
-  onOperating:value=>{operating=value;if(value)generation++;controls();}
+  onResume:async payload=>{await install(payload,true);chooseMode('single');$('single-current').focus({preventScroll:true});$('single-current').scrollIntoView?.({block:'start'});},onFinish:closeDocument,
+  onOperating:value=>{operating=value;if(value)generation++;controls();if(!value&&!view)$('single-file').focus({preventScroll:true});}
  })).then(ui=>{session=ui;session.setBusy(busy);return ui;}).catch(()=>{note('Automatic saving is unavailable. Download your edits before closing this tab.',true);return null;});
  document.querySelectorAll('[data-work-mode]').forEach(button=>button.addEventListener('click',()=>chooseMode(button.dataset.workMode)));
  async function install(payload,resuming=false){
@@ -26,11 +37,11 @@
    if(ticket!==generation){abort.abort();next.dispose();return;}
    await session?.flush();if(ticket!==generation){abort.abort();next.dispose();return;}
    controller?.abort();view?.dispose();controller=abort;view=next;$('single-editor-host').replaceChildren(stage);$('single-options').hidden=true;
-   $('single-current').textContent=payload.source.name;$('single-current').hidden=false;note('');
+   $('single-current').textContent=payload.source.name;$('single-current').hidden=false;note('');sourcePanel(false);
    // Bind to the opened file, never the candidate for a later replacement.
    const {source,sheet,delimiter}=payload;
    session?.activate(()=>({version:1,kind:'single-editor',source,sheet:sheet||null,delimiter,review:next.snapshot()}));
-   if(!resuming){const paste=$('single-paste');if(paste)paste.open=false;const destination=$('single-current');destination.scrollIntoView?.({block:'start'});destination.focus?.({preventScroll:true});}
+   const paste=$('single-paste');if(paste)paste.open=false;const destination=$('single-current');destination.scrollIntoView?.({block:'start'});destination.focus?.({preventScroll:true});
   }catch(error){abort.abort();next?.dispose();if(ticket===generation)note(error.message,true);if(resuming)throw error;}
   finally{if(ticket===generation)setBusy(false);}
  }

@@ -128,3 +128,12 @@ body.home-mode{background:#f8faf9}
 /* Opening a file starts at its document, below the sticky navigation. */
 #single-current{scroll-margin-top:100px}
 .wording-review-dialog .workspace-tools-heading{position:sticky;top:-20px;z-index:1;background:#fff;padding:12px 0}
+
+/* Keep an opened document in view; source controls remain available on demand. */
+.single-document-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0}
+.single-document-bar #single-current{margin:0;font-size:16px}
+#single-document-bar[hidden],#single-source-panel[hidden]{display:none!important}
+.single-mode.single-document-open .work-mode-switch,
+.single-mode.single-document-open:not(.single-source-open) #single-session:not(.session-error),
+.single-mode.single-document-open .single-local-note{display:none!important}
+@media(max-width:650px){.single-document-bar{flex-wrap:wrap}.single-document-bar #single-source-toggle{margin-left:auto}}

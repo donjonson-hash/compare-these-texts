@@ -219,6 +219,16 @@ try {
     };
     const singleEdited = await downloadSingle();
     assert.notDeepEqual(singleEdited, original, 'standalone edit changes the document');
+    assert.ok(await page.locator('#single-source-panel').isHidden(),'opening a document hides the upload and introductory area');
+    assert.ok(await page.locator('#single-session').isHidden(),'routine saved-work details stay out of the document view');
+    await page.locator('#single-source-toggle').click();
+    assert.ok(await page.locator('#single-source-panel').isVisible(),'Document options reveals source controls');
+    dismissNextDialog=true;
+    await page.locator('#single-file').setInputFiles({name:'cancelled.txt',mimeType:'text/plain',buffer:Buffer.from('Do not replace the edited document.')});
+    await page.waitForFunction(()=>!document.getElementById('single-file').disabled);
+    assert.deepEqual(await downloadSingle(),singleEdited,'cancelling replacement retains the edited document');
+    await page.locator('#single-source-toggle').click();
+
     await page.locator('#workspace-home').click();
     await page.locator('#start-menu').waitFor({state:'visible'});
     await page.locator('#header-edit').click();
@@ -387,8 +397,17 @@ try {
     await page.locator('#single-session-resume').click();
     await single.locator('[data-save-side="left"]').waitFor({state:'visible'});
     assert.ok(await reviewDialog.isHidden(),'restoring a draft starts with the analysis closed');
+    assert.ok(await page.locator('#single-source-panel').isHidden(),'restoring a draft hides the source form');
+    assert.equal(await page.locator('#single-current').evaluate(node=>node===document.activeElement),true,'restoring focuses the document heading');
     assert.deepEqual(await unzipDocument(await downloadSingle()),await unzipDocument(reviewFile.buffer),'restoring retains the exact document');
     await page.screenshot({path:path.join(output,'document-first-editor.png'),animations:'disabled'});
+    await page.locator('#single-source-toggle').click();
+    await page.locator('#single-session summary').click();
+    await page.locator('#single-session-delete').click();
+    await page.locator('#single-document-bar').waitFor({state:'hidden'});
+    assert.ok(await page.locator('#single-source-panel').isVisible(),'finishing a document restores the initial upload form');
+    assert.equal(await single.locator('[data-save-side="left"]').count(),0,'finished document editor is removed');
+
 
 
   }
