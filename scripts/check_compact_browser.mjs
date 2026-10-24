@@ -6,6 +6,8 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createServer} from 'node:http';
 import {peripheralFixture} from '../tests/fixtures/docx-headers-fixture.mjs';
+import {docx} from '../tests/fixtures/text-fixture.mjs';
+import {unzipDocument} from '../src/text-zip.mjs';
 
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -313,6 +315,36 @@ try {
     assert.equal(await page.locator('#home-right-text').inputValue(), pastedB, 'returning Home retains the original pasted B');
     await page.locator('#start-compare').click(); await ready();
     assert.equal((await downloadB()).toString(), pastedB, 'Continue keeps the existing comparison');
+
+    // Real browser download, reopening and PDF extraction for composed emoji.
+    const emojiText='Before 👩‍💻 👆 👆🏻 👆🏿 🇺🇸 👨‍👩‍👧‍👦 after';
+    const emojiFile={name:'emoji.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from(docx([emojiText]))};
+    await page.locator('#workspace-home').click();
+    await page.locator('#home-left-file').setInputFiles(emojiFile);
+    await page.locator('#home-right-file').setInputFiles(emojiFile);
+    await page.locator('#start-new-compare').click();await ready();
+    const emojiDocx=await downloadB();
+    // The exporter recompresses the ZIP; compare every decompressed package part.
+    assert.deepEqual(await unzipDocument(emojiDocx),await unzipDocument(emojiFile.buffer),'DOCX download preserves every package part');
+    await page.locator('#visual-review [data-download-format="right"]').selectOption('pdf');
+    await page.locator('#visual-review [data-save-side="right"]').click();
+    const emojiDialog=page.locator('#visual-review .document-pdf-dialog');
+    await emojiDialog.getByRole('button',{name:'Download PDF',exact:true}).waitFor({state:'visible'});
+    await page.waitForFunction(()=>!document.querySelector('#visual-review .document-pdf-dialog .primary').disabled);
+    const [emojiDownload]=await Promise.all([page.waitForEvent('download'),emojiDialog.getByRole('button',{name:'Download PDF',exact:true}).click()]);
+    const emojiPdf=await readFile(await emojiDownload.path());
+    const emojiExtracted=await page.evaluate(async bytes=>{
+      const {getDocument}=await import('/pdf-reader-vendor.mjs');
+      const task=getDocument({data:new Uint8Array(bytes),stopAtErrors:true,isEvalSupported:false});
+      try{const pdf=await task.promise;return(await(await pdf.getPage(1)).getTextContent()).items.map(i=>i.str).join('');}finally{await task.destroy();}
+    },[...emojiPdf]);
+    assert.equal(emojiExtracted,emojiText,'downloaded PDF retains exact emoji sequences');
+    await page.screenshot({path:path.join(output,'composed-emoji-pdf.png'),animations:'disabled'});
+    await emojiDialog.getByRole('button',{name:'Back to editing',exact:true}).click();
+    await page.locator('#workspace-home').click();
+    await page.locator('#home-right-file').setInputFiles({...emojiFile,name:'downloaded.docx',buffer:emojiDocx});
+    await page.locator('#start-new-compare').click();await ready();
+    assert.ok(await page.getByText('Texts match ✓',{exact:true}).isVisible(),'downloaded DOCX reopens and matches');
 
 
   }

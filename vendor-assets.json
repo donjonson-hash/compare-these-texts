@@ -35,8 +35,8 @@
       "sha256": "599b1521b3c10f542ef254afee75ba2d9cbda0bb8d92ca4c27eef5d7fd977da7"
     },
     "src/pdf-vendor.mjs": {
-      "bytes": 1369522,
-      "sha256": "9a5b8b110c5e5d980d07a032616f1bf4bcd1228caf5696943507be4829182828"
+      "bytes": 1369698,
+      "sha256": "79800585e412245a344efa2fea952247989690e667f9bbdf791beda87ac288bc"
     },
     "src/sheet-emoji-font.mjs": {
       "bytes": 1182266,
