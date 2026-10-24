@@ -2,7 +2,8 @@
 // npm run build first. Install Playwright separately or set PLAYWRIGHT_MODULE
 // to its module entry. CHROMIUM_EXECUTABLE can select an installed browser.
 import assert from 'node:assert/strict';
-import { readFile, mkdir, mkdtemp, rm, stat } from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import { readFile, writeFile, mkdir, mkdtemp, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve, extname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -28,7 +29,8 @@ const server = createServer(async (req, res) => {
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const origin = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch({ ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : { channel: 'chromium' }), headless: true, args: ['--no-sandbox'] });
-const errors = [], external = [];
+const errors = [], external = [], captured = [];
+const sha256=bytes=>createHash('sha256').update(bytes).digest('hex');
 async function appPage() {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
   const page = await context.newPage();
@@ -41,6 +43,7 @@ async function screenshot(page, name) {
   await page.evaluate(() => document.fonts.ready);
   await page.screenshot({ path: join(output, name), animations: 'disabled' });
   assert.ok((await stat(join(output, name))).size < 800000, `${name} exceeds 800 KB`);
+  captured.push({file:name,sha256:sha256(await readFile(join(output,name)))});
 }
 try {
   await mkdir(output, { recursive: true });
@@ -58,6 +61,19 @@ try {
   await tables.locator('.sheet-review .sheet-grid').first().waitFor();
   await tables.locator('#visual-review').evaluate(node => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY));
   await screenshot(tables, 'screenshot-tables-1280x800.png');
+
+  const editing = await appPage();
+  const demoCode=await readFile(join(unpacked,'document-demo.js'),'utf8');
+  const demoSources=JSON.parse(demoCode.slice(demoCode.indexOf('Object.freeze(')+14,demoCode.lastIndexOf(');')));
+  await editing.locator('#header-edit').click();
+  await editing.locator('#single-file').setInputFiles({name:'Sample-service-agreement.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from(demoSources.right.data,'base64')});
+  const single=editing.locator('#single-editor-host');
+  await single.locator('[data-save-side="left"]').waitFor({state:'visible'});
+  await screenshot(editing,'screenshot-editor-1280x800.png');
+  await single.locator('[data-download-format="left"]').selectOption('pdf');
+  await single.locator('[data-save-side="left"]').click();
+  await single.locator('.document-pdf-dialog .primary:not([disabled])').waitFor({state:'visible'});
+  await screenshot(editing,'screenshot-pdf-1280x800.png');
 
   const welcome = await appPage();
   await welcome.goto(origin + '/welcome.html');
@@ -88,7 +104,8 @@ try {
   await screenshot(marquee, 'promo-1400x560.png');
   assert.deepEqual(errors, [], 'Packaged UI must not produce uncaught errors');
   assert.deepEqual(external, [], 'Captures must use only local resources');
-  console.log(`Captured CTT ${release.version}: 3 screenshots and 2 promotional images, all below 800 KB.`);
+  await writeFile(join(output,'capture.json'),JSON.stringify({version:release.version,extension_sha256:sha256(await readFile(join(root,`dist/downloads/ctt-chrome-${release.version}.zip`))),browser:browser.version(),source:'packaged extension assets served locally; synthetic examples only',images:captured},null,2)+'\n');
+  console.log(`Captured CTT ${release.version}: 5 screenshots and 2 promotional images, all below 800 KB.`);
 } finally {
   await browser.close();
   await new Promise(resolve => server.close(resolve));

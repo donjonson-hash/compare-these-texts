@@ -31,19 +31,39 @@ def main():
     files['FULL-DESCRIPTION-EN.txt'] = files['descriptions/en.txt']
     files['CWS-LOCALIZATIONS.md'] = (ROOT / 'docs/CWS-LOCALIZATIONS.md').read_bytes()
     files['VERIFICATION.md'] = (ROOT / 'docs/STORE-KIT-VERIFICATION.md').read_bytes()
-    for name in ('SUBMISSION-RU.md', 'BOOTCAMP-CHECKLIST-RU.md', 'KEYWORDS.md', 'LISTING-EN.md', 'LOCALIZATION-RU.md'):
-        files[name] = (STORE / name).read_bytes()
+    for path in sorted(STORE.glob('*.md')):
+        files[path.name] = path.read_bytes()
+    files['TITLE-EN.txt'] = (catalog['en']['name'] + '\n').encode()
+    files['SHORT-DESCRIPTION-EN.txt'] = (catalog['en']['description'] + '\n').encode()
+    files['START-HERE-RU.md'] = (f'# Compare Two Texts {VERSION} — начните здесь\n\n'
+        f'1. В Chrome Web Store загрузите только `ctt-chrome-{VERSION}.zip`. Не загружайте весь комплект.\n'
+        '2. Следуйте SUBMISSION-RU.md: поля карточки, изображения, Privacy practices и заметки для ревьюера.\n'
+        '3. Название и краткое описание берутся из manifest; копии есть в TITLE-EN.txt и SHORT-DESCRIPTION-EN.txt.\n'
+        '4. Полное описание: FULL-DESCRIPTION-EN.txt; переводы: descriptions/.\n'
+        '5. Иконка магазина: icon128.png. Пять screenshot-*.png и два promo-*.png готовы для загрузки.\n'
+        '6. Welcome page уже внутри ZIP расширения и открывается при первой установке.\n'
+        '7. AUDIT-RESULTS.json, VERIFICATION.md и SHA256SUMS.txt описывают проверку и точные файлы.\n\n'
+        'Комплект не отправлен на модерацию. Настройки аккаунта и финальная отправка выполняются владельцем в кабинете.\n').encode()
     images = {
         'screenshot-documents-1280x800.png': (1280, 800),
         'screenshot-tables-1280x800.png': (1280, 800),
         'screenshot-welcome-1280x800.png': (1280, 800),
+        'screenshot-editor-1280x800.png': (1280, 800),
+        'screenshot-pdf-1280x800.png': (1280, 800),
         'promo-440x280.png': (440, 280),
         'promo-1400x560.png': (1400, 560),
     }
+    capture = json.loads((STORE / 'images/capture.json').read_text())
+    assert capture['version'] == VERSION, 'Recapture screenshots for this release'
+    assert capture['extension_sha256'] == hashlib.sha256(files[f'ctt-chrome-{VERSION}.zip']).hexdigest(), 'Screenshots were captured from a different extension ZIP'
+    captured = {item['file']: item['sha256'] for item in capture['images']}
+    assert set(captured) == set(images), 'Capture manifest must cover every store image'
+    files['SCREENSHOT-PROVENANCE.json'] = (STORE / 'images/capture.json').read_bytes()
     for name, dimensions in images.items():
         data = (STORE / 'images' / name).read_bytes()
         assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == dimensions, name
         assert len(data) < 800_000, (name, 'image exceeds kit size budget')
+        assert captured[name] == hashlib.sha256(data).hexdigest(), (name, 'image changed after capture')
         files[name] = data
     for size in (16, 32, 48, 64, 128):
         name = f'icon-{size}.png' if size != 128 else 'icon-store-128.png'
@@ -51,6 +71,8 @@ def main():
         assert struct.unpack('>II', data[16:24]) == (size, size), name
         files[f'icons/{name}'] = data
     files['icon128.png'] = files['icons/icon-store-128.png']
+    provenance = json.loads((ROOT / 'dist/release/provenance.json').read_text())
+    files['AUDIT-RESULTS.json'] = (json.dumps({'version': VERSION, 'source_commit': provenance['source_commit'], 'source_dirty': provenance['source_dirty'], 'capture_browser': capture['browser'], 'checks': {'archive_integrity': 'passed', 'manifest_version_and_root': 'passed', 'welcome_included': 'passed', 'localized_metadata': 'passed', 'screenshots_bound_to_exact_zip': 'passed', 'image_dimensions_and_size_budget': 'passed'}, 'store_submission': 'not_submitted', 'screenshots': list(images)}, indent=2) + '\n').encode()
     files['SHA256SUMS.txt'] = ''.join(f'{hashlib.sha256(data).hexdigest()}  {name}\n' for name, data in sorted(files.items())).encode()
     output = ROOT / 'artifacts'
     output.mkdir(exist_ok=True)

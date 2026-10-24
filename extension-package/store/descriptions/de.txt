@@ -11,6 +11,7 @@ FUNKTIONEN
 - Wähle bei Tabellen ein Tabellenblatt, ordne Zeilen anhand einer Kennung zu und lege fest, welche Spalten geprüft werden. Bearbeite Zellwerte und kopiere eine fehlende Zeile von A nach B.
 - Prüfe geänderte Geldbeträge und Prozentangaben beim Vergleich von Texten, Word-Dateien und unterstützten PDFs mit Amounts & percentages.
 - Bearbeite mit Edit & export ein einzelnes Dokument. Klicke in unterstützten PDFs mit Textebene auf erkannte gedruckte Leerstellen, um Angaben einzutragen, oder platziere einen Eintrag mit Add text. Die Schriftgröße passt sich dem verfügbaren Platz an; unter Format findest du manuelle Einstellungen.
+- Unterstützte Word-DOCX-Dokumente als PDF exportieren und vor dem Download prüfen. Unterstützte Kopf- und Fußzeilen, Seitenzahlen und einfache horizontale Linien bleiben enthalten; Seitenumbrüche und Schriftbild können von Word abweichen.
 
 LOKALE VERARBEITUNG
 Die Dokumente werden auf deinem Gerät verarbeitet. Die Erweiterung funktioniert offline und lädt deine Dokumente zum Vergleichen oder Bearbeiten nicht auf einen Server hoch. Entwürfe auf der Website und in der Erweiterung werden getrennt gespeichert und nicht automatisch synchronisiert. Lade eine Kopie deiner fertigen Arbeit herunter.

@@ -1,5 +1,5 @@
 /** Full, local PDF page rendering and bounded edits of existing text areas. */
-import {getDocument} from './pdf-reader-vendor.mjs';
+import {getDocument} from './pdf-reader.mjs';
 import {PDFDocument, fontkit, rgb} from './pdf-vendor.mjs';
 import fontBase64 from './pdf-font.mjs';
 import {refineRasterBounds} from './pdf-raster-bounds.mjs';

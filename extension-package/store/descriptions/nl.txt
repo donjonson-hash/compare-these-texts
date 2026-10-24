@@ -11,6 +11,7 @@ WAT JE KUNT DOEN
 - Kies voor spreadsheets een werkblad, koppel rijen via een identificatieveld en selecteer de kolommen die je wilt controleren. Bewerk celwaarden en kopieer een ontbrekende rij van A naar B.
 - Controleer gewijzigde geldbedragen en percentages bij het vergelijken van tekst, Word-bestanden en ondersteunde pdf's met Amounts & percentages.
 - Werk met één document in Edit & export. Klik in ondersteunde pdf's met een tekstlaag op herkende voorgedrukte invulruimtes om gegevens in te voeren, of plaats een invoer met Add text. De tekstgrootte past zich aan de beschikbare ruimte aan; met Format kun je dit handmatig instellen.
+- Exporteer ondersteunde Word DOCX-documenten naar PDF met een voorbeeld vóór het downloaden. Ondersteunde kop- en voetteksten, paginanummers en eenvoudige horizontale lijnen worden meegenomen; pagina-indeling en lettertypen kunnen afwijken van Word.
 
 LOKALE VERWERKING
 Documenten worden op je apparaat verwerkt. De extensie werkt offline en uploadt je documenten niet naar een server om ze te vergelijken of te bewerken. Concepten op de website en in de extensie worden apart opgeslagen, zonder automatische synchronisatie. Download een kopie van je afgeronde werk.

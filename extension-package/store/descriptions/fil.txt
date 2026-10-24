@@ -11,6 +11,7 @@ MGA MAAARI MONG GAWIN
 - Para sa mga spreadsheet, pumili ng sheet, itugma ang mga row gamit ang identifier, at piliin ang mga column na susuriin. I-edit ang mga value ng cell at kopyahin ang nawawalang row mula A papuntang B.
 - Suriin ang mga nabagong halaga ng pera at porsyento sa paghahambing ng teksto, Word, at suportadong PDF gamit ang Amounts & percentages.
 - Gumawa sa iisang dokumento gamit ang Edit & export. Sa suportadong PDF na may teksto, i-click ang mga natukoy na nakalimbag na puwang para maglagay ng impormasyon, o gamitin ang Add text para maglagay ng sagot sa napiling posisyon. Umaangkop ang laki ng teksto sa available na espasyo; may mga manwal na kontrol sa Format.
+- I-export ang mga suportadong Word DOCX na dokumento bilang PDF at tingnan muna ang preview bago i-download. Kasama ang mga suportadong header, footer, numero ng pahina at simpleng pahalang na linya; maaaring mag-iba ang paghahati ng mga pahina at hitsura ng font mula sa Word.
 
 PAGPROSESO SA IYONG DEVICE
 Sa iyong device pinoproseso ang mga dokumento. Gumagana ang extension nang offline at hindi nito ina-upload ang iyong mga dokumento sa server para paghambingin o i-edit. Magkahiwalay ang pag-save ng mga draft sa website at sa extension, at walang awtomatikong pag-sync. I-download ang kopya ng iyong natapos na gawa.

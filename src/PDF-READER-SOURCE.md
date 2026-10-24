@@ -117,3 +117,11 @@ This is a Worker protocol check, not a claim of native-browser visual verificati
 The six `Math.sumPrecise` calls in the font parser and DOM text length calculation sum integer byte sizes or text lengths. They use a local integer sum helper so older browsers and Node versions can render embedded TrueType fonts instead of falling back to missing glyphs. Other upstream calls are unchanged. No global Math polyfill is installed.
 
 Patched bundle SHA-256: `599b1521b3c10f542ef254afee75ba2d9cbda0bb8d92ca4c27eef5d7fd977da7`.
+
+## Browser URL compatibility
+
+Application consumers import `pdf-reader.mjs`, which first installs a local
+`URL.parse` fallback only when the browser lacks it (Chrome 120–125). This keeps
+link-annotation evidence and unsupported-action checks active. Vendored PDF.js
+bytes are unchanged. `tests/pdf-reader-compat.test.mjs` runs the existing link
+import/edit/export scenarios with native URL.parse deliberately absent.

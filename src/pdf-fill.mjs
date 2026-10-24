@@ -1,6 +1,6 @@
 /** Add user text above unchanged PDF artwork. Coordinates use PDF.js scale-1 viewports. */
 import {PDFDocument, PDFName, fontkit, rgb} from './pdf-vendor.mjs';
-import {getDocument} from './pdf-reader-vendor.mjs';
+import {getDocument} from './pdf-reader.mjs';
 import fontBase64 from './pdf-font.mjs';
 import {readPdfBytes} from './pdf-source.mjs';
 

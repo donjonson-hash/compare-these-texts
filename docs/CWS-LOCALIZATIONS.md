@@ -1,6 +1,6 @@
 # Локализация названия и краткого описания CTT
 
-Подготовлено для Chrome Web Store, версия 0.35.4. Все 19 запрошенных языков: 21 локализованный вариант с учетом регионов и английский резервный — 22 локали.
+Подготовлено для Chrome Web Store, версия 0.37.1. Все 19 запрошенных языков: 21 локализованный вариант с учетом регионов и английский резервный — 22 локали.
 
 ## Подход
 
@@ -14,28 +14,28 @@
 
 | Язык / локаль | Название | Краткое описание | Длина: название / описание |
 | --- | --- | --- | --- |
-| Английский (резервный) (`en`) | Compare Two Texts — Compare & Edit BETA | Compare Word, PDF, text and Excel files side by side. Edit differences and save the result. Works locally in your browser. | 41 / 122 |
-| Немецкий (`de`) | Compare Two Texts — Texte vergleichen und bearbeiten | Texte und Dokumente vergleichen, Unterschiede erkennen und direkt bearbeiten. Lokal auf deinem Gerät. Oberfläche auf Englisch. | 54 / 126 |
-| Французский (`fr`) | Compare Two Texts — Comparateur de texte et éditeur | Comparez et modifiez vos textes et documents sur votre appareil. Repérez les différences. Interface en anglais. | 53 / 111 |
-| Испанский — Испания (`es`) | Compare Two Texts — Comparar textos y editar | Compara y edita textos y documentos en tu dispositivo. Detecta las diferencias. Interfaz en inglés. | 46 / 99 |
-| Испанский — Латинская Америка (`es_419`) | Compare Two Texts — Comparar textos y editar | Compara y edita textos y documentos en tu dispositivo. Encuentra las diferencias. Interfaz en inglés. | 46 / 101 |
-| Итальянский (`it`) | Compare Two Texts — Confronta testi e modifica | Confronta e modifica testi e documenti sul tuo dispositivo. Individua le differenze. Interfaccia in inglese. | 48 / 108 |
-| Нидерландский (`nl`) | Compare Two Texts — Teksten vergelijken en bewerken | Vergelijk en bewerk teksten en documenten op je apparaat. Bekijk de verschillen. Interface in het Engels. | 53 / 105 |
-| Шведский (`sv`) | Compare Two Texts — Jämför och redigera texter | Jämför och redigera texter och dokument på din enhet. Se skillnaderna. Gränssnitt på engelska. | 48 / 94 |
-| Датский (`da`) | Compare Two Texts — Sammenlign og rediger tekster | Sammenlign og rediger tekster og dokumenter på din enhed. Se forskellene. Brugerflade på engelsk. | 51 / 97 |
-| Норвежский (букмол) (`no`) | Compare Two Texts — Sammenlign og rediger tekster | Sammenlign og rediger tekster og dokumenter på enheten din. Se forskjellene. Grensesnitt på engelsk. | 51 / 100 |
-| Финский (`fi`) | Compare Two Texts — Vertaa ja muokkaa tekstejä | Vertaa ja muokkaa tekstejä ja asiakirjoja omalla laitteellasi. Näe erot. Käyttöliittymä englanniksi. | 48 / 100 |
-| Арабский (`ar`) | Compare Two Texts — مقارنة النصوص وتحريرها | قارن النصوص والمستندات جنبًا إلى جنب، واعرض الفروق وعدّل النص. تتم المعالجة على جهازك. الواجهة باللغة الإنجليزية. | 44 / 113 |
-| Индонезийский (`id`) | Compare Two Texts — Bandingkan dan edit teks | Bandingkan teks dan dokumen berdampingan, lihat perbedaan, lalu edit. Pemrosesan di perangkat Anda. Antarmuka bahasa Inggris. | 46 / 125 |
-| Русский (`ru`) | Compare Two Texts — Сравнение текстов и правка | Сравнивайте тексты и документы рядом, находите отличия и вносите правки. Обработка на устройстве. Интерфейс на английском. | 48 / 122 |
-| Португальский — Бразилия (`pt_BR`) | Compare Two Texts — Comparar textos e editar | Compare e edite textos e documentos no seu dispositivo. Identifique as diferenças. Interface em inglês. | 46 / 103 |
-| Португальский — Португалия (`pt_PT`) | Compare Two Texts — Comparar textos e editar | Compare e edite textos e documentos no seu dispositivo. Veja as diferenças. Interface em inglês. | 46 / 96 |
-| Японский (`ja`) | Compare Two Texts — テキスト比較・編集 | テキストや文書を左右に並べて比較し、違いを確認して編集。処理はお使いの端末内で行われます。画面は英語です。 | 31 / 53 |
-| Филиппинский (`fil`) | Compare Two Texts — Paghambingin at i-edit ang teksto | Paghambingin ang teksto at dokumento, tingnan ang pagkakaiba at i-edit. Sa device mo ang pagproseso. Ingles ang interface. | 55 / 122 |
-| Вьетнамский (`vi`) | Compare Two Texts — So sánh văn bản và chỉnh sửa | So sánh văn bản, tài liệu cạnh nhau, xem khác biệt và chỉnh sửa. Xử lý trên thiết bị của bạn. Giao diện tiếng Anh. | 50 / 114 |
-| Турецкий (`tr`) | Compare Two Texts — Metin karşılaştırma ve düzenleme | Metin ve belgeleri yan yana karşılaştırın, farkları görün ve düzenleyin. İşlemler cihazınızda yapılır. Arayüz İngilizcedir. | 54 / 123 |
-| Тайский (`th`) | Compare Two Texts — เปรียบเทียบและแก้ไขข้อความ | เทียบข้อความและเอกสารแบบวางคู่กัน ดูความต่างและแก้ไข ประมวลผลบนอุปกรณ์ของคุณ อินเทอร์เฟซภาษาอังกฤษ | 48 / 98 |
-| Корейский (`ko`) | Compare Two Texts — 텍스트 비교 및 편집 | 텍스트와 문서를 나란히 비교하고 차이를 확인하며 편집하세요. 처리는 사용 중인 기기에서 이루어집니다. 인터페이스는 영어입니다. | 33 / 70 |
+| Английский (резервный) (`en`) | Compare Two Texts — Compare & Edit BETA | Compare Word, PDF, text and Excel files side by side. Edit differences and save the result. Works locally in your browser. | 39 / 122 |
+| Немецкий (`de`) | Compare Two Texts — Texte vergleichen und bearbeiten | Texte und Dokumente vergleichen, Unterschiede erkennen und direkt bearbeiten. Lokal auf deinem Gerät. Oberfläche auf Englisch. | 52 / 126 |
+| Французский (`fr`) | Compare Two Texts — Comparateur de texte et éditeur | Comparez et modifiez vos textes et documents sur votre appareil. Repérez les différences. Interface en anglais. | 51 / 111 |
+| Испанский — Испания (`es`) | Compare Two Texts — Comparar textos y editar | Compara y edita textos y documentos en tu dispositivo. Detecta las diferencias. Interfaz en inglés. | 44 / 99 |
+| Испанский — Латинская Америка (`es_419`) | Compare Two Texts — Comparar textos y editar | Compara y edita textos y documentos en tu dispositivo. Encuentra las diferencias. Interfaz en inglés. | 44 / 101 |
+| Итальянский (`it`) | Compare Two Texts — Confronta testi e modifica | Confronta e modifica testi e documenti sul tuo dispositivo. Individua le differenze. Interfaccia in inglese. | 46 / 108 |
+| Нидерландский (`nl`) | Compare Two Texts — Teksten vergelijken en bewerken | Vergelijk en bewerk teksten en documenten op je apparaat. Bekijk de verschillen. Interface in het Engels. | 51 / 105 |
+| Шведский (`sv`) | Compare Two Texts — Jämför och redigera texter | Jämför och redigera texter och dokument på din enhet. Se skillnaderna. Gränssnitt på engelska. | 46 / 94 |
+| Датский (`da`) | Compare Two Texts — Sammenlign og rediger tekster | Sammenlign og rediger tekster og dokumenter på din enhed. Se forskellene. Brugerflade på engelsk. | 49 / 97 |
+| Норвежский (букмол) (`no`) | Compare Two Texts — Sammenlign og rediger tekster | Sammenlign og rediger tekster og dokumenter på enheten din. Se forskjellene. Grensesnitt på engelsk. | 49 / 100 |
+| Финский (`fi`) | Compare Two Texts — Vertaa ja muokkaa tekstejä | Vertaa ja muokkaa tekstejä ja asiakirjoja omalla laitteellasi. Näe erot. Käyttöliittymä englanniksi. | 46 / 100 |
+| Арабский (`ar`) | Compare Two Texts — مقارنة النصوص وتحريرها | قارن النصوص والمستندات جنبًا إلى جنب، واعرض الفروق وعدّل النص. تتم المعالجة على جهازك. الواجهة باللغة الإنجليزية. | 42 / 113 |
+| Индонезийский (`id`) | Compare Two Texts — Bandingkan dan edit teks | Bandingkan teks dan dokumen berdampingan, lihat perbedaan, lalu edit. Pemrosesan di perangkat Anda. Antarmuka bahasa Inggris. | 44 / 125 |
+| Русский (`ru`) | Compare Two Texts — Сравнение текстов и правка | Сравнивайте тексты и документы рядом, находите отличия и вносите правки. Обработка на устройстве. Интерфейс на английском. | 46 / 122 |
+| Португальский — Бразилия (`pt_BR`) | Compare Two Texts — Comparar textos e editar | Compare e edite textos e documentos no seu dispositivo. Identifique as diferenças. Interface em inglês. | 44 / 103 |
+| Португальский — Португалия (`pt_PT`) | Compare Two Texts — Comparar textos e editar | Compare e edite textos e documentos no seu dispositivo. Veja as diferenças. Interface em inglês. | 44 / 96 |
+| Японский (`ja`) | Compare Two Texts — テキスト比較・編集 | テキストや文書を左右に並べて比較し、違いを確認して編集。処理はお使いの端末内で行われます。画面は英語です。 | 29 / 53 |
+| Филиппинский (`fil`) | Compare Two Texts — Paghambingin at i-edit ang teksto | Paghambingin ang teksto at dokumento, tingnan ang pagkakaiba at i-edit. Sa device mo ang pagproseso. Ingles ang interface. | 53 / 122 |
+| Вьетнамский (`vi`) | Compare Two Texts — So sánh văn bản và chỉnh sửa | So sánh văn bản, tài liệu cạnh nhau, xem khác biệt và chỉnh sửa. Xử lý trên thiết bị của bạn. Giao diện tiếng Anh. | 48 / 114 |
+| Турецкий (`tr`) | Compare Two Texts — Metin karşılaştırma ve düzenleme | Metin ve belgeleri yan yana karşılaştırın, farkları görün ve düzenleyin. İşlemler cihazınızda yapılır. Arayüz İngilizcedir. | 52 / 123 |
+| Тайский (`th`) | Compare Two Texts — เปรียบเทียบและแก้ไขข้อความ | เทียบข้อความและเอกสารแบบวางคู่กัน ดูความต่างและแก้ไข ประมวลผลบนอุปกรณ์ของคุณ อินเทอร์เฟซภาษาอังกฤษ | 46 / 98 |
+| Корейский (`ko`) | Compare Two Texts — 텍스트 비교 및 편집 | 텍스트와 문서를 나란히 비교하고 차이를 확인하며 편집하세요. 처리는 사용 중인 기기에서 이루어집니다. 인터페이스는 영어입니다. | 31 / 70 |
 
 ## Ключевые запросы для уточненных названий
 
@@ -43,13 +43,13 @@
 
 | Ключевой запрос | Страна / база | Поисков в месяц | KD / 100 |
 | --- | --- | ---: | ---: |
-| comparateur de texte | Франция (`fr`) | 880 | 24 |
-| comparar textos | Испания (`es`) | 1 900 | 26 |
+| comparateur de texte | Франция (`fr`) | Compare Two Texts — Comparateur de texte et éditeur | Comparez et modifiez vos textes et documents sur votre appareil. Repérez les différences. Interface en anglais. | 51 / 111 |
+| comparar textos | Испания (`es`) | Compare Two Texts — Comparar textos y editar | Compara y edita textos y documentos en tu dispositivo. Detecta las diferencias. Interfaz en inglés. | 44 / 99 |
 | comparar textos | Мексика (`mx`) | 1 600 | 30 |
-| confronta testi | Италия (`it`) | 720 | 25 |
+| confronta testi | Италия (`it`) | Compare Two Texts — Confronta testi e modifica | Confronta e modifica testi e documenti sul tuo dispositivo. Individua le differenze. Interfaccia in inglese. | 46 / 108 |
 | comparar textos | Бразилия (`br`) | 4 400 | 19 |
 | comparar textos | Португалия (`pt`) | 260 | 20 |
-| сравнение текстов | Россия (`ru`) | 2 900 | 45 |
+| сравнение текстов | Россия (`ru`) | Compare Two Texts — Сравнение текстов и правка | Сравнивайте тексты и документы рядом, находите отличия и вносите правки. Обработка на устройстве. Интерфейс на английском. | 46 / 122 |
 | so sánh văn bản | Вьетнам (`vn`) | 720 | 17 |
 
 ## Упаковка и публикация

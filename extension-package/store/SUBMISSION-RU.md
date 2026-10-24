@@ -1,147 +1,144 @@
-# Compare Two Texts 0.36.0 — комплект для магазина
+# Compare Two Texts 0.37.1 — загрузка в Chrome Web Store
 
-Подготовлено 20 октября 2026. Это кандидат из PR #11: комплект не означает
-слияние, публикацию сайта, отправку на модерацию или наличие действующей
-карточки Chrome Web Store.
+Комплект подготовлен 24 октября 2026. Он содержит кандидат расширения и
+материалы карточки. Подготовка комплекта не означает отправку на модерацию,
+одобрение Google или создание новой карточки.
 
-## Что куда загружать
+## 1. Распаковать комплект
 
-Распакуйте `ctt-0.36.0-store-kit.zip`. В поле загрузки расширения выбирайте
-только вложенный `ctt-chrome-0.36.0.zip`, где `manifest.json` лежит в корне.
-Весь комплект материалов и архив Firefox в это поле не подходят.
+Распакуйте `ctt-0.37.1-store-kit.zip`. В поле загрузки расширения выбирайте
+**только `ctt-chrome-0.37.1.zip`** — внутри него `manifest.json` лежит в корне.
+Не загружайте весь store-kit или ZIP Firefox как Chrome-расширение.
 
-| Поле / назначение | Файл в комплекте |
+| Что требуется | Файл |
 | --- | --- |
-| Расширение Chrome / Edge для ручной проверки | `ctt-chrome-0.36.0.zip` |
-| Отдельная сборка Firefox для временной установки | `ctt-firefox-0.36.0.zip` |
-| Названия и краткие описания — 22 локали | `localizations.json` |
-| Полное описание — английский | `descriptions/en.txt` |
-| Полные описания — остальные языки | `descriptions/<locale>.txt` |
-| Сравнение документов — 1280×800 | `screenshot-documents-1280x800.png` |
-| Сравнение таблиц — 1280×800 | `screenshot-tables-1280x800.png` |
-| Welcome page — 1280×800 | `screenshot-welcome-1280x800.png` |
-| Малое промо — 440×280 | `promo-440x280.png` |
-| Дополнительное промо — 1400×560 | `promo-1400x560.png` |
-| Иконка карточки — 128×128 | `icons/icon-store-128.png` |
-| Иконки расширения — 16/32/48/64 | `icons/` |
-| Ключевые слова и исторические оценки | `KEYWORDS.md` |
-| Проверка состава по буткемпу | `BOOTCAMP-CHECKLIST-RU.md` |
-| Порядок добавления локалей | `LOCALIZATION-RU.md`, `CWS-LOCALIZATIONS.md` |
+| Установочный ZIP Chrome | `ctt-chrome-0.37.1.zip` |
+| Полное описание, English | `FULL-DESCRIPTION-EN.txt` или `descriptions/en.txt` |
+| Название и короткое описание | `LISTING-EN.md`, `metadata/en.json` |
+| Локализованные названия и описания | `localizations.json`, `metadata/`, `descriptions/` |
+| Сравнение документов, 1280×800 | `screenshot-documents-1280x800.png` |
+| Сравнение таблиц, 1280×800 | `screenshot-tables-1280x800.png` |
+| Редактор одного документа, 1280×800 | `screenshot-editor-1280x800.png` |
+| Предпросмотр PDF, 1280×800 | `screenshot-pdf-1280x800.png` |
+| Welcome page, 1280×800 | `screenshot-welcome-1280x800.png` |
+| Малое промо, 440×280 | `promo-440x280.png` |
+| Дополнительное промо, 1400×560 | `promo-1400x560.png` |
+| Иконка карточки, 128×128 | `icon128.png` или `icons/icon-store-128.png` |
+| Иконки расширения, 16/32/48/64 px | `icons/` и установочный ZIP |
+| Single purpose и privacy practices | `PRIVACY-DISCLOSURES-EN.md` |
+| Инструкция модератору | `REVIEWER-INSTRUCTIONS-EN.md` |
+| Копия политики конфиденциальности | `PRIVACY-POLICY-EN.md` |
+| Примечания к выпуску | `RELEASE-NOTES-EN.md` |
+| Проверки и контрольные суммы | `VERIFICATION.md`, `SHA256SUMS.txt` |
 
-Для локальной проверки Chrome распакуйте установочный ZIP в отдельную папку,
-откройте `chrome://extensions`, включите Developer mode и выберите Load unpacked.
-В Firefox временно загрузите `manifest.json` распакованной Firefox-сборки через
-`about:debugging` → This Firefox → Load Temporary Add-on.
+Welcome page уже включена в ZIP как `welcome.html`. Её не нужно размещать
+отдельно или указывать как внешнюю страницу первого запуска. Она открывается
+при первой установке; повторно — через **Getting started**.
 
-## Карточка по умолчанию
+## 2. Проверить именно установочный архив
+
+Для ручной проверки распакуйте `ctt-chrome-0.37.1.zip` в отдельную папку.
+Откройте `chrome://extensions`, включите Developer mode, нажмите **Load unpacked**
+и выберите эту папку. Минимальный Chrome — 120. Проверьте welcome page,
+встроенный пример, редактирование, Undo/Redo и скачивание PDF.
+
+Firefox ZIP приложен отдельно для временной проверки. Он не требуется для
+загрузки в Chrome Web Store.
+
+## 3. Выбрать карточку
+
+Откройте https://chrome.google.com/webstore/devconsole в своём аккаунте
+разработчика. Если CTT уже имеет карточку, загрузите обновление туда, сохранив
+идентификатор расширения. Для первой публикации создайте новую карточку и
+загрузите Chrome ZIP. Данные аккаунта и существующий ID не включены в комплект.
+
+Если кабинет требует регистрацию, подтверждение контактов или настройку защиты
+аккаунта, выполните показанные Google шаги. Не создавайте повторную карточку
+только из-за переименования Compare These Texts → Compare Two Texts.
+
+## 4. Заполнить Store listing
 
 **Name**
 
 Compare Two Texts — Compare & Edit BETA
 
-**Short description** — 122 символа
+**Short description** — 122 UTF-16 единицы, лимит 132
 
 Compare Word, PDF, text and Excel files side by side. Edit differences and save the result. Works locally in your browser.
 
-**Full description**
+**Full description** — вставьте `descriptions/en.txt` целиком.
 
-Скопировать `descriptions/en.txt` целиком. Это согласованный текст для текущего
-набора функций. Для остальных локалей взять соответствующие TXT; не переводить
-интерфейс приложения в описании как уже готовую функцию.
-
-- Homepage: https://comparethesetexts.com/
-- Support: https://comparethesetexts.com/support/
-- Privacy policy: https://comparethesetexts.com/privacy/
-- Language: English; дополнительные карточки — по `LOCALIZATION-RU.md`.
+- Primary language: English.
 - Category: Productivity, если такое значение доступно в текущем кабинете.
+- Homepage: https://comparetwotexts.pro/
+- Support: https://comparetwotexts.pro/support/
+- Privacy policy: https://comparetwotexts.pro/privacy/
 
-Если карточка CTT уже существует, обновляйте её, сохраняя идентификатор
-расширения. Для новой beta можно выбрать Unlisted и сначала проверить установку
-по прямой ссылке. Это рекомендация, настройка ещё не применена. Видимость
-Unlisted не отменяет проверку магазина.
+Загрузите иконку 128×128, скриншоты и промоизображения в соответствующие поля.
+Скриншоты показывают реальный английский интерфейс на вымышленных документах.
+Не заменяйте их рекламными макетами вместо изображений работы приложения.
+Порядок пяти скриншотов: документы, таблицы, редактор, PDF, welcome page.
 
-## Privacy practices — готовые формулировки
+Переводы добавляйте в языковые карточки по `LOCALIZATION-RU.md`. `_locales`
+локализует метаданные Chrome; полный текст магазина вставляется вручную.
+Редактор и welcome page остаются английскими. Отдельное расширение для каждого
+языка не нужно.
 
-**Single purpose description**
+## 5. Заполнить Privacy practices
 
-Compare and edit supported text documents and spreadsheets locally, review
-differences between two versions, and download or print the result.
+Скопируйте **Single purpose description** из `PRIVACY-DISCLOSURES-EN.md`.
+Для Remote code выберите **No, I am not using remote code**. Manifest не
+запрашивает permissions или host permissions: добавлять их для формы не нужно.
 
-**Remote code**
+Для Data usage используйте фактическое описание из того же файла. Документы
+обрабатываются и черновики сохраняются локально. Отсутствие загрузки на сервер
+не означает, что расширение не работает с пользовательскими данными. Поэтому
+не ставьте автоматически «данные не обрабатываются» и не обещайте, что файлы
+никогда не сохраняются. Сверьте определения категорий в открытом кабинете с
+описанным поведением и опубликованной политикой. Готовый текст для пояснения
+предоставлен; выбранные в кабинете флажки этим комплектом не подтверждены.
 
-No, I am not using remote code.
+Укажите URL политики конфиденциальности. Данные не продаются, не используются
+для рекламы, обучения моделей или кредитных решений; обработка служит функции
+сравнения, редактирования и экспорта документов.
 
-**Пояснение к данным и локальной обработке**
+## 6. Добавить инструкции проверяющему
 
-The extension processes only files and text that the user explicitly chooses
-to open, paste or edit. Document names, contents, tables and supported images
-are processed locally using bundled code. They are not uploaded to the
-developer, a comparison server or an external AI service. The extension does
-not collect browsing history, analytics or diagnostic telemetry and does not
-read other tabs or automatically access files on the computer.
+В поле с инструкциями для проверки вставьте нужный текст из
+`REVIEWER-INSTRUCTIONS-EN.md`. Вход и тестовые пароли не требуются.
+Примеры доступны через **Help → Try document editing** и
+**Help → CSV / Excel example**. Для одного документа используется кнопка
+**Edit & convert**, открывающая раздел **Edit & export**.
 
-The app can save comparison and single-document drafts separately in local
-browser storage, including original files, edits, supported history and view
-settings. Saved work expires after seven days without opening or saving it;
-expired work is removed when the app is next opened. Users can delete saved
-work in the app. Website and extension drafts are separate and do not sync.
-Downloads remain on the user's device until the user deletes them.
+## 7. Проверить и отправить
 
-Opening an external website or support link is a user action. GitHub receives
-feedback only if the user chooses to submit it there. There is no account,
-payment or external service required for document processing.
+Выберите доступность и страны в соответствии со своим планом запуска.
+Для проверки установки по прямой ссылке можно выбрать Unlisted; это не отменяет
+модерацию. Public делает одобренную карточку публичной. Настройка доступности
+не применялась при подготовке этих файлов.
 
-**Permissions**
+Перед отправкой:
 
-Manifest не запрашивает API permissions или host permissions. Не добавляйте
-разрешения ради заполнения формы. Welcome page и открытие собственной вкладки
-не требуют доступа к чужим страницам или документам.
+- Версия в кабинете — **0.37.1**, название — **Compare Two Texts**.
+- Загружен Chrome ZIP, а не комплект материалов.
+- Иконка и скриншоты читаются в предпросмотре.
+- Ссылки на сайт, поддержку и privacy открываются.
+- Описания не обещают OCR, поддержку любого макета, автоматический перевод
+  интерфейса, редактирование старого `.doc` или сравнение изображений.
+- Ответы Privacy practices согласованы с локальным сохранением черновиков.
+- Проверен требуемый Google профиль издателя; контактные сведения не придуманы.
 
-**Data usage**
+Сохраните карточку. Отправка на модерацию выполняется отдельным действием в
+кабинете после проверки перечисленных полей. Срок и результат модерации
+определяет Google.
 
-Сверьте определения полей текущей формы с этим описанием и публичной privacy
-policy. Документы обрабатываются и могут сохраняться локально; отсутствие
-передачи разработчику не означает отсутствие локальной обработки. Не указывайте
-«данные никогда не сохраняются»: у CTT есть сохранённые черновики.
+## Официальные инструкции
 
-## Reviewer instructions
+Проверены при подготовке комплекта 24 октября 2026:
 
-No account, login, credentials, payment, API key or external AI service is
-required. The editor and welcome page are in English.
-
-1. Install the extension. Its local welcome page opens on first installation.
-   Select Open comparison. On updates, open Getting started from the editor
-   to revisit the guide.
-2. On the home screen, select Try document editing. Review the synthetic
-   documents side by side, select a highlighted change or use Next difference,
-   and make a supported edit. Use Undo, then download the revised document.
-3. Select CSV / Excel example on the home screen to inspect a synthetic table
-   comparison. Review changed or missing rows and the selected comparison
-   fields; edit a supported value and download the result.
-4. Optionally open a small supported document in Edit & export. For a PDF,
-   use a file with selectable text. Printed blank lines can accept text;
-   interactive PDF form fields, scans and OCR are outside this workflow.
-5. Wait for Saved in this browser before closing. Reopen and use the resume
-   control to verify a saved draft. Use Delete saved work to remove it.
-6. Repeat local comparison with the network offline. Website or GitHub links
-   are optional external navigation and are not needed to process files.
-
-Files are limited to 2 MiB each. Two-file spreadsheet comparison needs a single
-header row, no merged cells and values instead of formulas. Images, formatting
-and legal meaning are not compared. Word/PDF appearance can vary by document;
-preview the result before relying on it. Some helper answers and draft emails
-refer to the original comparison: reopen the revised download to compare again.
-
-## Финальная ручная проверка
-
-- Проверить установку именно Chrome ZIP и кнопки welcome page.
-- Убедиться, что загружаемые изображения показывают эту версию и синтетические
-  данные, а полные описания вставлены в правильные языковые карточки.
-- Сверить privacy policy и ответы формы с фактической локальной обработкой
-  и сохранением черновиков.
-- Проверить карточку в предпросмотре. Отправка на модерацию выполняется отдельно.
-
-Официальные инструкции:
-https://developer.chrome.com/docs/webstore/cws-dashboard-listing
-https://developer.chrome.com/docs/webstore/cws-dashboard-privacy
-https://developer.chrome.com/docs/webstore/cws-dashboard-distribution
+- https://developer.chrome.com/docs/webstore/prepare
+- https://developer.chrome.com/docs/webstore/cws-dashboard-listing
+- https://developer.chrome.com/docs/webstore/images
+- https://developer.chrome.com/docs/webstore/cws-dashboard-privacy
+- https://developer.chrome.com/docs/webstore/program-policies/user-data-faq
+- https://developer.chrome.com/docs/webstore/cws-dashboard-distribution

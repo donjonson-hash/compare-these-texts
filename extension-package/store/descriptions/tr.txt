@@ -11,6 +11,7 @@ NELER YAPABİLİRSİNİZ?
 - Elektronik tablolar için çalışma sayfasını seçin, satırları bir tanımlayıcıya göre eşleştirin ve kontrol edilecek sütunları belirleyin. Hücre değerlerini düzenleyin ve eksik bir satırı A'dan B'ye kopyalayın.
 - Metin, Word ve desteklenen PDF karşılaştırmalarında değişen para tutarlarını ve yüzdeleri Amounts & percentages ile inceleyin.
 - Edit & export ile tek bir belge üzerinde çalışın. Desteklenen metin tabanlı PDF'lerde algılanan basılı boşluklara tıklayarak bilgi girin veya Add text ile istediğiniz yere metin yerleştirin. Metin boyutu kullanılabilir alana göre ayarlanır; Format ile elle ayarlama yapabilirsiniz.
+- Desteklenen Word DOCX belgelerini indirmeden önce önizleyerek PDF olarak dışa aktarın. Desteklenen üstbilgiler, altbilgiler, sayfa numaraları ve basit yatay çizgiler dahil edilir; sayfalama ve yazı tiplerinin görünümü Word’den farklı olabilir.
 
 CİHAZINIZDA İŞLEME
 Belgeler cihazınızda işlenir. Uzantı çevrimdışı çalışır ve karşılaştırma ya da düzenleme için belgelerinizi bir sunucuya yüklemez. Web sitesindeki ve uzantıdaki taslaklar ayrı saklanır; otomatik olarak eşitlenmez. Tamamladığınız çalışmanın bir kopyasını indirin.

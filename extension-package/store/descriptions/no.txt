@@ -11,6 +11,7 @@ DETTE KAN DU GJØRE
 - For regneark kan du velge ark, koble sammen rader ved hjelp av en identifikator og velge hvilke kolonner som skal kontrolleres. Rediger celleverdier og kopier en manglende rad fra A til B.
 - Se gjennom endrede valutabeløp og prosenter i sammenligninger av tekst, Word og støttede PDF-filer med Amounts & percentages.
 - Arbeid med ett dokument i Edit & export. I støttede tekstbaserte PDF-filer kan du klikke på oppdagede trykte, tomme linjer for å fylle inn opplysninger, eller bruke Add text til å plassere tekst. Tekststørrelsen tilpasses den tilgjengelige plassen; Format gir deg manuelle justeringsmuligheter.
+- Eksporter støttede Word DOCX-dokumenter til PDF med forhåndsvisning før nedlasting. Støttede topptekster, bunntekster, sidetall og enkle vannrette linjer tas med; sideinndeling og skrifttyper kan avvike fra Word.
 
 LOKAL BEHANDLING
 Dokumentene behandles på enheten din. Utvidelsen fungerer uten internett og laster ikke opp dokumentene dine til en server for sammenligning eller redigering. Utkast på nettstedet og i utvidelsen lagres separat, uten automatisk synkronisering. Last ned en kopi av det ferdige arbeidet ditt.
