@@ -1,7 +1,7 @@
 import {openPdfVisual} from './pdf-visual.mjs';
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 /** Preview and download are one captured revision and the exact same PDF bytes. */
-export function openDocumentPdfDialog({host,label,prepare,current,download,onClose,description='Check your edited document before downloading. Fonts and page breaks may differ from Word. Emoji use a monochrome style.',downloadedMessage='PDF downloaded. Your Word document is still editable.'}){
+export function openDocumentPdfDialog({host,label,prepare,current,download,onClose,description='Check your edited document before downloading. Fonts and page breaks may differ from Word. Emoji use a consistent color style.',downloadedMessage='PDF downloaded. Your Word document is still editable.'}){
   const focus=document.activeElement,overlay=el('div',undefined,'pdf-block-overlay'),dialog=el('section',undefined,'document-pdf-dialog');dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label',`PDF preview of ${label}`);overlay.append(dialog);host.append(overlay);
   dialog.append(el('h2',`PDF preview · ${label}`),el('p',description));
   const status=el('p','Preparing PDF…','document-pdf-status');status.setAttribute('role','status');const stage=el('div',undefined,'document-pdf-stage'),nav=el('div',undefined,'document-pdf-nav'),previous=el('button','←','button secondary'),next=el('button','→','button secondary'),counter=el('span',''),zoom=el('button','Zoom in','button secondary'),actions=el('div',undefined,'pdf-block-actions'),close=el('button','Back to editing','button secondary'),save=el('button','Download PDF','button primary');

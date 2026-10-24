@@ -1,6 +1,10 @@
 {
   "schema_version": 1,
   "assets": {
+    "src/NOTO-COLOR-EMOJI-LICENSE.txt": {
+      "bytes": 4301,
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+    },
     "src/NOTO-EMOJI-LICENSE.txt": {
       "bytes": 4330,
       "sha256": "500bb1ccf43df7bbb522112f9133a52b16e1c35e809632f5d8609b179152de5b"
@@ -21,9 +25,17 @@
       "bytes": 11355,
       "sha256": "4d2a38ac35cda06a555c84074a819d413339cd3691b822cae50f8f322fe01f64"
     },
+    "src/UNICODE-COLOR-EMOJI-LICENSE.txt": {
+      "bytes": 2033,
+      "sha256": "fe5c62b543e287981db198f2acfa0ca732d12591a1024536dc8fd85dacd77104"
+    },
     "src/XMLDOM-LICENSE.txt": {
       "bytes": 1298,
       "sha256": "4da724fc305d81606b245b324d4d2586916b9d248b23d82183df753ace0fdf71"
+    },
+    "src/emoji-color-vendor.mjs": {
+      "bytes": 8420279,
+      "sha256": "cf798502050b5482624b97444c0c849bcb3d77d597d292766979da94bd9365bd"
     },
     "src/pdf-font.mjs": {
       "bytes": 1013063,
@@ -35,8 +47,8 @@
       "sha256": "599b1521b3c10f542ef254afee75ba2d9cbda0bb8d92ca4c27eef5d7fd977da7"
     },
     "src/pdf-vendor.mjs": {
-      "bytes": 1369698,
-      "sha256": "79800585e412245a344efa2fea952247989690e667f9bbdf791beda87ac288bc"
+      "bytes": 1369787,
+      "sha256": "65717317f1c58384983038e588564f8fe3c736b992dbc216d8fd7237abd70eb1"
     },
     "src/sheet-emoji-font.mjs": {
       "bytes": 1182266,

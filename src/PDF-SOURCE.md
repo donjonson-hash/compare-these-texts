@@ -36,7 +36,7 @@ This removes the unused legacy dynamic Function constructor fallback from the mi
 Create `entry.mjs`:
 
 ```js
-export {PDFDocument, PDFName, PDFRawStream, decodePDFRawStream, rgb, PDFHexString, pushGraphicsState, popGraphicsState, beginText, endText, setFontAndSize, setTextMatrix, setFillingRgbColor, showText} from 'pdf-lib';
+export {PDFDocument, PDFName, PDFRawStream, decodePDFRawStream, rgb, PDFHexString, pushGraphicsState, popGraphicsState, beginText, endText, setFontAndSize, setTextMatrix, setFillingRgbColor, setTextRenderingMode, showText} from 'pdf-lib';
 export {default as fontkit} from './fontkit-csp.mjs';
 ```
 
@@ -59,7 +59,7 @@ Subsetting occurs per generated PDF. Unsupported glyphs and control characters u
 
 ## Shipped asset SHA-256
 
-- `pdf-vendor.mjs`: `79800585e412245a344efa2fea952247989690e667f9bbdf791beda87ac288bc`
+- `pdf-vendor.mjs`: `65717317f1c58384983038e588564f8fe3c736b992dbc216d8fd7237abd70eb1`
 - `pdf-font.mjs`: `04258f500ddb395dd8ea591988991a9547661da72aeb5a7d9b1870c01a44a30b`
 - `PDF-LICENSES.txt`: `fd2d7a3a7dc64d3ff84c401ddf9d85b9373f6f4af01d1eeb659fd72ef23ba57c`
 

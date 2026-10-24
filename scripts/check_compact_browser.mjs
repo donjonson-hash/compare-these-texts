@@ -317,7 +317,7 @@ try {
     assert.equal((await downloadB()).toString(), pastedB, 'Continue keeps the existing comparison');
 
     // Real browser download, reopening and PDF extraction for composed emoji.
-    const emojiText='Before 👩‍💻 👆 👆🏻 👆🏿 🇺🇸 👨‍👩‍👧‍👦 after';
+    const emojiText='Before 🔴 🟡 🟢 👩‍💻 👆 👆🏻 👆🏿 🇺🇸 👨‍👩‍👧‍👦 after';
     const emojiFile={name:'emoji.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from(docx([emojiText]))};
     await page.locator('#workspace-home').click();
     await page.locator('#home-left-file').setInputFiles(emojiFile);
@@ -331,6 +331,12 @@ try {
     const emojiDialog=page.locator('#visual-review .document-pdf-dialog');
     await emojiDialog.getByRole('button',{name:'Download PDF',exact:true}).waitFor({state:'visible'});
     await page.waitForFunction(()=>!document.querySelector('#visual-review .document-pdf-dialog .primary').disabled);
+    const chromaticPixels=await emojiDialog.locator('canvas').evaluate(canvas=>{
+      const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;let count=0;
+      for(let i=0;i<pixels.length;i+=4)if(Math.max(pixels[i],pixels[i+1],pixels[i+2])-Math.min(pixels[i],pixels[i+1],pixels[i+2])>50)count++;
+      return count;
+    });
+    assert.ok(chromaticPixels>100,'PDF preview displays colored emoji pixels');
     const [emojiDownload]=await Promise.all([page.waitForEvent('download'),emojiDialog.getByRole('button',{name:'Download PDF',exact:true}).click()]);
     const emojiPdf=await readFile(await emojiDownload.path());
     const emojiExtracted=await page.evaluate(async bytes=>{
