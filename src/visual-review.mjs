@@ -593,7 +593,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     reviewBar.classList.toggle('is-complete', complete);
     reviewHint.textContent = complete ? (remaining ? 'All differences reviewed. Your chosen differences remain. Check again to finish.' : 'All differences reviewed. Check again, then download your updated document.') : 'Choose Use A or Keep B. You can also edit either version.';
     reviewHint.hidden = !complete;
-    if (complete) reviewHint.textContent = remaining ? 'All differences reviewed. Chosen differences remain. More → Check again.' : 'All differences reviewed. More → Check again, then download B.';
+    if (complete) reviewHint.textContent = remaining ? 'All differences reviewed. Chosen differences remain. All tools → Review & edit → Check again.' : 'All differences reviewed. All tools → Review & edit → Check again, then download B.';
     reviewNext.textContent = reviewStarted ? 'Next to review' : 'Start review'; reviewNext.disabled = !progress.pending;
     reviewUndo.disabled = !reviewHistory.length || reviewHistory.at(-1).copied && !drafts.right.canUndo;
     reviewDownload.hidden = !complete; reviewDownload.disabled = exporting.right || pdfChecking.right || ui.right.save.disabled;

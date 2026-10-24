@@ -1,4 +1,4 @@
-# Compare Two Texts 0.37.2 — final store audit
+# Compare Two Texts 0.37.3 — final store audit
 
 Prepared October 24, 2026. This kit is a Chrome Web Store submission candidate;
 it is not a store approval or a submitted listing.
@@ -62,8 +62,9 @@ Five full-bleed screenshots: 1280×800, document comparison, table comparison,
 single-document editing, PDF preview, welcome. Promo tiles: 440×280 and 1400×560.
 Each PNG is below the kit's 800 KB budget. Existing blue document icons are
 preserved at 16/32/48/64/128 px. The store icon has 96×96 artwork centered on a
-transparent 128×128 canvas. The site uses its existing green wordmark; this audit
-does not replace the extension's document symbol.
+transparent 128×128 canvas. The website and packaged workspace use a shared
+green CTT mark drawn as SVG paths; it fits inside its frame without relying on
+installed fonts. The extension's toolbar document symbol is unchanged.
 
 ## Practical limits
 

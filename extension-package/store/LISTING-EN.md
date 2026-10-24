@@ -1,6 +1,6 @@
 # Compare Two Texts — English Chrome Web Store listing
 
-Release candidate **0.37.2**, prepared 24 October 2026. This document supplies
+Release candidate **0.37.3**, prepared 24 October 2026. This document supplies
 copy for submission; it does not claim store publication or approval.
 `localizations.json` and `descriptions/en.txt` are the canonical copy inputs.
 

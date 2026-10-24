@@ -1,9 +1,16 @@
-# Compare Two Texts 0.37.2 — submission notes
+# Compare Two Texts 0.37.3 — submission notes
 
 This package prepares the current extension for Chrome Web Store review. It is
 not a claim that the listing is published or approved.
 
-## Changes in 0.37.2
+## Changes in 0.37.3
+
+- Added a shared, font-independent CTT logo to the home, privacy, help, terms
+  and extension pages, with fixed dimensions and padding inside its frame.
+- Updated footer pages with current navigation, document export and local
+  draft guidance. The supplied software license remains unchanged.
+
+## Retained from 0.37.2
 
 - Replaced the vague Tools & info entry with **All tools** and three labeled
   sections: **Review & edit**, **Files & settings** and **Reports**.
@@ -39,4 +46,4 @@ files must be saved as `.docx` first. No OCR or remote AI service is included.
 
 See `VERIFICATION.md` and the packaged checksums for the final build's audit
 results. This note lists features included in the candidate; it does not imply
-that every feature was introduced by the 0.37.2 patch alone.
+that every feature was introduced by the 0.37.3 patch alone.

@@ -1,4 +1,4 @@
-# Reviewer instructions — Compare Two Texts 0.37.2
+# Reviewer instructions — Compare Two Texts 0.37.3
 
 No account, sign-in, payment, API key or external AI service is required. The
 editor and welcome page are in English. Synthetic examples are built in, so
