@@ -1,5 +1,5 @@
 /** Strict, bounded PDF text-layer import. No rendering, OCR or external resources. */
-import {getDocument} from './pdf-reader-vendor.mjs';
+import {getDocument} from './pdf-reader.mjs';
 
 const MAX_BYTES = 2 * 1024 * 1024;
 const MAX_PAGES = 100, MAX_BLOCKS = 2000, MAX_CHARS = 500000, MAX_ITEMS = 100000;

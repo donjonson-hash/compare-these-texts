@@ -11,6 +11,7 @@ COSA PUOI FARE
 - Per i fogli di calcolo, scegliere un foglio, abbinare le righe tramite un identificativo e selezionare le colonne da controllare. Modificare i valori delle celle e copiare una riga mancante da A a B.
 - Esaminare le variazioni degli importi monetari e delle percentuali nei confronti di testi, file Word e PDF supportati con Amounts & percentages.
 - Lavorare su un singolo documento in Edit & export. Nei PDF supportati con livello di testo, fare clic sugli spazi da compilare rilevati per inserire i dati, oppure usare Add text per posizionare una voce. La dimensione del testo si adatta allo spazio disponibile; Format offre controlli manuali.
+- Esporta i documenti Word DOCX supportati in PDF con un’anteprima prima del download. Sono inclusi intestazioni, piè di pagina, numeri di pagina e semplici linee orizzontali supportati; impaginazione e caratteri possono differire da Word.
 
 ELABORAZIONE LOCALE
 I documenti vengono elaborati sul tuo dispositivo. L'estensione funziona offline e non carica i documenti su un server per confrontarli o modificarli. Le bozze del sito e dell'estensione vengono salvate separatamente, senza sincronizzazione automatica. Scarica una copia del lavoro completato.

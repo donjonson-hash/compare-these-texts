@@ -11,6 +11,7 @@ WHAT YOU CAN DO
 - For spreadsheets, choose a sheet, match rows by an identifier and select the columns to check. Edit cell values and copy a missing row from A to B.
 - Review changed currency amounts and percentages in text, Word and supported PDF comparisons with Amounts & percentages.
 - In Edit & export, work on a single document. On supported text-based PDFs, click detected printed blanks to enter information, or use Add text to place an entry. Text size adjusts to the available space; Format provides manual controls.
+- Export supported Word DOCX documents to PDF with a preview before download. Supported headers, footers, page numbers and plain horizontal rules are included; pagination and font appearance may differ from Word.
 
 LOCAL PROCESSING
 Document processing takes place on your device. The extension works offline and does not upload your documents to a server for comparison or editing. Website and extension drafts are stored separately, without automatic syncing. Download a copy of your finished work.

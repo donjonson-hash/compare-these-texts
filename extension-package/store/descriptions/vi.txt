@@ -11,6 +11,7 @@ BẠN CÓ THỂ LÀM GÌ?
 - Với bảng tính, chọn trang tính, ghép các hàng theo mã định danh và chọn những cột cần kiểm tra. Chỉnh sửa giá trị ô và sao chép hàng còn thiếu từ A sang B.
 - Xem những thay đổi về số tiền và tỷ lệ phần trăm khi so sánh văn bản, Word và PDF được hỗ trợ bằng Amounts & percentages.
 - Làm việc với một tài liệu trong Edit & export. Với PDF dạng văn bản được hỗ trợ, nhấp vào chỗ trống in sẵn đã được nhận diện để điền thông tin, hoặc dùng Add text để đặt nội dung vào vị trí mong muốn. Cỡ chữ tự điều chỉnh theo khoảng trống có sẵn; Format cung cấp các tùy chọn điều chỉnh thủ công.
+- Xuất tài liệu Word DOCX được hỗ trợ sang PDF với bản xem trước trước khi tải xuống. Các đầu trang, chân trang, số trang và đường ngang đơn giản được hỗ trợ sẽ được giữ lại; cách chia trang và phông chữ có thể khác với Word.
 
 XỬ LÝ TRÊN THIẾT BỊ
 Tài liệu được xử lý trên thiết bị của bạn. Tiện ích hoạt động ngoại tuyến và không tải tài liệu lên máy chủ để so sánh hoặc chỉnh sửa. Bản nháp trên trang web và trong tiện ích được lưu riêng, không tự động đồng bộ. Hãy tải xuống một bản sao khi hoàn thành công việc.

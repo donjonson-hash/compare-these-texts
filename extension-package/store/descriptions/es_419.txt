@@ -11,6 +11,7 @@ QUÉ PUEDES HACER
 - En hojas de cálculo, elegir una hoja, relacionar filas mediante un identificador y seleccionar las columnas que quieres revisar. Editar valores de celdas y copiar una fila faltante de A a B.
 - Revisar cambios en importes monetarios y porcentajes al comparar textos, archivos Word y PDF compatibles con Amounts & percentages.
 - Trabajar con un solo documento en Edit & export. En los PDF compatibles con capa de texto, hacer clic en los espacios para llenar que se hayan detectado para ingresar datos, o usar Add text para colocar una entrada. El tamaño del texto se adapta al espacio disponible; Format ofrece controles manuales.
+- Exporta documentos Word DOCX compatibles a PDF con vista previa antes de descargarlos. Se incluyen los encabezados, pies de página, números de página y líneas horizontales simples compatibles; la paginación y las fuentes pueden diferir de Word.
 
 PROCESAMIENTO LOCAL
 Los documentos se procesan en tu dispositivo. La extensión funciona sin conexión y no sube tus documentos a un servidor para compararlos o editarlos. Los borradores del sitio web y de la extensión se guardan por separado, sin sincronización automática. Descarga una copia de tu trabajo terminado.

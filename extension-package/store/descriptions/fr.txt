@@ -11,6 +11,7 @@ FONCTIONNALITÉS
 - Pour les feuilles de calcul, choisissez une feuille, associez les lignes à l'aide d'un identifiant et sélectionnez les colonnes à vérifier. Modifiez les valeurs des cellules et copiez une ligne manquante de A vers B.
 - Vérifiez les montants monétaires et les pourcentages modifiés dans les comparaisons de texte, de fichiers Word et de PDF compatibles avec Amounts & percentages.
 - Travaillez sur un seul document avec Edit & export. Dans les PDF compatibles dotés d'une couche de texte, cliquez sur les espaces à remplir détectés pour saisir vos informations, ou utilisez Add text pour placer une saisie. La taille du texte s'adapte à l'espace disponible ; Format propose des réglages manuels.
+- Exportez les documents Word DOCX pris en charge en PDF, avec un aperçu avant téléchargement. Les en-têtes, pieds de page, numéros de page et lignes horizontales simples pris en charge sont inclus ; la pagination et les polices peuvent différer de Word.
 
 TRAITEMENT LOCAL
 Les documents sont traités sur votre appareil. L'extension fonctionne hors connexion et ne transfère pas vos documents vers un serveur pour les comparer ou les modifier. Les brouillons du site et de l'extension sont enregistrés séparément, sans synchronisation automatique. Téléchargez une copie de votre travail terminé.

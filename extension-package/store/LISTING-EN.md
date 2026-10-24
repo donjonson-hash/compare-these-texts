@@ -1,14 +1,14 @@
-# Compare Two Texts — English store listing
+# Compare Two Texts — English Chrome Web Store listing
 
-Version 0.36.0 candidate, updated 24 October 2026. The fields below use
-the approved locale catalog and full description from 16 October, with the
-product renamed to Compare Two Texts. This file
-is a convenient copy reference; `localizations.json` and `descriptions/en.txt`
-remain the authoritative inputs. It does not claim a published store listing.
+Release candidate **0.37.1**, prepared 24 October 2026. This document supplies
+copy for submission; it does not claim store publication or approval.
+`localizations.json` and `descriptions/en.txt` are the canonical copy inputs.
 
 ## Name
 
 Compare Two Texts — Compare & Edit BETA
+
+39 UTF-16 code units; maximum 75.
 
 ## Short description
 
@@ -31,6 +31,7 @@ WHAT YOU CAN DO
 - For spreadsheets, choose a sheet, match rows by an identifier and select the columns to check. Edit cell values and copy a missing row from A to B.
 - Review changed currency amounts and percentages in text, Word and supported PDF comparisons with Amounts & percentages.
 - In Edit & export, work on a single document. On supported text-based PDFs, click detected printed blanks to enter information, or use Add text to place an entry. Text size adjusts to the available space; Format provides manual controls.
+- Export supported Word DOCX documents to PDF with a preview before download. Supported headers, footers, page numbers and plain horizontal rules are included; pagination and font appearance may differ from Word.
 
 LOCAL PROCESSING
 Document processing takes place on your device. The extension works offline and does not upload your documents to a server for comparison or editing. Website and extension drafts are stored separately, without automatic syncing. Download a copy of your finished work.
@@ -45,19 +46,22 @@ BEFORE YOU START
 
 Start with the built-in document or CSV / Excel example to try the workflow before opening your own files.
 
-## Publishing notes — not part of the description
+## Dashboard references — do not paste into the full description
 
-The full description above has 2,400 characters excluding its final newline.
-Its shorter length is deliberate: retain consistent reviewed copy across the
-22 locales instead of adding repeated keywords. Copy only the full description
-into the store field, without this file's internal headings or notes.
+The full description above contains 2,613 Unicode characters
+(2,613 UTF-16 code units), excluding its final newline.
+Copy `descriptions/en.txt` as-is into the description field.
 
-The editor and welcome page are English. Localized store metadata and full
-texts do not translate the editor. Screenshots use synthetic examples.
+- Primary language: English. The editor and welcome page are in English.
+- Category suggestion: Productivity, if offered by the current dashboard.
+- Homepage: https://comparetwotexts.pro/
+- Support: https://comparetwotexts.pro/support/
+- Privacy policy: https://comparetwotexts.pro/privacy/
+- Single purpose and privacy responses: `PRIVACY-DISCLOSURES-EN.md`.
+- Reviewer test instructions: `REVIEWER-INSTRUCTIONS-EN.md`.
+- Changes in this submission: `RELEASE-NOTES-EN.md`.
 
-Homepage: https://comparethesetexts.com/
-Support: https://comparethesetexts.com/support/
-Privacy: https://comparethesetexts.com/privacy/
-
-Use `SUBMISSION-RU.md` for single-purpose/privacy statements, reviewer steps
-and upload instructions. The complete store-kit ZIP is not the installable ZIP.
+22 localized metadata catalogs and 22 full descriptions are prepared. These
+localize the listing and Chrome metadata, not the editor. Screenshots use
+synthetic examples. Keep the same extension item ID when updating an existing
+listing. The store-kit ZIP is a materials bundle; upload its inner Chrome ZIP.

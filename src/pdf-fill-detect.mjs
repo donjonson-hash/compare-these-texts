@@ -1,5 +1,5 @@
 /** Conservative suggestions for printed blanks; all coordinates are scale-1 viewport points. */
-import {getDocument} from './pdf-reader-vendor.mjs';
+import {getDocument} from './pdf-reader.mjs';
 import {PDFDocument, fontkit} from './pdf-vendor.mjs';
 import fontBase64 from './pdf-font.mjs';
 import {planPdfFillField} from './pdf-fill.mjs';
