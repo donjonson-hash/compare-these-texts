@@ -42,7 +42,10 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
   const emojiSegments=new Intl.Segmenter('en',{granularity:'grapheme'});
   const needsFallback=text=>Array.from(emojiSegments.segment(text||''),s=>s.segment).some(wantsColorEmoji)||Array.from(text||'').some(c=>!/[\s\p{Default_Ignorable_Code_Point}]/u.test(c)&&(!regularChars.has(c.codePointAt(0))||!boldChars.has(c.codePointAt(0))))||(/\p{Extended_Pictographic}/u.test(text||'')&&/[\u200d\ufe0f]/u.test(text||''));
   let emoji=baseFonts.regular;
-  const allText=[...model.blocks,...(model.headersFooters||[])].flatMap(b=>[b.text||'',(b.runs||[]).map(r=>r.text||'').join(''),b.list?.label||'']);
+  const textboxBlocks=Object.values(model.peripheralTextboxes||{}).flatMap(types=>Object.values(types).flatMap(boxes=>boxes.flatMap(box=>box.blocks||[])));
+  const peripheralBlocks=['header','footer'].flatMap(kind=>Object.values(model.peripherals?.[kind]||{}).flat());
+  const styledBlocks=[...model.blocks,...textboxBlocks,...peripheralBlocks];
+  const allText=[...styledBlocks,...(model.headersFooters||[])].flatMap(b=>[b.text||'',(b.runs||[]).map(r=>r.text||'').join(''),b.list?.label||'']);
   if(allText.some(needsFallback)){
     const {default:emojiBytes}=await import('./sheet-emoji-font.mjs');
     const {createEmojiPdfFont}=await import('./pdf-emoji-font.mjs');
@@ -52,6 +55,15 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
   }
   const fontOptions={errorMessage:'This document contains a character that the PDF fonts cannot display. Download DOCX to preserve it.',preferFallback:wantsColorEmoji};
   const fonts=Object.fromEntries(Object.entries(baseFonts).map(([key,font])=>[key,sheetPdfFont(font,emoji,fontOptions)]));
+  // Carlito is metrically compatible with Calibri. Using the generic fallback
+  // font here can overflow a fixed Word text box even when its source text fits.
+  const isCalibri=style=>/^(?:calibri|carlito)$/i.test((style?.fontFamily||'').replace(/["']/g,'').trim());
+  let calibriFonts;
+  if(styledBlocks.some(block=>isCalibri(block.style)||(block.runs||[]).some(run=>isCalibri(run.style)))){
+    const [{default:regular},{default:bold}]=await Promise.all([import('./word-calibri-regular-font.mjs'),import('./word-calibri-bold-font.mjs')]);
+    calibriFonts={};
+    for(const [key,bytes]of Object.entries({regular,bold})){const font=await pdf.embedFont(decode(bytes),{subset:true,features:{liga:false}});calibriFonts[key]=sheetPdfFont(font,emoji,fontOptions);}
+  }
   let symbolFont;
   async function markerFont(label,preferred){
     // Exact supplementary Wingdings mapping, with an offline subset font.
@@ -62,28 +74,29 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
   }
   const pictures=new Map(),layout=[];let work=0;
   const cooperate=async()=>{if(++work%20===0){await new Promise(r=>setTimeout(r,0));abort(signal);}};
-  function typography(style={},heading){return {font:style.fontWeight==='bold'||!style.fontWeight&&heading?fonts.bold:fonts.regular,size:pt(style.fontSize,heading?Math.max(12,24-heading*2):11),color:color(style.color),italic:style.fontStyle==='italic',decoration:style.textDecoration||''};}
+  function typography(style={},heading){const selected=isCalibri(style)&&calibriFonts?calibriFonts:fonts;return {font:style.fontWeight==='bold'||!style.fontWeight&&heading?selected.bold:selected.regular,size:pt(style.fontSize,heading?Math.max(12,24-heading*2):11),color:color(style.color),italic:style.fontStyle==='italic',decoration:style.textDecoration||''};}
   function checkText(text,font){font.check(text);}
   async function imageFor(image){
     if(!pictures.has(image.src)){const match=/^data:image\/(png|jpeg);base64,([A-Za-z\d+/=]+)$/.exec(image.src);if(!match)fail('An image could not be included in the PDF.');const bytes=decode(match[2]);pictures.set(image.src,await(match[1]==='png'?pdf.embedPng(bytes):pdf.embedJpg(bytes)));}
     return pictures.get(image.src);
   }
-  async function paragraph(block,width,fields){
+  async function paragraph(block,width,fields,{noWrap=false}={}){
     if(!block)fail('A paragraph is missing from the Word document.');
     const style=block.style||{},base=typography(style,block.heading),left=block.list?Math.max(0,block.list.indent?.left??(block.list.level+1)*36):pt(style.paddingLeft),right=pt(style.paddingRight);
     const indent=block.list?0:pt(style.textIndent),available=width-left-right;
     if(available<8)fail('A paragraph is too narrow. Download DOCX to adjust its indentation.');
     const before=pt(style.marginTop,block.heading?10:0),after=pt(style.marginBottom,block.heading?7:6),ratio=Math.max(1.15,Number(style.lineHeight)||1.3);
     const fragments=[];let items=[],used=0,first=true,forced=false;
-    function flush(force=false){if(!items.length&&!force)return;const textHeight=Math.max(base.size*ratio,...items.filter(i=>!i.image).map(i=>i.size*ratio));const height=Math.max(textHeight,...items.filter(i=>i.image).map(i=>i.height));const shift=['center'].includes(style.textAlign)?Math.max(0,(available-(first?indent:0)-used)/2):['right','end'].includes(style.textAlign)?Math.max(0,available-(first?indent:0)-used):0;fragments.push({height,items:items.map(i=>({...i,x:i.x+left+(first?indent:0)+shift})),key:block.key,record:block.record,first,breakBefore:forced});items=[];used=0;first=false;forced=false;}
+    function flush(force=false){if(!items.length&&!force)return;const textItems=items.filter(i=>!i.image),textHeight=Math.max(...(textItems.length?textItems.map(i=>i.size*ratio):[base.size*ratio]));const height=Math.max(textHeight,...items.filter(i=>i.image).map(i=>i.height));const shift=['center'].includes(style.textAlign)?Math.max(0,(available-(first?indent:0)-used)/2):['right','end'].includes(style.textAlign)?Math.max(0,available-(first?indent:0)-used):0;fragments.push({height,requiredWidth:used+left+right+(first?indent:0),items:items.map(i=>({...i,x:i.x+left+(first?indent:0)+shift})),key:block.key,record:block.record,first,breakBefore:forced});items=[];used=0;first=false;forced=false;}
     const room=()=>available-(first?indent:0);
     function addText(text,format){
       text=text.replace(/\t/g,'    ').replace(/\r\n?/g,'\n');checkText(text.replace(/\n/g,''),format.font);
       for(const token of text.match(/\n|[^\S\n]+|[^\s]+/gu)||[]){
         if(token==='\n'){flush(true);continue;}
         const space=/^\s+$/u.test(token),tokenWidth=format.font.widthOfTextAtSize(token,format.size);
-        if(used+tokenWidth>room()&&items.length){flush();if(space)continue;}
+        if(used+tokenWidth>room()&&items.length){if(noWrap)fail('Text no longer fits its Word text box. Download DOCX to adjust the box.');flush();if(space)continue;}
         if(tokenWidth<=room()){items.push({...format,text:token,x:used,width:tokenWidth});used+=tokenWidth;continue;}
+        if(noWrap)fail('Text no longer fits its Word text box. Download DOCX to adjust the box.');
         // Long unbroken identifiers must wrap too, never get clipped at a cell edge.
         let chunk='';for(const c of format.font.graphemes(token)){const next=chunk+c,w=format.font.widthOfTextAtSize(next,format.size);if(w>room()&&chunk){const cw=format.font.widthOfTextAtSize(chunk,format.size);items.push({...format,text:chunk,x:0,width:cw});used=cw;flush();chunk=c;}else chunk=next;if(format.font.widthOfTextAtSize(c,format.size)>room())fail('A character is wider than its table cell. Download DOCX to widen the column.');}
         if(chunk){const cw=format.font.widthOfTextAtSize(chunk,format.size);items.push({...format,text:chunk,x:used,width:cw});used+=cw;}
@@ -95,7 +108,15 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
       else {const format=typography({...style,...run.style},block.heading);let text=run.text;if(run.field){if(!fields)fail('A page-number field is outside its header or footer.');text=fields.measure?Array.from('0123456789').sort((a,b)=>format.font.widthOfTextAtSize(b,format.size)-format.font.widthOfTextAtSize(a,format.size))[0].repeat(7):String(fields[run.field]);}addText(text,format);}
       await cooperate();
     }
-    flush(!fragments.length||forced);
+    const rules=block.horizontalRules||[];
+    if(rules.length&&block.list)fail('A numbered horizontal rule cannot be exported. Download DOCX to preserve it.');
+    flush((!fragments.length&&!rules.length)||forced);
+    for(const rule of rules){
+      const w=rule.width===null?available:rule.width,h=rule.height;
+      if(!Number.isFinite(w)||w<=0||w>available+.01||!Number.isFinite(h)||h<=0||!/^#[a-f\d]{6}$/i.test(rule.color||'')||!['left','center','right'].includes(rule.align))fail('A horizontal rule does not fit its paragraph. Download DOCX to preserve it.');
+      const shift=rule.align==='center'?(available-w)/2:rule.align==='right'?available-w:0;
+      fragments.push({height:h,items:[],rule:{x:left+shift,width:w,height:h,color:rule.color},key:block.key,record:block.record});
+    }
     if(block.list&&fragments.length){const fmt=typography({...style,...block.list.markerStyle}),label=block.list.label;fmt.font=await markerFont(label,fmt.font);checkText(label,fmt.font);const w=fmt.font.widthOfTextAtSize(label,fmt.size);fragments[0].items.unshift({...fmt,text:label,x:Math.max(0,left-w-5),width:w});}
     if(fragments.length){fragments[0].before=before;fragments[0].breakBefore ||= block.pageBreakBefore;fragments.at(-1).after=after;}
     return fragments;
@@ -106,7 +127,37 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
   const peripheral=model.peripherals||{},distances={header:(model.page.headerDistance??48)*.75,footer:(model.page.footerDistance??48)*.75};
   const activeTypes=['default',...(peripheral.firstPage?['first']:[]),...(peripheral.evenPages?['even']:[])];
   async function peripheralLines(blocks,fields){const lines=[];for(const block of blocks||[])lines.push(...await paragraph(block,usable,fields));if(lines.some(line=>line.breakBefore))fail('A page break inside a header or footer cannot be exported. Download DOCX to preserve it.');let height=0;for(const line of lines){height+=line.before||0;line.top=height;height+=line.height+(line.after||0);}return {lines,height};}
+  const textboxLayouts={header:{},footer:{}};
+  async function textboxLines(box,fields){
+    const {x,y,height,insets,verticalAlign='top'}=box;let width=box.width;
+    if(![x,y,width,height,...Object.values(insets||{})].every(Number.isFinite)||x<0||y<0||width<=0||height<=0||x+width>pageWidth+.01||y+height>pageHeight+.01||!insets||!['left','right','top','bottom'].every(edge=>Number.isFinite(insets[edge])&&insets[edge]>=0)||!['top','center','bottom'].includes(verticalAlign))fail('A Word text box has unsupported bounds. Download DOCX to preserve it.');
+    let innerWidth=width-insets.left-insets.right;const innerHeight=height-insets.top-insets.bottom;
+    if(innerWidth<8||innerHeight<=0)fail('A Word text box has too little space for its text. Download DOCX to preserve it.');
+    async function linesFor(available){const lines=[];for(const block of box.blocks||[])lines.push(...await paragraph(block,available,fields,{noWrap:box.wrap==='none'}));return lines;}
+    if(box.autoFit==='shape'&&box.wrap==='none'){
+      // Word's explicit shape-autofit may enlarge a no-wrap box. Measure within
+      // the page first; the source size is a minimum, never a clipping window.
+      const measured=await linesFor(pageWidth-x-insets.left-insets.right);
+      const required=Math.max(innerWidth,...measured.map(line=>line.requiredWidth||0));
+      if(required>innerWidth){const sourceWidth=width;width=required+insets.left+insets.right;innerWidth=required;box={...box,width,sourceWidth};}
+    }
+    const lines=await linesFor(innerWidth);let used=0;
+    if(lines.some(line=>line.breakBefore))fail('A page break inside a Word text box cannot be exported. Download DOCX to preserve it.');
+    for(const line of lines){used+=line.before||0;line.top=used;used+=line.height+(line.after||0);}
+    if(used>innerHeight+.01)fail('Text no longer fits its Word text box. Download DOCX to adjust the box.');
+    const shift=verticalAlign==='center'?(innerHeight-used)/2:verticalAlign==='bottom'?innerHeight-used:0;
+    return {box,lines,x:x+insets.left,y:y+insets.top+shift,width:innerWidth};
+  }
   for(const kind of ['header','footer']){
+    for(const type of activeTypes){
+      textboxLayouts[kind][type]=[];
+      for(const box of model.peripheralTextboxes?.[kind]?.[type]||[]){
+        // Measure before body pagination so an anchored header cannot cover body text.
+        const measured=await textboxLines(box,{measure:true});textboxLayouts[kind][type].push(measured);
+        const edge=kind==='header'?'top':'bottom',needed=kind==='header'?measured.box.y+measured.box.height:pageHeight-measured.box.y;
+        margins[edge]=Math.max(margins[edge],needed+6);
+      }
+    }
     let height=0;for(const type of activeTypes)height=Math.max(height,(await peripheralLines(peripheral[kind]?.[type],{measure:true})).height);
     if(height){const edge=kind==='header'?'top':'bottom';margins[edge]=Math.max(margins[edge],distances[kind]+height+6);}
   }
@@ -115,14 +166,15 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
   let page,y;
   function newPage(){abort(signal);if(pdf.getPageCount()>=500)fail('The PDF would exceed 500 pages. Shorten the document.');page=pdf.addPage([pageWidth,pageHeight]);y=margins.top;}
   newPage();
-  function drawFragment(fragment,x,top,{pageNumber=pdf.getPageCount(),region='body'}={}){
+  function drawFragment(fragment,x,top,{pageNumber=pdf.getPageCount(),region='body',width=usable}={}){
+    if(fragment.rule){const rule=fragment.rule;page.drawRectangle({x:x+rule.x,y:pageHeight-top-rule.height,width:rule.width,height:rule.height,color:color(rule.color)});layout.push({page:pageNumber,region,type:'horizontal-rule',key:fragment.key,record:fragment.record,x:x+rule.x,y:top,width:rule.width,height:rule.height,color:rule.color});return;}
     for(const item of fragment.items){
       if(item.image){page.drawImage(item.image,{x:x+item.x,y:pageHeight-top-fragment.height,width:item.width,height:item.height});continue;}
       const baseline=pageHeight-top-fragment.height+item.size*.24;
       item.font.drawText(page,item.text,{x:x+item.x,y:baseline,size:item.size,color:item.color,...(item.italic?{xSkew:{type:'degrees',angle:12}}:{})});
       for(const [kind,offset]of [['underline',-.1],['line-through',.3]])if(item.decoration.includes(kind))page.drawLine({start:{x:x+item.x,y:baseline+item.size*offset},end:{x:x+item.x+item.width,y:baseline+item.size*offset},thickness:Math.max(.4,item.size*.05),color:item.color});
     }
-    layout.push({page:pageNumber,region,key:fragment.key,record:fragment.record,x,y:top,width:usable,height:fragment.height});
+    layout.push({page:pageNumber,region,key:fragment.key,record:fragment.record,x,y:top,width,height:fragment.height});
   }
   async function flowParagraph(block){const lines=await paragraph(block,usable);for(const line of lines){if(line.breakBefore&&y>margins.top)newPage();const before=line.before||0;if(y+before+line.height>pageHeight-margins.bottom)newPage();if(line.height>bodyHeight)fail('A text line is taller than the PDF page.');y+=before;drawFragment(line,margins.left,y);y+=line.height+(line.after||0);}}
   const blocks=new Map(model.blocks.map(b=>[b.record,b]));
@@ -154,7 +206,7 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
         for(const cell of relevant){const from=Math.max(start,cell.top),to=Math.min(end,cell.top+cell.height);if(to<=from)continue;const x=tableX+offsets[cell.col],top=y+from-start,h=to-from,s=cell.style;
           if(s.backgroundColor)page.drawRectangle({x,y:pageHeight-top-h,width:cell.width,height:h,color:color(s.backgroundColor)});
           border(s.borderLeft,x,top,x,top+h);border(s.borderRight,x+cell.width,top,x+cell.width,top+h);border(s.borderTop,x,top,x+cell.width,top);border(s.borderBottom,x,top+h,x+cell.width,top+h);
-          for(const line of cell.lines)if(line.top>=start-.01&&line.top+line.height<=end+.01)drawFragment(line,x+cell.padding.left,y+line.top-start);
+          for(const line of cell.lines)if(line.top>=start-.01&&line.top+line.height<=end+.01)drawFragment(line,x+cell.padding.left,y+line.top-start,{width:cell.width-cell.padding.left-cell.padding.right});
         }
         y+=end-start;start=end;if(start<group.bottom-.01)newPage();await cooperate();
       }
@@ -170,6 +222,11 @@ export async function renderDocxPdf(model,{signal,onLayout}={}) {
     for(const kind of ['header','footer']){
       const result=await peripheralLines(peripheral[kind]?.[type],fields),top=kind==='header'?distances.header:pageHeight-distances.footer-result.height;
       for(const line of result.lines)drawFragment(line,margins.left,top+line.top,{pageNumber:index+1,region:kind});
+      for(const {box} of textboxLayouts[kind][type]||[]){
+        const placed=await textboxLines(box,fields);
+        layout.push({page:index+1,region:kind,type:'textbox',variant:type,x:box.x,y:box.y,width:placed.box.width,height:placed.box.height,...(placed.box.sourceWidth?{sourceWidth:placed.box.sourceWidth}:{})});
+        for(const line of placed.lines)drawFragment(line,placed.x,placed.y+line.top,{pageNumber:index+1,region:kind,width:placed.width});
+      }
     }
     await cooperate();
   }
