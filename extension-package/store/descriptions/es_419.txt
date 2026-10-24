@@ -1,4 +1,4 @@
-Compare These Texts te permite comparar textos y documentos lado a lado, encontrar diferencias y editar el resultado. Revisa un documento modificado, comprueba la hoja de cálculo de un proveedor o llena un espacio destinado a la escritura en un PDF compatible. Después, descarga o imprime tu trabajo.
+Compare Two Texts te permite comparar textos y documentos lado a lado, encontrar diferencias y editar el resultado. Revisa un documento modificado, comprueba la hoja de cálculo de un proveedor o llena un espacio destinado a la escritura en un PDF compatible. Después, descarga o imprime tu trabajo.
 
 COMPARA, EDITA Y GUARDA
 1. Abre la extensión y elige dos archivos para compararlos, o usa Edit & export para trabajar con un solo archivo.

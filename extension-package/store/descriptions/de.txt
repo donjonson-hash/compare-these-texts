@@ -1,4 +1,4 @@
-Mit Compare These Texts kannst du Texte vergleichen, Unterschiede erkennen und Dokumente direkt nebeneinander bearbeiten. Prüfe eine überarbeitete Fassung oder die Tabelle eines Lieferanten, oder fülle eine gedruckte Leerzeile in einer unterstützten PDF-Datei aus. Anschließend kannst du das Ergebnis herunterladen oder drucken.
+Mit Compare Two Texts kannst du Texte vergleichen, Unterschiede erkennen und Dokumente direkt nebeneinander bearbeiten. Prüfe eine überarbeitete Fassung oder die Tabelle eines Lieferanten, oder fülle eine gedruckte Leerzeile in einer unterstützten PDF-Datei aus. Anschließend kannst du das Ergebnis herunterladen oder drucken.
 
 VERGLEICHEN, BEARBEITEN, SPEICHERN
 1. Öffne die Erweiterung und wähle zwei Dateien zum Vergleichen oder nutze Edit & export für eine einzelne Datei.

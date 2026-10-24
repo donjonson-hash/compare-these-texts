@@ -1,4 +1,4 @@
-# Compare These Texts for Google Docs — prototype 0.1.0
+# Compare Two Texts for Google Docs — prototype 0.1.0
 
 Select a passage in Google Docs, edit it in a sidebar, preview removed and added text, and apply the change to the original document. No file download or upload to the Chrome extension is needed.
 
@@ -14,7 +14,7 @@ This proprietary prototype is free for personal and internal work use. Installat
 4. Choose **+ → HTML**, name the file **Sidebar**, and replace its contents with `Sidebar.html`.
 5. In project settings, enable the option to show `appsscript.json` in the editor. Replace its contents with the packaged manifest.
 6. Save the project and reload the document.
-7. Select words within one ordinary body paragraph. Choose **Compare These Texts → Edit selected text**. On first use, authorize access to the current document and its interface. Your organization's administrator may restrict Apps Script.
+7. Select words within one ordinary body paragraph. Choose **Compare Two Texts → Edit selected text**. On first use, authorize access to the current document and its interface. Your organization's administrator may restrict Apps Script.
 8. If the selection does not load automatically, select it again and click **Load selected text**.
 
 No web-app deployment, API key, or OAuth client ID is needed for this test. The script is bound to the current document; its manifest requests only `documents.currentonly` and `script.container.ui` scopes.

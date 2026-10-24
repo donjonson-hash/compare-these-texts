@@ -1,4 +1,4 @@
-# Compare These Texts for LibreOffice Writer — prototype 0.1.0
+# Compare Two Texts for LibreOffice Writer — prototype 0.1.0
 
 Edit one selected passage directly in Writer, preview removed/added text, then apply minimal changes as one Writer Undo operation. No browser, account, network calls, document upload, or temporary document copy.
 
@@ -9,7 +9,7 @@ This proprietary prototype is free for personal and internal work use. Installin
 1. Install `libreoffice/dist/compare-these-texts-writer-0.1.0.oxt` through **Tools → Extension Manager → Add**. Restart LibreOffice completely.
 2. On Ubuntu, LibreOffice's Python component support must be installed. If missing: `sudo apt install python3-uno libreoffice-script-provider-python`.
 3. Open a Writer document and select text within one paragraph.
-4. Choose **Compare These Texts → Edit selected text…** (Russian: **Редактировать выделенный текст…**), or use the added toolbar command.
+4. Choose **Compare Two Texts → Edit selected text…** (Russian: **Редактировать выделенный текст…**), or use the added toolbar command.
 5. Edit, choose **Preview changes**, then **Apply to document**. **Cancel** leaves the document unchanged. Writer **Ctrl+Z** restores the applied edit.
 
 Save the document normally in Writer. This extension does not save it automatically.

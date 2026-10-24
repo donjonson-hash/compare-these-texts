@@ -1,4 +1,4 @@
-Met Compare These Texts kun je teksten vergelijken, documenten naast elkaar bekijken, verschillen vinden en het resultaat bewerken. Controleer een herziene versie of een spreadsheet van een leverancier, of vul een voorgedrukte invulruimte in een ondersteunde pdf in. Download of print daarna je werk.
+Met Compare Two Texts kun je teksten vergelijken, documenten naast elkaar bekijken, verschillen vinden en het resultaat bewerken. Controleer een herziene versie of een spreadsheet van een leverancier, of vul een voorgedrukte invulruimte in een ondersteunde pdf in. Download of print daarna je werk.
 
 VERGELIJKEN, BEWERKEN, OPSLAAN
 1. Open de extensie en kies twee bestanden om te vergelijken, of gebruik Edit & export voor één bestand.

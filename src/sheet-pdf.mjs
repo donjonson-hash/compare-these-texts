@@ -104,5 +104,5 @@ export async function renderSheetPdf(model,{signal,onLayout}={}){
  }
  }
  const pages=pdf.getPageCount();for(let i=0;i<pageInfo.length;i++){const {page}=pageInfo[i],label=`${i+1} / ${pages}`;normal.drawText(page,label,{x:pageWidth-margin-normal.widthOfTextAtSize(label,8),y:18,font:normal,size:8,color:ink});}
- abort(signal);pdf.setCreator('Compare These Texts');const bytes=await pdf.save();abort(signal);if(bytes.length>32*1024*1024)throw Error('The PDF is too large. Download the spreadsheet instead.');onLayout?.(layout);return bytes;
+ abort(signal);pdf.setCreator('Compare Two Texts');const bytes=await pdf.save();abort(signal);if(bytes.length>32*1024*1024)throw Error('The PDF is too large. Download the spreadsheet instead.');onLayout?.(layout);return bytes;
 }

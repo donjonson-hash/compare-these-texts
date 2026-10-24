@@ -1,4 +1,4 @@
-Compare These Texts helps you compare text and documents side by side, find differences and edit the result. Check a revised document, review a supplier's spreadsheet or fill in a printed blank on a supported PDF — then download or print your work.
+Compare Two Texts helps you compare text and documents side by side, find differences and edit the result. Check a revised document, review a supplier's spreadsheet or fill in a printed blank on a supported PDF — then download or print your work.
 
 COMPARE, EDIT, SAVE
 1. Open the extension and choose two files to compare, or use Edit & export for one file.

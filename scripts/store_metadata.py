@@ -26,7 +26,7 @@ def load_localizations():
                 raise ValueError(f'Control character in store text: {locale}/{field}')
             if '$' in value or '__MSG_' in value:
                 raise ValueError(f'Unexpected message substitution: {locale}/{field}')
-        if not entry['name'].startswith('Compare These Texts — '):
+        if not entry['name'].startswith('Compare Two Texts — '):
             raise ValueError(f'Missing product brand: {locale}')
     release = json.loads((ROOT / 'release.json').read_text())
     if catalog['en'] != {field: release[field] for field in ('name', 'description')}:
@@ -37,7 +37,7 @@ def load_localizations():
 def message_files():
     files = {}
     for locale, entry in load_localizations().items():
-        title = 'CTT — Compare & Edit' if locale == 'en' else entry['name'].replace('Compare These Texts', 'CTT', 1)
+        title = 'CTT — Compare & Edit' if locale == 'en' else entry['name'].replace('Compare Two Texts', 'CTT', 1)
         messages = {
             'extensionName': {'message': entry['name']},
             'extensionDescription': {'message': entry['description']},

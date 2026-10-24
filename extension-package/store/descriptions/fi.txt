@@ -1,4 +1,4 @@
-Compare These Texts auttaa vertaamaan tekstejä ja asiakirjoja rinnakkain, löytämään erot ja muokkaamaan lopputulosta. Tarkista asiakirjan päivitetty versio, käy läpi toimittajan laskentataulukko tai täytä tuetussa PDF-tiedostossa oleva painettu tyhjä kohta. Lataa tai tulosta sitten työsi.
+Compare Two Texts auttaa vertaamaan tekstejä ja asiakirjoja rinnakkain, löytämään erot ja muokkaamaan lopputulosta. Tarkista asiakirjan päivitetty versio, käy läpi toimittajan laskentataulukko tai täytä tuetussa PDF-tiedostossa oleva painettu tyhjä kohta. Lataa tai tulosta sitten työsi.
 
 VERTAA, MUOKKAA, TALLENNA
 1. Avaa laajennus ja valitse kaksi vertailtavaa tiedostoa tai käsittele yhtä tiedostoa Edit & export -tilassa.

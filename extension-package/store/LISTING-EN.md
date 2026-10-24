@@ -1,13 +1,14 @@
-# Compare These Texts — English store listing
+# Compare Two Texts — English store listing
 
-Version 0.35.8 candidate, prepared 20 October 2026. The fields below preserve
-the approved locale catalog and full description from 16 October. This file
+Version 0.36.0 candidate, updated 24 October 2026. The fields below use
+the approved locale catalog and full description from 16 October, with the
+product renamed to Compare Two Texts. This file
 is a convenient copy reference; `localizations.json` and `descriptions/en.txt`
 remain the authoritative inputs. It does not claim a published store listing.
 
 ## Name
 
-Compare These Texts — Compare & Edit BETA
+Compare Two Texts — Compare & Edit BETA
 
 ## Short description
 
@@ -17,7 +18,7 @@ Compare Word, PDF, text and Excel files side by side. Edit differences and save 
 
 ## Full description
 
-Compare These Texts helps you compare text and documents side by side, find differences and edit the result. Check a revised document, review a supplier's spreadsheet or fill in a printed blank on a supported PDF — then download or print your work.
+Compare Two Texts helps you compare text and documents side by side, find differences and edit the result. Check a revised document, review a supplier's spreadsheet or fill in a printed blank on a supported PDF — then download or print your work.
 
 COMPARE, EDIT, SAVE
 1. Open the extension and choose two files to compare, or use Edit & export for one file.
@@ -46,7 +47,7 @@ Start with the built-in document or CSV / Excel example to try the workflow befo
 
 ## Publishing notes — not part of the description
 
-The full description above has 2,402 characters excluding its final newline.
+The full description above has 2,400 characters excluding its final newline.
 Its shorter length is deliberate: retain consistent reviewed copy across the
 22 locales instead of adding repeated keywords. Copy only the full description
 into the store field, without this file's internal headings or notes.

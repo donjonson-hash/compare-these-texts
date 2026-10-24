@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Compare These Texts — Compare & Edit BETA",
-  "version": "0.35.8",
+  "name": "Compare Two Texts — Compare & Edit BETA",
+  "version": "0.36.0",
   "homepage_url": "https://comparethesetexts.com/",
   "description": "Compare Word, PDF, text and Excel files side by side. Edit differences and save the result. Works locally in your browser.",
   "icons": {

@@ -141,7 +141,7 @@ class SelectionEdit:
                         raise ValueError("One replacement crosses different text formatting. Make smaller edits within each formatted part.")
             prepared.append((region, replacement, style))
         undo = self.document.getUndoManager()
-        title = "Compare These Texts " + uuid.uuid4().hex[:8]
+        title = "Compare Two Texts " + uuid.uuid4().hex[:8]
         if undo.isLocked():
             raise ValueError("Undo is unavailable. No changes were made.")
         changed = False
@@ -199,7 +199,7 @@ class Listener(unohelper.Base, XActionListener, XTextListener):
 
 def message(context, frame, text):
     toolkit = context.ServiceManager.createInstanceWithContext("com.sun.star.awt.Toolkit", context)
-    box = toolkit.createMessageBox(frame.getContainerWindow(), uno.Enum("com.sun.star.awt.MessageBoxType", "INFOBOX"), 1, "Compare These Texts", str(text))
+    box = toolkit.createMessageBox(frame.getContainerWindow(), uno.Enum("com.sun.star.awt.MessageBoxType", "INFOBOX"), 1, "Compare Two Texts", str(text))
     box.execute()
     box.dispose()
 
@@ -207,7 +207,7 @@ def message(context, frame, text):
 def editor_dialog(context, frame, selection):
     manager = context.ServiceManager
     model = manager.createInstanceWithContext("com.sun.star.awt.UnoControlDialogModel", context)
-    model.Width, model.Height, model.Title = 440, 335, "Compare These Texts — Writer prototype"
+    model.Width, model.Height, model.Title = 440, 335, "Compare Two Texts — Writer prototype"
     def control(kind, name, x, y, w, h, **props):
         item = model.createInstance("com.sun.star.awt.UnoControl" + kind + "Model")
         values = dict(Name=name, PositionX=x, PositionY=y, Width=w, Height=h, **props)

@@ -45,6 +45,7 @@ async function screenshot(page, name) {
 try {
   await mkdir(output, { recursive: true });
   const documents = await appPage();
+  await documents.locator('#home-help-open').click();
   await documents.locator('#demo').click();
   await documents.locator('.visual-columns .visual-column').first().waitFor();
   await documents.locator('[data-save-side="right"]').waitFor();
@@ -52,6 +53,7 @@ try {
   await screenshot(documents, 'screenshot-documents-1280x800.png');
 
   const tables = await appPage();
+  await tables.locator('#home-help-open').click();
   await tables.locator('#demo-tables').click();
   await tables.locator('.sheet-review .sheet-grid').first().waitFor();
   await tables.locator('#visual-review').evaluate(node => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY));
@@ -70,7 +72,7 @@ try {
   .brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:700;letter-spacing:-.5px}.brand img{width:34px;height:34px}
   h1{font-size:34px;letter-spacing:-1.2px;line-height:1.08;margin:22px 0 14px}p{margin:0;color:#52665a;font-size:15px;line-height:1.55}
   .badge{display:inline-block;margin-top:19px;border:1px solid #cbdaca;border-radius:20px;background:#eaf1e6;padding:6px 11px;color:#205a45;font-size:12px}
-  </style></head><body><div class="brand"><img src="data:image/png;base64,${icon}" alt="">Compare These Texts</div><h1>See the difference.<br>Make it right.</h1><p>Compare documents. Edit changes.</p><span class="badge">Your files stay in your browser.</span></body></html>`);
+  </style></head><body><div class="brand"><img src="data:image/png;base64,${icon}" alt="">Compare Two Texts</div><h1>See the difference.<br>Make it right.</h1><p>Compare documents. Edit changes.</p><span class="badge">Your files stay in your browser.</span></body></html>`);
   await tile.locator('img').evaluate(img => img.decode());
   await screenshot(tile, 'promo-440x280.png');
 
@@ -81,7 +83,7 @@ try {
   .brand{display:flex;align-items:center;gap:12px;font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:34px}.brand img{width:44px;height:44px;border-radius:11px}
   h1{font-size:54px;line-height:1.04;letter-spacing:-2px;margin:0 0 23px}p{font-size:20px;line-height:1.5;color:#d2e1d3;margin:0 0 25px}.badge{display:inline-block;border:1px solid #759781;border-radius:22px;padding:9px 14px;font-size:14px}
   .frame{width:100%;background:#eaf0e5;border:1px solid #8fad96;border-radius:12px;overflow:hidden;box-shadow:0 20px 40px #071b1840}.bar{height:26px;display:flex;align-items:center;gap:6px;padding:0 11px}.bar i{width:7px;height:7px;background:#a2b6a8;border-radius:50%}.bar span{margin:auto;color:#526d5b;font-size:10px}.frame>img{width:100%;display:block}
-  </style></head><body><div><div class="brand"><img src="data:image/png;base64,${icon}" alt="">Compare These Texts</div><h1>See the difference.<br>Make it right.</h1><p>Review two versions side by side.<br>Edit the changes. Save your copy.</p><span class="badge">Your documents stay on your device.</span></div><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Compare These Texts · Document comparison</span></div><img src="data:image/png;base64,${capture}" alt="Actual document comparison interface"></div></body></html>`);
+  </style></head><body><div><div class="brand"><img src="data:image/png;base64,${icon}" alt="">Compare Two Texts</div><h1>See the difference.<br>Make it right.</h1><p>Review two versions side by side.<br>Edit the changes. Save your copy.</p><span class="badge">Your documents stay on your device.</span></div><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Compare Two Texts · Document comparison</span></div><img src="data:image/png;base64,${capture}" alt="Actual document comparison interface"></div></body></html>`);
   await marquee.locator('.frame>img').evaluate(img => img.decode());
   await screenshot(marquee, 'promo-1400x560.png');
   assert.deepEqual(errors, [], 'Packaged UI must not produce uncaught errors');

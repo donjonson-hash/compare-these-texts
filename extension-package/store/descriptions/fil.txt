@@ -1,4 +1,4 @@
-Sa Compare These Texts, maaari mong paghambingin ang teksto at mga dokumento nang magkatabi, makita ang mga pagkakaiba, at i-edit ang resulta. Suriin ang binagong dokumento o spreadsheet ng supplier, o punan ang nakalimbag na puwang sa suportadong PDF — pagkatapos ay i-download o i-print ang iyong ginawa.
+Sa Compare Two Texts, maaari mong paghambingin ang teksto at mga dokumento nang magkatabi, makita ang mga pagkakaiba, at i-edit ang resulta. Suriin ang binagong dokumento o spreadsheet ng supplier, o punan ang nakalimbag na puwang sa suportadong PDF — pagkatapos ay i-download o i-print ang iyong ginawa.
 
 PAGHAMBINGIN, I-EDIT, I-SAVE
 1. Buksan ang extension at pumili ng dalawang file na paghahambingin, o gamitin ang Edit & export para sa isang file.

@@ -1,4 +1,4 @@
-Compare These Texts hjälper dig att jämföra texter och dokument sida vid sida, hitta skillnader och redigera resultatet. Granska en uppdaterad version av ett dokument, kontrollera en leverantörs kalkylblad eller fyll i en tryckt tomrad i en PDF som stöds. Ladda sedan ned eller skriv ut ditt arbete.
+Compare Two Texts hjälper dig att jämföra texter och dokument sida vid sida, hitta skillnader och redigera resultatet. Granska en uppdaterad version av ett dokument, kontrollera en leverantörs kalkylblad eller fyll i en tryckt tomrad i en PDF som stöds. Ladda sedan ned eller skriv ut ditt arbete.
 
 JÄMFÖR, REDIGERA, SPARA
 1. Öppna tillägget och välj två filer att jämföra, eller använd Edit & export för en fil.

@@ -96,6 +96,8 @@ try {
   await navigate(async () => { await page.locator('#open-editor').click(); await ready(page); });
   assert.equal(page.url(), editorUrl);
   assert.ok(await page.locator('#results').isHidden(), 'Open comparison leaves an empty fresh workspace');
+  assert.ok(await page.locator('#start-menu').isVisible(), 'Open comparison lands on the two-input home');
+  assert.ok(await page.locator('#start-new-compare').isDisabled(), 'an empty home cannot launch a comparison');
   checks.push('open-comparison');
 
   await navigate(async () => {

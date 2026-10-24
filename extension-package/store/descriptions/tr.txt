@@ -1,4 +1,4 @@
-Compare These Texts ile metin karşılaştırma ve belge düzenleme işlemlerini yan yana görünümde yapın. Farkları bulun, düzenlenmiş bir belgeyi kontrol edin, tedarikçinizin elektronik tablosunu inceleyin veya desteklenen bir PDF'deki basılı boşluğu doldurun. Ardından çalışmanızı indirin ya da yazdırın.
+Compare Two Texts ile metin karşılaştırma ve belge düzenleme işlemlerini yan yana görünümde yapın. Farkları bulun, düzenlenmiş bir belgeyi kontrol edin, tedarikçinizin elektronik tablosunu inceleyin veya desteklenen bir PDF'deki basılı boşluğu doldurun. Ardından çalışmanızı indirin ya da yazdırın.
 
 KARŞILAŞTIRIN, DÜZENLEYİN, KAYDEDİN
 1. Uzantıyı açıp karşılaştırmak için iki dosya seçin veya tek bir dosya için Edit & export seçeneğini kullanın.

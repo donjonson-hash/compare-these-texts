@@ -1,4 +1,4 @@
-Compare These Texts membantu Anda membandingkan teks dan dokumen berdampingan, menemukan perbedaan, dan mengedit hasilnya. Periksa revisi dokumen, tinjau spreadsheet dari pemasok, atau isi bagian kosong tercetak pada PDF yang didukung — lalu unduh atau cetak pekerjaan Anda.
+Compare Two Texts membantu Anda membandingkan teks dan dokumen berdampingan, menemukan perbedaan, dan mengedit hasilnya. Periksa revisi dokumen, tinjau spreadsheet dari pemasok, atau isi bagian kosong tercetak pada PDF yang didukung — lalu unduh atau cetak pekerjaan Anda.
 
 BANDINGKAN, EDIT, SIMPAN
 1. Buka ekstensi dan pilih dua file untuk dibandingkan, atau gunakan Edit & export untuk satu file.

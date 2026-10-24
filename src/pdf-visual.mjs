@@ -327,7 +327,7 @@ export async function renderReflowedPdf(entries, {signal, pageSize} = {}) {
     if(index%25===24)await new Promise(resolve=>setTimeout(resolve,0));
   }
   if(!page)newPage();
-  output.setTitle('Edited document');output.setCreator('Compare These Texts');output.setProducer('Compare These Texts');
+  output.setTitle('Edited document');output.setCreator('Compare Two Texts');output.setProducer('Compare Two Texts');
   abort(signal);return output.save();
 }
 

@@ -43,7 +43,7 @@ def build():
     revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "--", "."], cwd=ROOT, text=True).strip())
     record = {
-        "product": "Compare These Texts",
+        "product": "Compare Two Texts",
         "version": release["version"],
         "source_commit": revision,
         "source_dirty": dirty,
