@@ -59,7 +59,10 @@ try {
   await tables.locator('#home-help-open').click();
   await tables.locator('#demo-tables').click();
   await tables.locator('.sheet-review .sheet-grid').first().waitFor();
-  await tables.locator('#visual-review').evaluate(node => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY));
+  await tables.locator('#visual-review').evaluate(node => {
+    const header=document.querySelector('header');
+    window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY - (header?.getBoundingClientRect().height || 0) - 16);
+  });
   await screenshot(tables, 'screenshot-tables-1280x800.png');
 
   const editing = await appPage();
