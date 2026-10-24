@@ -252,11 +252,14 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     }
     panel.append(heading); if(single){panel.hidden=side==='right';heading.querySelector('.letter').hidden=true;menu.hidden=true;}
     if (models[side]?.headersFooters?.length) {
-      const note=el('p','Body text only. Headers/footers kept unchanged, not compared. PDF includes supported headers/footers.','docx-coverage-note');
+      const complexLayout=models[side].headersFooters.some(part=>part.complexLayout);
+      const pdfLimitation='PDF export is unavailable for text boxes in headers or footers. Download Word (.docx) to preserve their layout.';
+      if(complexLayout&&outputFormat){const option=outputFormat.querySelector('option[value="pdf"]');option.disabled=true;option.title=pdfLimitation;}
+      const note=el('p',complexLayout?pdfLimitation:'Body text only. Headers/footers kept unchanged, not compared. PDF includes supported headers/footers.','docx-coverage-note');
       note.dataset.docxPeripheralNote=side;
       const details=el('details',undefined,'docx-peripheral-parts');details.dataset.docxPeripheral=side;
       details.append(el('summary','Headers and footers — read-only, not compared'));
-      details.append(el('p','Only the main body is compared and edited. Headers and footers are kept unchanged in Word downloads. PDF includes text headers/footers and recalculates page numbers; pagination may differ from Word. Preview before downloading.'));
+      details.append(el('p',complexLayout?'Only the main body is compared and edited. Header and footer text is listed below; their original text boxes are kept unchanged in Word downloads.':'Only the main body is compared and edited. Headers and footers are kept unchanged in Word downloads. PDF includes text headers/footers and recalculates page numbers; pagination may differ from Word. Preview before downloading.'));
       const counts={header:0,footer:0};
       for(const part of models[side].headersFooters){
         details.append(el('strong',`${part.kind==='header'?'Header':'Footer'} ${++counts[part.kind]}`));

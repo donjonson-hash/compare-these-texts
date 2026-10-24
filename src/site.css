@@ -137,3 +137,6 @@ body.home-mode{background:#f8faf9}
 .single-mode.single-document-open:not(.single-source-open) #single-session:not(.session-error),
 .single-mode.single-document-open .single-local-note{display:none!important}
 @media(max-width:650px){.single-document-bar{flex-wrap:wrap}.single-document-bar #single-source-toggle{margin-left:auto}}
+
+.single-document-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-left:auto}
+@media(max-width:650px){.single-document-actions{width:100%}.single-document-actions .button{flex:1}}

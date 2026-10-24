@@ -30,7 +30,7 @@ test('DOCX imports the body, discloses peripheral coverage and preserves every o
  const {report}=await handleRequest('/api/compare',{left:src,right:fixture({header:'Different title'})});assert.equal(report.changed.length,0);assert.equal(report.sources.left.coverage,'main_body_only');
 });
 test('DOCX rejects missing references, active header fields, unsupported objects and unhandled notes',async()=>{
- for(const src of [fixture({ref:'missing'}),fixture({target:'missing.xml'}),fixture({field:'INCLUDETEXT &quot;https://example.org&quot;'}),fixture({headerXml:`<w:hdr xmlns:w="${W}"><w:p><w:r><w:drawing/></w:r></w:p></w:hdr>`}),fixture({extra:{'word/footnotes.xml':`<w:footnotes xmlns:w="${W}"/>`}})])await assert.rejects(()=>readTextSource(src),/header|footer|footnote/i);
+ for(const src of [fixture({ref:'missing'}),fixture({target:'missing.xml'}),fixture({field:'INCLUDETEXT &quot;https://example.org&quot;'}),fixture({headerXml:`<w:hdr xmlns:w="${W}"><w:p><w:r><w:drawing/></w:r></w:p></w:hdr>`}),fixture({extra:{'word/footnotes.xml':`<w:footnotes xmlns:w="${W}"><w:footnote w:id="1"><w:p><w:r><w:t>Real note</w:t></w:r></w:p></w:footnote></w:footnotes>`}})])await assert.rejects(()=>readTextSource(src),/header|footer|footnote/i);
  const external=fixture({target:'header1.xml" TargetMode="External'});await assert.rejects(()=>readTextSource(external),/external relationships/);
 });
 test('inherited list-level hints do not prevent importing unnumbered styled paragraphs',async()=>{

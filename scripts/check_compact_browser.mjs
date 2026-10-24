@@ -7,6 +7,8 @@ import {fileURLToPath} from 'node:url';
 import {createServer} from 'node:http';
 import {peripheralFixture} from '../tests/fixtures/docx-headers-fixture.mjs';
 import {docx} from '../tests/fixtures/text-fixture.mjs';
+import {emptyNotesFixture} from '../tests/fixtures/docx-empty-notes-fixture.mjs';
+import {textboxFixture} from '../tests/fixtures/docx-textbox-fixture.mjs';
 import {unzipDocument} from '../src/text-zip.mjs';
 
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -217,17 +219,22 @@ try {
       const [download] = await Promise.all([page.waitForEvent('download'), single.locator('[data-save-side="left"]').click()]);
       return readFile(await download.path());
     };
+    const openNewSingle = async file => {
+      const [chooser]=await Promise.all([page.waitForEvent('filechooser'),page.locator('#single-new-document').click()]);
+      await chooser.setFiles(file);
+    };
     const singleEdited = await downloadSingle();
     assert.notDeepEqual(singleEdited, original, 'standalone edit changes the document');
     assert.ok(await page.locator('#single-source-panel').isHidden(),'opening a document hides the upload and introductory area');
     assert.ok(await page.locator('#single-session').isHidden(),'routine saved-work details stay out of the document view');
     await page.locator('#single-source-toggle').click();
     assert.ok(await page.locator('#single-source-panel').isVisible(),'Document options reveals source controls');
+    await page.locator('#single-source-toggle').click();
     dismissNextDialog=true;
-    await page.locator('#single-file').setInputFiles({name:'cancelled.txt',mimeType:'text/plain',buffer:Buffer.from('Do not replace the edited document.')});
+    await openNewSingle({name:'cancelled.txt',mimeType:'text/plain',buffer:Buffer.from('Do not replace the edited document.')});
     await page.waitForFunction(()=>!document.getElementById('single-file').disabled);
     assert.deepEqual(await downloadSingle(),singleEdited,'cancelling replacement retains the edited document');
-    await page.locator('#single-source-toggle').click();
+    assert.ok(await page.locator('#single-source-panel').isHidden(),'the direct file picker does not expand the introductory form');
 
     await page.locator('#workspace-home').click();
     await page.locator('#start-menu').waitFor({state:'visible'});
@@ -236,6 +243,11 @@ try {
     await page.locator('#single-file').setInputFiles({name:'legacy.doc',mimeType:'application/msword',buffer:Buffer.from('unsupported legacy file')});
     assert.match(await page.locator('#single-notice').innerText(), /\.doc.*not supported/);
     assert.deepEqual(await downloadSingle(), singleEdited, 'rejecting legacy DOC preserves the open document');
+    await openNewSingle({name:'invalid.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from('invalid package')});
+    await page.waitForFunction(()=>document.getElementById('single-notice').textContent.includes('Could not open “invalid.docx”'));
+    assert.match(await page.locator('#single-notice').innerText(),/Your current document is still open/);
+    assert.deepEqual(await downloadSingle(),singleEdited,'a failed new document leaves the existing edits downloadable');
+
     await single.getByRole('button',{name:'Undo edit',exact:true}).click();
     assert.deepEqual(await downloadSingle(), original, 'standalone Undo survives Home navigation');
     await single.locator('[data-download-format="left"]').selectOption('pdf');
@@ -298,7 +310,7 @@ try {
       }
       await dialog.getByRole('button',{name:'Back to editing',exact:true}).click();
     };
-    await page.locator('#single-file').setInputFiles(headerFile);
+    await openNewSingle(headerFile);
     await page.waitForFunction(() => document.getElementById('single-current').textContent === 'with-headers.docx');
     await checkHeaderPdf(single,'left','word-headers-single-preview.png');
     await page.locator('#workspace-home').click();
@@ -401,6 +413,24 @@ try {
     assert.equal(await page.locator('#single-current').evaluate(node=>node===document.activeElement),true,'restoring focuses the document heading');
     assert.deepEqual(await unzipDocument(await downloadSingle()),await unzipDocument(reviewFile.buffer),'restoring retains the exact document');
     await page.screenshot({path:path.join(output,'document-first-editor.png'),animations:'disabled'});
+    const notesFile={name:'word-template.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from(emptyNotesFixture().data,'base64')};
+    await openNewSingle(notesFile);
+    await page.waitForFunction(()=>document.getElementById('single-current').textContent==='word-template.docx');
+    assert.deepEqual(await unzipDocument(await downloadSingle()),await unzipDocument(notesFile.buffer),'Word boilerplate notes survive a real new-document upload and download');
+    const textboxFile={name:'word-textboxes.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from(textboxFixture().data,'base64')};
+    await openNewSingle(textboxFile);
+    await page.waitForFunction(()=>document.getElementById('single-current').textContent==='word-textboxes.docx');
+    assert.ok(await single.locator('[data-download-format="left"] option[value="pdf"]').isDisabled(),'complex header layout explains unavailable PDF instead of dropping it');
+    assert.deepEqual(await unzipDocument(await downloadSingle()),await unzipDocument(textboxFile.buffer),'supported Word template parts survive a new-document upload and download');
+    await openNewSingle({name:'new-table.csv',mimeType:'text/csv',buffer:Buffer.from('Item;Quantity\nApple;3')});
+    await page.locator('#single-options').waitFor({state:'visible'});
+    assert.ok(await page.locator('#single-source-panel').isVisible(),'the direct file picker reveals required CSV settings');
+    assert.equal(await page.locator('#single-delimiter').inputValue(),';');
+    await page.locator('#single-open').click();
+    await page.waitForFunction(()=>document.getElementById('single-current').textContent==='new-table.csv');
+    assert.ok(await page.locator('#single-source-panel').isHidden(),'CSV settings close after opening the new document');
+    assert.equal((await downloadSingle()).toString(),'Item;Quantity\nApple;3');
+
     await page.locator('#single-source-toggle').click();
     await page.locator('#single-session summary').click();
     await page.locator('#single-session-delete').click();
