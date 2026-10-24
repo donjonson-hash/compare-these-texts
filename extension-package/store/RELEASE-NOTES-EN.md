@@ -1,9 +1,18 @@
-# Compare Two Texts 0.37.1 — submission notes
+# Compare Two Texts 0.37.2 — submission notes
 
 This package prepares the current extension for Chrome Web Store review. It is
 not a claim that the listing is published or approved.
 
-## Fixes completed in this audit
+## Changes in 0.37.2
+
+- Replaced the vague Tools & info entry with **All tools** and three labeled
+  sections: **Review & edit**, **Files & settings** and **Reports**.
+- Kept document comparison controls compact while making existing tools easier
+  to locate. Document processing and export capabilities are unchanged.
+- Corrected welcome and submission instructions to describe **Undo** accurately.
+  There is no application-level Redo command in this release.
+
+## Retained from the preceding audit
 
 - Preserved PDF link annotations in Chrome 120–125 with a local URL.parse compatibility fallback.
 - Updated welcome guidance for single-document editing and PDF preview.
@@ -30,4 +39,4 @@ files must be saved as `.docx` first. No OCR or remote AI service is included.
 
 See `VERIFICATION.md` and the packaged checksums for the final build's audit
 results. This note lists features included in the candidate; it does not imply
-that every feature was introduced by the 0.37.1 patch alone.
+that every feature was introduced by the 0.37.2 patch alone.

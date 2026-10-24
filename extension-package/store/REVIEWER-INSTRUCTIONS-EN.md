@@ -1,4 +1,4 @@
-# Reviewer instructions — Compare Two Texts 0.37.1
+# Reviewer instructions — Compare Two Texts 0.37.2
 
 No account, sign-in, payment, API key or external AI service is required. The
 editor and welcome page are in English. Synthetic examples are built in, so
@@ -17,11 +17,27 @@ review does not require private documents.
 1. From the home screen, open **Help → Try document editing**.
 2. Inspect the two synthetic documents side by side. Select a highlighted change
    or use difference navigation. Edit a supported paragraph on one side.
-3. Use **Undo**, then **Redo**. Download the edited DOCX from that side's
-   download controls. The downloaded document should contain the chosen edit.
+3. Use **Undo** to restore the previous text. Apply the edit again manually,
+   then download the DOCX from that side's download controls. The downloaded
+   document should contain the chosen edit.
 4. Select **PDF** for that Word document and open **Preview PDF**. Inspect the
    preview, select **Download PDF**, then **Back to editing**. The source remains
    editable after PDF export.
+
+## Find additional tools
+
+In a document comparison, open **All tools** next to difference navigation.
+Choose a labeled section:
+
+- **Review & edit**: find/replace, step-by-step review, amounts/percentages,
+  zoom, whole-document copying and restoration of the originals.
+- **Files & settings**: source files, comparison settings and saved-work controls.
+- **Reports**: explanatory summaries and available report downloads.
+
+The tab labels identify the tools without expanding the main document header.
+Close the tools window to return to the document. **Wording & style** opens
+stylistic observations separately where available. Undo is supported; an
+application-level Redo command is not included.
 
 ## Compare tables
 

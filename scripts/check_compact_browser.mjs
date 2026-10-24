@@ -66,18 +66,29 @@ try {
     assert.ok(await page.locator('.visual-navigation').isVisible(), 'difference navigation remains available');
     const tools = page.locator('dialog.workspace-tools-dialog');
     const toolsButton = page.locator('[data-workspace-tools-open]');
-    const openTools = async () => {if (!await tools.evaluate(element => element.open)) await toolsButton.click();};
+    const openTools = async (section = 'Review & edit') => {if (!await tools.evaluate(element => element.open)) await toolsButton.click(); await tools.getByRole('tab', {name:section,exact:true}).click();};
     const closeTools = async () => {if (await tools.evaluate(element => element.open)) await page.locator('[data-workspace-tools-close]').click();};
     assert.ok(await tools.isHidden(), 'secondary information starts hidden');
     for (const selector of ['#saved-session', '.work-mode-switch', '#source-picker', '.review-flow', '#office-open']) {
       assert.ok(await page.locator(selector).isHidden(), `${selector} does not occupy the comparison header`);
     }
     await openTools();
-    assert.ok(await page.locator('#saved-session').isVisible(), 'saved status remains accessible in Tools & info');
+    const reviewTab=tools.getByRole('tab',{name:'Review & edit',exact:true});
+    await reviewTab.focus();
+    await page.keyboard.press('End');
+    assert.equal(await tools.getByRole('tab',{name:'Reports',exact:true}).getAttribute('aria-selected'),'true','End opens the reports section');
+    assert.ok(await page.locator('#office-open').isVisible(),'explanations remain available in Reports');
+    assert.ok(await page.locator('#source-picker').isHidden(),'other sections do not clutter Reports');
+    await page.keyboard.press('Home');
+    assert.equal(await reviewTab.getAttribute('aria-selected'),'true','Home returns to review tools');
+    assert.ok(await tools.getByRole('button',{name:'Find & replace',exact:true}).isVisible(),'find and replace has a visible entry');
+    await page.screenshot({path:path.join(output,'all-tools-review.png'),animations:'disabled'});
+    await openTools('Files & settings');
+    assert.ok(await page.locator('#saved-session').isVisible(), 'saved status remains accessible in Files & settings');
     await page.keyboard.press('Escape');
     await tools.waitFor({state:'hidden'});
     assert.equal(await toolsButton.evaluate(element => document.activeElement === element), true, 'Escape returns keyboard focus to the tools button');
-    await openTools();
+    await openTools('Files & settings');
     const sourcePicker = page.locator('#source-picker');
     assert.equal(await sourcePicker.evaluate(element => element.open), false, 'loaded source controls start collapsed');
     await sourcePicker.locator(':scope > summary').click();
@@ -87,13 +98,14 @@ try {
     await sessionDetails.locator(':scope > summary').click();
     assert.ok(await page.locator('#session-delete').isVisible(), 'saved-work deletion remains accessible');
     await sessionDetails.locator(':scope > summary').click();
+    await openTools();
     const more = tools.locator('details.compact-review-tools');
-    await more.locator(':scope > summary').click();
+    if (!await more.evaluate(element => element.open)) await more.locator(':scope > summary').click();
     const help = more.locator('details.visual-help');
     await help.locator(':scope > summary').click();
     assert.match(await help.innerText(), /Click any text|Highlights/);
     assert.ok(await help.locator('.visual-instruction').isVisible(), 'review instructions remain discoverable');
-    await more.locator(':scope > summary').click();
+    if (await more.evaluate(element => element.open)) await more.locator(':scope > summary').click();
     await closeTools();
     const original = await downloadB();
 
@@ -110,7 +122,7 @@ try {
     assert.deepEqual(await downloadB(), original, 'review/undo preserves the original download');
 
     await openTools();
-    await more.locator(':scope > summary').click();
+    if (!await more.evaluate(element => element.open)) await more.locator(':scope > summary').click();
     await page.locator('[data-action="copy-all-right"]').click();
     await tools.waitFor({state:'hidden'});
     assert.equal(await more.evaluate(element => element.open), false, 'More closes after applying an action');
@@ -149,7 +161,7 @@ try {
     await saved();
     assert.deepEqual(await downloadB(), original, 'document Undo remains available');
 
-    await openTools();
+    await openTools('Files & settings');
     await page.locator('[data-work-mode="single"]').click();
     await page.locator('#single-workspace').waitFor({state:'visible'});
     assert.ok(await page.locator('.work-mode-switch').isVisible(), 'mode controls return to the page when leaving comparison');
@@ -197,7 +209,7 @@ try {
     assert.deepEqual(await downloadB(), original, 'PDF conversion preserves the editable Word document');
     // Replacing a source destroys the old review. Its relocated file controls
     // must survive, then join the new tools window without duplicate IDs.
-    await openTools();
+    await openTools('Files & settings');
     await sourcePicker.locator(':scope > summary').click();
     const replacement = 'Replacement document for the popup lifecycle check.\n';
     await page.locator('#right-file').setInputFiles({name:'replacement-B.txt',mimeType:'text/plain',buffer:Buffer.from(replacement)});

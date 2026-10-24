@@ -16,7 +16,8 @@
     const nodes = [$('saved-session'), document.querySelector('.work-mode-switch'), $('source-picker'), $('results').querySelector('.result-heading .downloads')].filter(Boolean);
     const homes = nodes.map(node => {
       const marker = document.createComment('workspace control home');
-      node.before(marker); host.append(node); return {node, marker};
+      const target = node.classList.contains('downloads') ? review.workspaceReportsHost || host : host;
+      node.before(marker); target.append(node); return {node, marker};
     });
     document.body.classList.add('popup-mode');
     // A failed autosave must remain visible even while the tools window is closed.

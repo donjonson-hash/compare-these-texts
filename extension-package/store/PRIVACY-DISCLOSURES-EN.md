@@ -1,4 +1,4 @@
-# Chrome Web Store privacy fields — Compare Two Texts 0.37.1
+# Chrome Web Store privacy fields — Compare Two Texts 0.37.2
 
 Prepared 24 October 2026 against the packaged extension's local processing and
 storage behavior. These are submission answers, not evidence that the Chrome

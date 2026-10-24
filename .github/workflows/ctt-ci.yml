@@ -48,4 +48,5 @@ jobs:
           path: |
             dist/
             artifacts/
+            test-output/compact/*.png
           if-no-files-found: error
