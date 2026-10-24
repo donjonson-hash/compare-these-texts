@@ -59,7 +59,7 @@ try {
   await tables.locator('#home-help-open').click();
   await tables.locator('#demo-tables').click();
   await tables.locator('.sheet-review .sheet-grid').first().waitFor();
-  await tables.locator('#visual-review').evaluate(node => {
+  await tables.locator('#results').evaluate(node => {
     const header=document.querySelector('header');
     window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY - (header?.getBoundingClientRect().height || 0) - 16);
   });
