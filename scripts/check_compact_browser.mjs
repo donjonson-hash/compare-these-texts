@@ -5,6 +5,7 @@ import {readFile, mkdir, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createServer} from 'node:http';
+import {peripheralFixture} from '../tests/fixtures/docx-headers-fixture.mjs';
 
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -32,14 +33,15 @@ try {
   const context = await browser.newContext({viewport:{width:1360,height:900},acceptDownloads:true});
   const page = await context.newPage();
   page.on('pageerror', error => errors.push(error.message));
-  page.on('dialog', dialog => dialog.accept());
+  let dismissNextDialog = false;
+  page.on('dialog', dialog => {if (dismissNextDialog) {dismissNextDialog = false; void dialog.dismiss();} else void dialog.accept();});
   page.on('request', request => {if (/^https?:/.test(request.url()) && new URL(request.url()).origin !== origin) externalRequests.push(request.url());});
-  const ready = () => page.locator('.visual-review [data-save-side="right"]').waitFor({state:'visible'});
+  const ready = () => page.locator('#visual-review [data-save-side="right"]').waitFor({state:'visible'});
   const saved = () => page.waitForFunction(() => document.getElementById('session-status')?.textContent.includes('Saved in this browser'));
   const downloadB = async () => {
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.locator('[data-save-side="right"]').click(),
+      page.locator('#visual-review [data-save-side="right"]').click(),
     ]);
     return readFile(await download.path());
   };
@@ -108,8 +110,29 @@ try {
     assert.notDeepEqual(edited, original, 'the relocated transfer action edits the downloaded document');
     await page.locator('#workspace-home').click();
     await page.locator('#start-menu').waitFor({state:'visible'});
-    assert.ok(await page.locator('#compare-workspace').isHidden(), 'Home shows the start menu instead of the editor');
+    assert.ok(await page.locator('#compare-workspace').isHidden(), 'Home shows uploads instead of the editor');
+    assert.ok(await page.locator('#home-left-drop').isVisible(), 'Home exposes the first new-file upload');
+    assert.ok(await page.locator('#home-right-drop').isVisible(), 'Home exposes the second new-file upload');
+    assert.ok(await page.locator('#start-new-compare').isDisabled(), 'a new comparison requires a complete new pair');
     await page.screenshot({path:path.join(output,'home-menu.png'),animations:'disabled'});
+    await page.setViewportSize({width:375,height:812});
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Home uploads fit a narrow viewport');
+    await page.screenshot({path:path.join(output,'home-menu-mobile.png'),animations:'disabled'});
+    await page.setViewportSize({width:1360,height:900});
+    await page.locator('#home-left-file').setInputFiles({name:'legacy.doc',mimeType:'application/msword',buffer:Buffer.from('legacy')});
+    assert.match(await page.locator('#home-notice').innerText(), /\.doc.*not supported/);
+    assert.ok(await page.locator('#start-new-compare').isDisabled(), 'unsupported DOC cannot replace existing work');
+    const newA = 'New reference document.\n', newB = 'New revised document.\n';
+    await page.locator('#home-left-file').setInputFiles({name:'new-A.txt',mimeType:'text/plain',buffer:Buffer.from(newA)});
+    await page.locator('#home-right-file').setInputFiles({name:'broken.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from('not a DOCX archive')});
+    await page.locator('#start-new-compare').click();
+    await page.locator('#home-notice.error').waitFor({state:'visible'});
+    assert.ok(await page.locator('#start-menu').isVisible(), 'failed parsing leaves the new-file screen open');
+    await page.locator('#home-right-file').setInputFiles({name:'new-B.txt',mimeType:'text/plain',buffer:Buffer.from(newB)});
+    dismissNextDialog = true;
+    await page.locator('#start-new-compare').click();
+    await page.waitForFunction(() => !document.getElementById('start-new-compare').disabled);
+    assert.ok(await page.locator('#start-menu').isVisible(), 'cancelling replacement keeps the old work');
     await page.locator('#start-compare').click();
     await ready();
     assert.deepEqual(await downloadB(), edited, 'Home and Continue preserve edited comparison bytes');
@@ -143,7 +166,7 @@ try {
     // A native Tools dialog used to stay open over the PDF preview launched
     // from the completed review, leaving its Download PDF button inert.
     await page.locator('[data-download-format="right"]').selectOption('pdf');
-    assert.equal(await page.locator('[data-save-side="right"]').innerText(), 'Preview PDF B');
+    assert.equal(await page.locator('#visual-review [data-save-side="right"]').innerText(), 'Preview PDF B');
     await openTools();
     await page.locator('[data-review-action="start"]').click();
     for (let index = 0; index < 4; index++) {
@@ -205,6 +228,69 @@ try {
     await singlePdfSave.waitFor({state:'visible'});
     const [singlePdf] = await Promise.all([page.waitForEvent('download'), singlePdfSave.click()]);
     assert.match((await readFile(await singlePdf.path())).subarray(0,8).toString(), /^%PDF-/);
+    await single.getByRole('button', {name:'Back to editing', exact:true}).click();
+    await single.locator('[data-download-format="left"]').selectOption('docx');
+    // Stage a new pair after the earlier reload, visit the editor, then return.
+    // Starting it must never mix a new A with the previous B.
+    await page.locator('#workspace-home').click();
+    await page.locator('#home-left-file').setInputFiles({name:'new-A.txt',mimeType:'text/plain',buffer:Buffer.from(newA)});
+    await page.locator('#home-right-file').setInputFiles({name:'new-B.txt',mimeType:'text/plain',buffer:Buffer.from(newB)});
+    await page.locator('#start-edit').click();
+    await page.locator('#workspace-home').click();
+    await page.locator('#start-new-compare').click();
+    await ready(); await saved();
+    assert.equal((await downloadB()).toString(), newB, 'Home starts the complete new comparison');
+    const [newADownload] = await Promise.all([page.waitForEvent('download'), page.locator('#visual-review [data-save-side="left"]').click()]);
+    assert.equal((await readFile(await newADownload.path())).toString(), newA, 'both sides come from the staged new pair');
+    assert.ok(await page.locator('#start-menu').isHidden(), 'successful new comparison leaves Home');
+    await page.locator('#workspace-home').click();
+    await page.locator('#start-edit').click();
+    assert.deepEqual(await downloadSingle(), original, 'starting a new comparison preserves the separate single-document workspace');
+    // Reproduce the reported Word export restriction with real header/footer parts.
+    const headerFile = {name:'with-headers.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from(peripheralFixture().data,'base64')};
+    const checkHeaderPdf = async (host, side, screenshot) => {
+      const select = host.locator(`[data-download-format="${side}"]`);
+      await select.waitFor({state:'visible'});
+      assert.equal(await select.locator('option[value="pdf"]').isDisabled(), false, 'text headers/footers do not disable PDF');
+      await select.selectOption('pdf');
+      await host.locator(`[data-save-side="${side}"]`).click();
+      const dialog = host.locator('.document-pdf-dialog');
+      await dialog.locator('.primary:not([disabled])').waitFor({state:'visible'});
+      assert.match(await dialog.locator('.document-pdf-nav').innerText(), /1 \/ 3/);
+      await page.screenshot({path:path.join(output,screenshot),animations:'disabled'});
+      const [download] = await Promise.all([page.waitForEvent('download'), dialog.getByRole('button',{name:'Download PDF',exact:true}).click()]);
+      const bytes = await readFile(await download.path());
+      assert.match(bytes.subarray(0,8).toString(), /^%PDF-/);
+      const texts = await page.evaluate(async bytes => {
+        const {getDocument} = await import('/pdf-reader-vendor.mjs');
+        const loading = getDocument({data:new Uint8Array(bytes),isEvalSupported:false});
+        try {
+          const pdf = await loading.promise, result = [];
+          for (let number = 1; number <= pdf.numPages; number++) {
+            const text = await (await pdf.getPage(number)).getTextContent();
+            result.push(text.items.map(item => item.str).join(' '));
+          }
+          return result;
+        } finally { await loading.destroy(); }
+      }, [...bytes]);
+      assert.equal(texts.length,3);
+      for (let index=0;index<3;index++) {
+        assert.match(texts[index], /default header/);
+        assert.match(texts[index], new RegExp('default footer — Page '+(index+1)+' of 3'));
+        assert.match(texts[index], new RegExp('Body page '+(index+1)));
+      }
+      await dialog.getByRole('button',{name:'Back to editing',exact:true}).click();
+    };
+    await page.locator('#single-file').setInputFiles(headerFile);
+    await page.waitForFunction(() => document.getElementById('single-current').textContent === 'with-headers.docx');
+    await checkHeaderPdf(single,'left','word-headers-single-preview.png');
+    await page.locator('#workspace-home').click();
+    await page.locator('#home-left-file').setInputFiles(headerFile);
+    await page.locator('#home-right-file').setInputFiles({...headerFile,name:'with-headers-B.docx'});
+    await page.locator('#start-new-compare').click();
+    await ready();
+    await checkHeaderPdf(page.locator('#visual-review'),'right','word-headers-comparison-preview.png');
+
 
   }
   assert.deepEqual(errors, [], 'no uncaught page errors');

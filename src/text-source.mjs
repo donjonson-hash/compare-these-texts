@@ -255,7 +255,7 @@ export async function readTextSource(item) {
     notes.push("Each TXT line is a separate block, including empty lines. One final newline marks the end of the last line and does not create an extra block.");
   } else {
     const checked = await readDocxPackage(raw); texts = checked.texts; locations = checked.structure.locations; headerFooterCount = checked.headersFooters.length;
-    if (headerFooterCount) notes.push('DOCX: only the main body is compared and edited. Headers, footers, and page-number fields are shown read-only and preserved in DOCX downloads; they are not compared. PDF export is unavailable for this document.');
+    if (headerFooterCount) notes.push('DOCX: only the main body is compared and edited. Headers, footers, and page-number fields are shown read-only and preserved in DOCX downloads; they are not compared. PDF includes supported text headers and footers with recalculated page numbers.');
     notes.push("Each main DOCX paragraph is a separate block, including empty paragraphs. Soft line breaks and tabs are preserved; displayed page numbers, styles, and formatting settings are not compared.");
     notes.push("Content hidden by formatting in the main paragraphs is included in the extracted text. File properties and the document thumbnail are not compared.");
     if (checked.structure.hasTables) notes.push("Table text is read by row and cell. Merged cells and formatting are preserved in the DOCX; cell content is compared.");
