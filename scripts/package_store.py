@@ -31,6 +31,14 @@ def main():
     files['FULL-DESCRIPTION-EN.txt'] = files['descriptions/en.txt']
     files['CWS-LOCALIZATIONS.md'] = (ROOT / 'docs/CWS-LOCALIZATIONS.md').read_bytes()
     files['VERIFICATION.md'] = (ROOT / 'docs/STORE-KIT-VERIFICATION.md').read_bytes()
+    storage_proof = (ROOT / 'test-output/encrypted-storage-check.json').read_bytes()
+    storage_check = json.loads(storage_proof)
+    assert storage_check['passed'] is True and storage_check['mode'] == 'extension', 'Run the installed-extension storage check before packaging'
+    assert storage_check['version'] == VERSION, 'Storage check belongs to another release'
+    assert storage_check['extension_sha256'] == hashlib.sha256(files[f'ctt-chrome-{VERSION}.zip']).hexdigest(), 'Storage check belongs to a different installation ZIP'
+    assert not storage_check['externalRequests'], 'Offline check made external requests'
+    assert {'encrypted-comparison-indexeddb', 'encrypted-legacy-migration-indexeddb', 'encrypted-single-indexeddb', 'encrypted-browser-restart'} <= set(storage_check['checks']), 'Missing encrypted storage browser checks'
+    files['ENCRYPTED-STORAGE-CHECK.json'] = storage_proof
     for path in sorted(STORE.glob('*.md')):
         files[path.name] = path.read_bytes()
     files['TITLE-EN.txt'] = (catalog['en']['name'] + '\n').encode()
@@ -42,7 +50,8 @@ def main():
         '4. Полное описание: FULL-DESCRIPTION-EN.txt; переводы: descriptions/.\n'
         '5. Иконка магазина: icon128.png. Пять screenshot-*.png и два promo-*.png готовы для загрузки.\n'
         '6. Welcome page уже внутри ZIP расширения и открывается при первой установке.\n'
-        '7. AUDIT-RESULTS.json, VERIFICATION.md и SHA256SUMS.txt описывают проверку и точные файлы.\n\n'
+        '7. Шифрование черновиков AES-GCM-256 включено автоматически. Старые черновики переносятся при открытии.\n'
+        '8. AUDIT-RESULTS.json, ENCRYPTED-STORAGE-CHECK.json, VERIFICATION.md и SHA256SUMS.txt описывают проверки и точные файлы.\n\n'
         'Комплект не отправлен на модерацию. Настройки аккаунта и финальная отправка выполняются владельцем в кабинете.\n').encode()
     images = {
         'screenshot-documents-1280x800.png': (1280, 800),
@@ -72,7 +81,7 @@ def main():
         files[f'icons/{name}'] = data
     files['icon128.png'] = files['icons/icon-store-128.png']
     provenance = json.loads((ROOT / 'dist/release/provenance.json').read_text())
-    files['AUDIT-RESULTS.json'] = (json.dumps({'version': VERSION, 'source_commit': provenance['source_commit'], 'source_dirty': provenance['source_dirty'], 'capture_browser': capture['browser'], 'checks': {'archive_integrity': 'passed', 'manifest_version_and_root': 'passed', 'welcome_included': 'passed', 'localized_metadata': 'passed', 'screenshots_bound_to_exact_zip': 'passed', 'image_dimensions_and_size_budget': 'passed'}, 'store_submission': 'not_submitted', 'screenshots': list(images)}, indent=2) + '\n').encode()
+    files['AUDIT-RESULTS.json'] = (json.dumps({'version': VERSION, 'source_commit': provenance['source_commit'], 'source_dirty': provenance['source_dirty'], 'capture_browser': capture['browser'], 'checks': {'archive_integrity': 'passed', 'encrypted_storage_in_installed_extension': 'passed', 'encrypted_legacy_migration': 'passed', 'encrypted_browser_restart': 'passed', 'manifest_version_and_root': 'passed', 'welcome_included': 'passed', 'localized_metadata': 'passed', 'screenshots_bound_to_exact_zip': 'passed', 'image_dimensions_and_size_budget': 'passed'}, 'store_submission': 'not_submitted', 'screenshots': list(images)}, indent=2) + '\n').encode()
     files['SHA256SUMS.txt'] = ''.join(f'{hashlib.sha256(data).hexdigest()}  {name}\n' for name, data in sorted(files.items())).encode()
     output = ROOT / 'artifacts'
     output.mkdir(exist_ok=True)

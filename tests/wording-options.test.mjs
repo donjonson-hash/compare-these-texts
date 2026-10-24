@@ -47,6 +47,9 @@ test('stale wording is blocked after selection changes, typing and paragraph swi
 });
 test('Edit & export opens pasted Unicode text through the real entry flow',async t=>{
  const {dom,downloads}=setup(t,await readFile(new URL('../dist/index.html',import.meta.url),'utf8'));Object.defineProperty(document,'currentScript',{value:{src:'https://ctt.example/single-entry.js'},configurable:true});
+ // No IndexedDB is installed in this DOM fixture; acknowledge the guard for
+ // an unreadable previous draft before continuing without saved-work storage.
+ window.confirm=message=>{assert.match(message,/Open .* instead/);return true;};
  const script=new Script(await readFile(new URL('../dist/single-entry.js',import.meta.url),'utf8'),{importModuleDynamically:specifier=>specifier.endsWith('single-session.mjs')?import('../dist/single-session.mjs'):import('../dist/single-editor.mjs')});script.runInContext(dom.getInternalVMContext());
  document.querySelector('[data-work-mode="single"]').click();document.getElementById('single-paste').open=true;document.getElementById('single-paste-text').value='We utilize 25 units.\nПривет 👋';document.getElementById('single-paste-open').click();await until(()=>document.querySelector('[data-save-side="left"]'));assert.equal(document.getElementById('single-current').textContent,'pasted-text.txt');assert.equal(document.getElementById('single-paste').open,false);assert.match(document.querySelector('[data-wording-review]').textContent,/1 matching expression/);assert.equal(document.activeElement,document.getElementById('single-current'));assert.equal(document.querySelector('.wording-review-dialog').open,false);
  document.querySelector('[data-save-side="left"]').click();await until(()=>downloads.length===1);assert.equal(await downloads[0].text(),'We utilize 25 units.\nПривет 👋\n');window.dispatchEvent(new window.Event('pagehide'));

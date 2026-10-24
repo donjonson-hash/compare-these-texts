@@ -49,4 +49,5 @@ jobs:
             dist/
             artifacts/
             test-output/compact/*.png
+            test-output/encrypted-storage-check.json
           if-no-files-found: error

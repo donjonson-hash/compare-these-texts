@@ -54,6 +54,9 @@ test('single-sheet pending input survives cell selection, undo, original export 
 });
 test('real mode switch opens one CSV, retains work on mode changes and keeps it after failed replacement',async t=>{
  const html=await readFile(new URL('../dist/index.html',import.meta.url),'utf8'),{dom,downloads}=setup(t,html);Object.defineProperty(document,'currentScript',{value:{src:'https://ctt.example/single-entry.js'},configurable:true});
+ // This DOM fixture has no IndexedDB. Explicitly accept opening a document
+ // while the app cannot determine whether an older draft exists.
+ window.confirm=message=>{assert.match(message,/Open .* instead/);return true;};
  const script=new Script(await readFile(new URL('../dist/single-entry.js',import.meta.url),'utf8'),{importModuleDynamically:specifier=>specifier.endsWith('single-session.mjs')?import('../dist/single-session.mjs'):import('../dist/single-editor.mjs')});script.runInContext(dom.getInternalVMContext());
  document.querySelector('[data-work-mode="single"]').click();assert.equal(document.getElementById('single-workspace').hidden,false);assert.equal(document.getElementById('compare-workspace').hidden,true);
  async function load(name,text){const file={name,size:Buffer.byteLength(text),arrayBuffer:async()=>new TextEncoder().encode(text).buffer},field=document.getElementById('single-file');Object.defineProperty(field,'files',{value:[file],configurable:true});field.dispatchEvent(new window.Event('change'));}

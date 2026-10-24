@@ -1,4 +1,4 @@
-# Chrome Web Store privacy fields — Compare Two Texts 0.37.3
+# Chrome Web Store privacy fields — Compare Two Texts 0.37.4
 
 Prepared 24 October 2026 against the packaged extension's local processing and
 storage behavior. These are submission answers, not evidence that the Chrome
@@ -24,7 +24,7 @@ The extension declares no required or optional API permissions, host permissions
 
 The extension handles document names and contents that the user chooses to open, paste or edit, including text, tables and supported images. It uses this information locally to compare versions, apply edits, show previews and generate downloads. Documents may contain personal or other sensitive information chosen by the user; the extension does not independently request or extract account credentials, health profiles, browsing history or advertising identifiers.
 
-Comparison and single-document drafts are saved separately in local browser storage. They can contain original files, edits, supported undo history and view settings. Saved work expires after seven days without opening or saving it and is removed when the app is next opened. The user can delete saved work in the app. Website and extension drafts are separate and do not sync. Downloaded files remain where the user saves them until the user deletes them.
+Comparison and single-document drafts are saved separately in local browser storage. Their full document payloads are encrypted with AES-GCM-256 before persistence, using a fresh nonce and a non-extractable key stored in the local browser profile. Revision identifiers and activity/expiry timestamps are not encrypted. The local key enables password-free resume and does not protect against code running in an unlocked profile. Downloaded documents are not encrypted by this feature. Valid older drafts are migrated when loaded; a migration failure preserves the old record and displays an error. They can contain original files, edits, supported undo history and view settings. Saved work expires after seven days without opening or saving it and is removed when the app is next opened. The user can delete saved work in the app, removing both the encrypted payload and its stored key. Website and extension drafts are separate and do not sync. Downloaded files remain where the user saves them until the user deletes them.
 
 Document data is not transmitted to the developer, a comparison server or an AI service. There is no analytics or diagnostic telemetry, no advertising use and no sale of document data. Opening the public website or GitHub support is optional. Information a user voluntarily submits to GitHub is handled there under GitHub's policy; public issue reports are visible to others.
 

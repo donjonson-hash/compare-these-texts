@@ -1,4 +1,4 @@
-# Compare Two Texts 0.37.3 — final store audit
+# Compare Two Texts 0.37.4 — final store audit
 
 Prepared October 24, 2026. This kit is a Chrome Web Store submission candidate;
 it is not a store approval or a submitted listing.
@@ -28,9 +28,35 @@ compact. Welcome and submission instructions no longer promise Redo; the
 application provides Undo only.
 
 Document data, edits and supported undo history are retained locally in separate
-comparison/editor drafts. They expire after seven days without opening or
+comparison/editor drafts, encrypted with AES-GCM-256. They expire after seven days without opening or
 saving; removal occurs when the workspace next opens. Privacy materials state
 local handling explicitly and do not equate it with no data handling.
+
+## Encrypted draft storage in 0.37.4
+
+The complete validated payload (filenames, sources, edits, supported undo history
+and reports) is encrypted before IndexedDB persistence. Each record uses a fresh
+96-bit nonce, a 256-bit non-extractable Web Crypto key and a 128-bit GCM tag.
+Authenticated metadata binds the record to its workspace, schema, ownership
+token, encryption revision and timestamps. Only that metadata remains plaintext.
+
+The key is stored in the same local browser profile for password-free resume.
+This does not protect against code running in an unlocked profile and is not a
+password vault. Deleting/expiring a draft removes its logical record and key;
+forensic erasure from browser disk files or backups is not promised. Downloaded
+documents use their ordinary formats and are not encrypted by this feature.
+
+Valid older drafts migrate on load. Crypto operations run outside IndexedDB
+transactions, followed by an atomic ownership/revision check before writing.
+Failed crypto or storage operations leave the previous record intact. No
+plaintext persistence fallback is allowed. Database version 2 prevents older
+version-1 code from reopening the store and saving plaintext again.
+
+Real Web Crypto tests cover tampering, missing/wrong keys, failed migration,
+quota failures, expiration, concurrent readers/writers/deletion and both draft
+types. The installed-extension check inspects actual IndexedDB records,
+migrates a version-1 fixture, restarts the browser profile and restores document
+downloads. ENCRYPTED-STORAGE-CHECK.json binds that check to the installation ZIP.
 
 ## Release gates
 
@@ -41,7 +67,8 @@ The release pipeline runs the following before producing the downloadable kit:
 - npm run check: manifests, versions, permissions, CSP, local asset closure,
   license/font hashes, JavaScript syntax and both extension ZIPs.
 - REQUIRE_EXTENSION=1 npm run check:extension: actual installed Chromium
-  extension, automatic welcome, offline editing/download and saved work.
+  extension, automatic welcome, offline editing/download, encrypted storage,
+  legacy migration and restoration after a full browser restart.
 - npm run check:compact: comparison, single-document replacement, PDF preview
   and download, navigation and preservation of existing edits.
 - npm run store:assets: five screenshots and two promotional images captured

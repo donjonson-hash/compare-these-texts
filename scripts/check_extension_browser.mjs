@@ -2,7 +2,8 @@
 // own regression suite. REQUIRE_EXTENSION=1 forbids the localhost fallback.
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
-import {mkdtemp, readFile, mkdir, rm} from 'node:fs/promises';
+import {mkdtemp, readFile, writeFile, mkdir, rm} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -26,14 +27,15 @@ const server = createServer(async (request, response) => {
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const localOrigin = `http://127.0.0.1:${server.address().port}`;
+const launchOptions = {
+  ...(process.env.CHROMIUM_EXECUTABLE ? {executablePath: process.env.CHROMIUM_EXECUTABLE} : {channel:'chromium'}),
+  headless: true, viewport: {width:1440, height:1000}, acceptDownloads:true,
+  args:['--no-sandbox', '--disable-gpu', `--disable-extensions-except=${unpacked}`, `--load-extension=${unpacked}`]
+};
 let context;
 const errors = [], externalRequests = [], checks = [];
 try {
-  context = await chromium.launchPersistentContext(path.join(temporary, 'profile'), {
-    ...(process.env.CHROMIUM_EXECUTABLE ? {executablePath: process.env.CHROMIUM_EXECUTABLE} : {channel:'chromium'}),
-    headless: true, viewport: {width:1440, height:1000}, acceptDownloads:true,
-    args:['--no-sandbox', '--disable-gpu', `--disable-extensions-except=${unpacked}`, `--load-extension=${unpacked}`]
-  });
+  context = await chromium.launchPersistentContext(path.join(temporary, 'profile'), launchOptions);
   context.setDefaultTimeout(30000);
   const watch = page => {
     page.on('pageerror', error => errors.push(error.message));
@@ -65,6 +67,35 @@ try {
     const store = await openSessionStore();
     try { return (await store.read()).payload; } finally { store.close(); }
   });
+  const encryptedRow = (page, dbName = 'kristina-review-session') => page.evaluate(async name => {
+    const db = await new Promise((resolve, reject) => {
+      const request = indexedDB.open(name, 2); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
+    });
+    try {
+      const row = await new Promise((resolve, reject) => {
+        const request = db.transaction('session').objectStore('session').get('current');
+        request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
+      });
+      let exportBlocked = false;
+      try { await crypto.subtle.exportKey('raw', row.key); } catch { exportBlocked = true; }
+      return {version: db.version, schema: row.schema, plaintext: Object.hasOwn(row, 'payload'),
+        ciphertextBytes: row.ciphertext?.byteLength, ivBytes: row.iv?.byteLength,
+        keyAlgorithm: row.key?.algorithm?.name, keyBits: row.key?.algorithm?.length,
+        extractable: row.key?.extractable, exportBlocked,
+        serialized: JSON.stringify(row), ciphertext: Array.from(new Uint8Array(row.ciphertext))};
+    } finally { db.close(); }
+  }, dbName);
+  const assertSealed = async (page, draft, dbName) => {
+    const stored = await encryptedRow(page, dbName);
+    assert.equal(stored.version, 2); assert.equal(stored.schema, 2); assert.equal(stored.plaintext, false);
+    assert.ok(stored.ciphertextBytes > 16); assert.equal(stored.ivBytes, 12);
+    assert.equal(stored.keyAlgorithm, 'AES-GCM'); assert.equal(stored.keyBits, 256);
+    assert.equal(stored.extractable, false); assert.equal(stored.exportBlocked, true);
+    for (const src of Object.values(draft.sources || {single:draft.source})) {
+      assert.ok(!stored.serialized.includes(src.name), 'source name is not plaintext in IndexedDB');
+      assert.ok(!Buffer.from(stored.ciphertext).includes(Buffer.from(src.data)), 'source data is not plaintext in IndexedDB');
+    }
+  };
   const downloadB = async page => {
     await page.bringToFront();
     const download = page.waitForEvent('download');
@@ -113,7 +144,8 @@ try {
   const edited = await downloadB(page);
   assert.notDeepEqual(edited, original, 'a supported edit changes the actual downloaded B');
   const storedEdited = await payload(page);
-  checks.push('fresh-example-and-edit');
+  await assertSealed(page, storedEdited);
+  checks.push('fresh-example-and-edit', 'encrypted-comparison-indexeddb');
 
   const popup = context.waitForEvent('page');
   let help;
@@ -142,9 +174,68 @@ try {
   assert.deepEqual(await downloadB(help), original, 'Continue restores the saved document');
   checks.push('saved-work-guard-and-continue');
   await help.screenshot({path:path.join(output, 'welcome-restored-document.png'), fullPage:true});
+  // Upgrade a real version-1 database using only the built-in fictional draft.
+  const migration = await help.evaluate(async legacyPayload => {
+    const name = 'ctt-encryption-upgrade-fixture';
+    const db = await new Promise((resolve, reject) => {
+      const request = indexedDB.open(name, 1);
+      request.onupgradeneeded = () => request.result.createObjectStore('session');
+      request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
+    });
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction('session', 'readwrite');
+      tx.objectStore('session').put({token:'browser-legacy', updatedAt:10, payload:legacyPayload}, 'current');
+      tx.oncomplete = resolve; tx.onabort = () => reject(tx.error);
+    });
+    db.close();
+    const {openSessionStore} = await import('./session-store.mjs');
+    const store = await openSessionStore({dbName:name});
+    try { return await store.read(); } finally { store.close(); }
+  }, storedOriginal);
+  assert.equal(migration.token, 'browser-legacy'); assert.equal(migration.updatedAt, 10);
+  assert.deepEqual(migration.payload, storedOriginal);
+  await assertSealed(help, storedOriginal, 'ctt-encryption-upgrade-fixture');
+  checks.push('encrypted-legacy-migration-indexeddb');
+
+  // Exercise the shared implementation for the single-document workspace too.
+  const singleDraft = {version:1, kind:'single-editor', source:storedOriginal.sources.right,
+    delimiter:',', sheet:null, review:{version:1}};
+  await help.evaluate(async draft => {
+    const {openSingleSessionStore} = await import('./single-session.mjs');
+    const store = await openSingleSessionStore();
+    try { await store.write(draft, (await store.read()).token); } finally { store.close(); }
+  }, singleDraft);
+  await assertSealed(help, singleDraft, 'ctt-single-editor-session');
+  checks.push('encrypted-single-indexeddb');
+
+  // CryptoKeys must survive a real browser process restart, not only a reload.
+  await context.close();
+  context = await chromium.launchPersistentContext(path.join(temporary, 'profile'), launchOptions);
+  context.setDefaultTimeout(30000);
+  context.pages().forEach(watch); context.on('page', watch);
+  context.on('request', request => {
+    if (/^https?:/.test(request.url()) && new URL(request.url()).origin !== localOrigin) externalRequests.push(request.url());
+  });
+  const restored = await context.newPage();
+  await navigate(async () => { await restored.goto(editorUrl); await ready(restored); });
+  await restored.locator('#session-resume').waitFor({state:'visible'});
+  await restored.locator('#session-resume').click(); await visualReady(restored); await saved(restored);
+  assert.deepEqual(await downloadB(restored), original, 'encrypted comparison restores unchanged after browser restart');
+  assert.deepEqual(await payload(restored), storedOriginal);
+  await assertSealed(restored, storedOriginal);
+  assert.deepEqual(await restored.evaluate(async () => {
+    const {openSingleSessionStore} = await import('./single-session.mjs');
+    const store = await openSingleSessionStore();
+    try { return (await store.read()).payload; } finally { store.close(); }
+  }), singleDraft, 'encrypted single-document draft restores after browser restart');
+  checks.push('encrypted-browser-restart');
   assert.deepEqual(errors, [], 'no uncaught page errors');
   assert.deepEqual(externalRequests, [], 'no external HTTP requests');
-  console.log(JSON.stringify({passed:true, mode:worker ? 'extension':'local-page', browser:context.browser()?.version(), checks, externalRequests}, null, 2));
+  const report = {passed:true, version:release.version, mode:worker ? 'extension':'local-page',
+    extension_sha256:createHash('sha256').update(await readFile(path.join(root, 'dist', 'downloads', `ctt-chrome-${release.version}.zip`))).digest('hex'),
+    browser:context.browser()?.version(), checks, externalRequests};
+  await writeFile(path.join(output, 'encrypted-storage-check.json'), JSON.stringify(report, null, 2) + '\n');
+  console.log(JSON.stringify(report, null, 2));
 } catch (error) {
   console.error({errors, externalRequests});
   if (context) for (const [index, page] of context.pages().entries()) if (!page.isClosed()) await page.screenshot({path:path.join(output, `welcome-failure-${index}.png`), fullPage:true}).catch(() => {});

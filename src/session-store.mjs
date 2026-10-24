@@ -64,22 +64,53 @@ export function validateSessionPayload(payload) {
   return JSON.parse(serialized);
 }
 
-function checkedRow(row, validatePayload = validateSessionPayload) {
-  if (row === undefined) return empty();
-  const token = tokenOf(row);
-  if (!object(row) || !token || !Number.isSafeInteger(row.updatedAt) || row.updatedAt < 0 || !Object.hasOwn(row, 'payload')) throw failure('corrupt', "Could not read the saved work. You can delete it.", {token});
-  if (row.payload !== null) {
-    try { row.payload = validatePayload(row.payload); }
-    catch (error) { throw failure(error.code === 'incompatible' ? 'incompatible' : 'corrupt', error.code === 'incompatible' ? error.message : "Could not read the saved work. You can delete it.", {token, updatedAt: row.updatedAt}); }
+// The key is local to this browser profile. Non-extractability prevents raw-key
+// export; it does not protect against code already running in the same origin.
+const SCHEMA = 2, READ_ATTEMPTS = 8;
+const corrupt = row => failure('corrupt', "Could not decrypt the saved work. You can delete it and open your documents again.", {token: tokenOf(row), updatedAt: row?.updatedAt});
+const conflict = () => failure('conflict', "This work changed in another window. Reopen the saved version.");
+const fields = (row, allowed) => Object.keys(row).every(key => allowed.includes(key));
+const isBytes = (value, length) => value instanceof Uint8Array && value.byteLength === length;
+
+function checkedHeader(row) {
+  if (!object(row) || !tokenOf(row) || !Number.isSafeInteger(row.updatedAt) || row.updatedAt < 0) throw corrupt(row);
+  if (row.expiresAt !== undefined && (!Number.isSafeInteger(row.expiresAt) || row.expiresAt < 0)) throw corrupt(row);
+  if (Object.hasOwn(row, 'schema') && row.schema !== SCHEMA) throw failure('incompatible', "This work was saved by a different version of Compare Two Texts.", {token: row.token, updatedAt: row.updatedAt});
+  if (row.schema === SCHEMA) {
+    if (row.payload === null && fields(row, ['schema', 'token', 'updatedAt', 'payload'])) return 'empty';
+    if (!fields(row, ['schema', 'token', 'updatedAt', 'expiresAt', 'revision', 'iv', 'ciphertext', 'key']) || typeof row.revision !== 'string' || !row.revision || !Number.isSafeInteger(row.expiresAt) || !isBytes(row.iv, 12) || !(row.ciphertext instanceof ArrayBuffer) || row.ciphertext.byteLength < 16 || row.ciphertext.byteLength > MAX_PAYLOAD_BYTES + 16) throw corrupt(row);
+    const key = row.key;
+    if (!key || key.type !== 'secret' || key.extractable !== false || key.algorithm?.name !== 'AES-GCM' || key.algorithm?.length !== 256 || !Array.isArray(key.usages) || key.usages.length !== 2 || !key.usages.includes('encrypt') || !key.usages.includes('decrypt')) throw corrupt(row);
+    return 'encrypted';
   }
-  return {token, payload: row.payload, updatedAt: row.updatedAt};
+  // Only the known v1 shape is eligible for migration. A damaged/future sealed
+  // envelope must never be mistaken for an unencrypted draft.
+  if (!fields(row, ['token', 'updatedAt', 'expiresAt', 'payload']) || !Object.hasOwn(row, 'payload')) throw corrupt(row);
+  return row.payload === null ? 'empty' : 'legacy';
 }
 
-export async function openSessionStore({indexedDB = globalThis.indexedDB, dbName = DB_NAME, validatePayload = validateSessionPayload, now = Date.now} = {}) {
+function validatedStoredPayload(payload, row, validatePayload) {
+  try { return validatePayload(payload); }
+  catch (error) {
+    if (error.code === 'incompatible') throw failure('incompatible', error.message, {token: row.token, updatedAt: row.updatedAt});
+    throw corrupt(row);
+  }
+}
+
+// read() renews retention without changing editor ownership. The independent
+// encryption revision detects a concurrent migration/renewal with the same token.
+function sameSnapshot(a, b) {
+  if (a === undefined || b === undefined) return a === b;
+  return ['schema', 'token', 'revision', 'updatedAt', 'expiresAt'].every(key => a?.[key] === b?.[key]);
+}
+
+export async function openSessionStore({indexedDB = globalThis.indexedDB, dbName = DB_NAME, validatePayload = validateSessionPayload, now = Date.now, crypto = globalThis.crypto} = {}) {
   if (!indexedDB?.open) throw failure('unavailable', "Your browser does not allow saving work on this device.");
   const db = await new Promise((resolve, reject) => {
     let request, settled = false;
-    try { request = indexedDB.open(dbName, 1); } catch (error) { reject(error); return; }
+    try { request = indexedDB.open(dbName, SCHEMA); } catch (error) { reject(error); return; }
+    // Upgrading closes older app connections through their onversionchange
+    // handler. Old code cannot reopen version 1 and resume plaintext writes.
     request.onupgradeneeded = () => { if (!request.result.objectStoreNames.contains(STORE)) request.result.createObjectStore(STORE); };
     request.onerror = () => { settled = true; reject(request.error); };
     request.onblocked = () => { settled = true; reject(failure('blocked', "Close other Compare Two Texts windows and try again.")); };
@@ -98,46 +129,114 @@ export async function openSessionStore({indexedDB = globalThis.indexedDB, dbName
       const abort = error => { reason = error; try { tx.abort(); } catch { reject(error); } };
       tx.oncomplete = () => resolve(result);
       tx.onabort = () => reject(reason || tx.error || failure('unavailable', "Could not save your work."));
-      // Request errors abort the entire transaction; never expose a partial save.
       tx.onerror = () => {};
       try { action(tx.objectStore(STORE), value => { result = value; }, abort); } catch (error) { abort(error); }
     });
   }
-  function read() {
-    // Expire only while loading saved work, never on a timer in an open editor.
-    // The same transaction protects another tab's more recent save from deletion.
+
+  function encryptionUnavailable(row) {
+    return failure('unavailable', "Encrypted saving is unavailable in this browser. Download your documents before closing and use HTTPS or the installed extension.", {token: tokenOf(row), updatedAt: row?.updatedAt, encryptionUnavailable: true});
+  }
+  function encryptionApi(row) {
+    if (!crypto?.getRandomValues || !crypto.subtle?.generateKey || !crypto.subtle?.encrypt || !crypto.subtle?.decrypt) throw encryptionUnavailable(row);
+    return crypto.subtle;
+  }
+  function newToken() {
+    if (!crypto?.getRandomValues) throw encryptionUnavailable();
+    // getRandomValues is also available for explicitly deleting a draft when
+    // SubtleCrypto is unavailable. Tokens are ownership IDs, not encryption keys.
+    return Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
+  }
+  function timestamp() {
+    const value = now();
+    if (!Number.isSafeInteger(value) || value < 0 || !Number.isSafeInteger(value + SESSION_TTL_MS)) throw failure('unavailable', "Could not save your work: invalid device time.");
+    return value;
+  }
+  function additionalData(row) {
+    return new TextEncoder().encode(JSON.stringify(['CTT saved draft', dbName, row.schema, row.token, row.updatedAt, row.expiresAt, row.revision]));
+  }
+  async function seal(payload, metadata) {
+    const subtle = encryptionApi(metadata);
+    const plaintext = new TextEncoder().encode(JSON.stringify(payload));
+    if (plaintext.byteLength > MAX_PAYLOAD_BYTES) throw failure('invalid', "This work is too large to save.");
+    try {
+      const row = {...metadata, schema: SCHEMA, revision: newToken(), iv: crypto.getRandomValues(new Uint8Array(12))};
+      row.key = await subtle.generateKey({name: 'AES-GCM', length: 256}, false, ['encrypt', 'decrypt']);
+      row.ciphertext = await subtle.encrypt({name: 'AES-GCM', iv: row.iv, additionalData: additionalData(row), tagLength: 128}, row.key, plaintext);
+      checkedHeader(row);
+      return row;
+    } catch { throw encryptionUnavailable(metadata); }
+    finally { plaintext.fill(0); }
+  }
+  async function unseal(row) {
+    const subtle = encryptionApi(row);
+    let plaintext;
+    try {
+      plaintext = new Uint8Array(await subtle.decrypt({name: 'AES-GCM', iv: row.iv, additionalData: additionalData(row), tagLength: 128}, row.key, row.ciphertext));
+      const payload = JSON.parse(new TextDecoder('utf-8', {fatal: true}).decode(plaintext));
+      return validatedStoredPayload(payload, row, validatePayload);
+    } catch (error) {
+      if (error.code === 'incompatible') throw error;
+      throw corrupt(row);
+    } finally { plaintext?.fill(0); }
+  }
+  const publicRow = (row, payload) => ({token: row.token, payload, updatedAt: row.updatedAt});
+  const tombstone = () => ({schema: SCHEMA, token: newToken(), payload: null, updatedAt: timestamp()});
+
+  function load() {
+    // Expiration and its tombstone commit are atomic. No async crypto runs while
+    // an IndexedDB transaction is active, avoiding premature auto-commit.
     return transaction('readwrite', (store, done, abort) => {
       const request = store.get(KEY);
       request.onsuccess = () => {
         try {
           const saved = request.result;
-          if (saved === undefined) { done(empty()); return; }
-          const currentTime = now();
-          if (object(saved) && tokenOf(saved) && Number.isSafeInteger(saved.expiresAt) && saved.expiresAt >= 0 && currentTime >= saved.expiresAt) {
-            const cleared = {token: globalThis.crypto.randomUUID(), payload: null, updatedAt: currentTime};
-            store.put(cleared, KEY); done(cleared); return;
+          if (saved === undefined) { done(undefined); return; }
+          const kind = checkedHeader(saved);
+          if (kind !== 'empty' && saved.expiresAt !== undefined && timestamp() >= saved.expiresAt) {
+            const cleared = tombstone(); store.put(cleared, KEY); done(cleared); return;
           }
-          const row = checkedRow(saved, validatePayload);
-          if (saved.expiresAt !== undefined && (!Number.isSafeInteger(saved.expiresAt) || saved.expiresAt < 0)) throw failure('corrupt', "Could not read the saved work. You can delete it.", {token: row.token});
-          // Loading a valid draft counts as activity. Legacy drafts get a full
-          // grace period on their first load; malformed drafts are never rewritten.
-          if (row.payload !== null) store.put({...saved, expiresAt: currentTime + SESSION_TTL_MS}, KEY);
-          done(row);
+          done(saved);
         } catch (error) { abort(error); }
       };
     });
   }
-  function replace(payload, expectedToken) {
-    if (expectedToken !== null && typeof expectedToken !== 'string') return Promise.reject(failure('conflict', "This work changed in another window. Reopen the saved version."));
+  function renew(snapshot, sealed) {
     return transaction('readwrite', (store, done, abort) => {
       const request = store.get(KEY);
       request.onsuccess = () => {
         try {
-          if (tokenOf(request.result) !== expectedToken) { abort(failure('conflict', "This work changed in another window. Reopen the saved version.")); return; }
-          const updatedAt = now();
-          const row = {token: globalThis.crypto.randomUUID(), payload, updatedAt};
-          if (payload !== null) row.expiresAt = updatedAt + SESSION_TTL_MS;
-          store.put(row, KEY); done({token: row.token, payload: row.payload, updatedAt: row.updatedAt});
+          if (!sameSnapshot(request.result, snapshot)) { done(false); return; }
+          store.put(sealed, KEY); done(true);
+        } catch (error) { abort(error); }
+      };
+    });
+  }
+  async function read() {
+    for (let attempt = 0; attempt < READ_ATTEMPTS; attempt++) {
+      const saved = await load();
+      if (saved === undefined) return empty();
+      const kind = checkedHeader(saved);
+      if (kind === 'empty') return publicRow(saved, null);
+      const payload = kind === 'encrypted' ? await unseal(saved) : validatedStoredPayload(saved.payload, saved, validatePayload);
+      // A valid legacy draft is encrypted before replacement. Failure leaves the
+      // previous bytes intact and is surfaced, never reported as a saved draft.
+      const sealed = await seal(payload, {token: saved.token, updatedAt: saved.updatedAt, expiresAt: timestamp() + SESSION_TTL_MS});
+      if (await renew(saved, sealed)) return publicRow(saved, payload);
+      // Another tab saved/cleared/refreshed during crypto; load its committed row.
+    }
+    throw conflict();
+  }
+  async function replace(payload, expectedToken) {
+    if (expectedToken !== null && typeof expectedToken !== 'string') throw conflict();
+    const updatedAt = timestamp(), token = newToken();
+    const row = payload === null ? {schema: SCHEMA, token, payload: null, updatedAt} : await seal(payload, {token, updatedAt, expiresAt: updatedAt + SESSION_TTL_MS});
+    return transaction('readwrite', (store, done, abort) => {
+      const request = store.get(KEY);
+      request.onsuccess = () => {
+        try {
+          if (tokenOf(request.result) !== expectedToken) { abort(conflict()); return; }
+          store.put(row, KEY); done(publicRow(row, payload));
         } catch (error) { abort(error); }
       };
     });

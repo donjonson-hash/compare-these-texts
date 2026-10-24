@@ -1,4 +1,4 @@
-# Reviewer instructions — Compare Two Texts 0.37.3
+# Reviewer instructions — Compare Two Texts 0.37.4
 
 No account, sign-in, payment, API key or external AI service is required. The
 editor and welcome page are in English. Synthetic examples are built in, so
@@ -62,6 +62,11 @@ application-level Redo command is not included.
    printed blanks, not interactive PDF widgets.
 
 ## Saved work and offline operation
+
+Saved comparison and single-document payloads are encrypted using AES-GCM-256.
+The non-extractable key stays in the local browser profile; no password or
+network request is needed to resume. Valid older plaintext drafts are migrated
+on load, and failures do not silently fall back to plaintext persistence.
 
 1. Wait for **Saved in this browser** after an edit, then close and reopen the
    workspace. Use its resume control to continue the saved draft.
