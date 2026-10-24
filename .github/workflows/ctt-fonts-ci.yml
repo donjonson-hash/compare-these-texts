@@ -35,7 +35,7 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.12'
-      - run: python -m pip install 'fonttools==4.61.1' 'Pillow==12.3.0' 'uharfbuzz==0.52.0'
+      - run: python -m pip install 'fonttools==4.61.1'
       - name: Fetch pinned font inputs
         shell: bash
         run: |
@@ -45,6 +45,9 @@ jobs:
           curl --fail --location --retry 2 'https://raw.githubusercontent.com/unicode-org/unicodetools/48afe632bf194a20bcd27c3488b49dc23274b684/unicodetools/data/emoji/17.0/emoji-test.txt' -o "$RUNNER_TEMP/ctt-emoji-test.txt"
       - name: Verify inputs and reproduce every font module
         run: python scripts/reproduce_fonts.py --dejavu-deb "$RUNNER_TEMP/ctt-dejavu.deb" --noto-variable "$RUNNER_TEMP/ctt-noto.ttf"
+      # HarfBuzz changes fontTools' optional OpenType repacker. Install it only
+      # after reproducing the existing outline fonts with their original toolchain.
+      - run: python -m pip install 'Pillow==12.3.0' 'uharfbuzz==0.52.0'
       - name: Reproduce offline color emoji artwork
         run: |
           python scripts/reproduce_color_emoji.py --font "$RUNNER_TEMP/ctt-color-emoji.ttf" --emoji-test "$RUNNER_TEMP/ctt-emoji-test.txt" --size 72 --output "$RUNNER_TEMP/emoji-color-vendor.mjs"
