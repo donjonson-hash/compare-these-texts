@@ -65,8 +65,9 @@ application-level Redo command is not included.
 
 1. Wait for **Saved in this browser** after an edit, then close and reopen the
    workspace. Use its resume control to continue the saved draft.
-2. Use **Delete saved work** in the relevant saved-work controls to remove the
-   draft. Comparison and single-document work have separate saved drafts.
+2. For a comparison, use **All tools → Files & settings → Saved work → Finish and delete**.
+   For one document, use **Document options → Saved work → Delete saved work**.
+   Comparison and single-document work have separate saved drafts.
 3. Repeat a built-in comparison with the network offline. File processing,
    editing and export use bundled code. Public website/support links need a
    connection and are not required for the workflow.
