@@ -102,8 +102,16 @@
   $('home-help-open').addEventListener('click', () => help.showModal());
   $('home-help-close').addEventListener('click', () => help.close());
   for (const button of modes) button.addEventListener('click', leaveHome);
-  // Document and spreadsheet examples retain the full existing demo engine.
-  for (const id of ['demo', 'demo-tables']) $(id).addEventListener('click', () => open('compare'), {capture:true});
+  // Help can be opened during editing. Do not let its examples silently replace
+  // an active comparison, partially loaded sources or a saved comparison.
+  for (const id of ['demo', 'demo-tables']) $(id).addEventListener('click', event => {
+    const saved = $('saved-session'), resume = $('session-resume');
+    const hasComparison = !$('results').hidden || sides.some(side => $(side + '-filename').dataset.sourceLoaded === 'true') || !!(saved && !saved.hidden && resume && !resume.hidden);
+    if (pending || event.currentTarget.disabled || (hasComparison && !window.confirm('Replace the previous comparison and its saved draft with an example? Download your edited files first if you want to keep them.'))) {
+      event.preventDefault(); event.stopImmediatePropagation(); return;
+    }
+    open('compare');
+  }, {capture:true});
   const saved = $('saved-session'); if (saved) menu.before(saved);
   // A saved comparison can be resumed from Home without hiding its restored result.
   const observer = new MutationObserver(() => {

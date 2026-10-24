@@ -8,7 +8,7 @@ import {File} from 'node:buffer';
 import {setImmediate as nextTurn} from 'node:timers/promises';
 import {JSDOM, VirtualConsole} from 'jsdom';
 
-function page(t) {
+function page(t, beforeNavigation = () => {}) {
   const errors = [];
   const console = new VirtualConsole();
   console.on('jsdomError', error => errors.push(error.message));
@@ -23,6 +23,7 @@ function page(t) {
   window.HTMLDialogElement.prototype.close = function () { this.open = false; };
   const commands = [];
   document.addEventListener('ctt:new-comparison', event => commands.push(event.detail));
+  beforeNavigation({window, document, $});
   window.eval(readFileSync(new URL('../src/navigation.js', import.meta.url), 'utf8'));
   t.after(() => { window.dispatchEvent(new window.Event('pagehide')); dom.window.close(); assert.deepEqual(errors, []); });
   function paste(side, value) {
@@ -146,4 +147,55 @@ test('saved result and full document demo leave Home, while Help alone preserves
   assert.equal(p.$('home-help').open, false);
   assert.equal(p.$('start-menu').hidden, true);
   assert.equal(p.$('home-left-text').value, 'unsent text');
+});
+
+
+test('Help examples require confirmation before replacing an open comparison', async t => {
+  for (const id of ['demo', 'demo-tables']) {
+    await t.test(id, async t => {
+      let launches = 0;
+      // app.js installs its bubbling demo listener before navigation.js. The
+      // later capture guard must stop that earlier listener on cancellation.
+      const p = page(t, ({$}) => {
+        $(id).addEventListener('click', () => {
+          launches++;
+          $('visual-review').textContent = 'Replacement demo';
+        });
+      });
+      const originalEditor = p.document.createElement('section');
+      originalEditor.textContent = 'Edited comparison with unsaved changes';
+      p.$('visual-review').append(originalEditor);
+      p.$('results').hidden = false;
+      await nextTurn();
+      p.$('workspace-home').click();
+      p.paste('left', 'staged A'); p.paste('right', 'staged B');
+      p.$('home-help-open').click();
+      let prompts = 0;
+      p.window.confirm = () => { prompts++; return false; };
+      p.$(id).click();
+      assert.equal(prompts, 1);
+      assert.equal(launches, 0, 'Cancel blocks the existing engine listener');
+      assert.equal(p.$('visual-review').firstChild, originalEditor);
+      assert.equal(p.$('results').hidden, false);
+      assert.equal(p.$('start-menu').hidden, false, 'Cancel stays in the current Home screen');
+      assert.equal(p.$('home-help').open, true);
+      assert.equal(p.$('home-left-text').value, 'staged A');
+      p.window.confirm = () => { prompts++; return true; };
+      p.$(id).click();
+      assert.equal(prompts, 2);
+      assert.equal(launches, 1, 'Accept calls the existing engine exactly once');
+      assert.equal(p.$('home-help').open, false);
+      assert.equal(p.$('start-menu').hidden, true);
+      assert.equal(p.$('home-right-text').value, 'staged B');
+
+      p.$('workspace-home').click();
+      p.$('start-new-compare').click();
+      assert.equal(p.commands.length, 1);
+      p.$(id).dispatchEvent(new p.window.MouseEvent('click', {bubbles:true, cancelable:true}));
+      assert.equal(launches, 1, 'A pending comparison cannot be replaced by a demo');
+      assert.equal(prompts, 2, 'Pending operations do not offer an inapplicable replacement');
+      p.commands[0].complete({ok:false});
+      await nextTurn();
+    });
+  }
 });
