@@ -1,6 +1,6 @@
 # Compare Two Texts — English Chrome Web Store listing
 
-Release candidate **0.37.1**, prepared 24 October 2026. This document supplies
+Release candidate **0.37.2**, prepared 24 October 2026. This document supplies
 copy for submission; it does not claim store publication or approval.
 `localizations.json` and `descriptions/en.txt` are the canonical copy inputs.
 
@@ -60,6 +60,8 @@ Copy `descriptions/en.txt` as-is into the description field.
 - Single purpose and privacy responses: `PRIVACY-DISCLOSURES-EN.md`.
 - Reviewer test instructions: `REVIEWER-INSTRUCTIONS-EN.md`.
 - Changes in this submission: `RELEASE-NOTES-EN.md`.
+- Additional document-comparison tools: **All tools → Review & edit / Files & settings / Reports**.
+- Undo is available; do not advertise an application-level Redo command.
 
 22 localized metadata catalogs and 22 full descriptions are prepared. These
 localize the listing and Chrome metadata, not the editor. Screenshots use

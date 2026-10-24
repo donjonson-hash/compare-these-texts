@@ -151,21 +151,54 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   navigation.append(back, next);
   const workspaceDialog = single ? null : el('dialog', undefined, 'workspace-tools-dialog');
   const workspaceControlsHost = single ? null : el('div', undefined, 'workspace-controls-host');
+  const workspaceReportsHost = single ? null : el('div', undefined, 'workspace-reports-host');
   const workspaceActions = single ? null : el('div', undefined, 'workspace-tool-actions');
-  const workspaceToggle = single ? null : button('Tools & info', openWorkspaceTools);
+  const workspaceReviewPanel = single ? null : el('section', undefined, 'workspace-tools-panel');
+  const workspaceTabs = [];
+  const workspaceToggle = single ? null : button('All tools', openWorkspaceTools, 'button secondary workspace-tools-trigger');
+  function selectWorkspaceTab(key, focus = false) {
+    for (const entry of workspaceTabs) {
+      const active = entry.key === key;
+      entry.tab.setAttribute('aria-selected', String(active)); entry.tab.tabIndex = active ? 0 : -1;
+      entry.panel.hidden = !active;
+      if (active && focus) entry.tab.focus({preventScroll: true});
+    }
+  }
   function openWorkspaceTools() {
-    if (!workspaceDialog || workspaceDialog.open) return;
-    workspaceDialog.showModal?.();
+    if (!workspaceDialog) return;
+    selectWorkspaceTab('review'); tools.open = true;
+    if (workspaceDialog.open) return;
+    workspaceDialog.showModal?.(); workspaceToggle.setAttribute('aria-expanded', 'true');
   }
   function closeWorkspaceTools() { if (workspaceDialog?.open) workspaceDialog.close(); }
   if (workspaceDialog) {
-    workspaceDialog.setAttribute('aria-label', 'Tools & info');
+    workspaceDialog.id = 'workspace-tools-dialog'; workspaceDialog.setAttribute('aria-label', 'All tools');
     workspaceToggle.dataset.workspaceToolsOpen = '';
-    workspaceToggle.setAttribute('aria-haspopup', 'dialog');
+    workspaceToggle.setAttribute('aria-haspopup', 'dialog'); workspaceToggle.setAttribute('aria-expanded', 'false'); workspaceToggle.setAttribute('aria-controls', workspaceDialog.id);
+    workspaceToggle.title = 'Find & replace, review changes, reports and file settings';
+    const icon = el('span', undefined, 'workspace-tools-icon'); icon.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < 4; i++) icon.append(el('span')); workspaceToggle.prepend(icon);
     const heading = el('div', undefined, 'workspace-tools-heading');
     const close = button('Close', closeWorkspaceTools); close.dataset.workspaceToolsClose = '';
-    heading.append(el('h2', 'Tools & info'), close);
-    workspaceDialog.append(heading, workspaceControlsHost, workspaceActions);
+    heading.append(el('h2', 'All tools'), close);
+    const tabs = el('div', undefined, 'workspace-tools-tabs'); tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Tool categories');
+    const filesPanel = el('section', undefined, 'workspace-tools-panel'); filesPanel.append(workspaceControlsHost);
+    const reportsPanel = el('section', undefined, 'workspace-tools-panel');
+    reportsPanel.append(el('p', 'Reports describe the original comparison. Download edited documents from A or B.', 'workspace-tools-note'), workspaceReportsHost);
+    for (const [key, label, panel] of [['review', 'Review & edit', workspaceReviewPanel], ['files', 'Files & settings', filesPanel], ['reports', 'Reports', reportsPanel]]) {
+      const tab = button(label, () => selectWorkspaceTab(key), 'workspace-tools-tab');
+      tab.id = `workspace-tools-tab-${key}`; tab.setAttribute('role', 'tab'); tab.setAttribute('aria-controls', `workspace-tools-panel-${key}`);
+      panel.id = `workspace-tools-panel-${key}`; panel.setAttribute('role', 'tabpanel'); panel.setAttribute('aria-labelledby', tab.id);
+      workspaceTabs.push({key, tab, panel}); tabs.append(tab);
+      tab.addEventListener('keydown', event => {
+        const index = workspaceTabs.findIndex(entry => entry.tab === tab);
+        const next = event.key === 'ArrowRight' ? (index + 1) % workspaceTabs.length : event.key === 'ArrowLeft' ? (index + workspaceTabs.length - 1) % workspaceTabs.length : event.key === 'Home' ? 0 : event.key === 'End' ? workspaceTabs.length - 1 : null;
+        if (next !== null) { event.preventDefault(); selectWorkspaceTab(workspaceTabs[next].key, true); }
+      });
+    }
+    workspaceReviewPanel.append(workspaceActions);
+    workspaceDialog.append(heading, tabs, ...workspaceTabs.map(entry => entry.panel)); selectWorkspaceTab('review');
+    workspaceDialog.addEventListener('close', () => workspaceToggle.setAttribute('aria-expanded', 'false'));
     workspaceDialog.addEventListener('click', event => {
       if (event.target !== workspaceDialog) return;
       const rect = workspaceDialog.getBoundingClientRect();
@@ -173,7 +206,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     });
   }
   const all = button("Make B match A", () => act('right', draft => draft.replaceAll(drafts.left.entries(), {rowPlan: drafts.left.rowPlan?.(), content: models.left?.content}))); all.dataset.action = 'copy-all-right';
-  const tools = el('details', undefined, 'visual-more compact-review-tools'); tools.append(el('summary', "More"));
+  const tools = el('details', undefined, 'visual-more compact-review-tools'); tools.append(el('summary', 'Copy & restore')); tools.open = !single;
   const toolsContent = el('div', undefined, 'visual-tools-content'); tools.append(toolsContent);
   toolsContent.addEventListener('click', event => {
     const action = event.target.closest('button');
@@ -192,7 +225,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   } else {
     toolbar.append(progress, navigation, workspaceToggle);
     const zoomLabel = el('label', 'Document zoom'); zoomLabel.append(zoom);
-    workspaceActions.append(zoomLabel, tools);
+    workspaceActions.append(zoomLabel);
   }
   root.append(toolbar); if (single) root.append(saveNote); else root.append(workspaceDialog);
   const findHost=el('div',undefined,'document-find');root.append(findHost);
@@ -206,9 +239,8 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   const reviewHint = el('p', 'Choose what to keep, one difference at a time.', 'review-flow-hint');
   reviewBar.append(reviewProgress, reviewNext, reviewUndo, reviewHint);
   const finalCheck = createFinalCheck(reviewBar, {beforeCheck: () => {if (!alive()) return false; for (const side of sides) drafts[side].endEdit(); changed(); return true;}, onGo: () => {closeWorkspaceTools(); reviewStarted = true; void advanceReview();}, scope: 'Current text, text order and supported Word table structure are checked. Images, fonts and page appearance are not compared.'});
-  if (!single) toolsContent.insertBefore(reviewBar.querySelector('[data-review-action="check"]'), help);
-  reviewBar.append(reviewDownload); (workspaceDialog || root).append(reviewBar); if(single)reviewBar.hidden=true;
-  const numberHost = el('div'); if (!single) workspaceDialog.append(numberHost);
+  reviewBar.append(reviewDownload); (workspaceReviewPanel || root).append(reviewBar); if(single)reviewBar.hidden=true;
+  const numberHost = el('div'); if (!single) workspaceReviewPanel.append(numberHost, tools);
   const structureReview = el('section', undefined, 'review-structure'); structureReview.hidden = true;
   structureReview.append(el('p', 'Review the document order and table layout in both versions.'), button('Keep B layout', () => decideReview('keep', STRUCTURE_KEY)), button('Back to text', () => { reviewingStructure = false; structureReview.hidden = true; }));
   root.append(structureReview);
@@ -1088,7 +1120,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   if (!single) {
     const findToggle = findHost.querySelector(':scope > button');
     findToggle.addEventListener('click', closeWorkspaceTools, {capture: true});
-    workspaceActions.insertBefore(findToggle, tools);
+    workspaceActions.prepend(findToggle);
     const restoreSearchFocus = () => {
       if (findHost.querySelector('.find-replace-panel')?.hidden && !workspaceDialog.open) workspaceToggle.focus();
     };
@@ -1170,5 +1202,5 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     }
   }
   restoring = false;
-  return {dispose, drafts, select, snapshot, getAssistantContext, workspaceControlsHost, closeWorkspaceTools, get changed() { return drafts.left.changed || drafts.right.changed || hasFill(); }};
+  return {dispose, drafts, select, snapshot, getAssistantContext, workspaceControlsHost, workspaceReportsHost, closeWorkspaceTools, get changed() { return drafts.left.changed || drafts.right.changed || hasFill(); }};
 }

@@ -1,6 +1,6 @@
 # Compare Two Texts — privacy policy copy
 
-Store kit 0.37.1, checked 24 October 2026. This is a readable copy of the
+Store kit 0.37.2, checked 24 October 2026. This is a readable copy of the
 policy included in the extension, not a separate policy with different terms.
 Published policy: https://comparetwotexts.pro/privacy/
 

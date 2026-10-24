@@ -1,4 +1,4 @@
-# Compare Two Texts 0.37.1 — final store audit
+# Compare Two Texts 0.37.2 — final store audit
 
 Prepared October 24, 2026. This kit is a Chrome Web Store submission candidate;
 it is not a store approval or a submitted listing.
@@ -18,8 +18,14 @@ warnings and unsupported chained actions. Vendor bytes remain unchanged.
 
 Welcome opens automatically only on first installation. Existing saved work is
 protected when opening a demo. Welcome now describes comparison and single-file
-Edit & export, Undo/Redo and PDF preview. The packaged editor and welcome are in
+Edit & export, Undo and PDF preview. The packaged editor and welcome are in
 English; 22 store metadata locales and full descriptions are prepared.
+
+In document comparison, **All tools** opens three labeled sections:
+**Review & edit**, **Files & settings** and **Reports**. Existing secondary
+controls stay available inside those sections while the main header remains
+compact. Welcome and submission instructions no longer promise Redo; the
+application provides Undo only.
 
 Document data, edits and supported undo history are retained locally in separate
 comparison/editor drafts. They expire after seven days without opening or
