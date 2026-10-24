@@ -8,7 +8,7 @@ review does not require private documents.
 
 1. Install the supplied Chrome extension package. Its local welcome page opens
    on first installation; an update does not automatically open another tab.
-2. Choose **Open comparison**. The toolbar icon can also open the workspace.
+2. Choose **Open workspace**. The toolbar icon can also open the workspace.
 3. Use **Getting started** in the editor footer to reopen the welcome page.
    **Try an example** on that page opens the synthetic document comparison.
 

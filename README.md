@@ -32,7 +32,7 @@ the guide separately; **Try an example** leaves an existing saved comparison
 available to resume. The editor and welcome page remain English.
 
 The Chrome package includes 22 localized metadata catalogs. Full store
-descriptions, five icon sizes, three actual screenshots, two promotional images
+descriptions, five icon sizes, five actual screenshots, two promotional images
 and Russian submission instructions are assembled with `npm run package:store`
 after building and running `npm run store:assets`. The result is `artifacts/ctt-0.37.1-store-kit.zip`; unpack it
 before uploading its inner Chrome ZIP. Firefox is supplied for temporary
