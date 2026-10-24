@@ -18,7 +18,8 @@
   const open=$('single-source-panel').hidden;sourcePanel(open);
   const target=open?$('single-file'):$('single-current');target.focus({preventScroll:true});target.scrollIntoView?.({block:'center'});
  });
- function controls(){ $('single-source-toggle').disabled=busy||operating;$('single-open').disabled=$('single-file').disabled=busy||operating;if($('single-paste-open'))$('single-paste-open').disabled=busy||operating;$('single-editor-host').inert=busy||operating; }
+ $('single-new-document').addEventListener('click',()=>{if(!busy&&!operating)$('single-file').click();});
+ function controls(){ $('single-new-document').disabled=$('single-source-toggle').disabled=busy||operating;$('single-open').disabled=$('single-file').disabled=busy||operating;if($('single-paste-open'))$('single-paste-open').disabled=busy||operating;$('single-editor-host').inert=busy||operating; }
  function setBusy(value){busy=value;session?.setBusy(value);controls();}
  function closeDocument(){
   generation++;controller?.abort();view?.dispose();controller=null;view=null;candidate=null;
@@ -42,12 +43,12 @@
    const {source,sheet,delimiter}=payload;
    session?.activate(()=>({version:1,kind:'single-editor',source,sheet:sheet||null,delimiter,review:next.snapshot()}));
    const paste=$('single-paste');if(paste)paste.open=false;const destination=$('single-current');destination.scrollIntoView?.({block:'start'});destination.focus?.({preventScroll:true});
-  }catch(error){abort.abort();next?.dispose();if(ticket===generation)note(error.message,true);if(resuming)throw error;}
+  }catch(error){abort.abort();next?.dispose();if(ticket===generation)note(resuming?error.message:`Could not open “${payload.source.name}”. ${error.message}${view?' Your current document is still open.':''}`,true);if(resuming)throw error;}
   finally{if(ticket===generation)setBusy(false);}
  }
  async function open(){
   await ready;if(!candidate||busy||operating)return;
-  if((view?.changed||session?.hasSavedWork)&&!window.confirm('Replace this document and its saved draft? Download it first if you want to keep a separate copy.'))return;
+  if((view?.changed||session?.hasSavedWork)&&!window.confirm(`Open “${candidate.name}” instead? Download your current document first if you want to keep a copy. Cancel keeps it open.`))return;
   await install({source:candidate,sheet:$('single-sheet').value||null,delimiter:$('single-delimiter').value});
  }
  async function load(file){
@@ -60,7 +61,7 @@
    $('single-sheet-label').hidden=info.format!=='xlsx';$('single-delimiter-label').hidden=!['csv','tsv'].includes(info.format);
    $('single-sheet').replaceChildren();for(const name of info.sheets||[]){const option=document.createElement('option');option.value=option.textContent=name;$('single-sheet').append(option);}
    $('single-delimiter').value=info.delimiter||',';note('');setBusy(false);
-   if(info.format==='docx'||info.format==='pdf'||info.format==='txt'){await open();}else{$('single-options').hidden=false;$('single-pending').textContent=source.name;}
+   if(info.format==='docx'||info.format==='pdf'||info.format==='txt'){await open();}else{sourcePanel(true);$('single-options').hidden=false;$('single-pending').textContent=source.name;$('single-open').focus({preventScroll:true});$('single-options').scrollIntoView?.({block:'center'});}
   }catch(error){if(ticket===generation)note(error.message,true);}
   finally{if(ticket===generation)setBusy(false);}
  }

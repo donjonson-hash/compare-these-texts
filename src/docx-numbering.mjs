@@ -99,7 +99,7 @@ export function parseDocxNumbering(docs, sourceParagraphs) {
     childrenOnly(instance,['abstractNumId','lvlOverride']);const abstractId=String(number(val(instance,'abstractNumId'))),base=abstract.get(abstractId);if(!base)fail("the automatic list template is missing.");
     childrenOnly(base,['nsid','multiLevelType','tmpl','name','styleLink','numStyleLink','lvl']);
     if(child(base,'numStyleLink'))fail("linked automatic numbering styles are not yet supported.");
-    for(const a of Array.from(base.attributes||[]))if(a.namespaceURI&&!W.has(a.namespaceURI)&&a.namespaceURI!=='http://www.w3.org/2000/xmlns/')fail("advanced list restart rules are not yet supported.");
+    for(const a of Array.from(base.attributes||[]))if(a.namespaceURI&&!W.has(a.namespaceURI)&&a.namespaceURI!=='http://www.w3.org/2000/xmlns/'&&!(a.namespaceURI==='http://schemas.microsoft.com/office/word/2012/wordml'&&a.localName==='restartNumberingAfterBreak'&&['0','false','off'].includes(a.value)))fail("advanced list restart rules are not yet supported.");
     const rawLevels=new Map();for(const n of elements(base).filter(n=>is(n,'lvl'))){const i=number(attr(n,'ilvl'),0,8);if(rawLevels.has(i))fail("duplicate list level.");rawLevels.set(i,n);}
     const overrides=new Map();for(const n of elements(instance).filter(n=>is(n,'lvlOverride'))){const i=number(attr(n,'ilvl'),0,8);if(overrides.has(i))fail("duplicate list level override.");childrenOnly(n,['startOverride','lvl']);overrides.set(i,n);}
     // Parse levels lazily: unused picture bullets and exotic templates do not block a document.

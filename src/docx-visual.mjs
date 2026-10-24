@@ -70,13 +70,15 @@ export async function readDocxVisual(source) {
       for(const c of elements(node)) visit(c,style);
     }
     visit(p);
-    return {record,text,...formatting.paragraph(p),runs,list,pageBreakBefore:!!enabled(child(child(p,'pPr'),'pageBreakBefore'))};
+    return {record,text,...formatting.paragraph(p),runs,list,hasHorizontalRule:all(p).some(n=>is(n,'pict')),pageBreakBefore:!!enabled(child(child(p,'pPr'),'pageBreakBefore'))};
   }
   const blocks=checked.structure.paragraphs.map((p,i)=>visualParagraph(p,{record:i+1,text:checked.texts[i],list:lists[i]}));
   const section=child(body,'sectPr'),size=child(section,'pgSz'),margin=child(section,'pgMar');
   const px=(node,name,fallback,min,max)=>finite(attr(node,name),min,max)?Number(attr(node,name))/15:fallback;
   const page={width:px(size,'w',794,1440,31680),height:px(size,'h',1123,1440,31680),marginTop:px(margin,'top',72,0,4320),marginRight:px(margin,'right',72,0,4320),marginBottom:px(margin,'bottom',72,0,4320),marginLeft:px(margin,'left',72,0,4320),headerDistance:px(margin,'header',48,0,4320),footerDistance:px(margin,'footer',48,0,4320)};
   const pdfUnsupported=[];
+  if(checked.horizontalRules)pdfUnsupported.push('PDF export is unavailable for legacy horizontal rules. Download Word (.docx) to preserve them.');
+  if(checked.headersFooters.some(part=>part.complexLayout))pdfUnsupported.push('PDF export is unavailable for text boxes in headers or footers. Download Word (.docx) to preserve their layout.');
   const pageNumber=child(section,'pgNumType'),pageStart=attr(pageNumber,'start');
   if(pageNumber&&(attr(pageNumber,'chapStyle')!==null||attr(pageNumber,'chapSep')!==null||![null,'decimal'].includes(attr(pageNumber,'fmt'))||pageStart!==null&&(!finite(pageStart,1,999999)||!Number.isInteger(Number(pageStart)))))pdfUnsupported.push('This page-number format cannot be exported yet. Download Word (.docx) to preserve it.');
   const peripherals={header:{},footer:{},firstPage:!!enabled(child(section,'titlePg')),evenPages:!!enabled(child(checked.docs.get('word/settings.xml')?.documentElement,'evenAndOddHeaders')),pageStart:finite(pageStart,1,999999)?Number(pageStart):1};
@@ -86,7 +88,8 @@ export async function readDocxVisual(source) {
     const type=attr(reference,'type'),id=reference.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id')||reference.getAttributeNS('http://purl.oclc.org/ooxml/officeDocument/relationships','id');
     const relationship=relationships.find(rel=>rel.getAttribute('Id')===id),part=checked.docs.get('word/'+relationship?.getAttribute('Target'));
     if(peripherals[kind][type])pdfUnsupported.push('This document has duplicate header or footer references. Download DOCX to preserve its layout.');
-    peripherals[kind][type]=elements(part?.documentElement).map(p=>visualParagraph(p));
+    const coverage=checked.headersFooters.find(item=>item.path==='word/'+relationship?.getAttribute('Target'));
+    if(!coverage?.complexLayout)peripherals[kind][type]=elements(part?.documentElement).map(p=>visualParagraph(p));
   }
   if(all(body).filter(n=>is(n,'sectPr')).length>1||all(body).some(n=>is(n,'cols')&&Number(attr(n,'num')||1)>1||is(n,'br')&&attr(n,'type')==='column'))pdfUnsupported.push('This document uses multiple page layouts or text columns. Download DOCX to preserve them.');
   return {format:'docx',headersFooters:checked.headersFooters,peripherals,blocks,page,content:checked.structure.content,hasTables:checked.structure.hasTables,listData:checked.listData,pdfUnsupported,notes:["Headings, tables, lists, text styles, and embedded photos are preserved. Page breaks in the browser may differ from Word."]};
@@ -150,9 +153,9 @@ export function projectDocxVisual(model,sequence,{rowPlan}={}) {
     const text=validateText(item.text);chars+=[...text].length;
     if(chars>MAX_TEXT_CHARS||blocks.length>=MAX_TEXT_BLOCKS)throw new Error("The DOCX version exceeds the text size limit.");
     const original=originals.get(item.record),rowTemplate=originals.get(layout?.templates[item.record]),template=original||rowTemplate||blocks.at(-1)||model.blocks[0];
-    blocks.push({record:item.record,sourceRecord:item.record,key:item.key,text,heading:template?.heading||null,style:{...template?.style},runs:original?revisedRuns(original.runs,text):rowTemplate?(text?[{text,style:{...rowTemplate.runs.find(run=>!run.image)?.style}}]:[]):[{text,style:{}}],list:template?.list||null,pageBreakBefore:!!original?.pageBreakBefore});
+    blocks.push({record:item.record,sourceRecord:item.record,key:item.key,text,heading:template?.heading||null,style:{...template?.style},runs:original?revisedRuns(original.runs,text):rowTemplate?(text?[{text,style:{...rowTemplate.runs.find(run=>!run.image)?.style}}]:[]):[{text,style:{}}],list:template?.list||null,pageBreakBefore:!!original?.pageBreakBefore,hasHorizontalRule:!!original?.hasHorizontalRule});
   }
-  for(const original of model.blocks)if(!layout&&!seen.has(original.record)&&original.runs.some(run=>run.image)){
+  for(const original of model.blocks)if(!layout&&!seen.has(original.record)&&(original.hasHorizontalRule||original.runs.some(run=>run.image))){
     const next=blocks.findIndex(block=>block.sourceRecord>original.record);
     blocks.splice(next===-1?blocks.length:next,0,{...original,key:undefined,sourceRecord:original.record,text:'',runs:revisedRuns(original.runs,''),retainedMedia:true});
   }
@@ -199,7 +202,7 @@ export async function writeDocxVisual(source,edits=[],options={}) {
     editParagraph(p,text);output.push({record:item.record,node:p});
   }
   // Removing a textual paragraph must not remove an attached photograph.
-  for(let i=0;i<paragraphs.length;i++)if(!seen.has(i+1)&&all(paragraphs[i]).some(n=>is(n,'drawing'))){
+  for(let i=0;i<paragraphs.length;i++)if(!seen.has(i+1)&&all(paragraphs[i]).some(n=>is(n,'drawing')||is(n,'pict'))){
     const p=paragraphs[i];editParagraph(p,'');const next=output.findIndex(item=>item.record>i+1);output.splice(next===-1?output.length:next,0,{record:i+1,node:p});
   }
   if(output.length>MAX_TEXT_BLOCKS)throw new Error("The DOCX version contains more than 2,000 paragraphs.");
