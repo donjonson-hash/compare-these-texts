@@ -4,31 +4,51 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
-  <title>Welcome — Compare Two Texts</title>
-  <link rel="icon" href="icon-32.png">
+  <title>Compare Two Texts — Getting started</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="welcome.css">
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="index.html"><img src="icon-48.png" width="42" height="42" alt=""><span>Compare Two Texts</span></a><span class="badge">LOCAL DOCUMENT REVIEW</span></header>
+  <header class="topbar">
+    <a class="brand" href="index.html"><img src="favicon.svg" width="40" height="40" alt=""><span>Compare Two Texts</span></a>
+    <a class="help-link" href="support.html">Help &amp; feedback</a>
+  </header>
   <main>
     <section class="hero" aria-labelledby="welcome-title">
-      <p class="eyebrow">WELCOME TO YOUR COMPARISON WORKSPACE</p>
-      <h1 id="welcome-title">See the difference.<br><span>Make it right.</span></h1>
-      <p class="intro">Compare documents side by side, edit what matters,<br>and download your revised copy. Your files stay in your browser.</p>
-      <div class="actions"><a id="open-editor" class="button primary" href="index.html">Open workspace <span aria-hidden="true">→</span></a><a id="try-example" class="button secondary" href="index.html?welcome-example=1">Try an example</a></div>
-      <p class="formats">Word DOCX · Text-based PDF · TXT · Excel XLSX · CSV</p>
+      <div class="hero-copy">
+        <p class="eyebrow">READY WHEN YOU ARE</p>
+        <h1 id="welcome-title">Compare two texts.<br><span>Edit the differences.</span></h1>
+        <p class="intro">See what changed side by side, make your corrections, and download the revised document.</p>
+        <div class="actions">
+          <a id="try-example" class="button primary" href="index.html?welcome-example=1">Try an example <span aria-hidden="true">→</span></a>
+          <a id="open-editor" class="button secondary" href="index.html">Compare my files</a>
+        </div>
+        <p class="reassurance">Works offline · No account needed · Files stay on your device</p>
+      </div>
+      <aside class="example" aria-label="Illustrative text comparison">
+        <div class="example-heading"><span>Text comparison</span><span class="example-label">Example</span></div>
+        <div class="example-documents">
+          <div class="example-document"><p class="document-label"><span class="version">A</span> Original</p><h2>Project proposal</h2><p>Delivery: <del>Monday</del></p><p>Total: <del>$100</del></p><p class="unchanged">Support included.</p></div>
+          <div class="example-document"><p class="document-label"><span class="version">B</span> Revised</p><h2>Project proposal</h2><p>Delivery: <ins>Tuesday</ins></p><p>Total: <ins>$120</ins></p><p class="unchanged">Support included.</p></div>
+        </div>
+        <p class="example-caption">Find changed dates, amounts and wording.</p>
+      </aside>
     </section>
-    <section class="steps" aria-label="Three steps to a revised document">
-      <article><span class="step">01</span><h2>Open your documents</h2><p>Add A and B to compare, or choose <strong>Edit &amp; export</strong> to work on one document.</p></article>
-      <article><span class="step">02</span><h2>Review what changed</h2><p>Jump to highlighted differences. Edit supported text or table values. Undo lets you reverse changes.</p></article>
-      <article><span class="step">03</span><h2>Download your copy</h2><p>Save a revised file or choose PDF and preview it before downloading. Available formats depend on your document.</p></article>
+    <section class="steps" aria-label="From upload to download">
+      <article><span class="step">1</span><div><h2>Upload</h2><p>Add your original as A and the revised version as B.</p></div></article>
+      <article><span class="step">2</span><div><h2>See</h2><p>Jump straight to highlighted differences.</p></div></article>
+      <article><span class="step">3</span><div><h2>Edit</h2><p>Correct supported text or table values. Undo a change if needed.</p></div></article>
+      <article><span class="step">4</span><div><h2>Download</h2><p>Save your revised copy. Preview PDF exports before saving.</p></div></article>
     </section>
-    <section class="notes" aria-label="Getting started tips">
-      <article><h2>Keep it close</h2><p>Pin Compare Two Texts from your browser’s Extensions menu. The toolbar icon opens the comparison workspace. Find this page again through <strong>Getting started</strong> in the footer.</p></article>
-      <article><h2>Keep your work</h2><p>Drafts are encrypted in this browser and kept for 7 days after opening or saving. Download important results. Website and extension drafts are separate. The interface is in English.</p></article>
+    <div class="formats"><p>Word DOCX · Text-based PDF · TXT · Excel XLSX · CSV / TSV</p><p>Up to 2 MiB per file. PDF files need selectable text.</p></div>
+    <section class="help" aria-labelledby="quick-help-title">
+      <h2 id="quick-help-title">A little help getting started</h2>
+      <details><summary>Which documents can I compare?</summary><div class="answer"><p>Compare text files and Word documents (.docx), or compare PDF files with selectable text. To compare Excel files or CSV files, choose the sheet, a shared row identifier and the columns to check.</p><p>Scanned PDFs need OCR in another tool first. Images, interactive PDF form fields and comments are not compared. Spreadsheet comparison needs one header row, no merged cells and values instead of formulas.</p></div></details>
+      <details><summary>Can I edit or convert just one document?</summary><div class="answer"><p>Open the workspace and choose <strong>Edit &amp; convert</strong>. Edit a supported document and choose an available download format. For supported Word DOCX documents, choose PDF and check the preview before downloading. Export formats and layout preservation depend on the source document.</p></div></details>
+      <details><summary>How do I open the extension again?</summary><div class="answer"><p>Open your browser’s Extensions menu and pin <strong>Compare Two Texts</strong>. Click its toolbar icon to open the workspace. To return here, choose <strong>Getting started</strong> in the workspace footer.</p></div></details>
+      <details><summary>What happens to my files and saved drafts?</summary><div class="answer"><p>Comparison and editing happen on your device, without uploading your documents. Saved drafts are encrypted in this browser profile and expire after 7 days without opening or saving. Expired drafts are removed when you next open the app.</p><p>Download important results. Website and extension drafts are separate and do not sync. Draft encryption is not a password lock; see <a href="privacy.html">Your files &amp; privacy</a> for details. The editor interface is in English.</p></div></details>
     </section>
-    <p class="limits">Up to 2 MiB per file. PDFs need selectable text; scans, PDF forms, comments and image comparison are not supported. Export options depend on the file and layout.</p>
   </main>
-  <footer><span>Your documents stay yours.</span><nav aria-label="Help"><a href="privacy.html">Your files &amp; privacy</a><a href="support.html">Help &amp; feedback</a><a href="terms.html">Terms of use</a></nav></footer>
+  <footer><span>Compare. Edit. Keep your copy.</span><nav aria-label="Help"><a href="privacy.html">Your files &amp; privacy</a><a href="support.html">Help &amp; feedback</a><a href="terms.html">Terms of use</a></nav></footer>
 </body>
 </html>
