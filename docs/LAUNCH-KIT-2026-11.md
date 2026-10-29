@@ -58,8 +58,8 @@ Chrome Web Store (store Analytics supports source, medium and campaign only):
 
 ## 1. GitHub repository
 
-The repository is public but has no description, website or topics. Changing
-them publishes text, so it needs the owner's approval.
+Applied on 2026-10-30 with the command below. Changing these fields publishes
+text, so later edits need the owner's approval.
 
 - Description: Compare two texts, Word, PDF and Excel/CSV files side by side in the browser. Edit the differences and export. Files are processed locally, never uploaded.
 - Website: the GitHub About URL above.
