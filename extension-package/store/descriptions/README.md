@@ -1,6 +1,6 @@
 # Полные описания Chrome Web Store
 
-Тексты от 16 октября 2026, обновлённые 24 октября для версии CTT 0.37.4 и бренда Compare Two Texts: 19 выбранных языков, региональные варианты испанского и португальского и английский оригинал — 22 файла TXT.
+Тексты от 16 октября 2026, обновлённые 24 октября для версии CTT 0.37.4 (английский текст обновлён 29 октября для 0.37.5) и бренда Compare Two Texts: 19 выбранных языков, региональные варианты испанского и португальского и английский оригинал — 22 файла TXT.
 
 ## Как использовать
 
@@ -26,7 +26,7 @@
 
 | Локаль | Название | Полное описание |
 |---|---|---|
-| en | Compare Two Texts — Compare & Edit BETA | [en.txt](en.txt) |
+| en | Compare Two Texts — Diff Checker for Word, PDF & Excel | [en.txt](en.txt) |
 | de | Compare Two Texts — Texte vergleichen und bearbeiten | [de.txt](de.txt) |
 | fr | Compare Two Texts — Comparateur de texte et éditeur | [fr.txt](fr.txt) |
 | es | Compare Two Texts — Comparar textos y editar | [es.txt](es.txt) |

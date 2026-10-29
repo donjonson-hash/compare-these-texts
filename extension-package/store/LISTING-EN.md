@@ -1,55 +1,65 @@
 # Compare Two Texts — English Chrome Web Store listing
 
-Release candidate **0.37.4**, prepared 24 October 2026. This document supplies
+Release candidate **0.37.5**, prepared 29 October 2026. This document supplies
 copy for submission; it does not claim store publication or approval.
 `localizations.json` and `descriptions/en.txt` are the canonical copy inputs.
 
 ## Name
 
-Compare Two Texts — Compare & Edit BETA
+Compare Two Texts — Diff Checker for Word, PDF & Excel
 
-39 UTF-16 code units; maximum 75.
+54 UTF-16 code units; maximum 75.
 
 ## Short description
 
-Compare Word, PDF, text and Excel files side by side. Edit differences and save the result. Works locally in your browser.
+Compare two texts, Word, PDF and Excel files side by side. Find differences, edit and export. Works offline, no file uploads.
 
-122 UTF-16 code units; maximum 132.
+125 UTF-16 code units; maximum 132.
 
 ## Full description
 
-Compare Two Texts helps you compare text and documents side by side, find differences and edit the result. Check a revised document, review a supplier's spreadsheet or fill in a printed blank on a supported PDF — then download or print your work.
+Compare two versions of a document and see exactly what changed. Compare Two Texts is a diff checker for plain text, Word (DOCX), PDF and Excel/CSV files that runs entirely in your browser. Your files are never uploaded to a server.
 
-COMPARE, EDIT, SAVE
-1. Open the extension and choose two files to compare, or use Edit & export for one file.
-2. Review highlighted differences and make your changes.
-3. Download the result or print it using the options available for that format.
+WHO IT'S FOR
+- Contracts and agreements: compare two versions of a contract and review every changed clause, amount and percentage.
+- Price lists and supplier files: compare two Excel or CSV files by SKU, product code or any ID and spot changed values and missing rows.
+- Reports, policies and drafts: compare two Word documents or PDFs and check what an editor changed.
+- Writers and students: compare two texts online without pasting them into a website.
 
-WHAT YOU CAN DO
-- Compare TXT and Word DOCX text, PDFs with selectable text, and CSV/TSV or Excel XLSX tables.
-- See two versions next to each other, move between differences and edit text in the comparison workspace.
-- For spreadsheets, choose a sheet, match rows by an identifier and select the columns to check. Edit cell values and copy a missing row from A to B.
-- Review changed currency amounts and percentages in text, Word and supported PDF comparisons with Amounts & percentages.
-- In Edit & export, work on a single document. On supported text-based PDFs, click detected printed blanks to enter information, or use Add text to place an entry. Text size adjusts to the available space; Format provides manual controls.
-- Export supported Word DOCX documents to PDF with a preview before download. Supported headers, footers, page numbers and plain horizontal rules are included; pagination and font appearance may differ from Word.
+HOW IT WORKS
+1. Open the extension and choose two files to compare.
+2. Review the highlighted differences side by side and move from change to change.
+3. Edit the result right in the comparison and download or print it.
 
-LOCAL PROCESSING
-Document processing takes place on your device. The extension works offline and does not upload your documents to a server for comparison or editing. Website and extension drafts are stored separately, without automatic syncing. Download a copy of your finished work.
+FEATURES
+- Text compare and document compare: TXT, Word DOCX, text-based PDF, CSV/TSV and Excel XLSX.
+- Side-by-side view with highlighted additions, deletions and changes.
+- Edit text in the comparison workspace instead of switching back to Word.
+- Excel compare by ID: pick a sheet, match rows by an identifier, choose the columns to check, edit cells and copy a missing row from A to B.
+- Amounts & percentages: catch changed prices, totals and percentages in text, Word and PDF comparisons.
+- Edit & export for a single document: fill printed blanks or add text on supported text-based PDFs.
+- Export Word DOCX to PDF with a preview, including headers, footers and page numbers.
+- Built-in examples so you can try the workflow before opening your own files.
 
-BEFORE YOU START
-- The editor interface is currently in English. Translated store descriptions do not change the editor language.
-- Input files can be up to 2 MiB each.
-- PDFs need a text layer: scanned images without text are not supported, and there is no OCR. Printed blanks are different from interactive PDF form fields; interactive fields and PDF comments are not supported.
-- Images and formatting are not compared. PDF layout preservation depends on the document; complex layouts may require text-only export. Word layout may differ from Microsoft Word.
-- DOCX footnotes, endnotes and comments need to be moved into the main paragraphs of a copy before import.
-- Two-file spreadsheet comparison requires a single header row, no merged cells and values instead of formulas.
+PRIVATE BY DESIGN
+- Documents are processed on your device. The extension works offline.
+- Nothing is uploaded for comparison or editing.
+- Drafts are saved locally and encrypted with AES-GCM-256. The key stays in your browser profile: this is not a password-protected vault, and downloaded files are not encrypted.
+- Drafts expire after seven days without use. Website and extension drafts are stored separately.
 
-Start with the built-in document or CSV / Excel example to try the workflow before opening your own files.
+GOOD TO KNOW
+- Files up to 2 MiB each. The editor interface is in English.
+- PDFs need a text layer: scanned images and OCR are not supported. Interactive PDF form fields and comments are not supported.
+- Images and formatting are not compared. Complex PDF or Word layouts may export as text only, and Word layout may differ from Microsoft Word.
+- DOCX footnotes, endnotes and comments are not imported; move them into the main text of a copy first.
+- Spreadsheet comparison needs one header row, no merged cells and values instead of formulas.
+
+Also available on the web at comparetwotexts.pro. Questions or ideas? Use the support link on this page.
 
 ## Dashboard references — do not paste into the full description
 
-The full description above contains 2,613 Unicode characters
-(2,613 UTF-16 code units), excluding its final newline.
+The full description above contains 2,741 Unicode characters
+(2,741 UTF-16 code units), excluding its final newline.
 Copy `descriptions/en.txt` as-is into the description field.
 
 - Primary language: English. The editor and welcome page are in English.
