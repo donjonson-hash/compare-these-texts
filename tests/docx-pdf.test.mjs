@@ -73,3 +73,7 @@ test('Word PDF preview downloads edited text and image, rejects stale revisions 
  root.querySelector('[data-save-side="right"]').click();await until(()=>save()&&!save().disabled);save().click();assert.equal(downloads.length,2);assert.match((await extracted(new Uint8Array(await downloads[1].arrayBuffer()))).join(' '),/Warranty: 48 months/);dialog().querySelector('.pdf-block-actions .secondary').click();
  const latest=view.drafts.right.snapshot();root.querySelector('[data-save-side="right"]').click();await until(()=>dialog());dialog().querySelector('.pdf-block-actions .secondary').click();await delay(50);assert.equal(dialog(),null);assert.deepEqual(view.drafts.right.snapshot(),latest);assert.equal(downloads.length,2);
 });
+test('built-in Word examples use the current product name',async()=>{
+ const sources=await demo();
+ for(const side of ['left','right']){const text=(await readDocxVisual(sources[side])).blocks.map(b=>b.text).join('\n');assert.match(text,/Sample documents · Compare Two Texts/,side);assert.doesNotMatch(text,/Compare These Texts/,side);}
+});
