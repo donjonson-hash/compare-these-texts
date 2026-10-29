@@ -83,3 +83,23 @@ test('home page has its main heading before any other heading', () => {
   const doc = load(new URL('index.html', dist));
   assert.equal(doc.querySelector('h1,h2,h3').tagName, 'H1');
 });
+
+test('each guide targets its search phrase in title, main heading and inbound links', () => {
+  // Phrases chosen from Semrush US data on 2026-10-30; see docs/SEO-PLAN-2026-10-29.md.
+  const targets = {
+    '/compare-word-documents/': 'compare two word documents',
+    '/compare-pdf-files/': 'compare two pdf files',
+    '/compare-excel-files/': 'compare two excel files',
+    '/compare-csv-files/': 'compare two csv files',
+  };
+  const anchors = {};
+  for (const page of pages()) {
+    for (const a of load(page).querySelectorAll('a[href^="/compare-"]')) (anchors[a.getAttribute('href')] ??= []).push(a.textContent.toLowerCase());
+  }
+  for (const [route, phrase] of Object.entries(targets)) {
+    const doc = load(new URL('.' + route + 'index.html', dist));
+    assert.ok(doc.title.toLowerCase().includes(phrase), route + ' title');
+    assert.ok(doc.querySelector('h1').textContent.toLowerCase().includes(phrase), route + ' h1');
+    assert.ok(anchors[route].filter(text => text === phrase).length >= 3, route + ' anchors');
+  }
+});
