@@ -29,6 +29,9 @@ async function linkValidator(raw) {
       const uri = lookup(action, 'URI');
       if (!uri || typeof uri.decodeText !== 'function' || uri instanceof PDFName) return false;
       const value = uri.decodeText();
+      // Some document generators emit empty link placeholders. They stay inert
+      // like other accepted links; keep every dictionary/action check above.
+      if (value === 'about:blank') continue;
       if (!/^(?:https?:\/\/|mailto:)/i.test(value) || /[\u0000-\u0020\u007f]/u.test(value)) return false;
       try { if (!['http:', 'https:', 'mailto:'].includes(new URL(value).protocol)) return false; } catch { return false; }
     }
@@ -131,7 +134,7 @@ export async function readPdfBytes(raw) {
         const viewport = page.getViewport({scale: 1});
         const annotations = await page.getAnnotations({intent: 'any'});
         if (annotations.length) {
-          const unsupported = () => fail(`Page ${pageNumber}: only ordinary HTTP(S) and email links are supported. Comments, forms, and other annotations or actions are not supported. Prepare a copy without them.`);
+          const unsupported = () => fail(`Page ${pageNumber}: only ordinary HTTP(S), email and empty about:blank links are supported. Comments, forms, and other annotations or actions are not supported. Prepare a copy without them.`);
           if (annotations.some(annotation => annotation.annotationType !== 2)) unsupported();
           validateLinks ||= await linkValidator(raw);
           checkTime();

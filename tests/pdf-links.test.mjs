@@ -60,6 +60,19 @@ test('email links import as inert text and do not affect comparison', async () =
   }
 });
 
+test('three inert about:blank placeholders do not block document text or create comparison changes', async () => {
+  const placeholders = Array.from({length: 3}, () => link('/Type /Action /S /URI /URI (about:blank)', '/Contents (about:blank) /BS << /W 0 >> /F 4'));
+  const source = fixture(placeholders), plain = fixture();
+  const parsed = await readTextSource(source);
+  assert.deepEqual(parsed.blocks.map(block => block.text), ['Contact support']);
+  assert.equal(parsed.meta.link_count, 3);
+  assert.match(parsed.meta.notes.join(' '), /link destinations are not compared or opened/);
+  const report = await compareText({left: source, right: plain});
+  assert.equal(report.summary.changed, 0);
+  assert.equal(report.summary.matched, 1);
+  assert.notEqual(report.sources.left.sha256, report.sources.right.sha256);
+});
+
 test('other annotations, unsafe schemes and additional link actions remain unsupported', async () => {
   for (const [name, annotations] of [
     ['comment', ['<< /Type /Annot /Subtype /Text /Rect [50 595 180 615] /Contents (Review) >>']],
@@ -67,6 +80,13 @@ test('other annotations, unsafe schemes and additional link actions remain unsup
     ['email chained action', [link('/S /URI /URI (mailto:test@example.com) /Next << /S /JavaScript /JS (noop) >>')]],
     ['email additional action', [link('/S /URI /URI (mailto:test@example.com)', '/AA << /E << /S /JavaScript /JS (noop) >> >>')]],
     ['email control character', [link('/S /URI /URI (mailto:test@example.com\\n)')]],
+    ['about fragment', [link('/S /URI /URI (about:blank#reference)')]],
+    ['about query', [link('/S /URI /URI (about:blank?reference)')]],
+    ['other about page', [link('/S /URI /URI (about:config)')]],
+    ['blank chained action', [link('/S /URI /URI (about:blank) /Next << /S /JavaScript /JS (noop) >>')]],
+    ['blank additional action', [link('/S /URI /URI (about:blank)', '/AA << /E << /S /JavaScript /JS (noop) >> >>')]],
+    ['blank alternative destination', [link('/S /URI /URI (about:blank)', '/Dest [3 0 R /Fit]')]],
+    ['mixed blank and comment', [link('/S /URI /URI (about:blank)'), '<< /Type /Annot /Subtype /Text /Rect [50 595 180 615] /Contents (Review) >>']],
     ['javascript URI', [link('/S /URI /URI (javascript:alert%281%29)')]],
     ['relative URI', [link('/S /URI /URI (/reference)')]],
     ['file URI', [link('/S /URI /URI (file:///tmp/example)')]],
@@ -97,30 +117,33 @@ test('PDF editor displays link scope and rebuilt downloads contain no stale link
   const input = await PDFDocument.create(); input.registerFontkit(fontkit);
   const font = await input.embedFont(Buffer.from(fontBase64, 'base64'), {subset: true});
   const page = input.addPage([500, 700]); page.drawText('Contact support', {x: 50, y: 600, size: 14, font});
-  input.setTitle('mailto:test@example.com');
-  const uri = input.context.lookup(input.context.trailerInfo.Info).get(PDFName.of('Title'));
-  page.node.set(PDFName.of('Annots'), input.context.obj([{Type: 'Annot', Subtype: 'Link', Rect: [50, 595, 180, 615], Border: [0, 0, 0], A: {S: 'URI', URI: uri}}]));
-  const original = fromBytes(await input.save()), parsed = await readTextSource(original);
-  const sources = {left: original, right: original}, report = await compareText(sources);
-  for (const single of [false, true]) {
-    view = await mountVisualReview(document.querySelector('main'), {report, sources, single});
-    const notice = document.querySelector('[data-pdf-link-note="left"]');
-    assert.ok(notice && !notice.hidden && !notice.closest('.visual-column').hidden);
-    assert.match(notice.textContent, /Link destinations are not compared/);
-    assert.match(notice.textContent, /Edited PDF downloads do not retain clickable links/);
-    view.dispose(); view = null;
-  }
-  const blocks = parsed.blocks.map(block => ({...block, key: `section-${block.record}`}));
-  const entries = blocks.map(block => ({key: block.key, record: block.record, text: 'Contact sales'}));
-  const exports = [
-    await renderPdfRevision(original, [{block: blocks[0], text: 'Contact sales'}], {blocks}),
-    await renderPreservedPdf(original, entries, {blocks}),
-    await renderReflowedPdf(entries),
-  ];
-  for (const bytes of exports) {
-    const loading = getDocument({data: bytes.slice(), disableFontFace: true, useSystemFonts: false, isEvalSupported: false, verbosity: 0});
-    try { const pdf = await loading.promise; for (let page = 1; page <= pdf.numPages; page++) assert.deepEqual(await (await pdf.getPage(page)).getAnnotations({intent: 'any'}), []); }
-    finally { await loading.destroy(); }
-    assert.match((await readTextSource(fromBytes(bytes))).blocks.map(block => block.text).join(' '), /Contact sales/);
+  for (const destination of ['mailto:test@example.com', 'about:blank']) {
+    input.setTitle(destination);
+    const uri = input.context.lookup(input.context.trailerInfo.Info).get(PDFName.of('Title'));
+    page.node.set(PDFName.of('Annots'), input.context.obj([{Type: 'Annot', Subtype: 'Link', Rect: [50, 595, 180, 615], Border: [0, 0, 0], A: {S: 'URI', URI: uri}}]));
+    const original = fromBytes(await input.save()), parsed = await readTextSource(original);
+    const sources = {left: original, right: original}, report = await compareText(sources);
+    for (const single of [false, true]) {
+      view = await mountVisualReview(document.querySelector('main'), {report, sources, single});
+      const notice = document.querySelector('[data-pdf-link-note="left"]');
+      assert.ok(notice && !notice.hidden && !notice.closest('.visual-column').hidden);
+      assert.match(notice.textContent, /Link destinations are not compared/);
+      assert.match(notice.textContent, /Edited PDF downloads do not retain clickable links/);
+      assert.equal(document.querySelector('a[href="about:blank"]'), null, 'placeholder destinations remain inert in the editor');
+      view.dispose(); view = null;
+    }
+    const blocks = parsed.blocks.map(block => ({...block, key: `section-${block.record}`}));
+    const entries = blocks.map(block => ({key: block.key, record: block.record, text: 'Contact sales'}));
+    const exports = [
+      await renderPdfRevision(original, [{block: blocks[0], text: 'Contact sales'}], {blocks}),
+      await renderPreservedPdf(original, entries, {blocks}),
+      await renderReflowedPdf(entries),
+    ];
+    for (const bytes of exports) {
+      const loading = getDocument({data: bytes.slice(), disableFontFace: true, useSystemFonts: false, isEvalSupported: false, verbosity: 0});
+      try { const pdf = await loading.promise; for (let page = 1; page <= pdf.numPages; page++) assert.deepEqual(await (await pdf.getPage(page)).getAnnotations({intent: 'any'}), []); }
+      finally { await loading.destroy(); }
+      assert.match((await readTextSource(fromBytes(bytes))).blocks.map(block => block.text).join(' '), /Contact sales/);
+    }
   }
 });
