@@ -1,4 +1,4 @@
-# Compare Two Texts 0.37.4 — загрузка в Chrome Web Store
+# Compare Two Texts 0.37.5 — загрузка в Chrome Web Store
 
 Комплект подготовлен 24 октября 2026. Он содержит кандидат расширения и
 материалы карточки. Подготовка комплекта не означает отправку на модерацию,
@@ -6,13 +6,13 @@
 
 ## 1. Распаковать комплект
 
-Распакуйте `ctt-0.37.4-store-kit.zip`. В поле загрузки расширения выбирайте
-**только `ctt-chrome-0.37.4.zip`** — внутри него `manifest.json` лежит в корне.
+Распакуйте `ctt-0.37.5-store-kit.zip`. В поле загрузки расширения выбирайте
+**только `ctt-chrome-0.37.5.zip`** — внутри него `manifest.json` лежит в корне.
 Не загружайте весь store-kit или ZIP Firefox как Chrome-расширение.
 
 | Что требуется | Файл |
 | --- | --- |
-| Установочный ZIP Chrome | `ctt-chrome-0.37.4.zip` |
+| Установочный ZIP Chrome | `ctt-chrome-0.37.5.zip` |
 | Полное описание, English | `FULL-DESCRIPTION-EN.txt` или `descriptions/en.txt` |
 | Название и короткое описание | `LISTING-EN.md`, `metadata/en.json` |
 | Локализованные названия и описания | `localizations.json`, `metadata/`, `descriptions/` |
@@ -37,7 +37,7 @@ Welcome page уже включена в ZIP как `welcome.html`. Её не н�
 
 ## 2. Проверить именно установочный архив
 
-Для ручной проверки распакуйте `ctt-chrome-0.37.4.zip` в отдельную папку.
+Для ручной проверки распакуйте `ctt-chrome-0.37.5.zip` в отдельную папку.
 Откройте `chrome://extensions`, включите Developer mode, нажмите **Load unpacked**
 и выберите эту папку. Минимальный Chrome — 120. Проверьте welcome page,
 встроенный пример, редактирование, отмену Undo и скачивание PDF.
@@ -61,11 +61,11 @@ Firefox ZIP приложен отдельно для временной пров
 
 **Name**
 
-Compare Two Texts — Compare & Edit BETA
+Compare Two Texts — Diff Checker for Word, PDF & Excel
 
-**Short description** — 122 UTF-16 единицы, лимит 132
+**Short description** — 125 UTF-16 единиц, лимит 132
 
-Compare Word, PDF, text and Excel files side by side. Edit differences and save the result. Works locally in your browser.
+Compare two texts, Word, PDF and Excel files side by side. Find differences, edit and export. Works offline, no file uploads.
 
 **Full description** — вставьте `descriptions/en.txt` целиком.
 
@@ -128,7 +128,7 @@ Compare Word, PDF, text and Excel files side by side. Edit differences and save 
 
 Перед отправкой:
 
-- Версия в кабинете — **0.37.4**, название — **Compare Two Texts**.
+- Версия в кабинете — **0.37.5**, название — **Compare Two Texts**.
 - Загружен Chrome ZIP, а не комплект материалов.
 - Иконка и скриншоты читаются в предпросмотре.
 - Ссылки на сайт, поддержку и privacy открываются.

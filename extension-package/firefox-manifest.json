@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Compare Two Texts — Compare & Edit BETA",
-  "version": "0.37.4",
+  "name": "Compare Two Texts — Diff Checker for Word, PDF & Excel",
+  "version": "0.37.5",
   "homepage_url": "https://comparethesetexts.com/",
-  "description": "Compare Word, PDF, text and Excel files side by side. Edit differences and save the result. Works locally in your browser.",
+  "description": "Compare two texts, Word, PDF and Excel files side by side. Find differences, edit and export. Works offline, no file uploads.",
   "icons": {
     "16": "icon-16.png",
     "32": "icon-32.png",

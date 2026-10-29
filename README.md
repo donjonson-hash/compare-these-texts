@@ -1,6 +1,6 @@
 # Compare Two Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.37.4**.
+Current CTT website and offline Chrome/Firefox extension source: **0.37.5**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparethesetexts.com/.
@@ -44,7 +44,7 @@ available to resume. The editor and welcome page remain English.
 The Chrome package includes 22 localized metadata catalogs. Full store
 descriptions, five icon sizes, five actual screenshots, two promotional images
 and Russian submission instructions are assembled with `npm run package:store`
-after building and running `npm run store:assets`. The result is `artifacts/ctt-0.37.4-store-kit.zip`; unpack it
+after building and running `npm run store:assets`. The result is `artifacts/ctt-0.37.5-store-kit.zip`; unpack it
 before uploading its inner Chrome ZIP. Firefox is supplied for temporary
 testing; its metadata remains English. This preparation does not publish either
 store listing or deploy the website.
@@ -108,8 +108,8 @@ npm run check
 Outputs:
 
 - `dist/`: static website, including extension downloads.
-- `dist/downloads/ctt-chrome-0.37.4.zip`: load the extracted directory in Chrome.
-- `dist/downloads/ctt-firefox-0.37.4.zip`: temporary Firefox installation.
+- `dist/downloads/ctt-chrome-0.37.5.zip`: load the extracted directory in Chrome.
+- `dist/downloads/ctt-firefox-0.37.5.zip`: temporary Firefox installation.
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 
