@@ -3,7 +3,7 @@
 Current CTT website and offline Chrome/Firefox extension source: **0.37.5**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
-host permissions. Website: https://comparethesetexts.com/.
+host permissions. Website: https://comparetwotexts.pro/.
 
 ## Encrypted saved drafts
 

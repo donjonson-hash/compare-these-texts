@@ -6,6 +6,7 @@ import {mountFindReplace} from './find-replace.mjs';
 import {createFinalCheck} from './final-check.mjs';
 import {createReviewQueue} from './review-queue.mjs';
 import {mountNumberReview} from './number-review.mjs';
+import {recordProductEvent} from './product-events.mjs';
 /* Documents first: original pages, local corrections, and two editable versions. */
 const sides = ['left', 'right'];
 const letter = side => side === 'left' ? 'A' : 'B';
@@ -68,18 +69,27 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     URL.revokeObjectURL(downloadOffer.url);downloadOffer.node.remove();downloadOffer=null;
   }
   function download(data,name,mime) {
-    if(!single||report.sources.left.format!=='pdf'||mime!=='application/pdf')return triggerDownload(data,name,mime);
+    const fileFormat = mime === 'application/pdf' ? 'pdf' : mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? 'docx' : 'txt';
+    const recordDownload = () => recordProductEvent('document_download', {file_format:fileFormat, workspace:single?'editor':'comparison'});
+    if(!single||report.sources.left.format!=='pdf'||mime!=='application/pdf'){
+      triggerDownload(data,name,mime);recordDownload();return;
+    }
     clearDownloadOffer();
     const url=URL.createObjectURL(new Blob([data],{type:mime}));
     const node=el('section',undefined,'pdf-download-ready');node.setAttribute('aria-label','Prepared PDF');
     const note=el('p','PDF prepared. If the download did not start, use Save PDF to computer. You can also open the PDF and save it from your browser.');
     const save=el('a','Save PDF to computer','button primary');save.href=url;save.download=name;save.dataset.pdfReadyDownload='';
+    // Count a prepared PDF once even if its automatic download needs the manual
+    // fallback. This records initiation, not confirmation of saving to disk.
+    let downloadRecorded=false;
+    const recordPreparedDownload=()=>{if(!downloadRecorded){downloadRecorded=true;recordDownload();}};
+    save.addEventListener('click',event=>{if(event.isTrusted)recordPreparedDownload();});
     const open=el('a','Open PDF','button secondary');open.href=url;open.target='_blank';open.rel='noopener';open.dataset.pdfReadyOpen='';
     node.append(note,save,open);status.after(node);
     downloadOffer={url,node,key:downloadKey()};
     // Keep a real link alive for a direct user gesture if the embedded browser
     // declines the asynchronous automatic download. A click is not proof of saving.
-    try { save.click(); } catch { /* The persistent links remain usable. */ }
+    try { save.click(); recordPreparedDownload(); } catch { /* The persistent links remain usable. */ }
   }
   async function flushFill() {
     if (!inlineFill) return true;
