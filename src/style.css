@@ -19,8 +19,8 @@ button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-vis
 main{max-width:1440px;margin:auto;padding:0 42px}
 .hero{display:flex;align-items:center;justify-content:space-between;gap:32px;padding:48px 0 32px}
 .eyebrow{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:14px}
-h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(38px,4.3vw,62px);line-height:1.04;letter-spacing:-2px}
-h1 span{color:var(--green)}
+h1,.hero-title{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(38px,4.3vw,62px);line-height:1.04;letter-spacing:-2px}
+h1 span,.hero-title span{color:var(--green)}
 .intro{font-size:16px;line-height:1.6;margin-top:20px}
 .hint{font-size:13px;line-height:1.6;color:var(--muted);margin-top:8px;overflow-wrap:anywhere}
 .hero .hint{max-width:580px}
@@ -245,9 +245,9 @@ main{padding:0 18px}
 .review-mode .topbar{padding-block:14px;background:#fff}
 .review-mode .hero{padding:18px 0 16px;gap:16px}
 .review-mode .hero .eyebrow,.review-mode .hero .intro,.review-mode .hero .hint{display:none}
-.review-mode .hero h1{font-family:inherit;font-size:21px;letter-spacing:-.4px;line-height:1.3;font-weight:600}
-.review-mode .hero h1 br{display:none}
-.review-mode .hero h1 span::before{content:" "}
+.review-mode .hero .hero-title{font-family:inherit;font-size:21px;letter-spacing:-.4px;line-height:1.3;font-weight:600}
+.review-mode .hero .hero-title br{display:none}
+.review-mode .hero .hero-title span::before{content:" "}
 .review-mode .hero>.button{padding:7px 10px;font-size:11px;margin:0}
 .review-mode .workspace-layout{display:block}
 .review-mode .sources{gap:14px}
@@ -350,7 +350,7 @@ main{padding:0 18px}
 @media(max-width:700px){
   .review-mode main,.review-mode .topbar{padding-inline:12px}
   .review-mode .hero{display:flex;padding:14px 0}
-  .review-mode .hero h1{font-size:17px;letter-spacing:-.2px}
+  .review-mode .hero .hero-title{font-size:17px;letter-spacing:-.2px}
   .review-mode .hero>.button{max-width:120px;font-size:10px}
   .review-mode .sources{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
   .review-mode .source-card{padding:8px;gap:5px}
