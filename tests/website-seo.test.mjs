@@ -1,0 +1,85 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync, existsSync, readdirSync} from 'node:fs';
+import {JSDOM} from 'jsdom';
+
+const dist = new URL('../dist/', import.meta.url);
+const STORE = 'https://chromewebstore.google.com/detail/kclhfaiampafehfhhlejeeefhdhocfcg';
+const GUIDES = ['/compare-word-documents/', '/compare-pdf-files/', '/compare-excel-files/', '/compare-csv-files/'];
+
+function pages(dir = dist) {
+  return readdirSync(dir, {withFileTypes: true}).flatMap(entry => {
+    if (entry.isDirectory()) return entry.name === 'downloads' || entry.name === 'release' ? [] : pages(new URL(entry.name + '/', dir));
+    return entry.name.endsWith('.html') ? [new URL(entry.name, dir)] : [];
+  });
+}
+const load = url => new JSDOM(readFileSync(url, 'utf8')).window.document;
+const meta = (doc, key) => doc.querySelector(`meta[property="${key}"],meta[name="${key}"]`)?.content;
+
+test('every website page shares its own title, description and canonical URL', () => {
+  const list = pages();
+  assert.ok(list.length >= 9);
+  for (const page of list) {
+    const doc = load(page), canonical = doc.querySelector('link[rel=canonical]').href;
+    assert.equal(meta(doc, 'og:url'), canonical, page.pathname);
+    assert.equal(meta(doc, 'og:title'), doc.title, page.pathname);
+    assert.equal(meta(doc, 'og:description'), meta(doc, 'description'), page.pathname);
+    assert.equal(meta(doc, 'og:image'), 'https://comparetwotexts.pro/images/og-1200x630.png', page.pathname);
+    assert.equal(meta(doc, 'twitter:card'), 'summary_large_image', page.pathname);
+  }
+  assert.ok(existsSync(new URL('images/og-1200x630.png', dist)));
+});
+
+test('home page links to every file comparison guide', () => {
+  const doc = load(new URL('index.html', dist));
+  const links = [...doc.querySelectorAll('a[href]')].map(a => a.getAttribute('href'));
+  for (const guide of GUIDES) assert.ok(links.includes(guide), guide);
+});
+
+test('store links on the website name their placement for store analytics', () => {
+  for (const [page, campaign] of [['index.html', 'home_header'], ['extension/index.html', 'extension_page'],
+    ['compare-word-documents/index.html', 'guide_word'], ['compare-pdf-files/index.html', 'guide_pdf'],
+    ['compare-excel-files/index.html', 'guide_excel'], ['compare-csv-files/index.html', 'guide_csv']]) {
+    const links = [...load(new URL(page, dist)).querySelectorAll(`a[href^="${STORE}"]`)];
+    assert.ok(links.length, page);
+    for (const link of links) {
+      const url = new URL(link.href);
+      assert.equal(url.origin + url.pathname, STORE, page);
+      assert.deepEqual(Object.fromEntries(url.searchParams), {utm_source: 'comparetwotexts', utm_medium: 'website', utm_campaign: campaign}, page);
+    }
+  }
+});
+
+test('home page store button is counted as a store click', t => {
+  const dom = new JSDOM(readFileSync(new URL('index.html', dist), 'utf8'), {url: 'https://comparetwotexts.pro/', runScripts: 'outside-only'});
+  t.after(() => dom.window.close());
+  const {window} = dom, doc = window.document;
+  window.eval([...doc.scripts].find(s => !s.src && s.textContent.includes('cttProductEvent')).textContent);
+  const link = doc.querySelector(`a[href^="${STORE}"]`);
+  window.addEventListener('click', e => e.preventDefault(), {once: true});
+  link.dispatchEvent(new window.MouseEvent('click', {bubbles: true, cancelable: true}));
+  const events = Array.from(window.dataLayer).filter(x => x[0] === 'event').map(x => x[1]);
+  assert.deepEqual(events, ['chrome_store_click']);
+});
+
+test('structured data is valid JSON describing the free web app and extension', () => {
+  const data = page => [...load(new URL(page, dist)).querySelectorAll('script[type="application/ld+json"]')].map(s => JSON.parse(s.textContent));
+  const home = data('index.html'), extension = data('extension/index.html');
+  assert.equal(home.length, 1);
+  assert.equal(extension.length, 1);
+  const types = home[0]['@graph'].map(node => node['@type']);
+  assert.deepEqual(types, ['WebSite', 'WebApplication']);
+  const app = home[0]['@graph'][1];
+  assert.equal(app.url, 'https://comparetwotexts.pro/');
+  assert.equal(app.offers.price, '0');
+  assert.equal(extension[0]['@type'], 'SoftwareApplication');
+  assert.equal(extension[0].applicationCategory, 'BrowserApplication');
+  assert.equal(new URL(extension[0].installUrl).origin + new URL(extension[0].installUrl).pathname, STORE);
+  // No ratings exist yet; never publish invented review data.
+  for (const node of [...home[0]['@graph'], extension[0]]) assert.equal('aggregateRating' in node, false);
+});
+
+test('home page has its main heading before any other heading', () => {
+  const doc = load(new URL('index.html', dist));
+  assert.equal(doc.querySelector('h1,h2,h3').tagName, 'H1');
+});

@@ -3,6 +3,7 @@ from pathlib import Path
 import json,zipfile,re
 from store_metadata import message_files
 from website_analytics import strip_website_analytics
+from website_meta import WEBSITE_ONLY
 root=Path(__file__).resolve().parents[1];dist=root/'dist';sources=root/'extension-package'
 release=json.loads((root/'release.json').read_text())
 version=release['version']
@@ -19,7 +20,9 @@ for target in ['chrome','firefox']:
  for name in files:
   if name.endswith('.html'):files[name]=strip_website_analytics(files[name].decode()).encode()
  if target=='chrome':files.update(localized_files)
- html=files['index.html'].decode().replace('href="/"','href="index.html"').replace('href="/site.css"','href="site.css"').replace('href="/favicon.svg"','href="favicon.svg"').replace('src="/favicon.svg"','src="favicon.svg"')
+ # Store buttons, guide links and structured data describe the website, not the installed copy.
+ html=re.sub(re.escape(WEBSITE_ONLY[0])+'.*?'+re.escape(WEBSITE_ONLY[1]),'',files['index.html'].decode(),flags=re.S)
+ html=html.replace('href="/"','href="index.html"').replace('href="/site.css"','href="site.css"').replace('href="/favicon.svg"','href="favicon.svg"').replace('src="/favicon.svg"','src="favicon.svg"')
  html=html.replace('href="/extension/"','href="https://comparethesetexts.com/extension/"').replace('href="/privacy/"','href="privacy.html"').replace('href="/support/"','href="support.html"').replace('href="/terms/"','href="terms.html"')
  html=html.replace('>Extension</a>','>Website</a>').replace('href="https://comparethesetexts.com/extension/">Website','href="https://comparethesetexts.com/">Website')
  html=re.sub(r'<a href="(https://[^"]+)"',r'<a href="\1" target="_blank" rel="noopener noreferrer"',html)

@@ -41,6 +41,7 @@ for p in root.rglob('*.html'):
  assert SCRIPT_HASH in parser.csp,p
  assert 'https://*.google-analytics.com' in parser.csp,p
  assert p.read_text().count(TAG)==1,(p,'one website Google tag')
+ assert f'<meta property="og:url" content="{canonical}">' in p.read_text(),(p,'social metadata')
  for ref in parser.refs:
   u=urlparse(ref)
   if u.scheme or u.netloc or not u.path:continue
@@ -60,6 +61,7 @@ for p in (root/'downloads').glob('*.zip'):
   for name in z.namelist():
    if name.endswith(('.html','.js','.mjs')):
     assert b'googletagmanager.com/gtag/js' not in z.read(name),(p,name,'analytics leaked into extension')
+    for marker in (b'<!-- website-only -->',b'application/ld+json',b'property="og:',b'chromewebstore.google.com'):assert marker not in z.read(name),(p,name,'website-only content leaked into extension')
     if name.endswith('.html'):
      offline=Parser();offline.feed(z.read(name).decode())
      if offline.csp:assert "connect-src 'none'" in offline.csp,(p,name,'offline CSP')

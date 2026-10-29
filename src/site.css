@@ -143,3 +143,8 @@ body.home-mode{background:#f8faf9}
 
 /* Informational pages share readable list spacing. */
 .privacy-copy ul{padding-left:22px;margin-top:14px;font-size:15px;line-height:1.8}.privacy-copy li+li{margin-top:8px}
+
+/* Website-only home links: store button and file guides. Chrome extensions install from desktop only. */
+.topbar nav a.chrome-cta{display:inline-flex;padding:8px 14px;font-size:13px;text-decoration:none}
+.home-guides{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0 0;font-size:12px;color:#65757c}.home-guides a{color:var(--green)}
+@media(max-width:700px){.topbar nav a.chrome-cta{display:none}}
