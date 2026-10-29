@@ -35,11 +35,15 @@ const errors = [], externalRequests = [];
 try {
   browser = await chromium.launch({headless:true, args:['--no-sandbox'], ...(process.env.CHROMIUM_EXECUTABLE ? {executablePath:process.env.CHROMIUM_EXECUTABLE} : {channel:'chromium'})});
   const context = await browser.newContext({viewport:{width:1360,height:900},acceptDownloads:true});
+  // Exercise the built website without contacting Analytics. Its bootstrap and
+  // allowed fields are covered separately; all other external requests fail.
+  const analyticsUrl = 'https://www.googletagmanager.com/gtag/js?id=G-J33QPHR8L3';
+  await context.route(analyticsUrl, route => route.fulfill({body:'',contentType:'application/javascript'}));
   const page = await context.newPage();
   page.on('pageerror', error => errors.push(error.message));
   let dismissNextDialog = false;
   page.on('dialog', dialog => {if (dismissNextDialog) {dismissNextDialog = false; void dialog.dismiss();} else void dialog.accept();});
-  page.on('request', request => {if (/^https?:/.test(request.url()) && new URL(request.url()).origin !== origin) externalRequests.push(request.url());});
+  page.on('request', request => {if (/^https?:/.test(request.url()) && new URL(request.url()).origin !== origin && request.url() !== analyticsUrl) externalRequests.push(request.url());});
   const ready = () => page.locator('#visual-review [data-save-side="right"]').waitFor({state:'visible'});
   const saved = () => page.waitForFunction(() => document.getElementById('session-status')?.textContent.includes('Saved in this browser'));
   const downloadB = async () => {
