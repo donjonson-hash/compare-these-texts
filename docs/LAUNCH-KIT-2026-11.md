@@ -238,7 +238,7 @@ and disclose affiliation (Stack Exchange requires it).
 
 | Date | Placement | URL of the post or listing | Status | Link type | Notes |
 | --- | --- | --- | --- | --- | --- |
-| | GitHub About | | | | |
+| 2026-10-30 | GitHub About | https://github.com/donjonson-hash/compare-these-texts | Live | Repository website field | Description, website and 12 topics set |
 | | AlternativeTo | | | | |
 | | SaaSHub | | | | |
 | | Show HN | | | | |
