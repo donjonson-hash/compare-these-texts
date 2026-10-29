@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 from website_analytics import add_website_analytics
+from website_meta import add_social_meta
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src"
@@ -42,6 +43,7 @@ def build():
     subprocess.run([sys.executable, str(ROOT / "scripts/package_extension.py")], check=True)
     # Keep remote scripts and website CSP permissions out of offline extensions.
     add_website_analytics(OUTPUT)
+    add_social_meta(OUTPUT)
     release = json.loads((ROOT / "release.json").read_text())
     revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "--", "."], cwd=ROOT, text=True).strip())

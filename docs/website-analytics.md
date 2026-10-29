@@ -31,6 +31,25 @@ report. Mark `document_download` as a key event if measuring completed product
 use; keep `chrome_store_click` separate from the store-managed `install` event.
 Parameter breakdowns in reports may require event-scoped custom dimensions.
 
+## On-site store links
+
+Every website link to the Chrome Web Store names its placement so the store's
+own Analytics property can split installs by source. Format:
+`?utm_source=comparetwotexts&utm_medium=website&utm_campaign=<placement>`.
+
+| Placement | `utm_campaign` |
+| --- | --- |
+| Home page header button | `home_header` |
+| Extension page install button | `extension_page` |
+| Word / PDF / Excel / CSV guide buttons | `guide_word`, `guide_pdf`, `guide_excel`, `guide_csv` |
+
+The website `chrome_store_click` event matches the store URL path, so these
+parameters do not change it. The home-page button, guide links and structured
+data sit between `<!-- website-only -->` markers and are removed from the
+offline extensions by `scripts/package_extension.py`. Open Graph tags are added
+to website output by `scripts/website_meta.py` from each page's own title,
+description and canonical URL; `scripts/og-image.mjs` regenerates the card.
+
 ## Acquisition links
 
 The website config preserves only `utm_source`, `utm_medium`, `utm_campaign`

@@ -6,7 +6,7 @@
 .guide-page section{scroll-margin-top:24px}
 .guide-page .privacy-copy{max-width:none;margin-top:0}
 .guide-page .privacy-copy section{padding:26px 0}
-.guide-cta{margin-top:22px}
+.guide-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
 .guide-page a.button{display:inline-flex;text-decoration:none}
 .guide-steps{padding-left:26px}
 .guide-steps li{padding:7px 0 7px 5px}
