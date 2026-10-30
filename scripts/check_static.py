@@ -8,6 +8,7 @@ from website_analytics import SCRIPT_HASH, TAG
 root=Path(__file__).resolve().parents[1]/'dist'
 release=json.loads((root.parent/'release.json').read_text())
 localized_files=message_files()
+minified_files={entry['file'] for entry in json.loads((root/'release/provenance.json').read_text())['website_minification']['files']}
 assert release['homepage_url']=='https://comparetwotexts.pro/'
 assert release['privacy_url']==release['homepage_url']+'privacy/'
 assert release['support_url']==release['homepage_url']+'support/'
@@ -104,7 +105,9 @@ for p in (root/'downloads').glob('*.zip'):
    if is_chrome:expected.update(localized_files)
    assert set(z.namelist())==expected,(p,'asset closure')
    for f in root.iterdir():
-    if f.is_file() and f.name not in ('index.html','robots.txt','sitemap.xml','_headers'):assert z.read(f.name)==f.read_bytes(),(p,f.name)
+    if f.is_file() and f.name not in ('index.html','robots.txt','sitemap.xml','_headers'):
+     expected_file=root.parent/'src'/f.name if f.name in minified_files else f
+     assert z.read(f.name)==expected_file.read_bytes(),(p,f.name)
    parser=Parser();parser.feed(z.read('index.html').decode())
    assert manifest['content_security_policy']['extension_pages']==parser.csp
    assert manifest['name']==release['name']

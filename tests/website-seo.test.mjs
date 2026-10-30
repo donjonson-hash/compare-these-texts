@@ -62,21 +62,29 @@ test('home page store button is counted as a store click', t => {
   assert.deepEqual(events, ['chrome_store_click']);
 });
 
-test('structured data is valid JSON describing the free web app and extension', () => {
-  const data = page => [...load(new URL(page, dist)).querySelectorAll('script[type="application/ld+json"]')].map(s => JSON.parse(s.textContent));
-  const home = data('index.html'), extension = data('extension/index.html');
-  assert.equal(home.length, 1);
-  assert.equal(extension.length, 1);
-  const types = home[0]['@graph'].map(node => node['@type']);
-  assert.deepEqual(types, ['WebSite', 'WebApplication']);
-  const app = home[0]['@graph'][1];
-  assert.equal(app.url, 'https://comparetwotexts.pro/');
-  assert.equal(app.offers.price, '0');
-  assert.equal(extension[0]['@type'], 'SoftwareApplication');
-  assert.equal(extension[0].applicationCategory, 'BrowserApplication');
-  assert.equal(new URL(extension[0].installUrl).origin + new URL(extension[0].installUrl).pathname, STORE);
-  // No ratings exist yet; never publish invented review data.
-  for (const node of [...home[0]['@graph'], extension[0]]) assert.equal('aggregateRating' in node, false);
+test('website structured data describes canonical pages without unsupported app rich results', () => {
+  for (const [path, url] of [['index.html', 'https://comparetwotexts.pro/'],
+    ['extension/index.html', 'https://comparetwotexts.pro/extension/']]) {
+    const doc = load(new URL(path, dist));
+    const scripts = [...doc.querySelectorAll('script[type="application/ld+json"]')];
+    assert.equal(scripts.length, 1, path);
+    const data = JSON.parse(scripts[0].textContent);
+    assert.equal(data['@context'], 'https://schema.org');
+    const [site, page] = data['@graph'];
+    assert.deepEqual(data['@graph'].map(node => node['@type']), ['WebSite', 'WebPage']);
+    assert.equal(site.url, 'https://comparetwotexts.pro/');
+    assert.equal(page.url, url);
+    assert.equal(page.url, doc.querySelector('link[rel=canonical]').href);
+    assert.equal(page.name, doc.title);
+    assert.equal(page.isPartOf['@id'], site['@id']);
+    assert.equal(page.isAccessibleForFree, true);
+    // App rich results require genuine review/rating data. Do not invent it.
+    for (const node of data['@graph']) {
+      assert.equal('aggregateRating' in node, false);
+      assert.equal('review' in node, false);
+      assert.equal('offers' in node, false);
+    }
+  }
 });
 
 test('home page has its main heading before any other heading', () => {
@@ -102,4 +110,13 @@ test('each guide targets its search phrase in title, main heading and inbound li
     assert.ok(doc.querySelector('h1').textContent.toLowerCase().includes(phrase), route + ' h1');
     assert.ok(anchors[route].filter(text => text === phrase).length >= 3, route + ' anchors');
   }
+});
+
+test('Word guide answers the how-to searches for Word and Google Docs', () => {
+  const doc = load(new URL('compare-word-documents/index.html', dist));
+  const headings = [...doc.querySelectorAll('h2')].map(h => h.textContent.toLowerCase());
+  assert.ok(headings.includes('how to compare two word documents'));
+  assert.ok(headings.includes('compare documents in microsoft word'));
+  assert.ok(headings.includes('compare two google docs'));
+  assert.ok(headings.includes('which method should you use?'));
 });
