@@ -1,9 +1,16 @@
 # Compare Two Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.37.5**.
+Current CTT website and offline Chrome/Firefox extension source: **0.37.6**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparetwotexts.pro/.
+
+## PDF compatibility update in 0.37.6
+
+This release ships the shared PDF placeholder-link fix in the offline extension.
+The published 0.37.5 store package was built before that fix. Existing permissions,
+offline processing and encrypted saved drafts are unchanged. Store packaging now
+requires the PDF regression checks to pass in the installed extension.
 
 ## Encrypted saved drafts
 
@@ -44,7 +51,7 @@ available to resume. The editor and welcome page remain English.
 The Chrome package includes 22 localized metadata catalogs. Full store
 descriptions, five icon sizes, five actual screenshots, two promotional images
 and Russian submission instructions are assembled with `npm run package:store`
-after building and running `npm run store:assets`. The result is `artifacts/ctt-0.37.5-store-kit.zip`; unpack it
+after building and running `npm run store:assets`. The result is `artifacts/ctt-0.37.6-store-kit.zip`; unpack it
 before uploading its inner Chrome ZIP. Firefox is supplied for temporary
 testing; its metadata remains English. This preparation does not publish either
 store listing or deploy the website.
@@ -108,8 +115,8 @@ npm run check
 Outputs:
 
 - `dist/`: static website, including extension downloads.
-- `dist/downloads/ctt-chrome-0.37.5.zip`: load the extracted directory in Chrome.
-- `dist/downloads/ctt-firefox-0.37.5.zip`: temporary Firefox installation.
+- `dist/downloads/ctt-chrome-0.37.6.zip`: load the extracted directory in Chrome.
+- `dist/downloads/ctt-firefox-0.37.6.zip`: temporary Firefox installation.
 - `dist/release/provenance.json`: Git revision, working-tree status, asset hashes
   and ZIP hashes for that build.
 

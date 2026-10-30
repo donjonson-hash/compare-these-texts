@@ -1,7 +1,17 @@
-# Compare Two Texts 0.37.4 — final store audit
+# Compare Two Texts 0.37.6 — final store audit
 
-Prepared October 24, 2026. This kit is a Chrome Web Store submission candidate;
+Prepared October 30, 2026. This kit is a Chrome Web Store submission candidate;
 it is not a store approval or a submitted listing.
+
+## PDF import release correction
+
+Version 0.37.6 packages the shared `about:blank` link-placeholder compatibility
+fix (PR #38), which was deployed to the website after the 0.37.5 store package
+was built. The importer and PDF modules in the offline ZIP match the build.
+The installed-extension check opens a synthetic six-page PDF with three inert
+placeholders, edits and downloads it, undoes the edit, compares it with a copy
+without annotations, and rejects a chained action while preserving the open file.
+Existing PDF-link tests cover query/fragment variants and additional actions.
 
 ## Scope and findings
 
