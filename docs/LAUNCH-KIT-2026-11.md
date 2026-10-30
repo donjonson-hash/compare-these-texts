@@ -32,8 +32,9 @@ website: the website uses Google Analytics; the extensions do not.
 | Spread over 2–3 weeks | Reddit (one subreddit at a time) | Avoids cross-posting flags |
 | Ongoing, 10–20 per month | Resource-page outreach, Q&A answers | Slow but durable links |
 
-The Chrome Web Store still showed 0.37.4 ("Compare & Edit BETA") on 30 October.
-Check the listing name before any launch that sends traffic to the store.
+On 30 October the Chrome Web Store listing showed 0.37.6 with the new name,
+long description and a link to comparetwotexts.pro, so store-bound launches are
+unblocked. Show HN is planned for Wednesday 4 November 2026.
 
 ## Links by placement
 
@@ -113,6 +114,34 @@ to open-source directories or awesome lists that require an OSI license.
 
 Post on Tuesday–Thursday, 8–10 a.m. US Eastern. Submit the URL; post the text
 below as the first comment immediately.
+
+### Run sheet for 4 November 2026 (8:00 ET = 16:00 Moscow)
+
+Before the day:
+
+- Use an existing Hacker News account, or create one now and take part in a few
+  discussions first. Brand-new accounts draw suspicion and may be restricted.
+- Walk the whole path once as a new user: site, Add to Chrome, install, Try an
+  example, your own DOCX and PDF, download.
+- Keep the first comment and the answers below open in a text file.
+
+On the day:
+
+1. Check that the site, the store listing and the guides open.
+2. Submit at about 16:00 Moscow: https://news.ycombinator.com/submit with the
+   title and URL below and an empty text field.
+3. Post the first comment immediately.
+4. Do not ask anyone to upvote or share the link for votes. Vote-ring detection
+   can kill the post.
+5. Stay for 3–4 hours. Reply to every comment briefly and factually; thank
+   critics; never argue. Do not edit the title.
+6. Log bugs as GitHub issues with fictional data. Fix only what blocks usage on
+   the day; a site fix needs a clean build from main and a Sites deploy.
+7. Watch GA4 Realtime and Chrome Web Store stats. Record the HN item URL, peak
+   position and installs in the tracking table.
+
+A post that gets no traction is normal. Do not delete and repost it; try a
+different angle weeks later, or use Show HN's resubmission rules.
 
 - Title (≤ 80): `Show HN: Compare Two Texts – diff Word, PDF and Excel files in the browser`
 - URL: https://comparetwotexts.pro/
