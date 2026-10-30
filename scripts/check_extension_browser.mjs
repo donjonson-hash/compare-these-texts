@@ -8,6 +8,7 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createServer} from 'node:http';
+import {checkExtensionPdf} from './check_extension_pdf.mjs';
 
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -229,6 +230,7 @@ try {
     try { return (await store.read()).payload; } finally { store.close(); }
   }), singleDraft, 'encrypted single-document draft restores after browser restart');
   checks.push('encrypted-browser-restart');
+  await checkExtensionPdf({context, editorUrl, checks});
   assert.deepEqual(errors, [], 'no uncaught page errors');
   assert.deepEqual(externalRequests, [], 'no external HTTP requests');
   const report = {passed:true, version:release.version, mode:worker ? 'extension':'local-page',
