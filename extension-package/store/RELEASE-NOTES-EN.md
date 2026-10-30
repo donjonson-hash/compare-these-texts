@@ -5,6 +5,9 @@ not a claim that the listing is published or approved.
 
 ## Changes in 0.37.6
 
+- Point the extension homepage, privacy/support metadata and generated website
+  links directly to the canonical `https://comparetwotexts.pro/` domain.
+
 - Ship the shared PDF import fix in a new Chrome/Firefox installation package.
   Text-based PDFs containing empty `about:blank` link placeholders now open in
   both Edit & export and comparison. Version 0.37.5 from the store predates it.

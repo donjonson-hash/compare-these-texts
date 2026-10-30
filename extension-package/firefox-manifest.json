@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Compare Two Texts — Diff Checker for Word, PDF & Excel",
   "version": "0.37.6",
-  "homepage_url": "https://comparethesetexts.com/",
+  "homepage_url": "https://comparetwotexts.pro/",
   "description": "Compare two texts, Word, PDF and Excel files side by side. Find differences, edit and export. Works offline, no file uploads.",
   "icons": {
     "16": "icon-16.png",

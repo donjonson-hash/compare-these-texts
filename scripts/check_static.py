@@ -8,8 +8,12 @@ from website_analytics import SCRIPT_HASH, TAG
 root=Path(__file__).resolve().parents[1]/'dist'
 release=json.loads((root.parent/'release.json').read_text())
 localized_files=message_files()
+assert release['homepage_url']=='https://comparetwotexts.pro/'
+assert release['privacy_url']==release['homepage_url']+'privacy/'
+assert release['support_url']==release['homepage_url']+'support/'
 for relative in ('package.json', 'extension-package/chrome-manifest.json', 'extension-package/firefox-manifest.json'):
  assert json.loads((root.parent/relative).read_text())['version']==release['version'], ('version mismatch',relative)
+ if relative.endswith('-manifest.json'):assert json.loads((root.parent/relative).read_text())['homepage_url']==release['homepage_url'], ('homepage mismatch',relative)
 lock=json.loads((root.parent/'package-lock.json').read_text())
 assert lock['version']==lock['packages']['']['version']==release['version'], 'lockfile version mismatch'
 assert lock['packages']['']['license']==json.loads((root.parent/'package.json').read_text())['license']=='SEE LICENSE IN LICENSE'
@@ -82,7 +86,7 @@ for p in (root/'downloads').glob('*.zip'):
    assert 'default_locale' not in manifest
    assert not any(name.startswith('_locales/') for name in z.namelist())
   assert manifest['description']==release['description']
-  assert manifest['homepage_url']=='https://comparethesetexts.com/'
+  assert manifest['homepage_url']==release['homepage_url']
   assert manifest['version']==re.search(r'-(\d+\.\d+\.\d+)\.zip$',p.name).group(1)
   if p.name.startswith('ctt-'):
    assert manifest['name'] in ('Compare Two Texts — Compare & Edit',release['name'])
