@@ -111,3 +111,12 @@ test('each guide targets its search phrase in title, main heading and inbound li
     assert.ok(anchors[route].filter(text => text === phrase).length >= 3, route + ' anchors');
   }
 });
+
+test('Word guide answers the how-to searches for Word and Google Docs', () => {
+  const doc = load(new URL('compare-word-documents/index.html', dist));
+  const headings = [...doc.querySelectorAll('h2')].map(h => h.textContent.toLowerCase());
+  assert.ok(headings.includes('how to compare two word documents'));
+  assert.ok(headings.includes('compare documents in microsoft word'));
+  assert.ok(headings.includes('compare two google docs'));
+  assert.ok(headings.includes('which method should you use?'));
+});
