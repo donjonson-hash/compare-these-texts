@@ -42,8 +42,8 @@ Website (campaign `launch_2026_11`):
 | Placement | URL |
 | --- | --- |
 | GitHub About | https://comparetwotexts.pro/?utm_source=github&utm_medium=referral&utm_campaign=launch_2026_11&utm_content=about |
-| AlternativeTo | https://comparetwotexts.pro/?utm_source=alternativeto&utm_medium=directory&utm_campaign=launch_2026_11 |
-| SaaSHub | https://comparetwotexts.pro/?utm_source=saashub&utm_medium=directory&utm_campaign=launch_2026_11 |
+| AlternativeTo | https://comparetwotexts.pro/ (directory moderators reject tracking parameters in the official URL; the referrer domain attributes visits) |
+| SaaSHub | https://comparetwotexts.pro/ (same reason) |
 | Product Hunt | https://comparetwotexts.pro/?utm_source=producthunt&utm_medium=launch&utm_campaign=launch_2026_11 |
 | Reddit r/SideProject | https://comparetwotexts.pro/?utm_source=reddit&utm_medium=social&utm_campaign=launch_2026_11&utm_content=sideproject |
 | Show HN | https://comparetwotexts.pro/ (HN readers distrust tracking parameters; the referrer is attributed anyway) |
@@ -98,7 +98,13 @@ to open-source directories or awesome lists that require an OSI license.
 
 - Name: Compare Two Texts
 - Tagline: Private diff checker for Word, PDF and Excel files
-- Description: use the AlternativeTo short description.
+- Description: three paragraphs adapted from the AlternativeTo long description; added a Chrome Web Store line at the end.
+- Name: SaaSHub imported "Compare Two Texts Edit Differences" from the page title. The name can only be changed through "suggest changes" under the URL field; a request for "Compare Two Texts" was sent on 2026-10-30.
+- Open Source: No. Google Play field left empty (no Android app).
+- Competitors: Diff Checker, Draftable Compare, Text compare!, DiffNow, WinMerge, Beyond Compare.
+- Features: eight rows (files, side-by-side, edit in results, Excel & CSV by ID, export, local processing, offline extension, encrypted drafts). Platforms: Web, Chrome, Microsoft Edge.
+- Q&A: five answers; "biggest customers" left blank until there are real customers who agree to be named.
+- Skip the SaaSHub Experts "Top 5" nominations: no link value, and voting for products you have not used is not a genuine recommendation. Decline badges and paid featuring.
 - Categories: Diff Tools, Document Comparison, Chrome Extensions, Productivity
 - Pricing: Free
 - Alternatives to suggest: Diffchecker, Draftable
@@ -239,8 +245,8 @@ and disclose affiliation (Stack Exchange requires it).
 | Date | Placement | URL of the post or listing | Status | Link type | Notes |
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-30 | GitHub About | https://github.com/donjonson-hash/compare-these-texts | Live | Repository website field | Description, website and 12 topics set |
-| | AlternativeTo | | | | |
-| | SaaSHub | | | | |
+| 2026-10-30 | AlternativeTo | | Submitted, awaiting moderation | Directory listing | Name "Compare Two Texts"; alternatives Diffchecker, Draftable, WinMerge, Text Compare! |
+| 2026-10-30 | SaaSHub | https://www.saashub.com/compare-two-texts-edit-differences | Live, verified | Directory listing, Visit website → https://comparetwotexts.pro/ | Name change to "Compare Two Texts" requested |
 | | Show HN | | | | |
 | | Product Hunt | | | | |
 | | Reddit r/SideProject | | | | |
