@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
-  "version": "0.37.5",
-  "homepage_url": "https://comparethesetexts.com/",
+  "version": "0.37.6",
+  "homepage_url": "https://comparetwotexts.pro/",
   "description": "__MSG_extensionDescription__",
   "icons": {
     "16": "icon-16.png",

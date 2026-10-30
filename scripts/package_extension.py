@@ -7,6 +7,8 @@ from website_meta import WEBSITE_ONLY
 root=Path(__file__).resolve().parents[1];dist=root/'dist';sources=root/'extension-package'
 release=json.loads((root/'release.json').read_text())
 version=release['version']
+website=release['homepage_url'].rstrip('/')+'/'
+extension_url=website+'extension/'
 localized_files=message_files()
 for target in ['chrome','firefox']:
  manifest=json.loads((sources/(target+'-manifest.json')).read_text())
@@ -23,15 +25,15 @@ for target in ['chrome','firefox']:
  # Store buttons, guide links and structured data describe the website, not the installed copy.
  html=re.sub(re.escape(WEBSITE_ONLY[0])+'.*?'+re.escape(WEBSITE_ONLY[1]),'',files['index.html'].decode(),flags=re.S)
  html=html.replace('href="/"','href="index.html"').replace('href="/site.css"','href="site.css"').replace('href="/favicon.svg"','href="favicon.svg"').replace('src="/favicon.svg"','src="favicon.svg"')
- html=html.replace('href="/extension/"','href="https://comparethesetexts.com/extension/"').replace('href="/privacy/"','href="privacy.html"').replace('href="/support/"','href="support.html"').replace('href="/terms/"','href="terms.html"')
- html=html.replace('>Extension</a>','>Website</a>').replace('href="https://comparethesetexts.com/extension/">Website','href="https://comparethesetexts.com/">Website')
+ html=html.replace('href="/extension/"',f'href="{extension_url}"').replace('href="/privacy/"','href="privacy.html"').replace('href="/support/"','href="support.html"').replace('href="/terms/"','href="terms.html"')
+ html=html.replace('>Extension</a>','>Website</a>').replace(f'href="{extension_url}">Website',f'href="{website}">Website')
  html=re.sub(r'<a href="(https://[^"]+)"',r'<a href="\1" target="_blank" rel="noopener noreferrer"',html)
  html=html.replace('</head>', '<script type="module" src="welcome-entry.mjs"></script></head>')
  html=html.replace('<nav aria-label="Footer navigation">', '<nav aria-label="Footer navigation"><a id="getting-started" href="welcome.html" target="_blank" rel="noopener noreferrer">Getting started</a>')
  files['index.html']=html.encode();files['manifest.json']=(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n').encode()
  for page in ['privacy','support','terms']:
   content=strip_website_analytics((dist/page/'index.html').read_text())
-  for before,after in {'/':'index.html','/style.css':'style.css','/site.css':'site.css','/favicon.svg':'favicon.svg','/privacy/':'privacy.html','/support/':'support.html','/terms/':'terms.html','/LICENSE.txt':'LICENSE.txt','/extension/':'https://comparethesetexts.com/extension/'}.items():
+  for before,after in {'/':'index.html','/style.css':'style.css','/site.css':'site.css','/favicon.svg':'favicon.svg','/privacy/':'privacy.html','/support/':'support.html','/terms/':'terms.html','/LICENSE.txt':'LICENSE.txt','/extension/':extension_url}.items():
    content=content.replace('href="'+before+'"','href="'+after+'"')
   content=content.replace('src="/favicon.svg"','src="favicon.svg"')
   files[page+'.html']=content.encode()
