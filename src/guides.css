@@ -1,0 +1,27 @@
+.guide-page{max-width:980px;padding-bottom:24px}
+.guide-page .info-heading{max-width:760px;padding:44px 0 30px}
+.guide-page h1{font-family:system-ui,sans-serif;font-weight:650;font-size:clamp(30px,4vw,44px);letter-spacing:-1.4px;line-height:1.15}
+.guide-page .intro{max-width:700px;font-size:18px;line-height:1.65}
+.guide-page p,.guide-page li{font-size:16px;line-height:1.75}
+.guide-page section{scroll-margin-top:24px}
+.guide-page .privacy-copy{max-width:none;margin-top:0}
+.guide-page .privacy-copy section{padding:26px 0}
+.guide-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.guide-page a.button{display:inline-flex;text-decoration:none}
+.guide-steps{padding-left:26px}
+.guide-steps li{padding:7px 0 7px 5px}
+.guide-page .privacy-copy .guide-example{margin:20px 0;padding:22px;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:auto}
+.guide-example table{width:100%;border-collapse:collapse;min-width:340px}
+.guide-example caption{text-align:left;font-weight:650;margin-bottom:14px}
+.guide-example th,.guide-example td{padding:12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.guide-example th{font-size:14px;background:#edf3ee}
+.guide-example p{margin-top:10px}
+.guide-example pre{font-size:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.guide-note{padding:16px 20px;background:#edf3ee;border-left:3px solid var(--green);border-radius:0 8px 8px 0}
+.guide-page details{padding:16px 0;border-bottom:1px solid var(--line)}
+.guide-page summary{font-size:16px;font-weight:600;line-height:1.5}
+.guide-page details p{margin-top:10px}
+.guide-links,.guide-related ul{display:flex;flex-wrap:wrap;gap:12px 26px;padding-left:20px}
+.guide-page .site-footer{flex-wrap:wrap}
+.guide-page .site-footer nav{flex-wrap:wrap}
+@media(max-width:600px){.guide-page .info-heading{padding-top:28px}.guide-page .intro{font-size:17px}.guide-page .privacy-copy .guide-example{padding:14px}.guide-links,.guide-related ul{display:block}.guide-links li,.guide-related li{margin:8px 0}}

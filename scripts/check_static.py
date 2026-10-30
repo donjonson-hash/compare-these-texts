@@ -2,12 +2,18 @@ from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlparse
 import json,zipfile,subprocess,re
+import xml.etree.ElementTree as ET
 from store_metadata import message_files
+from website_analytics import SCRIPT_HASH, TAG
 root=Path(__file__).resolve().parents[1]/'dist'
 release=json.loads((root.parent/'release.json').read_text())
 localized_files=message_files()
+assert release['homepage_url']=='https://comparetwotexts.pro/'
+assert release['privacy_url']==release['homepage_url']+'privacy/'
+assert release['support_url']==release['homepage_url']+'support/'
 for relative in ('package.json', 'extension-package/chrome-manifest.json', 'extension-package/firefox-manifest.json'):
  assert json.loads((root.parent/relative).read_text())['version']==release['version'], ('version mismatch',relative)
+ if relative.endswith('-manifest.json'):assert json.loads((root.parent/relative).read_text())['homepage_url']==release['homepage_url'], ('homepage mismatch',relative)
 lock=json.loads((root.parent/'package-lock.json').read_text())
 assert lock['version']==lock['packages']['']['version']==release['version'], 'lockfile version mismatch'
 assert lock['packages']['']['license']==json.loads((root.parent/'package.json').read_text())['license']=='SEE LICENSE IN LICENSE'
@@ -16,28 +22,53 @@ assert '<!-- CTT-LICENSE -->' not in (root/'terms/index.html').read_text(), 'lic
 subprocess.run(['node',str(root.parent/'scripts/check_source_policy.mjs')],check=True)
 subprocess.run(['python3',str(root.parent/'scripts/verify_vendor.py')],check=True)
 class Parser(HTMLParser):
- def __init__(self): super().__init__(); self.refs=[]; self.ids=[]; self.csp=''
+ def __init__(self): super().__init__(); self.refs=[]; self.ids=[]; self.csp=''; self.canonicals=[]; self.descriptions=[]; self.h1_count=0
  def handle_starttag(self,tag,attrs):
   a=dict(attrs)
+  if tag=='h1':self.h1_count+=1
+  if tag=='link' and a.get('rel')=='canonical':self.canonicals.append(a.get('href'))
+  if tag=='meta' and a.get('name')=='description':self.descriptions.append(a.get('content'))
   if 'id' in a:self.ids.append(a['id'])
   if tag=='meta' and a.get('http-equiv')=='Content-Security-Policy':self.csp=a['content']
   for key in ('src','href'):
    if key in a:self.refs.append(a[key])
+canonical_pages=set(); descriptions=set()
 for p in root.rglob('*.html'):
  parser=Parser();parser.feed(p.read_text());assert len(parser.ids)==len(set(parser.ids)),p
- assert "connect-src 'none'" in parser.csp,p
+ route=p.relative_to(root).as_posix().removesuffix('index.html')
+ canonical='https://comparetwotexts.pro/'+route
+ assert parser.canonicals==[canonical],(p,'canonical mismatch')
+ assert parser.h1_count==1,(p,'expected one main heading')
+ assert len(parser.descriptions)==1 and parser.descriptions[0],(p,'missing description')
+ assert parser.descriptions[0] not in descriptions,(p,'duplicate description')
+ descriptions.add(parser.descriptions[0]);canonical_pages.add(canonical)
+ assert SCRIPT_HASH in parser.csp,p
+ assert 'https://*.google-analytics.com' in parser.csp,p
+ assert p.read_text().count(TAG)==1,(p,'one website Google tag')
+ assert f'<meta property="og:url" content="{canonical}">' in p.read_text(),(p,'social metadata')
  for ref in parser.refs:
   u=urlparse(ref)
   if u.scheme or u.netloc or not u.path:continue
   f=root/u.path.lstrip('/') if u.path.startswith('/') else p.parent/u.path
   if f.is_dir():f=f/'index.html'
   assert f.exists(),(p,ref)
+sitemap=ET.parse(root/'sitemap.xml')
+sitemap_urls=[loc.text for loc in sitemap.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
+assert len(sitemap_urls)==len(set(sitemap_urls)) and set(sitemap_urls)==canonical_pages,'sitemap must list every canonical page exactly once'
+assert 'Sitemap: https://comparetwotexts.pro/sitemap.xml' in (root/'robots.txt').read_text()
 for p in [*root.glob('*.js'), *root.glob('*.mjs')]:subprocess.run(['node','--check',str(p)],check=True)
 assert 'new Worker(' in (root/'transport.js').read_text()
 for target in ('chrome','firefox'):
  assert (root/'downloads'/f"ctt-{target}-{release['version']}.zip").is_file(), f'Missing {target} release; run npm run build first'
 for p in (root/'downloads').glob('*.zip'):
  with zipfile.ZipFile(p) as z:
+  for name in z.namelist():
+   if name.endswith(('.html','.js','.mjs')):
+    assert b'googletagmanager.com/gtag/js' not in z.read(name),(p,name,'analytics leaked into extension')
+    for marker in (b'<!-- website-only -->',b'application/ld+json',b'property="og:',b'chromewebstore.google.com'):assert marker not in z.read(name),(p,name,'website-only content leaked into extension')
+    if name.endswith('.html'):
+     offline=Parser();offline.feed(z.read(name).decode())
+     if offline.csp:assert "connect-src 'none'" in offline.csp,(p,name,'offline CSP')
   manifest=json.loads(z.read('manifest.json'))
   is_chrome=p.name.startswith('ctt-chrome-')
   if is_chrome:
@@ -55,7 +86,7 @@ for p in (root/'downloads').glob('*.zip'):
    assert 'default_locale' not in manifest
    assert not any(name.startswith('_locales/') for name in z.namelist())
   assert manifest['description']==release['description']
-  assert manifest['homepage_url']=='https://comparethesetexts.com/'
+  assert manifest['homepage_url']==release['homepage_url']
   assert manifest['version']==re.search(r'-(\d+\.\d+\.\d+)\.zip$',p.name).group(1)
   if p.name.startswith('ctt-'):
    assert manifest['name'] in ('Compare Two Texts — Compare & Edit',release['name'])
@@ -69,11 +100,11 @@ for p in (root/'downloads').glob('*.zip'):
      assert not u.path.startswith('/'),(p,ref)
      assert u.path in z.namelist(),(p,ref)
   if p.name in (f"ctt-chrome-{release['version']}.zip",f"ctt-firefox-{release['version']}.zip"):
-   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
+   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','sitemap.xml','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
    if is_chrome:expected.update(localized_files)
    assert set(z.namelist())==expected,(p,'asset closure')
    for f in root.iterdir():
-    if f.is_file() and f.name not in ('index.html','robots.txt','_headers'):assert z.read(f.name)==f.read_bytes(),(p,f.name)
+    if f.is_file() and f.name not in ('index.html','robots.txt','sitemap.xml','_headers'):assert z.read(f.name)==f.read_bytes(),(p,f.name)
    parser=Parser();parser.feed(z.read('index.html').decode())
    assert manifest['content_security_policy']['extension_pages']==parser.csp
    assert manifest['name']==release['name']

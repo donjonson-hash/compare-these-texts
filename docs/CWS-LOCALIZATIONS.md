@@ -1,6 +1,6 @@
 # Локализация названия и краткого описания CTT
 
-Подготовлено для Chrome Web Store, версия 0.37.4. Все 19 запрошенных языков: 21 локализованный вариант с учетом регионов и английский резервный — 22 локали.
+Подготовлено для Chrome Web Store, версия 0.37.6. Все 19 запрошенных языков: 21 локализованный вариант с учетом регионов и английский резервный — 22 локали.
 
 ## Подход
 
@@ -14,7 +14,7 @@
 
 | Язык / локаль | Название | Краткое описание | Длина: название / описание |
 | --- | --- | --- | --- |
-| Английский (резервный) (`en`) | Compare Two Texts — Compare & Edit BETA | Compare Word, PDF, text and Excel files side by side. Edit differences and save the result. Works locally in your browser. | 39 / 122 |
+| Английский (резервный) (`en`) | Compare Two Texts — Diff Checker for Word, PDF & Excel | Compare two texts, Word, PDF and Excel files side by side. Find differences, edit and export. Works offline, no file uploads. | 54 / 125 |
 | Немецкий (`de`) | Compare Two Texts — Texte vergleichen und bearbeiten | Texte und Dokumente vergleichen, Unterschiede erkennen und direkt bearbeiten. Lokal auf deinem Gerät. Oberfläche auf Englisch. | 52 / 126 |
 | Французский (`fr`) | Compare Two Texts — Comparateur de texte et éditeur | Comparez et modifiez vos textes et documents sur votre appareil. Repérez les différences. Interface en anglais. | 51 / 111 |
 | Испанский — Испания (`es`) | Compare Two Texts — Comparar textos y editar | Compara y edita textos y documentos en tu dispositivo. Detecta las diferencias. Interfaz en inglés. | 44 / 99 |

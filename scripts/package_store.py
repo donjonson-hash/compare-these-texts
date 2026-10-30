@@ -38,6 +38,7 @@ def main():
     assert storage_check['extension_sha256'] == hashlib.sha256(files[f'ctt-chrome-{VERSION}.zip']).hexdigest(), 'Storage check belongs to a different installation ZIP'
     assert not storage_check['externalRequests'], 'Offline check made external requests'
     assert {'encrypted-comparison-indexeddb', 'encrypted-legacy-migration-indexeddb', 'encrypted-single-indexeddb', 'encrypted-browser-restart'} <= set(storage_check['checks']), 'Missing encrypted storage browser checks'
+    assert {'pdf-placeholder-six-page-import-and-original-download', 'pdf-chained-action-rejected-without-document-loss', 'pdf-placeholder-edit-download-reimport-and-undo', 'pdf-placeholder-comparison-in-installed-extension'} <= set(storage_check['checks']), 'Missing packaged PDF regression checks'
     files['ENCRYPTED-STORAGE-CHECK.json'] = storage_proof
     for path in sorted(STORE.glob('*.md')):
         files[path.name] = path.read_bytes()

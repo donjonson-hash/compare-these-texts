@@ -1,9 +1,34 @@
-# Compare Two Texts 0.37.4 — submission notes
+# Compare Two Texts 0.37.6 — submission notes
 
 This package prepares the current extension for Chrome Web Store review. It is
 not a claim that the listing is published or approved.
 
-## Changes in 0.37.4
+## Changes in 0.37.6
+
+- Point the extension homepage, privacy/support metadata and generated website
+  links directly to the canonical `https://comparetwotexts.pro/` domain.
+
+- Ship the shared PDF import fix in a new Chrome/Firefox installation package.
+  Text-based PDFs containing empty `about:blank` link placeholders now open in
+  both Edit & export and comparison. Version 0.37.5 from the store predates it.
+- Placeholders remain inert. Additional/chained actions, other `about:` URLs,
+  interactive forms and comments remain unsupported.
+- Unchanged PDF downloads preserve the original bytes and links. Edited rebuilt
+  PDFs omit clickable annotations, as stated in the editor.
+- Add an installed-extension regression covering a six-page PDF with three
+  placeholders, page navigation, editing, download, Undo, comparison and rejection
+  of chained actions without losing the open document.
+- Saved draft encryption, permissions and offline operation remain unchanged.
+
+## Retained from 0.37.5
+
+- Renamed the English listing to **Compare Two Texts — Diff Checker for Word,
+  PDF & Excel** and removed the BETA label. Editor features are unchanged.
+- Updated the English short description and full description to lead with
+  use cases (contracts, price lists, reports) and local, offline processing.
+  Limitations are kept in full. The 21 translated listings are unchanged.
+
+## Retained from 0.37.4
 
 - Encrypt saved comparison and single-document drafts locally with AES-GCM-256.
   Document names, source files, edits, undo history and reports are encrypted.
@@ -56,4 +81,4 @@ files must be saved as `.docx` first. No OCR or remote AI service is included.
 
 See `VERIFICATION.md` and the packaged checksums for the final build's audit
 results. This note lists features included in the candidate; it does not imply
-that every feature was introduced by the 0.37.4 patch alone.
+that every feature was introduced by the 0.37.6 patch alone.

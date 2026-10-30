@@ -26,8 +26,12 @@ async function until(condition, details = () => '') {
 async function page(t, target, browserCompatibility = false, realModules = false) {
   const directory = target === 'web' ? fileURLToPath(new URL('../dist/', import.meta.url)).replace(/\/$/, '') : target;
   const errors = [], network = [], workers = [], requests = [], downloads = [], clipboard = [], navigations = [];
+  // Website analytics has its own bootstrap/privacy tests. Keep the UI suite
+  // deterministic by serving only this known tag locally; reject other requests.
+  const analyticsUrl = target === 'web' ? 'https://www.googletagmanager.com/gtag/js?id=G-J33QPHR8L3' : null;
   const localResources = {interceptors: [requestInterceptor(request => {
       const parsed = new URL(request.url);
+      if (request.url === analyticsUrl) return new Response('', {headers:{'Content-Type':'text/javascript'}});
       if (parsed.protocol === 'file:' && ['/site.css','/favicon.svg'].includes(parsed.pathname)) return new Response(readFileSync(path.join(directory,parsed.pathname.slice(1))), {headers:{'Content-Type':'text/css'}});
       if (parsed.protocol !== 'file:' || !fileURLToPath(parsed).startsWith(directory + path.sep)) {
         network.push(request.url);
@@ -118,6 +122,7 @@ async function page(t, target, browserCompatibility = false, realModules = false
   if (realModules) {
     const run=moduleLoader(dom,directory,{failVisualOnce:realModules === 'fail-first-visual'});
     for (const script of dom.window.document.querySelectorAll('script[src]')) {
+      if (script.src === analyticsUrl) continue;
       Object.defineProperty(dom.window.document,'currentScript',{configurable:true,value:script});
       if (script.type==='module') await run(script); else run(script);
     }

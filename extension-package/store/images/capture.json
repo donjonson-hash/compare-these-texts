@@ -1,0 +1,36 @@
+{
+  "version": "0.37.5",
+  "extension_sha256": "af9e5a81aae289424491787b477a30b2b554a02f378aef620d554df3f37c3be8",
+  "browser": "151.0.7922.34",
+  "source": "packaged extension assets served locally; synthetic examples only",
+  "images": [
+    {
+      "file": "screenshot-documents-1280x800.png",
+      "sha256": "687631921feb67251d7357a81b0735f16f569eaf380c55cf57f3dd5659ec7987"
+    },
+    {
+      "file": "screenshot-tables-1280x800.png",
+      "sha256": "ad5a82e8a49751dc97aa475352d269e96aba0294b1e54037857cf66e298a5a2b"
+    },
+    {
+      "file": "screenshot-editor-1280x800.png",
+      "sha256": "d52c98d92b3025544bcdb791ab1b6ef2830d5c47ef2020b247538fd06b9f2172"
+    },
+    {
+      "file": "screenshot-pdf-1280x800.png",
+      "sha256": "d491bf108d1b25196993b959fd5520f98bcb61d6bc2b276eb402ffb1c928c21b"
+    },
+    {
+      "file": "screenshot-welcome-1280x800.png",
+      "sha256": "9a352cbbc8761bd86cd08f740d8cb20dce506c801838bc6324a6dda06a3910bc"
+    },
+    {
+      "file": "promo-440x280.png",
+      "sha256": "6c5a30167116249439403be0e6ea26ac44726268c7123a256a425b1258e5c345"
+    },
+    {
+      "file": "promo-1400x560.png",
+      "sha256": "d653dcb2c9a4817093fb925e72324050a2b49d2923bf0b93fde08e377ed0e5e2"
+    }
+  ]
+}

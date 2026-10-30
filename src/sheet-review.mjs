@@ -6,6 +6,7 @@ import {captureSheetPdf} from './sheet-pdf-model.mjs';
 import {comparisonCellValue} from './xlsx-source.mjs';
 import {utils,SSF} from './xlsx-vendor.mjs';
 import {createReviewQueue} from './review-queue.mjs';
+import {recordProductEvent} from './product-events.mjs';
 const sides=['left','right'],letter=s=>s==='left'?'A':'B',other=s=>s==='left'?'right':'left';
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 const button=(text,fn,cls='button secondary')=>{const n=el('button',text,cls);n.type='button';n.addEventListener('click',fn);return n;};
@@ -107,7 +108,7 @@ export async function mountSheetReview(root,{report,sources,single=false,restore
   const edits=pendingEdits();
   return !edits.length||mutate(()=>{for(const [s,a,value,type]of edits)docs[s].edit(a,value,type);});
  }
- function download(s,data,ext,mime){const url=URL.createObjectURL(new Blob([data],{type:mime})),a=el('a');a.href=url;a.download=sources[s].name.replace(/\.[^.]*$/,'')+(single?'-edited':'-version-'+letter(s))+'.'+ext;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+ function download(s,data,ext,mime){const url=URL.createObjectURL(new Blob([data],{type:mime})),a=el('a');a.href=url;a.download=sources[s].name.replace(/\.[^.]*$/,'')+(single?'-edited':'-version-'+letter(s))+'.'+ext;a.click();recordProductEvent('document_download',{file_format:ext,workspace:single?'editor':'comparison'});setTimeout(()=>URL.revokeObjectURL(url),1000);}
  async function previewPdf(s){
   const model=captureSheetPdf(docs[s],{name:sources[s].name}),revision=docs[s].revision;pdfDialog?.close();
   const {openDocumentPdfDialog}=await import('./document-pdf-dialog.mjs');if(!alive()||pdfDialog)return;

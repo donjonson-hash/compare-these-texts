@@ -1,7 +1,7 @@
 {
   "en": {
-    "name": "Compare Two Texts — Compare & Edit BETA",
-    "description": "Compare Word, PDF, text and Excel files side by side. Edit differences and save the result. Works locally in your browser."
+    "name": "Compare Two Texts — Diff Checker for Word, PDF & Excel",
+    "description": "Compare two texts, Word, PDF and Excel files side by side. Find differences, edit and export. Works offline, no file uploads."
   },
   "de": {
     "name": "Compare Two Texts — Texte vergleichen und bearbeiten",

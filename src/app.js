@@ -1,5 +1,8 @@
 "use strict";
 (() => {
+  function recordProductEvent(name, parameters) {
+    try { window.cttProductEvent?.(name, parameters); } catch (_) {}
+  }
   const $ = (id) => document.getElementById(id);
   const visualModuleURL = new URL('visual-review.mjs', document.currentScript.src);
   const sheetModuleURL = new URL('sheet-review.mjs', document.currentScript.src);
@@ -397,6 +400,9 @@
       state.report = result.report; state.html = result.html;
       $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
       await renderResult(); officeDescribe(); notice();
+      if (revision === state.revision && state.report === result.report && result.report.status === 'complete') {
+        recordProductEvent('comparison_complete', {comparison_type: result.report.kind === 'text' ? 'text' : 'table'});
+      }
     } catch (error) { if (error.name !== 'AbortError' && revision === state.revision) { clearResult(); notice("Comparison failed. " + error.message, true); officeReset("Comparison failed. Correct the data or settings described in the error message."); busy(false); } }
     finally { if (revision === state.revision) busy(false); }
   }
@@ -648,6 +654,7 @@
     const url = URL.createObjectURL(new Blob([state.editor.exportText()], {type: 'text/plain;charset=utf-8'}));
     const link = element('a'); link.href = url; link.download = 'ctt-edited-B.txt';
     document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    recordProductEvent('document_download', {file_format: 'txt', workspace: 'comparison'});
   });
   function textPanel(item, side) {
     const isLeft = side === 'left', row = item[side] || (item.category === (isLeft ? 'only_left' : 'only_right') ? item.row : null);
@@ -801,6 +808,7 @@
     const html = format === 'html', content = html ? state.html : JSON.stringify(state.report, null, 2) + '\n';
     const url = URL.createObjectURL(new Blob([content], {type: html ? 'text/html;charset=utf-8' : 'application/json;charset=utf-8'}));
     const link = element('a'); link.href = url; link.download = 'ctt-comparison.' + format; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    recordProductEvent('document_download', {file_format: format, workspace: 'comparison'});
   }
   function exportEnable() {
     const available = !!window.KristinaTransport && state.report?.status === 'complete';
@@ -830,6 +838,7 @@
       const link = element('a'); link.href = url; link.download = result.filename;
       try { document.body.append(link); link.click(); }
       finally { link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
+      recordProductEvent('document_download', {file_format: format, workspace: 'comparison'});
       exportStatus(format.toUpperCase() + " report sent to your browser for download.");
     } catch (error) {
       if (!current() || error?.name === 'AbortError') return;
