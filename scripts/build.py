@@ -44,10 +44,14 @@ def build():
     # Keep remote scripts and website CSP permissions out of offline extensions.
     add_website_analytics(OUTPUT)
     add_social_meta(OUTPUT)
+    # Only the website is minified; extension ZIPs retain their original payload.
+    minification = json.loads(subprocess.check_output(
+        ["node", str(ROOT / "scripts/minify_website.mjs")], cwd=ROOT, text=True))
     release = json.loads((ROOT / "release.json").read_text())
     revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "--", "."], cwd=ROOT, text=True).strip())
     record = {
+        "website_minification": minification,
         "product": "Compare Two Texts",
         "version": release["version"],
         "source_commit": revision,

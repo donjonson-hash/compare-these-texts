@@ -125,6 +125,17 @@ dedicated CTT GitHub Actions job builds and tests from a clean checkout and
 uploads the generated website and extensions. Store publishing and website
 deployment are separate actions; a successful CI run does not publish them.
 
+## Website minification
+
+The build compacts seven audited first-party assets in `dist/`: `compact-review.css`,
+`office.js`, `text-editor.js`, `transport.js`, `app.js`, `site.js`, and `navigation.js`.
+Terser prints JavaScript without compression or identifier renaming; esbuild removes
+CSS whitespace without syntax optimization. Both build dependencies are pinned.
+This pass runs after extension ZIP packaging, so extension payloads remain unchanged.
+Readable `src/`, inline scripts/CSP hashes, vendor bundles, fonts, generated data and
+license files are outside this pass. Per-file before/after sizes and tool versions
+are recorded in `dist/release/provenance.json`.
+
 ## Development and audit scope
 
 Edit `src/`, then rebuild before testing. Source is deliberately outside a
