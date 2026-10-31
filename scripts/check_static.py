@@ -5,9 +5,12 @@ import json,zipfile,subprocess,re
 import xml.etree.ElementTree as ET
 from store_metadata import message_files
 from website_analytics import SCRIPT_HASH, TAG
+from firefox_package import split_color_emoji, MODULE_LIMIT
 root=Path(__file__).resolve().parents[1]/'dist'
 release=json.loads((root.parent/'release.json').read_text())
 localized_files=message_files()
+firefox_emoji={'emoji-color-vendor.mjs':(root.parent/'src/emoji-color-vendor.mjs').read_bytes()}
+split_color_emoji(firefox_emoji)
 minified_files={entry['file'] for entry in json.loads((root/'release/provenance.json').read_text())['website_minification']['files']}
 assert release['homepage_url']=='https://comparetwotexts.pro/'
 assert release['privacy_url']==release['homepage_url']+'privacy/'
@@ -90,7 +93,7 @@ for p in (root/'downloads').glob('*.zip'):
   assert manifest['homepage_url']==release['homepage_url']
   assert manifest['version']==re.search(r'-(\d+\.\d+\.\d+)\.zip$',p.name).group(1)
   if p.name.startswith('ctt-'):
-   assert manifest['name'] in ('Compare Two Texts — Compare & Edit',release['name'])
+   assert manifest['name']==(release['name'] if is_chrome else 'Compare Two Texts — Diff Checker')
    assert '<html lang="en">' in z.read('index.html').decode()
    assert manifest['action']['default_title']=='CTT — Compare & Edit'
    for name in ['index.html','launcher.html','welcome.html']:
@@ -103,14 +106,19 @@ for p in (root/'downloads').glob('*.zip'):
   if p.name in (f"ctt-chrome-{release['version']}.zip",f"ctt-firefox-{release['version']}.zip"):
    expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','sitemap.xml','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
    if is_chrome:expected.update(localized_files)
+   else:
+    expected.update(firefox_emoji)
+    for name,data in firefox_emoji.items():
+     assert z.read(name)==data and len(data)<MODULE_LIMIT,(p,name,'Firefox emoji payload')
    assert set(z.namelist())==expected,(p,'asset closure')
    for f in root.iterdir():
     if f.is_file() and f.name not in ('index.html','robots.txt','sitemap.xml','_headers'):
      expected_file=root.parent/'src'/f.name if f.name in minified_files else f
-     assert z.read(f.name)==expected_file.read_bytes(),(p,f.name)
+     expected_data=firefox_emoji[f.name] if not is_chrome and f.name in firefox_emoji else expected_file.read_bytes()
+     assert z.read(f.name)==expected_data,(p,f.name)
    parser=Parser();parser.feed(z.read('index.html').decode())
    assert manifest['content_security_policy']['extension_pages']==parser.csp
-   assert manifest['name']==release['name']
+   assert manifest['name']==(release['name'] if is_chrome else 'Compare Two Texts — Diff Checker')
    assert 'id="getting-started"' in z.read('index.html').decode()
    assert manifest['background']==({'service_worker':'background.js'} if is_chrome else {'scripts':['background.js']})
    for name in ('welcome.html','welcome.css','background.js','welcome-entry.mjs'):

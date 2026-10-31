@@ -4,6 +4,7 @@ import json,zipfile,re
 from store_metadata import message_files
 from website_analytics import strip_website_analytics
 from website_meta import WEBSITE_ONLY
+from firefox_package import split_color_emoji
 root=Path(__file__).resolve().parents[1];dist=root/'dist';sources=root/'extension-package'
 release=json.loads((root/'release.json').read_text())
 version=release['version']
@@ -17,8 +18,12 @@ for target in ['chrome','firefox']:
  if target=='chrome':
   manifest.update(name='__MSG_extensionName__',description='__MSG_extensionDescription__',default_locale='en')
   manifest['action']['default_title']='__MSG_actionTitle__'
+ else:
+  # AMO limits the add-on name to 45 characters; retain Chrome's localized title.
+  manifest['name']='Compare Two Texts — Diff Checker'
  # Preserve the Firefox ID and permission-free offline CSP.
  files={p.name:p.read_bytes() for p in dist.iterdir() if p.is_file() and p.name not in ('robots.txt','sitemap.xml','_headers')}
+ if target=='firefox':split_color_emoji(files)
  for name in files:
   if name.endswith('.html'):files[name]=strip_website_analytics(files[name].decode()).encode()
  if target=='chrome':files.update(localized_files)
