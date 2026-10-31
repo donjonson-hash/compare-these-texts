@@ -337,7 +337,7 @@ the summary and Markdown in the description.
 - Name: Compare Two Texts — Word, PDF & Excel Diff
 - Summary: `Diff checker for Word, PDF, Excel, CSV and plain text. Compare two texts or documents side by side, edit the differences and download the result. Works offline. Files are never uploaded.`
 - Support website: https://comparetwotexts.pro/support/
-- Privacy policy: not needed for "no data transmitted"; link https://comparetwotexts.pro/privacy/ in the homepage field instead if the form asks.
+- Privacy policy: AMO requires one only if data is transmitted from the device. The extension transmits none, so leave the checkbox unticked.
 - Compatibility: Firefox desktop only; Android is untested.
 
 Description:
