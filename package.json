@@ -6,6 +6,7 @@
     "check": "python3 scripts/check_static.py",
     "check:extension": "node scripts/check_extension_browser.mjs",
     "package:extension": "python3 scripts/package_extension.py",
+    "package:edge": "python3 scripts/package_edge.py",
     "package:store": "python3 scripts/package_store.py",
     "store:assets": "node scripts/store-assets.mjs",
     "build": "python3 scripts/build.py",

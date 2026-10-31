@@ -269,6 +269,81 @@ and disclose affiliation (Stack Exchange requires it).
 >
 > Limits: images are not compared and complex layouts may differ from Word.
 
+## 9. Microsoft Edge Add-ons
+
+Free to register and publish. Rules read on 31 October 2026 from Microsoft Learn;
+Partner Center screens may differ. Certification can take up to seven business
+days, and Edge reads name and short description from the manifest, so they cannot
+be edited in Partner Center.
+
+Package: run `npm run build && npm run package:edge`, then upload
+`artifacts/ctt-edge-<version>.zip`. It is the Chrome build with one change of
+metadata: English only and a 42-character name, because the 54-character store
+name and 14 of 22 localized names exceed the 45-character limit MDN documents for
+Edge. Tested in Chromium, not in Edge: load it in Edge once before publishing.
+
+Registration: sign in at Partner Center with a Microsoft account (or GitHub),
+choose an Individual account. Country/region and account type cannot be changed
+later. Publisher display name, up to 50 characters: Compare Two Texts.
+
+Availability: Public, all markets.
+
+Properties:
+
+- Category: Productivity
+- Website: https://comparetwotexts.pro/
+- Support contact detail: https://comparetwotexts.pro/support/
+- Mature content: not selected
+
+Privacy:
+
+- Single Purpose Description: `Compare two versions of a text, Word, PDF, Excel or CSV file side by side, edit the differences and download the result, with all processing done locally in the browser.`
+- Permission justification: none listed; the extension requests no permissions.
+- Remote code: No, I am not using remote code.
+- Data usage: select no data types. Read each certification before ticking it.
+- Privacy Policy URL: https://comparetwotexts.pro/privacy/
+
+Store listing (English):
+
+- Description: paste `extension-package/store/descriptions/en.txt`.
+- Extension logo: `src/icon-store-128.png` (the icon users see in the toolbar; 128×128 is the allowed minimum).
+- Small promotional tile: `artifacts/store-screenshots-0.37.5/promo-440x280.png`
+- Large promotional tile: `artifacts/store-screenshots-0.37.5/promo-1400x560.png`
+- Screenshots: the five 1280×800 files in `artifacts/store-screenshots-0.37.5/`.
+- Search terms (limit 7 terms, 21 words, 30 characters each): `diff checker`, `compare two texts`, `compare word documents`, `compare pdf files`, `compare excel files`, `text compare`, `document compare`
+
+Notes for certification:
+
+> No account, login or network access is needed. Click the extension icon in the toolbar; the workspace opens in a new tab. Select Try an example to load a built-in sample, or paste two texts and select Compare texts. Files are processed locally; the extension requests no permissions and its content security policy sets connect-src 'none'.
+
+After approval, tell the maintainer: the website's Edge install note on
+`/extension/` should then link the Edge listing instead of the Chrome Web Store.
+
+## 10. Firefox AMO: blocked until the next release
+
+The Firefox ZIP fails `web-ext lint` (31 October 2026, main bd84b17) with two
+errors. Listed AMO publishing needs a code change and a new version, so it follows
+Show HN. Until then Firefox stays a temporary add-on.
+
+1. Name is 54 characters; the linter schema allows 45. Use `short_name` from
+   `release.json` for the Firefox manifest.
+2. `emoji-color-vendor.mjs` is 8.4 MB; AMO's limit is 4 MB per file. Split the
+   generated emoji assets into chunks under 4 MB and load only the needed chunk
+   from `src/pdf-color-emoji.mjs`, updating `vendor-assets.json` and its checks.
+
+Also prepare before submitting:
+
+- Source package: vendor bundles are built with esbuild, so AMO requires source and
+  build instructions with OS, tool versions, the lockfile and exact commands
+  (`npm ci --ignore-scripts && npm run build`, Node ^24.15). The build is
+  reproducible, which reviewers can verify.
+- Reviewer notes: explain the 11 linter warnings: dynamic `import()` of local
+  modules in `app.js` and one `eval` occurrence inside vendored `pdf-vendor.mjs`.
+  Check that occurrence before writing the note.
+- Decide on the Gecko ID. `kristina-reconciliation@donjonson-hash.github.io` is
+  permanent once listed and carries an old internal name.
+- License: proprietary, so choose All Rights Reserved or a custom license.
+
 ## Tracking
 
 | Date | Placement | URL of the post or listing | Status | Link type | Notes |
@@ -276,6 +351,7 @@ and disclose affiliation (Stack Exchange requires it).
 | 2026-10-30 | GitHub About | https://github.com/donjonson-hash/compare-these-texts | Live | Repository website field | Description, website and 12 topics set |
 | 2026-10-30 | AlternativeTo | | Submitted, awaiting moderation | Directory listing | Name "Compare Two Texts"; alternatives Diffchecker, Draftable, WinMerge, Text Compare! |
 | 2026-10-30 | SaaSHub | https://www.saashub.com/compare-two-texts-edit-differences | Live, verified | Directory listing, Visit website → https://comparetwotexts.pro/ | Name change to "Compare Two Texts" requested |
+| | Microsoft Edge Add-ons | | | | |
 | | Show HN | | | | |
 | | Product Hunt | | | | |
 | | Reddit r/SideProject | | | | |
