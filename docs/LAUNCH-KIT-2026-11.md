@@ -429,12 +429,14 @@ documents" (2400 / KD 35). Captions must carry the story without sound. Record a
 Do not show or say: OCR, whole-workbook comparison, formula comparison, pixel-level
 PDF comparison, or real customer documents.
 
+Recorded on 31 October 2026: `artifacts/ctt-demo-youtube-78s.webm` (gitignored; 78 seconds, 1920×1080, VP8, silent, captions burned in, built-in samples, site served locally).
+
 YouTube copy:
 
 - Title: `How to Compare Two Word Documents for Free (No Upload, No Word Needed)`
 - Thumbnail text: `What changed?` over the two highlighted versions.
 - Tags: compare two word documents, compare word documents, diff checker, compare pdf files, compare excel files, document comparison
-- Chapters: `0:00 Spot the change`, `0:06 Compare two Word documents`, `0:30 Edit in the results`, `0:42 Download Word or PDF`, `0:50 Excel and CSV`, `1:02 Private and offline`
+- Chapters: `0:00 Spot the change`, `0:06 Compare two Word documents`, `0:30 Edit in the results`, `0:40 Download Word or PDF`, `0:49 Excel and CSV`, `1:00 Private and offline`
 - Description:
 
   > Compare two Word documents side by side in your browser, without Microsoft Word and without uploading your files. Compare Two Texts highlights every difference and lets you fix it right in the results, then download the edited document.
