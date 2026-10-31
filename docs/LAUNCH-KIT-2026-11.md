@@ -403,6 +403,50 @@ Also prepare before submitting:
   permanent once listed and carries an old internal name.
 - License: proprietary, so choose All Rights Reserved or a custom license.
 
+## 11. Demo video
+
+`ctt-promo.mp4` (35 seconds, 1920×1080, local file) works as a short teaser. Before
+reusing it, change the end card: "Upload. Compare. Edit. Download." contradicts
+"files are never uploaded". Use "Open. Compare. Edit. Download." It shows neither
+privacy nor Excel matching, which the video below adds.
+
+YouTube version: about 80 seconds, on the search intent "how to compare two word
+documents" (2400 / KD 35). Captions must carry the story without sound. Record at
+1920×1080 in a clean browser profile, using only the built-in sample documents.
+
+| Time | Screen | Caption | Voice-over (optional) |
+| --- | --- | --- | --- |
+| 0:00–0:06 | Two sample versions side by side, highlight on Warranty | Warranty: 24 months → 12 months. Would you have spotted it? | One line changed in this agreement. Would you have spotted it? |
+| 0:06–0:14 | Home page, cursor on Upload file for A and B | Compare two Word documents. No Word needed. | Here's how to compare two Word documents in your browser, without Microsoft Word. |
+| 0:14–0:22 | Help → Try document editing, comparison opens | Open both versions. Differences are highlighted. | Open both versions. Every difference is highlighted side by side. |
+| 0:22–0:30 | Next difference, moving through the changes | Jump from change to change. | Jump straight from one change to the next. |
+| 0:30–0:42 | Select the Warranty passage, Use A, Done | Fix it right in the results. | Fix a passage right there: type over it, or take the wording from the other version. |
+| 0:42–0:50 | Download the Word file; PDF → Preview PDF | Download Word, or preview a PDF. | Then download the edited Word file, or preview and export a PDF. |
+| 0:50–1:02 | Help → CSV / Excel example, changed cells and missing rows | Excel and CSV: rows matched by ID, even when reordered. | Spreadsheets work too. Rows are matched by ID, so reordered rows still line up. |
+| 1:02–1:12 | Privacy page or Chrome extension in the toolbar | Your files never leave your browser. Works offline. | And your files never leave your browser. The extension works offline, with no account. |
+| 1:12–1:20 | End card: logo, comparetwotexts.pro, Add to Chrome | Free. comparetwotexts.pro | Compare Two Texts. Free at comparetwotexts.pro. |
+
+Do not show or say: OCR, whole-workbook comparison, formula comparison, pixel-level
+PDF comparison, or real customer documents.
+
+YouTube copy:
+
+- Title: `How to Compare Two Word Documents for Free (No Upload, No Word Needed)`
+- Thumbnail text: `What changed?` over the two highlighted versions.
+- Tags: compare two word documents, compare word documents, diff checker, compare pdf files, compare excel files, document comparison
+- Chapters: `0:00 Spot the change`, `0:06 Compare two Word documents`, `0:30 Edit in the results`, `0:42 Download Word or PDF`, `0:50 Excel and CSV`, `1:02 Private and offline`
+- Description:
+
+  > Compare two Word documents side by side in your browser, without Microsoft Word and without uploading your files. Compare Two Texts highlights every difference and lets you fix it right in the results, then download the edited document.
+  >
+  > Try it free: https://comparetwotexts.pro/?utm_source=youtube&utm_medium=video&utm_campaign=launch_2026_10&utm_content=description
+  > Chrome extension: https://chromewebstore.google.com/detail/kclhfaiampafehfhhlejeeefhdhocfcg?utm_source=youtube&utm_medium=video&utm_campaign=launch_2026_10
+  >
+  > It also compares PDFs with selectable text, Excel and CSV files by ID, and plain text. Files up to 2 MB. No OCR for scanned PDFs.
+
+After publishing, embed nothing on the site yet: the site CSP blocks frames. Link the
+video from the Word guide if it performs, and add the YouTube URL to the Edge listing.
+
 ## Tracking
 
 | Date | Placement | URL of the post or listing | Status | Link type | Notes |
