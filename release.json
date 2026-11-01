@@ -1,6 +1,7 @@
 {
   "version": "0.37.6",
   "name": "Compare Two Texts — Diff Checker for Word, PDF & Excel",
+  "short_name": "Compare Two Texts — Word, PDF & Excel Diff",
   "description": "Compare two texts, Word, PDF and Excel files side by side. Find differences, edit and export. Works offline, no file uploads.",
   "homepage_url": "https://comparetwotexts.pro/",
   "privacy_url": "https://comparetwotexts.pro/privacy/",
