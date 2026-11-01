@@ -456,7 +456,8 @@ video from the Word guide if it performs, and add the YouTube URL to the Edge li
 | 2026-10-30 | GitHub About | https://github.com/donjonson-hash/compare-these-texts | Live | Repository website field | Description, website and 12 topics set |
 | 2026-10-30 | AlternativeTo | | Submitted, awaiting moderation | Directory listing | Name "Compare Two Texts"; alternatives Diffchecker, Draftable, WinMerge, Text Compare! |
 | 2026-10-30 | SaaSHub | https://www.saashub.com/compare-two-texts-edit-differences | Live, verified | Directory listing, Visit website → https://comparetwotexts.pro/ | Name change to "Compare Two Texts" requested |
-| | Microsoft Edge Add-ons | | | | |
+| | Microsoft Edge Add-ons | | Postponed by the owner on 2026-10-31; package and copy are ready | | |
+| 2026-11-01 | YouTube demo | https://youtu.be/BEHHf0I0kE8 | Published as a premiere | Video | Description links carry launch_2026_10 labels; chapters and tags still to add |
 | | Show HN | | | | |
 | | Product Hunt | | | | |
 | | Reddit r/SideProject | | | | |
