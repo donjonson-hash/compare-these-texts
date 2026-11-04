@@ -449,6 +449,69 @@ YouTube copy:
 After publishing, embed nothing on the site yet: the site CSP blocks frames. Link the
 video from the Word guide if it performs, and add the YouTube URL to the Edge listing.
 
+## 12. Position tracking and the $100 Google Ads test (4 November 2026)
+
+Semrush Position Tracking, 28 Oct – 4 Nov 2026 (US): comparetwotexts.pro is not in
+the top 100 for any of the 10 tracked queries. Expected one week after the guides
+were retargeted; Google has not ranked the pages yet.
+
+Who holds the top 10 today (Semrush phrase_organic, US):
+
+| Query (volume / KD) | Positions worth noting |
+| --- | --- |
+| compare two texts (1600 / 27) | YouTube #8, Microsoft Store app listing #9, a r/SideProject "I built an offline text compare tool" post #10 |
+| compare pdf files (2400 / 27) | YouTube #5 and #8, a university knowledge base (kb.siue.edu) #6 |
+| compare word documents (1300 / 33) | YouTube #5, Reddit #10 |
+| compare csv files (90 / 7) | Reddit #2, Stack Overflow #3, YouTube #10 |
+
+Conclusion: the realistic route into the top 5 is through high-authority platforms
+that already rank, while the domain itself has no authority:
+
+1. YouTube: titles that match a query exactly. The Word video exists; add short
+   videos for "compare pdf files" and "compare text online". New channels need
+   views and watch time, so share each video where it answers a real question.
+2. Reddit: a r/SideProject post ranks #10 for "compare two texts". Post ours after
+   Show HN, then answer existing threads that rank, with disclosure.
+3. Store listings: Microsoft Store, CWS and AMO pages rank on their own domain
+   authority. The Edge Add-ons listing is ready and is a reason to resume Edge.
+4. Own site: "compare two texts" (KD 27) matches the brand and domain. Add a short
+   website-only explanation and FAQ under the home tool.
+
+Google Ads does not change organic rankings. Use the $100 as a measurement test:
+which queries and messages lead to store clicks and installs.
+
+Campaign (owner creates the account, payment and GA4 link; nothing changes in the
+site code because GA4 already records `chrome_store_click`):
+
+- Type: Search only, Expert mode (not a Smart campaign); no Display or Search
+  partners.
+- Budget: $7 per day for 14 days, Maximize clicks with a $0.60 bid limit.
+- Locations: United States, United Kingdom, Canada, Australia, Ireland. Language:
+  English. Devices: desktop and tablet only (set mobile to -100%): extensions do not
+  install on phones.
+- Conversion: import GA4 `chrome_store_click` as the primary conversion;
+  `comparison_complete` as secondary.
+- Ad group A, text (landing `/`): [compare two texts], [compare text online],
+  "text comparison tool", [diff text], "compare texts online".
+- Ad group B, Word (landing `/compare-word-documents/`): [compare two word
+  documents], "compare word documents online", [compare word docs].
+- Negative keywords: python, java, excel formula, git, github, code, plagiarism,
+  similarity, ai detector, jobs, salary, download, crack, notepad++.
+- Do not use competitor trademarks in ad text or bid on them.
+
+Responsive search ad, group A (headlines up to 30 characters, descriptions up to 90):
+
+- Headlines: `Compare Two Texts Online` / `Free Diff Checker` / `See Every Change Highlighted` / `Edit Differences in Place` / `No Upload, No Account` / `Word, PDF and Excel Too` / `Works Offline in Chrome`
+- Descriptions: `Paste two texts and see every difference side by side. Fix them right in the results.` / `Files are processed in your browser, never uploaded. Free, with an offline extension.`
+
+Group B uses the same pattern with `Compare Two Word Documents`, `No Microsoft Word Needed`
+and `Download the Edited DOCX`.
+
+Read the results after 7 and 14 days: cost per store click by query, search terms
+to add as negatives, and installs in the CWS dashboard for the same days. Stop
+early if store clicks stay at zero after $50. Expect roughly 150–250 clicks at
+Semrush's CPC estimates; that is an estimate, not a forecast of installs.
+
 ## Tracking
 
 | Date | Placement | URL of the post or listing | Status | Link type | Notes |
