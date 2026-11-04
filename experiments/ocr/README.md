@@ -41,6 +41,21 @@ Use generated fixture PNGs for a first test. The comparison display is a simple
 line-position diagnostic, not the production diff engine; insertion shifts are
 not evidence of OCR quality. Plain text is rendered as text, never as HTML.
 
+## Recognition language
+
+Choose OCR language immediately above Recognize: Русский (rus) for Russian
+source text, English (eng) for English. Browser translation changes interface
+labels, not the recognition model. Do not use an English model for Cyrillic text.
+
+Each A/B panel remembers its last explicitly selected language and layout for
+the next upload and pages not yet opened. Already opened pages retain their
+settings when revisited. Changing a current page setting cancels its approval;
+recognize it again before checking the result. Preferences are in memory for
+this tab, not persisted across reloads. A/B are configured independently.
+
+Recognized text and diff passages opt out of browser translation. Numeric and
+Latin/Cyrillic lookalikes still require manual review even with the right language.
+
 ## PDF review workflow
 
 Use the Page selector to inspect every page. Existing text layers are extracted

@@ -36,24 +36,25 @@ for (const label of ['A','B']) {
   const panel = document.createElement('section');
   panel.innerHTML = `<h2>Document ${label}</h2>
     <input aria-label="Document ${label}" type="file" accept="image/png,image/jpeg,application/pdf,.pdf">
-    <p class="filename"></p><div class="page-nav" hidden>
+    <p class="filename" translate="no"></p><div class="page-nav" hidden>
     <label>Page <select class="page-select" aria-label="Page ${label}"></select></label>
     <button class="reload">Reload page</button></div>
     <small class="pdf-note" hidden>PDF preview excludes annotations and form fields. Check the source PDF separately.</small>
     <p class="review-count" aria-live="polite"></p>
-    <label>Language <select class="language"><option value="eng">English</option><option value="rus">Russian</option></select></label>
     <details><summary>Recognition options</summary><label>Layout <select class="layout"><option value="6">Single text block</option><option value="3">Automatic page layout (experimental)</option></select></label><p>Automatic layout may help columns but reorder invoices and tables.</p></details>
     <img alt="Page preview ${label}" hidden><br>
     <a class="full-size" target="_blank" rel="noopener" hidden>Open full-size image</a><br>
+    <label>OCR language <select class="language" translate="no"><option value="eng">English (eng)</option><option value="rus">Русский (rus)</option></select></label><br>
+    <small>Choose the text language here; translating the interface does not change OCR.</small>
     <button class="recognize" disabled>Recognize</button> <button class="cancel" disabled>Cancel</button>
     <p class="status" role="status">Choose an image or PDF.</p>
-    <textarea aria-label="Recognized text ${label}" placeholder="Page text appears here"></textarea>
+    <textarea translate="no" spellcheck="false" autocorrect="off" autocapitalize="off" aria-label="Recognized text ${label}" placeholder="Page text appears here"></textarea>
     <label class="blank-label"><input class="blank" type="checkbox"> I checked: this page has no text to compare</label><br>
     <button class="confirm" disabled>Confirm checked text</button>
     <button class="download" disabled>Download TXT</button>`;
   document.querySelector('#panels').append(panel);
   const $ = q => panel.querySelector(q);
-  const s = {pages:[],index:0,doc:null,image:null,url:null,ready:false,busy:false,generation:0,worker:null,controller:null};
+  const s = {pages:[],index:0,doc:null,image:null,url:null,ready:false,busy:false,generation:0,worker:null,controller:null,preferences:{language:"eng",psm:"6"}};
   states.push(s);
   const current = () => s.pages[s.index];
   const status = text => { $('.status').textContent=text; };
@@ -84,7 +85,7 @@ for (const label of ['A','B']) {
     const worker=s.worker;s.worker=null;s.busy=false;
     if(worker)await worker.terminate().catch(()=>{});
   }
-  function record() { return {text:'',confirmed:false,loaded:false,blank:false,language:'eng',psm:'6',source:'unread',warning:''}; }
+  function record() { return {text:'',confirmed:false,loaded:false,blank:false,language:s.preferences.language,psm:s.preferences.psm,source:'unread',warning:''}; }
   async function showPage(index) {
     if(!Number.isInteger(index)||index<0||index>=s.pages.length)return;
     const pending=stop();const generation=s.generation;s.index=index;s.busy=true;clearPreview();
@@ -145,7 +146,11 @@ for (const label of ['A','B']) {
   $('.cancel').onclick=async()=>{const pending=stop();const generation=s.generation;invalidate();await pending;if(generation===s.generation){status(s.ready?'Recognition cancelled. Review or recognize again.':'Loading cancelled. Use Reload page or choose another document.');controls();}};
   $('textarea').oninput=()=>{const p=current();if(!p)return;p.text=$('textarea').value;p.blank=false;$('.blank').checked=false;invalidate();status('Text changed. Check and confirm this page again.');};
   $('.blank').onchange=()=>{if(current())current().blank=$('.blank').checked;invalidate();};
-  for(const [selector,key] of [['.language','language'],['.layout','psm']])$(selector).onchange=()=>{if(current())current()[key]=$(selector).value;invalidate();status('Settings changed. Recognize again if needed, then confirm.');};
+  for(const [selector,key] of [['.language','language'],['.layout','psm']])$(selector).onchange=()=>{
+    const value=$(selector).value;s.preferences[key]=value;
+    for(const page of s.pages)if(page===current()||!page.loaded)page[key]=value;
+    invalidate();status('Setting saved for this page, unopened pages and the next document. Recognize again if needed, then confirm.');
+  };
   $('.confirm').onclick=()=>{const p=current();if(!s.ready||s.busy||!(p.text.trim()||p.blank))return;p.confirmed=true;status(`Page ${s.index+1} checked.`);changed();controls();};
   $('.download').onclick=()=>{if(complete(s))download(s.pages.length===1?s.pages[0].text:s.pages.map((p,i)=>`[Page ${i+1}]\n${p.text}`).join('\n\n'),`ocr-${label}.txt`);};
 }
@@ -158,7 +163,7 @@ compare.onclick=()=>{
     const heading=document.createElement('h3');heading.textContent=`Page ${page+1}`;result.append(heading);
     for(const [i,s] of states.entries())if(s.pages[page]){const button=document.createElement('button');button.textContent=`Open ${i?'B':'A'} page ${page+1}`;button.onclick=()=>{s.showPage(page);document.querySelector('#panels').scrollIntoView({behavior:'smooth'});};result.append(button);}
     const al=a?a.text.split(/\r?\n/):[],bl=b?b.text.split(/\r?\n/):[];
-    for(let i=0;i<Math.max(al.length,bl.length);i++)if(al[i]!==bl[i]){count++;for(const [prefix,text,cls] of [['A',al[i],'removed'],['B',bl[i],'added']]){const p=document.createElement('pre');p.className=cls;p.textContent=`${prefix} page ${page+1}, line ${i+1}: ${text??'[missing line/page]'}`;result.append(p);}}
+    for(let i=0;i<Math.max(al.length,bl.length);i++)if(al[i]!==bl[i]){count++;for(const [prefix,text,cls] of [['A',al[i],'removed'],['B',bl[i],'added']]){const p=document.createElement('pre');p.className=cls;p.setAttribute('translate','no');p.textContent=`${prefix} page ${page+1}, line ${i+1}: ${text??'[missing line/page]'}`;result.append(p);}}
   }
   summary.textContent=count?`${count} differing line positions. Pages and lines are compared by position; insertions can shift later content. OCR mistakes may look like changes.`:'Confirmed texts are identical.';
 };

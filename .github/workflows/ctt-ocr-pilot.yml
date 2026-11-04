@@ -34,6 +34,7 @@ jobs:
       - run: node --test test_pdf_input.mjs
       - run: npx playwright install --with-deps chromium
       - run: node check-pdf-browser.mjs
+      - run: node check-russian-browser.mjs
       - run: OCR_UI_ONLY=1 node benchmark-browser.mjs
       - run: python3 package_pilot.py --output results/ctt-ocr-pdf-pilot.zip
       - uses: actions/upload-artifact@v4
@@ -43,3 +44,4 @@ jobs:
             experiments/ocr/results/ctt-ocr-pdf-pilot.zip
             experiments/ocr/results/pdf-browser-smoke.json
             experiments/ocr/results/ui-smoke.json
+            experiments/ocr/results/russian-browser-smoke.json
