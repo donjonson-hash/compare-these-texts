@@ -1,12 +1,20 @@
 import Tesseract from './node_modules/tesseract.js/dist/tesseract.esm.min.js';
-export async function makeWorker(lang, logger = () => {}) {
+export async function makeWorker(lang, logger = () => {}, {psm = '6'} = {}) {
+  if (!['3', '6'].includes(psm)) throw new Error('Unsupported page layout mode');
   if (!['eng', 'rus'].includes(lang)) throw new Error('Unsupported language');
-  return Tesseract.createWorker(lang, 1, {
+  const worker = await Tesseract.createWorker(lang, 1, {
     workerPath: new URL('./node_modules/tesseract.js/dist/worker.min.js', import.meta.url).href,
     corePath: new URL('./node_modules/tesseract.js-core/', import.meta.url).href,
     langPath: new URL(`./node_modules/@tesseract.js-data/${lang}/4.0.0_best_int/`, import.meta.url).href,
     workerBlobURL: false, logger,
   });
+  try {
+    await worker.setParameters({tessedit_pageseg_mode: psm});
+    return worker;
+  } catch (error) {
+    await worker.terminate();
+    throw error;
+  }
 }
 window.ocrBenchmark = {makeWorker};
 const states = [];
@@ -16,12 +24,12 @@ const result = document.querySelector('#result');
 function changed() { result.replaceChildren(); summary.textContent = ''; compare.disabled = states.length !== 2 || states.some(s => !s.confirmed || s.busy); }
 for (const label of ['A', 'B']) {
   const panel = document.createElement('section');
-  panel.innerHTML = `<h2>Document ${label}</h2><input aria-label="Image ${label}" type="file" accept="image/png,image/jpeg"><br><label>Language <select><option value="eng">English</option><option value="rus">Russian</option></select></label><br><img alt="Original document ${label}" hidden><br><a class="full-size" target="_blank" rel="noopener" hidden>Open full-size image</a><br><button class="recognize" disabled>Recognize</button> <button class="cancel" disabled>Cancel</button><p class="status" role="status">Choose an image.</p><textarea aria-label="Recognized text ${label}" placeholder="Recognized text appears here"></textarea><button class="confirm" disabled>Confirm checked text</button> <button class="download" disabled>Download TXT</button>`;
+  panel.innerHTML = `<h2>Document ${label}</h2><input aria-label="Image ${label}" type="file" accept="image/png,image/jpeg"><br><label>Language <select><option value="eng">English</option><option value="rus">Russian</option></select></label><br><details><summary>Recognition options</summary><label>Layout <select class="layout"><option value="6">Single text block</option><option value="3">Automatic page layout (experimental)</option></select></label><p>Automatic layout may help columns but can reorder invoices and tables.</p></details><br><img alt="Original document ${label}" hidden><br><a class="full-size" target="_blank" rel="noopener" hidden>Open full-size image</a><br><button class="recognize" disabled>Recognize</button> <button class="cancel" disabled>Cancel</button><p class="status" role="status">Choose an image.</p><textarea aria-label="Recognized text ${label}" placeholder="Recognized text appears here"></textarea><button class="confirm" disabled>Confirm checked text</button> <button class="download" disabled>Download TXT</button>`;
   document.querySelector('#panels').append(panel);
   const $ = q => panel.querySelector(q);
   const s = {confirmed:false,busy:false,worker:null,generation:0,url:null,ready:false}; states.push(s);
   const invalidate = () => { s.confirmed=false; $('.download').disabled=true; changed(); };
-  const controls = () => { $('.recognize').disabled = !s.ready || s.busy; $('.cancel').disabled=!s.busy; $('.confirm').disabled=s.busy || !s.ready || !$('textarea').value.trim(); $('textarea').disabled=s.busy; $('select').disabled=s.busy; };
+  const controls = () => { $('.recognize').disabled = !s.ready || s.busy; $('.cancel').disabled=!s.busy; $('.confirm').disabled=s.busy || !s.ready || !$('textarea').value.trim(); $('textarea').disabled=s.busy; panel.querySelectorAll('select').forEach(select=>select.disabled=s.busy); };
   async function cancel() { s.generation++; const w=s.worker;s.worker=null;s.busy=false;if(w) await w.terminate(); controls(); }
   $('input').onchange = async () => {
     invalidate();s.ready=false;$('.full-size').hidden=true;$('.full-size').removeAttribute('href');const pending=cancel(); const generation=s.generation;controls();await pending;if(generation!==s.generation)return; $('textarea').value=''; $('img').hidden=true;
@@ -38,7 +46,7 @@ for (const label of ['A', 'B']) {
   $('.recognize').onclick = async () => {
     invalidate();s.busy=true;controls();const generation=++s.generation;
     try {
-      const w=await makeWorker($('select').value, m => {if(generation===s.generation)$('.status').textContent=`${m.status} ${Math.round((m.progress||0)*100)}%`;});
+      const w=await makeWorker($('select').value, m => {if(generation===s.generation)$('.status').textContent=`${m.status} ${Math.round((m.progress||0)*100)}%`;}, {psm: $('.layout').value});
       if(generation!==s.generation){await w.terminate();return;}s.worker=w;
       const {data}=await w.recognize(s.url);
       if(generation===s.generation){$('textarea').value=data.text;$('.status').textContent='Review the text against the image, then confirm.';}
@@ -47,7 +55,7 @@ for (const label of ['A', 'B']) {
   };
   $('.cancel').onclick=async()=>{const pending=cancel();const generation=s.generation;await pending;if(generation!==s.generation)return;invalidate();$('.status').textContent='Recognition cancelled.';};
   $('textarea').oninput=()=>{invalidate();controls();$('.status').textContent='Text changed. Check and confirm it again.';};
-  $('select').onchange=()=>{invalidate();$('.status').textContent='Language changed. Recognize again if needed.';};
+  panel.querySelectorAll('select').forEach(select=>{select.onchange=()=>{invalidate();$('.status').textContent='Recognition settings changed. Recognize again if needed.';};});
   $('.confirm').onclick=()=>{if(s.busy || !s.ready || !$('textarea').value.trim())return;s.confirmed=true;s.text=$('textarea').value;$('.download').disabled=false;$('.status').textContent='Text confirmed.';changed();};
   $('.download').onclick=()=>{if(!s.confirmed)return;const url=URL.createObjectURL(new Blob([s.text],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`ocr-${label}.txt`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 }

@@ -7,6 +7,9 @@ import os from 'node:os';
 import {createHash} from 'node:crypto';
 const sha256=data=>createHash('sha256').update(data).digest('hex');
 const root=dirname(fileURLToPath(import.meta.url));
+const psm=process.env.OCR_PSM || '6';
+const resultName=process.env.OCR_UI_ONLY==='1'?'ui-smoke.json':psm==='3'?'tesseract-auto-psm3.json':'tesseract-browser.json';
+if(!['3','6'].includes(psm))throw Error('OCR_PSM must be 3 or 6');
 const require=createRequire(process.env.OCR_PLAYWRIGHT_PACKAGE || resolve(root,'package.json'));
 const {chromium}=require('playwright');
 const types={'.html':'text/html','.mjs':'text/javascript','.js':'text/javascript','.wasm':'application/wasm','.json':'application/json','.png':'image/png','.gz':'application/gzip'};
@@ -20,9 +23,9 @@ try {
  await context.route('**/*',route=>{const url=route.request().url();if(!url.startsWith(origin+'/')){outbound.push(url);return route.abort();}return route.continue();});
  const page=await context.newPage();await page.goto(origin);await page.waitForFunction(()=>window.ocrBenchmark);
  const manifest=JSON.parse(await readFile(resolve(root,'fixtures/manifest.json'),'utf8'));
- const report={manifest_sha256:sha256(await readFile(resolve(root,'fixtures/manifest.json'))),engine:'Tesseract.js browser WASM',version:'7.0.0',created_at:new Date().toISOString(),environment:{browser:browser.version(),platform:os.platform(),architecture:os.arch(),cpu:os.cpus()[0]?.model,logical_cpus:os.cpus().length,memory_note:'Sampled JS heap only; excludes worker/WASM allocations and total browser/process memory. Not a peak RSS measurement.'},setup:[],repeatability:[],results:[]};
- for(const lang of ['eng','rus']) {
-   const setup=await page.evaluate(async lang=>{const start=performance.now();window.benchWorker=await window.ocrBenchmark.makeWorker(lang);return {lang,elapsed_ms:performance.now()-start};},lang);report.setup.push(setup);
+ const report={manifest_sha256:sha256(await readFile(resolve(root,'fixtures/manifest.json'))),engine:'Tesseract.js browser WASM',settings:{psm,psm_name:psm==='3'?'AUTO':'SINGLE_BLOCK',oem:1,languages:['eng','rus']},version:'7.0.0',created_at:new Date().toISOString(),environment:{browser:browser.version(),platform:os.platform(),architecture:os.arch(),cpu:os.cpus()[0]?.model,logical_cpus:os.cpus().length,memory_note:'Sampled JS heap only; excludes worker/WASM allocations and total browser/process memory. Not a peak RSS measurement.'},setup:[],repeatability:[],results:[]};
+ if(process.env.OCR_UI_ONLY!=='1') for(const lang of ['eng','rus']) {
+   const setup=await page.evaluate(async ({lang,psm})=>{const start=performance.now();window.benchWorker=await window.ocrBenchmark.makeWorker(lang, undefined, {psm});return {lang,elapsed_ms:performance.now()-start};},{lang,psm});report.setup.push(setup);
    for(const item of manifest.filter(x=>x.lang===lang)) {
      const image_sha256=sha256(await readFile(resolve(root,'fixtures',item.image)));const truth_sha256=sha256(await readFile(resolve(root,'fixtures',item.truth)));
      const measurement=await page.evaluate(async item=>{const start=performance.now();try{const {data}=await window.benchWorker.recognize(`./fixtures/${item.image}`);return {id:item.id,status:'ok',text:data.text,elapsed_ms:performance.now()-start,sampled_main_thread_js_heap_bytes:performance.memory?.usedJSHeapSize??null};}catch(e){return{id:item.id,status:'error',text:'',error:e.message,elapsed_ms:performance.now()-start};}},item);
@@ -41,6 +44,12 @@ try {
   await upload(i);if(!await page.evaluate(i=>{const p=document.querySelectorAll('section')[i];const a=p.querySelector('.full-size');return !a.hidden && a.href===p.querySelector('img').src && a.href.startsWith('blob:') && a.target==='_blank' && a.rel==='noopener';},i))throw Error('Full-size image link invalid');await page.locator('.recognize').nth(i).click();
   await page.waitForFunction(i=>!document.querySelectorAll('.confirm')[i].disabled,i,{timeout:120000});
   await page.locator('.confirm').nth(i).click();
+  if(i===0){
+   if(await page.locator('details').first().getAttribute('open')!==null)throw Error('Recognition options must initially be collapsed');
+   await page.locator('details summary').first().click();await page.locator('.layout').first().selectOption('3');
+   if(!await page.locator('.download').first().isDisabled() || !await page.locator('#compare').isDisabled())throw Error('Layout change retained confirmation');
+   await page.locator('.recognize').first().click();await page.waitForFunction(()=>!document.querySelector('.confirm').disabled,null,{timeout:120000});await page.locator('.confirm').first().click();
+  }
  }
  await page.locator('#compare').click();
  if(await page.locator('#summary').textContent()!=='Confirmed texts are identical.')throw Error('Identical OCR comparison failed');
@@ -54,8 +63,8 @@ try {
  await page.waitForTimeout(500);
  if(await page.locator('textarea').first().inputValue()!=='')throw Error('Cancelled run wrote stale OCR');
  if(!await page.locator('#compare').isDisabled())throw Error('Replacement retained old confirmation');
- report.review_gate_smoke='passed: recognition, confirmation, compare, edit invalidation, invalid file, cancellation and replacement';
- await mkdir(resolve(root,'results'),{recursive:true});await writeFile(resolve(root,'results/tesseract-browser.json'),JSON.stringify(report,null,2)+'\n');
+ report.review_gate_smoke='passed: recognition, confirmation, compare, layout change invalidation and automatic-mode recognition, edit invalidation, invalid file, cancellation and replacement';
+ await mkdir(resolve(root,'results'),{recursive:true});await writeFile(resolve(root,'results',resultName),JSON.stringify(report,null,2)+'\n');
  if(outbound.length)throw Error(`Unexpected outbound requests blocked: ${outbound.length}`);
- console.log('Saved results/tesseract-browser.json; outbound requests: 0; review gate: passed.');
+ console.log(`Saved results/${resultName}; outbound requests: 0; review gate: passed.`);
 } finally {if(browser)await browser.close();await new Promise(r=>server.close(r));}

@@ -26,7 +26,10 @@ invalidates confirmation. Cancel stops the recognition task. Files are not
 uploaded to the local HTTP server: it only serves static application assets.
 The UI does not persist document text or send telemetry. Tesseract may cache
 language assets in the browser. Use **Open full-size image** to inspect the
-original at readable scale.
+original at readable scale. The collapsed **Recognition options** control defaults
+to single-block segmentation (PSM 6). Automatic page layout (PSM 3) is optional:
+it improved English columns in this pilot but degraded invoices. Changing the
+language or layout invalidates the reviewed transcription.
 
 Use generated fixture PNGs for a first test. The comparison display is a simple
 line-position diagnostic, not the production diff engine; insertion shifts are
@@ -41,6 +44,11 @@ node benchmark-browser.mjs
 python3 summarize.py results/tesseract-browser.json --output results/tesseract-summary.json
 python3 -m unittest discover -s . -p 'test_*.py'
 ```
+
+The default report is `results/tesseract-browser.json`. Set `OCR_PSM=3` for a
+separate automatic-layout run saved as `results/tesseract-auto-psm3.json`.
+Set `OCR_UI_ONLY=1` for the interaction smoke test, saved as `results/ui-smoke.json`.
+These modes do not overwrite the default benchmark report.
 
 A preinstalled Chromium can be selected using `CHROMIUM_EXECUTABLE`.
 The benchmark blocks requests outside its loopback origin and records blocked
@@ -128,3 +136,18 @@ hashed the actual local model files and started its server with those exact path
 See `evidence/environment-2026-11-04.json`. The browser pilot serves local assets;
 network blocking is enforced by the benchmark runner, not a production CSP in
 the standalone development page.
+
+## Portable image pilot
+
+After dependency installation and fixture generation, run:
+
+```bash
+python3 package_pilot.py --output /tmp/ctt-ocr-pilot.zip
+```
+
+The ZIP contains the browser UI, local OCR runtime and EN/RU language assets,
+24 synthetic example pages, license notices and checksums. It excludes Xiaomi
+weights, the inference server, Playwright and browser binaries. Extract it and
+follow `START-HERE.txt`; Python serves the files on loopback, with no npm install
+required on the testing machine. This is a standalone image prototype, not a
+Chrome/Firefox store package.
