@@ -1,0 +1,117 @@
+[
+  {
+    "file": "scan-a.pdf",
+    "page_count": 3,
+    "purpose": "scan_pair",
+    "pages": [
+      {
+        "number": 1,
+        "source_fixture_id": "eng-paragraphs-a",
+        "truth": "scan-a-page-1.txt",
+        "has_text_layer": false,
+        "expected_pair_changed": true
+      },
+      {
+        "number": 2,
+        "source_fixture_id": "eng-invoice-a",
+        "truth": "scan-a-page-2.txt",
+        "has_text_layer": false,
+        "expected_pair_changed": true
+      },
+      {
+        "number": 3,
+        "source_fixture_id": "eng-degraded-a",
+        "truth": "scan-a-page-3.txt",
+        "has_text_layer": false,
+        "expected_pair_changed": false
+      }
+    ],
+    "synthetic": true,
+    "bytes": 141477,
+    "sha256": "76e21e6f9babfb56bd73774b154bc0ad42662fd241ab1fced713d4023fd2902b"
+  },
+  {
+    "file": "scan-b.pdf",
+    "page_count": 3,
+    "purpose": "scan_pair",
+    "pages": [
+      {
+        "number": 1,
+        "source_fixture_id": "eng-paragraphs-b",
+        "truth": "scan-b-page-1.txt",
+        "has_text_layer": false,
+        "expected_pair_changed": true
+      },
+      {
+        "number": 2,
+        "source_fixture_id": "eng-invoice-b",
+        "truth": "scan-b-page-2.txt",
+        "has_text_layer": false,
+        "expected_pair_changed": true
+      },
+      {
+        "number": 3,
+        "source_fixture_id": "eng-degraded-b",
+        "truth": "scan-b-page-3.txt",
+        "has_text_layer": false,
+        "expected_pair_changed": false
+      }
+    ],
+    "synthetic": true,
+    "bytes": 466756,
+    "sha256": "d4e212b6646e13c2df9da482aa233205c1fd803f9888baa77fb12b6fee03ebb9"
+  },
+  {
+    "file": "mixed.pdf",
+    "page_count": 2,
+    "purpose": "per_page_routing",
+    "pages": [
+      {
+        "number": 1,
+        "truth": "mixed-page-1.txt",
+        "has_text_layer": true
+      },
+      {
+        "number": 2,
+        "truth": "mixed-page-2.txt",
+        "has_text_layer": false
+      }
+    ],
+    "synthetic": true,
+    "bytes": 103920,
+    "sha256": "4caa59cec2a665cbad20f7ba04fcffa04407d0822772dd4bbdb0a156861a0e53"
+  },
+  {
+    "file": "blank.pdf",
+    "page_count": 1,
+    "purpose": "blank_page",
+    "pages": [
+      {
+        "number": 1,
+        "truth": "blank-page-1.txt",
+        "has_text_layer": false
+      }
+    ],
+    "synthetic": true,
+    "bytes": 1350,
+    "sha256": "a0f357aa900d74de0bb06029fceec9f5fb40eb44ebd036fa5f57455975050d7d"
+  },
+  {
+    "file": "too-many-pages.pdf",
+    "page_count": 31,
+    "purpose": "reject_page_limit",
+    "expected_error": true,
+    "synthetic": true,
+    "bytes": 13121,
+    "sha256": "1501253d8ac996f383e5b597fe0ec9445b698b554804595eff8e6b2268f59c14"
+  },
+  {
+    "file": "corrupt.pdf",
+    "page_count": null,
+    "purpose": "reject_malformed_pdf",
+    "expected_error": true,
+    "synthetic": true,
+    "bytes": 63,
+    "sha256": "4497807b06738206bcab950d4b5e92381be396693b44b4098fd9c48d33058f9d"
+  }
+]

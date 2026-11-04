@@ -10,8 +10,9 @@ ROOT = Path(__file__).resolve().parent
 START = '''Compare Two Texts — экспериментальный OCR-пилот
 
 Это отдельный прототип, НЕ обновление расширения и НЕ пакет Chrome Web Store.
-Поддерживаются только PNG/JPEG (до 10 MiB, до 12 млн пикселей), английский
-и русский языки. PDF непосредственно в этом пилоте не загружается.
+Поддерживаются PNG/JPEG (до 10 MiB, до 12 млн пикселей) и PDF
+(до 20 MiB, до 30 страниц), английский и русский языки.
+PDF отображается по одной странице, растр ограничен 4 млн пикселей.
 Все компоненты OCR уже включены. npm и скачивание моделей не нужны.
 После распаковки обработка работает локально, без облачного API.
 
@@ -20,7 +21,7 @@ START = '''Compare Two Texts — экспериментальный OCR-пило
 2. Откройте терминал в папке ctt-ocr-pilot.
 3. Выполните:
    python3 -m http.server 8787 --bind 127.0.0.1
-4. Откройте в Chrome или Firefox:
+4. Откройте в Chrome:
    http://127.0.0.1:8787/
 Остановка сервера: Ctrl+C в терминале. Не открывайте index.html через file://.
 
@@ -29,7 +30,14 @@ START = '''Compare Two Texts — экспериментальный OCR-пило
 Выберите язык, нажмите Recognize. Open full-size image открывает оригинал
 в полном размере. Проверьте текст рядом с оригиналом, исправьте ошибки OCR,
 нажмите Confirm checked text для каждого документа, затем Compare confirmed texts.
-Download TXT сохраняет подтвержденный текст. Любая правка отменяет подтверждение.
+Download TXT сохраняет подтвержденный текст. Любая правка отменяет подтверждение текущей страницы.
+Для PDF выберите страницу в Page. Каждую страницу нужно проверить и подтвердить.
+Download TXT доступна после подтверждения всех страниц.
+Для явно пустой страницы отметьте I checked: this page has no text to compare.
+PDF с текстовым слоем извлекается без OCR; кнопка Recognize остаётся доступна.
+Примеры PDF: fixtures/pdf/scan-a.pdf, scan-b.pdf, mixed.pdf, blank.pdf.
+Текст сохраняется с номерами страниц. Вёрстка PDF в TXT не сохраняется.
+Аннотации и поля форм PDF в этом пилоте не включены — проверьте исходный PDF отдельно.
 Для русского примера используйте rus-paragraphs-a/b.png и язык Russian.
 
 Набор fixtures содержит 24 СИНТЕТИЧЕСКИЕ страницы и эталонные тексты .txt.
@@ -64,6 +72,9 @@ Git blob 261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64, on 2026-11-04.
 Only 4.0.0_best_int language files are included; README and metadata retained.
 
 Original Compare Two Texts code remains governed by LICENSE.
+PDF.js 6.3.289 (modified offline reader): Apache-2.0.
+See vendor/PDF-READER-LICENSE.txt and vendor/PDF-READER-SOURCE.md.
+
 No Playwright, Chromium binary, or Xiaomi model weights are bundled.
 '''
 
@@ -73,9 +84,14 @@ def build(output):
         if not path.is_file():
             raise FileNotFoundError(path)
         entries[name or path.relative_to(ROOT).as_posix()] = path.read_bytes()
-    for name in ['index.html', 'browser.mjs', 'TESSDATA-LICENSE']:
+    for name in ['index.html', 'browser.mjs', 'pdf-input.mjs', 'TESSDATA-LICENSE']:
         add(ROOT / name)
     add(ROOT.parents[1] / 'LICENSE', 'LICENSE')
+    from prepare_assets import prepare
+    prepare()
+    for path in sorted((ROOT / 'vendor').iterdir()):
+        if path.is_file():
+            add(path)
     for path in sorted((ROOT / 'fixtures').rglob('*')):
         if path.is_file():
             add(path)

@@ -3,3 +3,5 @@ fixtures/
 results/
 __pycache__/
 *.log
+
+vendor/

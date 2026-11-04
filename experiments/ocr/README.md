@@ -1,14 +1,18 @@
 # OCR evaluation pilot — Compare Two Texts
 
+PDF follow-up: [behavior, validation and portable package](PDF-PILOT-2026-11-04.md).
+
 An isolated experiment, not a released extension feature. Nothing in `src/`, the
 extension manifests, release version, or production build is changed. The normal
-PDF text-layer importer remains strict. This pilot accepts PNG/JPEG pages only;
-PDF rasterization and mixed-page routing are a separate integration step.
+PDF text-layer importer remains strict. The pilot accepts PNG/JPEG and PDF
+(up to 20 MiB / 30 pages). PDF pages are rendered on demand to at most 4 million
+pixels; encrypted PDFs and pages requiring unavailable external resources are
+rejected with a visible error.
 
 ## Browser pilot
 
-Requirements: Node.js 20+ (tested with 24.22.1), Python 3, Pillow
-(generator only), and DejaVu Sans/Mono fonts. Dependencies are pinned in the
+Requirements: Node.js 24+, Python 3, Pillow 13.0.0, ReportLab 4.4.9
+(fixture generation only), and DejaVu Sans/Mono fonts. Dependencies are pinned in the
 nested package lock. Runtime scripts, WASM and language data are served locally;
 there are no CDN requests or hosted OCR calls.
 
@@ -16,6 +20,8 @@ there are no CDN requests or hosted OCR calls.
 cd experiments/ocr
 npm ci --ignore-scripts
 python3 generate_fixtures.py
+python3 prepare_assets.py
+python3 generate_pdf_fixtures.py
 python3 -m http.server 8787 --bind 127.0.0.1
 ```
 
@@ -35,6 +41,31 @@ Use generated fixture PNGs for a first test. The comparison display is a simple
 line-position diagnostic, not the production diff engine; insertion shifts are
 not evidence of OCR quality. Plain text is rendered as text, never as HTML.
 
+## PDF review workflow
+
+Use the Page selector to inspect every page. Existing text layers are extracted
+without OCR and still require review against the rendered original. On scanned
+pages, select the recognition language and press Recognize. If a text layer is
+incomplete or wrong, Recognize replaces it after successful OCR; it is never
+silently combined with the old text.
+
+Edits and confirmation are kept per page while navigating. Editing a page or
+changing its recognition settings invalidates that page's approval. Complete
+document TXT export and comparison require every page to be confirmed. A blank
+page needs the explicit “no text to compare” checkbox and confirmation. This is
+a user's decision, not an automatic claim that a scan is blank.
+
+TXT export includes page markers for multi-page documents. The diagnostic diff
+compares pages and lines by position and offers buttons to reopen differing pages.
+It is not automatic page matching; inserted pages can shift subsequent results.
+Text, images and approvals are in memory only and are lost on page refresh.
+
+PDF page annotations are not rendered in this pilot. PDF.js extraction order is
+retained; complex reading order, handwritten text, mixed scripts and unusual
+fonts need manual review. Cancellation or replacement cannot approve stale output.
+The existing modified PDF reader is copied into local vendor assets by
+prepare_assets.py; no CDN or model API is used.
+
 ## Reproducible benchmark
 
 ```bash
@@ -43,6 +74,8 @@ npx playwright install chromium
 node benchmark-browser.mjs
 python3 summarize.py results/tesseract-browser.json --output results/tesseract-summary.json
 python3 -m unittest discover -s . -p 'test_*.py'
+node --test test_pdf_input.mjs
+node check-pdf-browser.mjs
 ```
 
 The default report is `results/tesseract-browser.json`. Set `OCR_PSM=3` for a
@@ -98,8 +131,8 @@ Before adding OCR to the released extension:
 2. Score exact changed numbers and edit locations, not only global OCR metrics.
 3. Measure repeatability, cancellation, peak process memory and startup on
    ordinary supported Windows/macOS/Linux laptops.
-4. Decide PDF rendering limits and safe per-page routing; preserve source page
-   numbers and original images alongside confirmed OCR text.
+4. Validate the prototype PDF limits and per-page routing with real-world files;
+   preserve source page numbers and original images alongside confirmed OCR text.
 5. Preserve the confirmed transcription for repeated comparisons and Undo/Redo;
    record engine/model version and options rather than rerunning OCR silently.
 6. Verify Chrome/Firefox packaging with local WASM/workers/language data and an
@@ -137,7 +170,7 @@ See `evidence/environment-2026-11-04.json`. The browser pilot serves local asset
 network blocking is enforced by the benchmark runner, not a production CSP in
 the standalone development page.
 
-## Portable image pilot
+## Portable image/PDF pilot
 
 After dependency installation and fixture generation, run:
 
@@ -146,8 +179,8 @@ python3 package_pilot.py --output /tmp/ctt-ocr-pilot.zip
 ```
 
 The ZIP contains the browser UI, local OCR runtime and EN/RU language assets,
-24 synthetic example pages, license notices and checksums. It excludes Xiaomi
+24 synthetic image pages, PDF test documents, license notices and checksums. It excludes Xiaomi
 weights, the inference server, Playwright and browser binaries. Extract it and
 follow `START-HERE.txt`; Python serves the files on loopback, with no npm install
-required on the testing machine. This is a standalone image prototype, not a
+required on the testing machine. This is a standalone document prototype, not a
 Chrome/Firefox store package.
