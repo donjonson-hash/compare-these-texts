@@ -80,7 +80,9 @@
    $('single-sheet').replaceChildren();for(const name of info.sheets||[]){const option=document.createElement('option');option.value=option.textContent=name;$('single-sheet').append(option);}
    $('single-delimiter').value=info.delimiter||',';note('');setBusy(false);
    if(info.format==='docx'||info.format==='pdf'||info.format==='txt'){await open();}else{sourcePanel(true);$('single-options').hidden=false;$('single-pending').textContent=source.name;$('single-open').focus({preventScroll:true});$('single-options').scrollIntoView?.({block:'center'});}
-  }catch(error){if(ticket===generation)note(error.message,true);}
+  }catch(error){
+   if(ticket===generation)note(`Could not open “${file.name}”. ${error.message}${view?' Your current document is still open.':''}`,true);
+  }
   finally{if(ticket===generation)setBusy(false);}
  }
  $('single-paste-open')?.addEventListener('click',()=>{const text=$('single-paste-text').value;if(!text.trim()){note('Paste some text first.',true);return;}const bytes=new TextEncoder().encode(text);void load({name:'pasted-text.txt',size:bytes.length,arrayBuffer:async()=>bytes.buffer});});
