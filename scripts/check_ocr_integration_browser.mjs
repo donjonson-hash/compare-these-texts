@@ -102,6 +102,10 @@ async function exercise(context, base, mode) {
   await modal().locator('.ocr-region-result').waitFor({state:'visible', timeout:120000});
   assert.match(await modal().locator('.ocr-region-text').inputValue(), /Заказчик/);
   assert.equal(await modal().locator('.ocr-text').inputValue(), a, 'area OCR does not overwrite page text');
+  await modal().locator('.ocr-region-text').fill('Manually corrected area draft');
+  await recognize('rus+eng');
+  assert.equal(await modal().locator('.ocr-region-result').isVisible(), true, 'full-page OCR preserves the area draft');
+  assert.equal(await modal().locator('.ocr-region-text').inputValue(), 'Manually corrected area draft');
   await modal().locator('.ocr-clear-area').click();
   checks.push('mixed Russian + English recognition; pointer selection; separate area OCR preserves page edits');
   await page.screenshot({path:path.join(output,`${mode}-ocr-review.png`)});

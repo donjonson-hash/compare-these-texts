@@ -125,3 +125,18 @@ Application consumers import `pdf-reader.mjs`, which first installs a local
 link-annotation evidence and unsupported-action checks active. Vendored PDF.js
 bytes are unchanged. `tests/pdf-reader-compat.test.mjs` runs the existing link
 import/edit/export scenarios with native URL.parse deliberately absent.
+
+
+## OCR rendering error propagation
+
+The reviewed OCR importer also uses this reader to render page previews. A pinned,
+exact-match post-bundle patch repairs PDF.js 6.3.289's operator-stream rejection
+handler: it rejects the operator-list promise and cancels active render tasks
+before completion can resolve them. Previously, a rejected oversized image could
+produce a successful blank or partial page even with `stopAtErrors: true`.
+
+The patch applies after verifying the 0.33.4 compatibility hash above. The final
+bundle SHA-256 is `29676045ba2fc8a635a12620b0b6195cd2ec13ec410341c1fe949c3431472d28`.
+The upstream image/decompression limits stay in force; no additional PDF data is
+decoded and no external resources are enabled. Regression coverage includes real
+oversized raster XObjects and inline images, plus ordinary successful rendering.

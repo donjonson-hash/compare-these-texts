@@ -55,6 +55,7 @@ function abortable(promise, signal, onAbort = () => {}) {
 }
 function friendlyError(error) {
   if (error?.name === 'AbortError') return error;
+  if (/Image exceeded maximum allowed size/.test(error?.message || '')) return new Error('PDF: a page image exceeds 16 million pixels. Reduce the scan resolution and try again.');
   if (error?.name === 'PasswordException') return new Error('PDF: password-protected files are not supported for OCR import. Use an unlocked copy.');
   return error instanceof Error ? error : new Error('PDF: could not read this document.');
 }

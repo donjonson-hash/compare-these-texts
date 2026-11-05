@@ -105,3 +105,39 @@ test('real PDF raster crops match the selected visible region for upright and ro
     } finally { await doc.destroy(); }
   }
 });
+
+
+test('oversized PDF raster and inline images reject instead of producing a blank preview', async t => {
+  const globals = {DOMMatrix, ImageData, Path2D, document: {createElement() {
+    const canvas = createCanvas(1, 1);
+    canvas.toBlob = done => done(new Blob([canvas.toBuffer('image/png')]));
+    return canvas;
+  }}};
+  const prior = new Map(Object.keys(globals).map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  Object.assign(globalThis, globals);
+  t.after(() => { for (const [key, descriptor] of prior) { if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key]; } });
+  const {PDFDocument, PDFName} = await import('../src/pdf-vendor.mjs');
+  const {openPdf} = await import('../src/ocr-pdf-input.mjs');
+  const {getDocument} = await import('../src/pdf-reader.mjs');
+  for (const inline of [false, true]) {
+    const source = await PDFDocument.create(), page = source.addPage([200, 200]);
+    if (inline) {
+      const stream = Buffer.concat([Buffer.from('q 200 0 0 200 0 0 cm BI /W 4001 /H 4000 /BPC 1 /CS /G ID\n'), Buffer.alloc(Math.ceil(4001 / 8) * 4000), Buffer.from('\nEI Q')]);
+      page.node.set(PDFName.of('Contents'), source.context.register(source.context.flateStream(stream)));
+    } else {
+      const image = createCanvas(4001, 4000); image.getContext('2d').fillRect(0, 0, 4001, 4000);
+      page.drawImage(await source.embedPng(image.toBuffer('image/png')), {x:0,y:0,width:200,height:200});
+    }
+    const bytes = await source.save();
+    const loading = getDocument({data:bytes.slice(), stopAtErrors:true, maxImageSize:16_000_000, verbosity:0});
+    try {
+      const raw = await loading.promise, rawPage = await raw.getPage(1);
+      await assert.rejects(rawPage.getOperatorList({annotationMode:0}), /maximum allowed size/, 'operator-list promise must reject before success notification');
+    } finally { await loading.destroy(); }
+    const doc = await openPdf(new Blob([bytes]));
+    try {
+      await assert.rejects(doc.page(1), /image exceeds 16 million pixels/);
+      await assert.rejects(doc.page(1, {region:{x:0,y:0,width:.25,height:.25}}), /image exceeds 16 million pixels/);
+    } finally { await doc.destroy(); }
+  }
+});

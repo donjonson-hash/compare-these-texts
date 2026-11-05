@@ -129,7 +129,7 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
     [...pageSelect.options].forEach((option, i) => { option.textContent = `${i + 1}${pages[i].confirmed ? ' — checked' : ''}`; });
   }
   function rememberRegion() {
-    if (current()) current().regionDraft = region ? {region: {...region}, text: regionText.value, visible: !regionPanel.hidden} : null;
+    if (ready && current() && region) current().regionDraft = {region: {...region}, text: regionText.value, visible: !regionPanel.hidden};
   }
   function restoreRegion() {
     const draft = current()?.regionDraft;
@@ -158,10 +158,13 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
     Object.assign(selectionBox.style, {left: `${bounds.left - parent.left + region.x * bounds.width}px`, top: `${bounds.top - parent.top + region.y * bounds.height}px`, width: `${region.width * bounds.width}px`, height: `${region.height * bounds.height}px`});
   }
   function setRegion(value) {
-    if (!value || !Object.values(value).every(Number.isFinite) || value.x < 0 || value.y < 0 || value.width <= 0 || value.height <= 0 || value.x + value.width > 1.000001 || value.y + value.height > 1.000001) {
+    if (!value || !Object.values(value).every(Number.isFinite) || value.x < 0 || value.x >= 1 || value.y < 0 || value.y >= 1 || value.width <= 0 || value.height <= 0 || value.x + value.width > 1.000001 || value.y + value.height > 1.000001) {
       region = null; selectionBox.hidden = true; regionPanel.hidden = true; controls(); return false;
     }
-    region = {...value, width: Math.min(value.width, 1 - value.x), height: Math.min(value.height, 1 - value.y)}; regionPanel.hidden = true; regionText.value = '';
+    region = {...value, width: Math.min(value.width, 1 - value.x), height: Math.min(value.height, 1 - value.y)};
+    const saved = current()?.regionDraft;
+    const sameRegion = saved && ['x', 'y', 'width', 'height'].every(key => Math.abs(saved.region[key] - region[key]) < 1e-9);
+    regionPanel.hidden = !(sameRegion && saved.visible); regionText.value = sameRegion ? saved.text : '';
     coordinateFields.forEach(field => { field.value = String(Math.round(region[field.dataset.coordinate] * 1000) / 10); });
     rememberRegion(); drawRegion(); controls(); return true;
   }
@@ -175,7 +178,7 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
     selecting = !selecting; stage.classList.toggle('selecting', selecting); selectArea.setAttribute('aria-pressed', String(selecting));
     say(selecting ? 'Drag over the original to select an area, or enter its coordinates.' : 'Area selection stopped.');
   });
-  clearArea.addEventListener('click', () => { clearRegion(); rememberRegion(); controls(); });
+  clearArea.addEventListener('click', () => { clearRegion(); if (current()) current().regionDraft = null; controls(); });
   coordinateFields.forEach(field => field.addEventListener('change', () => {
     const value = Object.fromEntries(coordinateFields.map(input => [input.dataset.coordinate, input.value === '' ? NaN : Number(input.value) / 100]));
     if (!setRegion(value)) say('Enter an area inside the page with a positive width and height.');
@@ -292,6 +295,7 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
         say('Check the area result, then insert it at the cursor or replace selected page text.'); return;
       }
       page.text = data.text; page.blank = false; page.source = 'ocr'; text.value = page.text; blank.checked = false;
+      restoreRegion();
       say('Check this text against the original, then confirm the page.');
     } catch (error) { if (!closed && ticket === generation) { restoreRegion(); say(`Recognition failed: ${error.message}`); } }
     finally {

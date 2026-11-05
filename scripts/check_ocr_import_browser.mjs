@@ -1,6 +1,7 @@
 // Import-boundary regression gate: real browser, parser and editors; manual
 // checked text keeps this gate independent of recognition quality and models.
 import assert from 'node:assert/strict';
+import {createCanvas} from '@napi-rs/canvas';
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
 import path from 'node:path';
@@ -90,6 +91,22 @@ try {
   await single.locator('#single-current').waitFor({state:'visible'});
   assert.match(await single.locator('#single-current').textContent(),/checked OCR/);
   checks.push('forced hybrid PDF single editor');
+  const largeCanvas = createCanvas(4001,4000);
+  largeCanvas.getContext('2d').fillRect(0,0,4001,4000);
+  const largePdf = await PDFDocument.create();
+  const largeScan = await largePdf.embedPng(largeCanvas.toBuffer('image/png'));
+  largePdf.addPage([200,200]).drawImage(largeScan,{x:0,y:0,width:200,height:200});
+  const oversized = await fresh();
+  await oversized.locator('#home-left-file').setInputFiles({name:'oversized-scan.pdf',mimeType:'application/pdf',buffer:Buffer.from(await largePdf.save())});
+  await oversized.locator('#home-left-ocr').check();
+  await oversized.locator('#home-right-text').fill('Comparison');
+  await oversized.locator('#start-new-compare').click();
+  await oversized.waitForFunction(()=>/Could not load page:/.test(document.querySelector('.ocr-status')?.textContent || ''));
+  assert.equal(await oversized.locator('.ocr-blank').isDisabled(),true,'a missing image cannot be approved as a blank page');
+  assert.equal(await oversized.locator('.ocr-confirm').isDisabled(),true);
+  assert.equal(await oversized.locator('.ocr-use').isDisabled(),true);
+  await oversized.locator('.ocr-close').click();
+  checks.push('oversized PDF scan fails visibly before blank-page approval');
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({ok:true,checks}));
 } finally {

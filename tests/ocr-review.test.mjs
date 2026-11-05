@@ -7,7 +7,7 @@ import {validateCheckedText} from '../src/ocr-import.mjs';
 
 const tick = () => new Promise(resolve => setImmediate(resolve));
 const deferred = () => { let resolve; const promise = new Promise(done => { resolve = done; }); return {promise, resolve}; };
-async function harness(t, {texts = ['Page one', 'Page two'], makeWorker} = {}) {
+async function harness(t, {texts = ['Page one', 'Page two'], makeWorker, loadPage} = {}) {
   const dom = new JSDOM('<button id="before">Upload</button>', {runScripts: 'outside-only'});
   const context = dom.getInternalVMContext(), destroyed = [], revoked = [], languages = [], pageCalls = [], workerOptions = [];
   dom.window.TextEncoder = TextEncoder;
@@ -17,7 +17,7 @@ async function harness(t, {texts = ['Page one', 'Page two'], makeWorker} = {}) {
   dom.window.HTMLDialogElement.prototype.close = function() { this.open = false; this.dispatchEvent(new dom.window.Event('close')); };
   const pdf = new vm.SyntheticModule(['openPdf'], function() { this.setExport('openPdf', async () => ({
     pageCount: texts.length, destroy: async () => { destroyed.push(true); },
-    page: async (n, options) => { pageCalls.push({n, options}); return {blob: {}, text: texts[n - 1], hasText: Boolean(texts[n - 1].trim())}; },
+    page: async (n, options) => { pageCalls.push({n, options}); if (loadPage) await loadPage(n, options); return {blob: {}, text: texts[n - 1], hasText: Boolean(texts[n - 1].trim())}; },
   })); }, {context});
   const runtime = new vm.SyntheticModule(['makeWorker'], function() { this.setExport('makeWorker', async (lang, logger, options) => {
     languages.push(lang); workerOptions.push(options); return makeWorker ? makeWorker(options) : {recognize: async () => ({data: {text: 'Recognized Russian Я'}}), terminate: async () => {}};
@@ -142,5 +142,67 @@ test('edited area drafts survive page changes and failed recognition', async t =
   assert.equal(h.$('.ocr-region-text').value, 'Manually corrected region'); assert.equal(h.$('.ocr-region-result').hidden, false);
   fail = true; h.$('.ocr-recognize-area').click(); await tick();
   assert.equal(h.$('.ocr-region-text').value, 'Manually corrected region'); assert.equal(h.$('.ocr-region-result').hidden, false);
+  h.$('.ocr-close').click(); await result;
+});
+
+
+test('failed page reload and retry preserve checked page and area drafts', async t => {
+  let fail = false;
+  const h = await harness(t, {loadPage: async () => { if (fail) throw new Error('render failed'); }}), {result} = await h.open();
+  h.change('[data-coordinate="width"]', '50'); h.$('.ocr-recognize-area').click(); await tick();
+  h.$('.ocr-region-text').value = 'Corrected area'; h.$('.ocr-region-text').dispatchEvent(new h.dom.window.Event('input'));
+  h.$('.ocr-text').value = 'Corrected page'; h.$('.ocr-text').dispatchEvent(new h.dom.window.Event('input'));
+  const reload = () => [...h.dom.window.document.querySelectorAll('button')].find(button => button.textContent === 'Reload page');
+  fail = true; reload().click(); await tick();
+  assert.match(h.$('.ocr-status').textContent, /render failed/);
+  fail = false; reload().click(); await tick();
+  assert.equal(h.$('.ocr-text').value, 'Corrected page');
+  assert.equal(h.$('.ocr-region-text').value, 'Corrected area');
+  assert.equal(h.$('.ocr-region-result').hidden, false);
+  h.$('.ocr-close').click(); await result;
+});
+
+test('successful whole-page recognition keeps the existing area draft available', async t => {
+  const h = await harness(t), {result} = await h.open();
+  h.change('[data-coordinate="width"]', '50'); h.$('.ocr-recognize-area').click(); await tick();
+  h.$('.ocr-region-text').value = 'Corrected area'; h.$('.ocr-region-text').dispatchEvent(new h.dom.window.Event('input'));
+  h.$('.ocr-recognize').click(); await tick();
+  assert.equal(h.$('.ocr-region-result').hidden, false);
+  assert.equal(h.$('.ocr-region-text').value, 'Corrected area');
+  h.change('.ocr-page-select', '1'); await tick(); h.change('.ocr-page-select', '0'); await tick();
+  assert.equal(h.$('.ocr-region-result').hidden, false);
+  assert.equal(h.$('.ocr-region-text').value, 'Corrected area');
+  h.$('.ocr-close').click(); await result;
+});
+
+test('rounding tolerance cannot create an empty region at the page edge', async t => {
+  const h = await harness(t), {result} = await h.open();
+  for (const axis of ['x', 'y']) {
+    h.$('.ocr-clear-area').click();
+    h.change(`[data-coordinate="${axis}"]`, '100');
+    h.change(`[data-coordinate="${axis === 'x' ? 'width' : 'height'}"]`, '0.00001');
+    assert.equal(h.$('.ocr-recognize-area').disabled, true);
+  }
+  h.$('.ocr-close').click(); await result;
+});
+
+
+test('invalid coordinates retain area edits for correction or page return, while Clear discards them', async t => {
+  const h = await harness(t), {result} = await h.open();
+  h.change('[data-coordinate="width"]', '50'); h.$('.ocr-recognize-area').click(); await tick();
+  h.$('.ocr-region-text').value = 'Corrected area'; h.$('.ocr-region-text').dispatchEvent(new h.dom.window.Event('input'));
+  h.change('[data-coordinate="x"]', '60');
+  assert.equal(h.$('.ocr-recognize-area').disabled, true);
+  h.change('[data-coordinate="x"]', '0');
+  assert.equal(h.$('.ocr-region-text').value, 'Corrected area');
+  assert.equal(h.$('.ocr-region-result').hidden, false);
+  h.change('[data-coordinate="x"]', '60');
+  h.change('.ocr-page-select', '1'); await tick(); h.change('.ocr-page-select', '0'); await tick();
+  assert.equal(h.$('.ocr-region-text').value, 'Corrected area');
+  assert.equal(h.$('.ocr-region-result').hidden, false);
+  h.$('.ocr-clear-area').click();
+  h.change('.ocr-page-select', '1'); await tick(); h.change('.ocr-page-select', '0'); await tick();
+  assert.equal(h.$('.ocr-region-result').hidden, true);
+  assert.equal(h.$('.ocr-region-text').value, '');
   h.$('.ocr-close').click(); await result;
 });
