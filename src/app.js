@@ -5,9 +5,9 @@
   }
   const $ = (id) => document.getElementById(id);
   const ocrImportURL = new URL('ocr-import.mjs', document.currentScript.src);
-  async function reviewedImport(file, side) {
+  async function reviewedImport(file, side, forceOcr = false) {
     const {prepareOcrImport} = await import(ocrImportURL.href);
-    return prepareOcrImport(file, {side, probePdf: async pdf => window.KristinaTransport.request('/api/pdf-ocr-check', {source:{name:pdf.name,data:encode(new Uint8Array(await pdf.arrayBuffer()))}})});
+    return prepareOcrImport(file, {side, forceOcr, probePdf: async pdf => window.KristinaTransport.request('/api/pdf-ocr-check', {source:{name:pdf.name,data:encode(new Uint8Array(await pdf.arrayBuffer()))}})});
   }
   const visualModuleURL = new URL('visual-review.mjs', document.currentScript.src);
   const sheetModuleURL = new URL('sheet-review.mjs', document.currentScript.src);
@@ -217,7 +217,10 @@
     if (value) officeReset("Reading the documents and checking the data. I'll answer questions about the new comparison when it's ready.");
     officeEnable(); exportEnable();
     for (const id of ['demo', 'demo-tables', 'visual-retry', 'left-file', 'right-file', 'delimiter', 'left-key', 'right-key', 'answer']) $(id).disabled = value;
-    for (const side of ['left', 'right']) if ($(side + '-sheet')) $(side + '-sheet').disabled = value;
+    for (const side of ['left', 'right']) {
+      if ($(side + '-sheet')) $(side + '-sheet').disabled = value;
+      $(side + '-ocr').disabled = value;
+    }
     $('rules').disabled = value || !state.metadata || state.metadata.kind === 'text';
     $('compare').disabled = value;
     $('compare').textContent = value ? "Processing…" : "Apply settings";
@@ -366,14 +369,23 @@
   }
   async function loadFile(side, file) {
     if (!file || state.busy) return;
+    let stagedSource;
     if (/\.doc$/i.test(file.name)) { visualReview?.closeWorkspaceTools?.(); notice('Old Word files (.doc) are not supported. Open the file in Word or LibreOffice and save it as .docx, then try again.', true); $('notice').scrollIntoView({block: 'nearest'}); return; }
     if (/\.(pdf|png|jpe?g)$/i.test(file.name) && window.KristinaTransport) {
       const version = ++loads[side];
       visualReview?.closeWorkspaceTools?.();
       busy(true);
       try {
-        const reviewed = await reviewedImport(file, side);
+        const reviewed = await reviewedImport(file, side, $(side + '-ocr').checked);
         if (!reviewed || version !== loads[side]) return;
+        if (reviewed !== file) {
+          stagedSource = {name:reviewed.name, data:encode(new Uint8Array(await reviewed.arrayBuffer()))};
+          const next = {...state.sources, [side]:stagedSource};
+          // A failed OCR replacement must retain the live editor and its Undo.
+          // Ordinary uploads still allow changing a table pair to text one side at a time.
+          if (next.left && next.right) await window.KristinaTransport.request('/api/prepare', {...next, delimiter:delimiter()});
+          if (version !== loads[side]) return;
+        }
         file = reviewed;
       } catch (error) {
         if (version === loads[side]) notice("Couldn't open the file. " + error.message, true);
@@ -393,9 +405,9 @@
     if (/\.(txt|docx|pdf|png|jpe?g)$/i.test(file.name) && !window.KristinaTransport) { notice("The document engine could not load. Reload this page and try again.", true); return; }
     if (/\.(xlsx|xls|xlsm|xlsb|ods)$/i.test(file.name) && !window.KristinaTransport) { notice("The spreadsheet engine could not load. Reload this page and try again.", true); return; }
     try {
-      const bytes = new Uint8Array(await file.arrayBuffer());
+      const source = stagedSource || {name:file.name, data:encode(new Uint8Array(await file.arrayBuffer()))};
       if (version !== loads[side]) return;
-      state.sources[side] = {name: file.name, data: encode(bytes)}; sourceLabel(side, file); await prepare();
+      state.sources[side] = source; sourceLabel(side, file); await prepare();
     } catch (error) { if (version === loads[side]) { clearResult(); state.metadata = null; notice("Couldn't open the file. " + error.message, true); } }
   }
   function selectedRules() {
@@ -887,7 +899,7 @@
   });
   document.addEventListener('ctt:home', () => restoreWorkspaceTools());
   document.addEventListener('ctt:new-comparison', event => {
-    const {files, complete} = event.detail || {};
+    const {files, ocr, complete} = event.detail || {};
     if (typeof complete !== 'function') return;
     void (async () => {
       if (state.busy) return {ok:false, message:'Wait for the current operation to finish, then try again.'};
@@ -899,7 +911,7 @@
           let file = files?.[side];
           if (!file || !/\.(docx|pdf|txt|xlsx|csv|tsv|png|jpe?g)$/i.test(file.name)) throw new Error('Choose two supported files. Old .doc files must first be saved as .docx in Word or LibreOffice.');
           if (/\.(pdf|png|jpe?g)$/i.test(file.name)) {
-            file = await reviewedImport(file, side);
+            file = await reviewedImport(file, side, ocr?.[side] === true);
             if (!file) return {ok:false};
           }
           if (file.size > MAX_FILE_BYTES) throw new Error('Choose files up to 2 MB each.');

@@ -19,3 +19,11 @@
 .ocr-review-dialog .ocr-pdf-note{font-size:.9rem;color:#526b61}
 .ocr-review-dialog button{font:inherit;min-height:42px}
 @media(max-width:760px){.ocr-review-dialog{padding:16px}.ocr-review-dialog .ocr-review-columns{grid-template-columns:1fr}.ocr-review-dialog .ocr-review-original img{height:32vh}.ocr-review-dialog .ocr-text{min-height:28vh}}
+.ocr-review-dialog .ocr-image-stage{position:relative}
+.ocr-review-dialog .ocr-image-stage.selecting{cursor:crosshair;touch-action:none;user-select:none}
+.ocr-review-dialog .ocr-selection-box{position:absolute;box-sizing:border-box;border:2px solid #08785b;background:rgb(13 156 110 / 12%);pointer-events:none}
+.ocr-review-dialog .ocr-review-original img{border:0;outline:1px solid #dce5e0}
+.ocr-review-dialog .ocr-review-original details label{display:inline-block;margin:8px 12px 0 0;font-size:.9rem}
+.ocr-review-dialog .ocr-review-original input[type=number]{width:5em;padding:6px;font:inherit}
+.ocr-review-dialog .ocr-region-result{margin-top:16px;padding:12px;border:1px solid #aebfb6;border-radius:8px;background:#f1f7f3}
+.ocr-review-dialog .ocr-region-text{box-sizing:border-box;width:100%;min-height:6em;padding:8px;font:16px/1.4 ui-monospace,monospace;resize:vertical}

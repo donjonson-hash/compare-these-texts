@@ -5,7 +5,7 @@
     "test": "node --experimental-vm-modules --test tests/*.test.mjs",
     "check": "python3 scripts/check_static.py",
     "check:extension": "node scripts/check_extension_browser.mjs",
-    "check:ocr": "node scripts/check_ocr_integration_browser.mjs",
+    "check:ocr": "node scripts/check_ocr_integration_browser.mjs && node scripts/check_ocr_runtime_browser.mjs && node scripts/check_ocr_import_browser.mjs",
     "package:extension": "python3 scripts/package_extension.py",
     "package:edge": "python3 scripts/package_edge.py",
     "package:store": "python3 scripts/package_store.py",

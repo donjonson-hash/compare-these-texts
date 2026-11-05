@@ -20,7 +20,7 @@
   const target=open?$('single-file'):$('single-current');target.focus({preventScroll:true});target.scrollIntoView?.({block:'center'});
  });
  $('single-new-document').addEventListener('click',()=>{if(!busy&&!operating)$('single-file').click();});
- function controls(){ $('single-new-document').disabled=$('single-source-toggle').disabled=busy||operating;$('single-open').disabled=$('single-file').disabled=busy||operating;if($('single-paste-open'))$('single-paste-open').disabled=busy||operating;$('single-editor-host').inert=busy||operating; }
+ function controls(){ $('single-new-document').disabled=$('single-source-toggle').disabled=busy||operating;$('single-open').disabled=$('single-file').disabled=$('single-ocr').disabled=busy||operating;if($('single-paste-open'))$('single-paste-open').disabled=busy||operating;$('single-editor-host').inert=busy||operating; }
  function setBusy(value){busy=value;session?.setBusy(value);controls();}
  function closeDocument(){
   generation++;controller?.abort();view?.dispose();controller=null;view=null;candidate=null;
@@ -65,7 +65,7 @@
    let source;
    if (/\.(pdf|png|jpe?g)$/i.test(file.name)) {
     const {prepareOcrImport, probeOcrPdf} = await import(ocrImportURL.href);
-    const reviewed = await prepareOcrImport(file, {side: 'single', probePdf: async pdf => {
+    const reviewed = await prepareOcrImport(file, {side: 'single', forceOcr: $('single-ocr').checked, probePdf: async pdf => {
      source = await readSource(pdf);
      return probeOcrPdf(source);
     }});

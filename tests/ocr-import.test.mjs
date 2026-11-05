@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {prepareOcrImport, checkedTextFile, importFileLimit} from '../src/ocr-import.mjs';
+import {prepareOcrImport, checkedTextFile, validateCheckedText, importFileLimit} from '../src/ocr-import.mjs';
+import {readTextSource} from '../src/text-source.mjs';
 
 const reviewed = {originalName:'scan.pdf',text:'Цена 18,50 USD\n\nСрок 15 ноября',pages:[{text:'Цена 18,50 USD',confirmed:true},{text:'Срок 15 ноября',confirmed:true}]};
 test('reviewed OCR imports exact text without synthetic headings or spelling correction', async () => {
@@ -19,6 +20,15 @@ test('scan review cancellation produces no import; a text PDF stays original', a
   const result = await prepareOcrImport(pdf,{probePdf:async()=>({needsReview:true}),review:async()=>reviewed});
   assert.equal(await result.text(), reviewed.text);
 });
+test('explicit OCR lets a PDF with a partial text layer enter review', async () => {
+  const pdf = new File(['%PDF'], 'hybrid.pdf'); let probes = 0, reviews = 0;
+  const result = await prepareOcrImport(pdf, {forceOcr:true, probePdf:async()=>{probes++; return {needsReview:false};}, review:async file=>{assert.equal(file,pdf); reviews++; return reviewed;}});
+  assert.equal(probes, 0);
+  assert.equal(reviews, 1);
+  assert.equal(await result.text(), reviewed.text);
+  const txt = new File(['plain'], 'plain.txt');
+  assert.equal(await prepareOcrImport(txt, {forceOcr:true}), txt);
+});
 test('invalid PDF errors do not silently enter OCR and aborted approval is discarded', async () => {
   const pdf = new File(['broken'],'bad.pdf'); let calls = 0;
   await assert.rejects(prepareOcrImport(pdf,{probePdf:async()=>{throw new Error('Invalid PDF');},review:async()=>{calls++;}}), /Invalid PDF/);
@@ -32,4 +42,14 @@ test('checked text respects downstream parser bounds and type-specific input lim
   assert.equal(importFileLimit('x.pdf'),20*1024*1024);
   assert.equal(importFileLimit('x.jpg'),10*1024*1024);
   assert.equal(importFileLimit('x.txt'),2*1024*1024);
+});
+test('review validation agrees with TXT trailing lines, Unicode and NUL rules', async () => {
+  for (const text of ['x\n'.repeat(2000), 'x\r\n'.repeat(2000), '\uFEFF' + '📄'.repeat(500000), '']) {
+    assert.doesNotThrow(() => validateCheckedText(text));
+    const file = checkedTextFile({text,originalName:'scan.png',pages:[{text,confirmed:true}]});
+    await readTextSource({name:file.name,data:Buffer.from(await file.arrayBuffer()).toString('base64')});
+  }
+  for (const text of ['x\n'.repeat(2001), '📄'.repeat(500001), 'before\0after']) {
+    assert.throws(() => validateCheckedText(text), /too large|NUL/);
+  }
 });

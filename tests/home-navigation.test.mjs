@@ -38,6 +38,22 @@ function page(t, beforeNavigation = () => {}) {
   return {window, document, $, commands, paste, upload};
 }
 
+test('explicit OCR belongs to its staged PDF and follows swaps', async t => {
+  const p = page(t);
+  p.upload('left', new File(['pdf'], 'hybrid.pdf')); p.paste('right', 'Reference');
+  assert.equal(p.$('home-left-ocr-label').hidden, false);
+  assert.equal(p.$('home-right-ocr-label').hidden, true);
+  assert.equal(p.$('home-left-ocr').checked, false);
+  p.$('home-left-ocr').checked = true;
+  p.$('home-swap').click(); p.$('start-new-compare').click();
+  assert.equal(p.commands[0].ocr.right, true);
+  assert.equal(p.commands[0].ocr.left, false);
+  assert.equal(p.$('home-right-ocr').disabled, true);
+  p.commands[0].complete({ok:false}); await nextTurn();
+  p.upload('right', new File(['pdf'], 'another.pdf'));
+  assert.equal(p.$('home-right-ocr').checked, false, 'a new PDF defaults to its text layer');
+});
+
 test('fresh Home compares exact pasted text once, then returns without losing either input', async t => {
   const p = page(t);
   assert.equal(p.$('start-menu').hidden, false);

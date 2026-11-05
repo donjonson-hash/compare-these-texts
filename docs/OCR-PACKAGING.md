@@ -13,3 +13,12 @@ Tesseract.js and its core are Apache-2.0. The language npm metadata declares MIT
 The main workspace needs `script-src 'self' 'wasm-unsafe-eval'`, `connect-src 'self'`, and `worker-src 'self'`. The WASM token permits WebAssembly compilation; it does not enable JavaScript eval. The connection directive permits only same-origin packaged model/core reads. No host permissions are requested. The other extension pages retain their existing more restrictive meta policies. Website Analytics is added only after extension packaging and is removed correctly when repackaging website output.
 
 A browser test must verify OCR under the real installed extension CSP; static policy checks alone do not establish runtime compatibility. Firefox validation remains separate from Chromium validation.
+
+
+## Reviewed recognition controls
+
+The import dialog offers English, Russian and Russian + English, with a separate saved choice for each input. PDFs render at a target 300 dpi, bounded to 12 million pixels and 4000 pixels per axis. Selecting an area renders that PDF region directly at the bounded target resolution; image regions use the source pixels. Area results remain separate until explicitly inserted into the checked page text. Page text and area drafts survive page navigation.
+
+Use the optional PDF OCR checkbox when a partial text layer omits a scanned body. The default native-text PDF path remains available. PNG/JPEG headers, dimensions and EXIF metadata are inspected before bitmap decoding, with 10 MiB / 12 million pixel limits. Checked text is validated before the review dialog closes, and an incompatible replacement preserves the existing comparison and Undo history.
+
+A first-party module worker owns the nested Tesseract worker. Aborting initialization or recognition, a model error, or the 120-second operation timeout terminates both. `npm run check:ocr` runs the website/installed Chromium extension flow plus runtime cleanup and import-boundary regressions. Firefox runtime coverage remains separate.
