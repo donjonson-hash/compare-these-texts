@@ -32,8 +32,8 @@
     if (!file || pending) return;
     let error = '';
     if (/\.doc$/i.test(file.name)) error = 'Old Word files (.doc) are not supported. Save the file as .docx in Word or LibreOffice, then try again. Renaming the file is not enough.';
-    else if (!/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.test(file.name)) error = 'Choose a DOCX, PDF, TXT, XLSX, CSV or TSV file.';
-    else if (file.size > 2 * 1024 * 1024) error = 'Choose a file up to 2 MB.';
+    else if (!/\.(docx|pdf|txt|xlsx|csv|tsv|png|jpe?g)$/i.test(file.name)) error = 'Choose a DOCX, PDF, TXT, XLSX, CSV, TSV, PNG or JPEG file.';
+    else if (file.size > (/\.pdf$/i.test(file.name) ? 20 : /\.(png|jpe?g)$/i.test(file.name) ? 10 : 2) * 1024 * 1024) error = 'Choose a file up to 2 MB, a PDF up to 20 MiB, or a PNG/JPEG up to 10 MiB.';
     if (error) notice(error, true);
     else { files[side] = file; notice(); }
     controls();

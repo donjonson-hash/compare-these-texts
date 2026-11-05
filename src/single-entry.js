@@ -1,6 +1,7 @@
 /* Independent local draft; switching modes retains both workspaces. */
 (() => {
  const $=id=>document.getElementById(id),moduleURL=new URL('single-editor.mjs',document.currentScript.src),sessionURL=new URL('single-session.mjs',document.currentScript.src);
+ const ocrImportURL=new URL('ocr-import.mjs',document.currentScript.src);
  let controller=null,view=null,generation=0,candidate=null,busy=false,operating=false,session=null;
  const note=(text,error=false)=>{const notice=$('single-notice');notice.classList.toggle('error',error);notice.setAttribute('role',error?'alert':'status');notice.setAttribute('aria-live',error?'assertive':'polite');notice.textContent=text;notice.hidden=!text;};
  function chooseMode(next){
@@ -55,9 +56,26 @@
   if(file&&/\.doc$/i.test(file.name)){note('Old Word files (.doc) are not supported. Open the file in Word or LibreOffice and save it as .docx, then try again.',true);return;}
   if(!file||busy||operating)return;const ticket=++generation;candidate=null;$('single-options').hidden=true;setBusy(true);
   try{
+   async function readSource(input) {
+    const bytes = new Uint8Array(await input.arrayBuffer());
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    return {name: input.name, data: btoa(binary)};
+   }
+   let source;
+   if (/\.(pdf|png|jpe?g)$/i.test(file.name)) {
+    const {prepareOcrImport, probeOcrPdf} = await import(ocrImportURL.href);
+    const reviewed = await prepareOcrImport(file, {side: 'single', probePdf: async pdf => {
+     source = await readSource(pdf);
+     return probeOcrPdf(source);
+    }});
+    if (!reviewed) {note('');return;}
+    if (reviewed !== file) source = undefined;
+    file = reviewed;
+   }
    if(file.size>2097152)throw Error('Choose a file up to 2 MB.');note('Reading your file…');
-   const bytes=new Uint8Array(await file.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
-   const source={name:file.name,data:btoa(binary)},{inspectSingleSource}=await import(moduleURL.href),info=await inspectSingleSource(source);if(ticket!==generation)return;candidate=source;
+   source ??= await readSource(file);
+   const {inspectSingleSource}=await import(moduleURL.href),info=await inspectSingleSource(source);if(ticket!==generation)return;candidate=source;
    $('single-sheet-label').hidden=info.format!=='xlsx';$('single-delimiter-label').hidden=!['csv','tsv'].includes(info.format);
    $('single-sheet').replaceChildren();for(const name of info.sheets||[]){const option=document.createElement('option');option.value=option.textContent=name;$('single-sheet').append(option);}
    $('single-delimiter').value=info.delimiter||',';note('');setBusy(false);

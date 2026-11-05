@@ -8,6 +8,7 @@ import subprocess
 import sys
 from website_analytics import add_website_analytics
 from website_meta import add_social_meta
+from build_ocr_assets import build_ocr_assets
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src"
@@ -25,6 +26,7 @@ def build():
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     shutil.copytree(SOURCE, OUTPUT)
+    ocr_assets = build_ocr_assets(OUTPUT)
     # One authoritative license supplies the website and every downloadable copy.
     license_text = (ROOT / "LICENSE").read_text()
     shutil.copyfile(ROOT / "LICENSE", OUTPUT / "LICENSE.txt")
@@ -52,6 +54,7 @@ def build():
     dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "--", "."], cwd=ROOT, text=True).strip())
     record = {
         "website_minification": minification,
+        "ocr_assets": ocr_assets,
         "product": "Compare Two Texts",
         "version": release["version"],
         "source_commit": revision,

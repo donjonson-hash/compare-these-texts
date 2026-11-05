@@ -5,6 +5,7 @@
     "test": "node --experimental-vm-modules --test tests/*.test.mjs",
     "check": "python3 scripts/check_static.py",
     "check:extension": "node scripts/check_extension_browser.mjs",
+    "check:ocr": "node scripts/check_ocr_integration_browser.mjs",
     "package:extension": "python3 scripts/package_extension.py",
     "package:edge": "python3 scripts/package_edge.py",
     "package:store": "python3 scripts/package_store.py",
@@ -26,5 +27,10 @@
   "engines": {
     "node": "^24.15.0 || >=26.0.0"
   },
-  "license": "SEE LICENSE IN LICENSE"
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "@tesseract.js-data/eng": "1.0.0",
+    "@tesseract.js-data/rus": "1.0.0",
+    "tesseract.js": "7.0.0"
+  }
 }
