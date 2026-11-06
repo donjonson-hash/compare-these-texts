@@ -65,7 +65,7 @@ test('real mode switch opens one CSV, retains work on mode changes and keeps it 
  // This DOM fixture has no IndexedDB. Explicitly accept opening a document
  // while the app cannot determine whether an older draft exists.
  window.confirm=message=>{assert.match(message,/Open .* instead/);return true;};
- const script=new Script(await readFile(new URL('../dist/single-entry.js',import.meta.url),'utf8'),{importModuleDynamically:specifier=>specifier.endsWith('single-session.mjs')?import('../dist/single-session.mjs'):import('../dist/single-editor.mjs')});script.runInContext(dom.getInternalVMContext());
+ const script=new Script(await readFile(new URL('../dist/single-entry.js',import.meta.url),'utf8'),{importModuleDynamically:specifier=>specifier.endsWith('single-session.mjs')?import('../dist/single-session.mjs'):specifier.endsWith('ocr-import.mjs')?import('../dist/ocr-import.mjs'):import('../dist/single-editor.mjs')});script.runInContext(dom.getInternalVMContext());
  document.querySelector('[data-work-mode="single"]').click();assert.equal(document.getElementById('single-workspace').hidden,false);assert.equal(document.getElementById('compare-workspace').hidden,true);
  async function load(name,text){const file={name,size:Buffer.byteLength(text),arrayBuffer:async()=>new TextEncoder().encode(text).buffer},field=document.getElementById('single-file');Object.defineProperty(field,'files',{value:[file],configurable:true});field.dispatchEvent(new window.Event('change'));}
  await load('one.csv','001;10\n002;20');await until(()=>!document.getElementById('single-options').hidden);assert.equal(document.getElementById('single-delimiter').value,';');document.getElementById('single-open').click();await until(()=>document.querySelector('#single-editor-host [data-cell="B2"]'));
@@ -88,7 +88,7 @@ test('single PDF entry restores edits, block geometry and view, then downloads w
  async function openEntry(){
   const env=setup(t,await readFile(new URL('../dist/index.html',import.meta.url),'utf8')),context=env.dom.getInternalVMContext();Object.defineProperty(document,'currentScript',{value:{src:'https://ctt.example/single-entry.js'},configurable:true});
   const module=new SyntheticModule(['mountSingleSession'],function(){this.setExport('mountSingleSession',(root,options)=>mountSingleSession(root,{...options,openStore:async()=>store}));},{context});await module.link(()=>{});await module.evaluate();
-  new Script(await readFile(new URL('../dist/single-entry.js',import.meta.url),'utf8'),{importModuleDynamically:specifier=>specifier.endsWith('single-session.mjs')?module:import('../dist/single-editor.mjs')}).runInContext(context);
+  new Script(await readFile(new URL('../dist/single-entry.js',import.meta.url),'utf8'),{importModuleDynamically:specifier=>specifier.endsWith('single-session.mjs')?module:specifier.endsWith('ocr-import.mjs')?import('../dist/ocr-import.mjs'):import('../dist/single-editor.mjs')}).runInContext(context);
   env.$=id=>document.getElementById(id);await until(()=>env.$('single-session-status'));env.host=env.$('single-editor-host');return env;
  }
  let env=await openEntry();window.confirm=()=>true;document.querySelector('[data-work-mode="single"]').click();
@@ -110,8 +110,15 @@ test('single PDF entry restores edits, block geometry and view, then downloads w
  env.host.querySelector('[data-pdf-preview="left"]').click();await until(()=>env.host.querySelector('canvas')&&env.host.querySelector('[data-pdf-view="left"]').getAttribute('aria-pressed')==='true');assert.match(env.host.querySelector('.visual-page-nav').textContent,/2 \/ 2/);
  env.host.querySelector('[data-save-side="left"]').click();await until(()=>env.downloads.length===1);const output=source('edited.pdf',new Uint8Array(await env.downloads.pop().arrayBuffer())),text=(await readTextSource(output)).blocks.map(b=>b.text).join(' ');assert.match(text,/Alexandra Montgomery/);assert.doesNotMatch(text,/Original name/);assert.match(text,/Unchanged second page/);
  const viewer=await openPdfVisual(output),canvas=document.createElement('canvas');await viewer.renderPage(1,canvas);await viewer.dispose();const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;let red=0;for(let i=0;i<pixels.length;i+=4)if(pixels[i]>190&&pixels[i+1]<60&&pixels[i+2]>40&&pixels[i+2]<100)red++;assert.ok(red>2800,'The image survives single PDF edit/export');
- // A rejected scan leaves the current PDF and saved edits intact.
- window.confirm=()=>true;const scan=await PDFDocument.create();scan.addPage([400,500]);await upload('scan.pdf',await scan.save());await until(()=>/text|scan/i.test(env.$('single-notice').textContent)&&!env.$('single-file').disabled);assert.equal(saved.payload.source.name,'document.pdf');assert.deepEqual(saved.payload.review.drafts.left,blockState);
+ // Cancelling OCR review keeps the current PDF and saved edits intact.
+ env.dom.window.HTMLDialogElement.prototype.showModal = function() { this.open = true; };
+ env.dom.window.HTMLDialogElement.prototype.close = function() { this.open = false; };
+ window.confirm=()=>true;
+ const scan=await PDFDocument.create();scan.addPage([400,500]);await upload('scan.pdf',await scan.save());
+ await until(()=>document.querySelector('.ocr-review-dialog[open]'));
+ document.querySelector('.ocr-review-dialog .ocr-close').click();
+ await until(()=>!env.$('single-file').disabled);
+ assert.equal(saved.payload.source.name,'document.pdf');assert.deepEqual(saved.payload.review.drafts.left,blockState);
  env.host.querySelector('[aria-label="Undo edit"]').click();await until(()=>!env.host.querySelector('[data-save-side="left"]').disabled);env.host.querySelector('[data-save-side="left"]').click();await until(()=>env.downloads.length===1);assert.deepEqual(new Uint8Array(await env.downloads.pop().arrayBuffer()),bytes,'Undo restores original PDF bytes');
  // Long typing uses the image-preserving layout and can be restored on generated pages.
  env.host.querySelector('[data-pdf-text-view="left"]').click();await until(()=>env.host.querySelector('[data-group="text:2"].visual-paragraph'));env.host.querySelector('[data-group="text:2"].visual-paragraph').click();const field=env.host.querySelector('[data-edit-side="left"]');field.value=Array.from({length:45},(_,i)=>`Expanded line ${i+1}`).join('\n');field.dispatchEvent(new window.Event('input'));await until(()=>!env.host.querySelector('[data-save-side="left"]').disabled);env.host.querySelector('[data-pdf-preview="left"]').click();await until(()=>env.host.querySelector('[data-pdf-layout="updated"]'));

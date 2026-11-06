@@ -1,0 +1,40 @@
+{
+  "method": "Read actual local file bytes and compute SHA256; model labels alone do not verify a running HTTP server.",
+  "files": [
+    {
+      "name": "model.gguf",
+      "bytes": 1557662848,
+      "sha256": "f4f2f14b6d330a8e8df509b2de98bb4e2704a0ba6bead22e4d4b9361dc33c76f"
+    },
+    {
+      "name": "mmproj.gguf",
+      "bytes": 207346528,
+      "sha256": "aa8b9bed474e2f5c34356c15e25c35a82f0da55ba6e76d36f710d6acdb82e2a8"
+    },
+    {
+      "name": "llama-server",
+      "bytes": 17864,
+      "sha256": "6ab16cf70389f8b76a8da000badb540af76218d3319f7db7852819e954e35880"
+    },
+    {
+      "name": "DejaVuSans.ttf",
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    {
+      "name": "DejaVuSansMono.ttf",
+      "bytes": 343140,
+      "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88"
+    },
+    {
+      "name": "llama-b12091-linux-x64.tar.gz",
+      "bytes": 22963980,
+      "sha256": "0bb3f3a704e143b19b15617a43f0c9e6c179c1b126caf4a80d1f24bbbb125078"
+    }
+  ],
+  "cpu_quota": "800000 100000",
+  "memory_limit_bytes": 8589934592,
+  "python": "3.12.14",
+  "pillow": "13.0.0",
+  "ctt_base_commit": "2ec1193b7a217a9fd730fd9f593d882d9d3272d2"
+}

@@ -1,0 +1,28 @@
+{
+  "manifest_sha256": "1a02a923387f1acf1748032ba9939f545ac3c57763c1d0cc544db20a00873ee3",
+  "engine": "Tesseract.js browser WASM",
+  "settings": {
+    "psm": "6",
+    "psm_name": "SINGLE_BLOCK",
+    "oem": 1,
+    "languages": [
+      "eng",
+      "rus"
+    ]
+  },
+  "version": "7.0.0",
+  "created_at": "2026-11-04T04:55:04.923Z",
+  "environment": {
+    "browser": "153.0.8010.0",
+    "platform": "linux",
+    "architecture": "x64",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logical_cpus": 9,
+    "memory_note": "Sampled JS heap only; excludes worker/WASM allocations and total browser/process memory. Not a peak RSS measurement."
+  },
+  "setup": [],
+  "repeatability": [],
+  "results": [],
+  "outbound_requests_blocked": [],
+  "review_gate_smoke": "passed: recognition, confirmation, compare, layout change invalidation and automatic-mode recognition, edit invalidation, invalid file, cancellation and replacement"
+}

@@ -5,6 +5,10 @@ import {renderTextHtml} from './text-report.mjs';
 import {buildCommercialSummary} from './commercial-summary.mjs';
 
 export async function handleRequest(path, payload) {
+  if (path === '/api/pdf-ocr-check') {
+    const {probeOcrPdf} = await import('./ocr-import.mjs');
+    return probeOcrPdf(payload.source);
+  }
   if (path === '/api/export') {
     const format = payload?.format, report = payload?.report;
     if (!['xlsx', 'pdf'].includes(format)) throw new Error("Select XLSX or PDF export.");

@@ -1,0 +1,47 @@
+name: OCR pilot
+on:
+  pull_request:
+    paths:
+      - 'experiments/ocr/**'
+      - 'src/pdf-reader*.mjs'
+      - 'src/PDF-READER-*'
+      - '.github/workflows/ctt-ocr-pilot.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: experiments/ocr
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: experiments/ocr/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --ignore-scripts
+      - run: python3 -m pip install Pillow==13.0.0 reportlab==4.4.9
+      - run: sudo apt-get update && sudo apt-get install -y fonts-dejavu-core
+      - run: python3 generate_fixtures.py && python3 generate_pdf_fixtures.py && python3 prepare_assets.py
+      - run: python3 -m unittest discover -s . -p 'test_*.py'
+      - run: node --test test_pdf_input.mjs
+      - run: npx playwright install --with-deps chromium
+      - run: node check-pdf-browser.mjs
+      - run: node check-russian-browser.mjs
+      - run: OCR_UI_ONLY=1 node benchmark-browser.mjs
+      - run: python3 package_pilot.py --output results/ctt-ocr-pdf-pilot.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ctt-ocr-pdf-pilot
+          path: |
+            experiments/ocr/results/ctt-ocr-pdf-pilot.zip
+            experiments/ocr/results/pdf-browser-smoke.json
+            experiments/ocr/results/ui-smoke.json
+            experiments/ocr/results/russian-browser-smoke.json

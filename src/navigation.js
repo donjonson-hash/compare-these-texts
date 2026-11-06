@@ -20,6 +20,8 @@
     for (const side of sides) {
       const file = files[side], field = $('home-' + side + '-text');
       $('home-' + side + '-file').disabled = pending;
+      $('home-' + side + '-ocr').disabled = pending;
+      $('home-' + side + '-ocr-label').hidden = !file || !/\.pdf$/i.test(file.name);
       $('home-' + side + '-paste').disabled = pending;
       field.disabled = pending || !!file; field.hidden = !!file;
       $('home-' + side + '-file-card').hidden = !file;
@@ -32,10 +34,10 @@
     if (!file || pending) return;
     let error = '';
     if (/\.doc$/i.test(file.name)) error = 'Old Word files (.doc) are not supported. Save the file as .docx in Word or LibreOffice, then try again. Renaming the file is not enough.';
-    else if (!/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.test(file.name)) error = 'Choose a DOCX, PDF, TXT, XLSX, CSV or TSV file.';
-    else if (file.size > 2 * 1024 * 1024) error = 'Choose a file up to 2 MB.';
+    else if (!/\.(docx|pdf|txt|xlsx|csv|tsv|png|jpe?g)$/i.test(file.name)) error = 'Choose a DOCX, PDF, TXT, XLSX, CSV, TSV, PNG or JPEG file.';
+    else if (file.size > (/\.pdf$/i.test(file.name) ? 20 : /\.(png|jpe?g)$/i.test(file.name) ? 10 : 2) * 1024 * 1024) error = 'Choose a file up to 2 MB, a PDF up to 20 MiB, or a PNG/JPEG up to 10 MiB.';
     if (error) notice(error, true);
-    else { files[side] = file; notice(); }
+    else { files[side] = file; $('home-' + side + '-ocr').checked = false; notice(); }
     controls();
   }
   function updateResume() {
@@ -64,7 +66,8 @@
     try {
       const next = {};
       for (const side of sides) next[side] = files[side] || new File([$('home-' + side + '-text').value], side === 'left' ? 'original-text.txt' : 'changed-text.txt', {type:'text/plain'});
-      const result = await new Promise(resolve => document.dispatchEvent(new CustomEvent('ctt:new-comparison', {detail:{files:next, complete:resolve}})));
+      const ocr = Object.fromEntries(sides.map(side => [side, $('home-' + side + '-ocr').checked]));
+      const result = await new Promise(resolve => document.dispatchEvent(new CustomEvent('ctt:new-comparison', {detail:{files:next, ocr, complete:resolve}})));
       if (!result.ok) { notice(result.message || '', !!result.message); return; }
       // Keep the staged sources for convenient corrections on a later Home visit.
       notice(); open('compare');
@@ -83,6 +86,8 @@
   $('home-swap').addEventListener('click', () => {
     if (pending) return;
     [files.left, files.right] = [files.right, files.left];
+    const leftOcr = $('home-left-ocr'), rightOcr = $('home-right-ocr');
+    [leftOcr.checked, rightOcr.checked] = [rightOcr.checked, leftOcr.checked];
     const left = $('home-left-text'), right = $('home-right-text');
     [left.value, right.value] = [right.value, left.value]; notice(); controls();
   });
