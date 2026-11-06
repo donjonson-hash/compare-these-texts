@@ -149,7 +149,7 @@ async function exercise(context, base, mode) {
     return {x:r.x + (r.width - img.naturalWidth * scale) / 2, y:r.y + (r.height - img.naturalHeight * scale) / 2, width:img.naturalWidth*scale, height:img.naturalHeight*scale};
   });
   await page.mouse.move(rect.x + 1, rect.y + 1); await page.mouse.down();
-  await page.mouse.move(rect.x + rect.width - 1, rect.y + rect.height - 1, {steps:5}); await page.mouse.up();
+  await page.mouse.move(rect.x + rect.width - 1, rect.y + Math.min(rect.height - 1, 420), {steps:5}); await page.mouse.up();
   await modal().locator('.ocr-recognize-area').click();
   await modal().locator('.ocr-region-result').waitFor({state:'visible', timeout:120000});
   assert.match(await modal().locator('.ocr-region-text').inputValue(), /Заказчик/);
