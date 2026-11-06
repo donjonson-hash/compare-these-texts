@@ -3,6 +3,7 @@ import {validateOcrImage} from './ocr-image-input.mjs';
 import {reviewOcrFile} from './ocr-review.mjs';
 import {checkedTextFile} from './ocr-import.mjs';
 import {ocrSourceBytes, validateOcrSnapshot} from './ocr-document-model.mjs';
+import {exportCheckedOcrPdf} from './ocr-pdf-export.mjs';
 
 const el = (tag, text, className) => {
   const node = document.createElement(tag);
@@ -19,7 +20,7 @@ export async function mountOcrDocumentEditor(root, {source, restoredState, signa
   const bytes = ocrSourceBytes(source), pdf = /\.pdf$/i.test(source.name);
   const file = new File([bytes], source.name, {type: pdf ? 'application/pdf' : /\.png$/i.test(source.name) ? 'image/png' : 'image/jpeg'});
   let state = validateOcrSnapshot(restoredState), doc = null, disposed = false, busy = false, generation = 0, url = null;
-  let selected = null, operation = null;
+  let selected = null, operation = null, exportOperation = null;
   const lifecycle = new AbortController(), downloads = new Set(), timers = new Set();
   const abort = () => dispose();
   if (signal?.aborted) throw new DOMException('Document closed.', 'AbortError');
@@ -34,7 +35,9 @@ export async function mountOcrDocumentEditor(root, {source, restoredState, signa
   const review = button('Review text', 'ocr-document-review');
   const original = button('Download original', 'ocr-document-original');
   const downloadText = button('Download checked text', 'ocr-document-text-download');
-  toolbar.append(page, zoom, review, original, downloadText);
+  const downloadPdf = button('Download PDF with OCR text', 'ocr-document-pdf-download');
+  const cancelExport = button('Cancel PDF export', 'ocr-document-export-cancel'); cancelExport.hidden = true;
+  toolbar.append(page, zoom, review, downloadPdf, original, downloadText, cancelExport);
   const status = el('p', '', 'ocr-document-status'); status.setAttribute('role', 'status');
   const layout = el('div', undefined, 'ocr-document-layout');
   const scroll = el('div', undefined, 'ocr-document-scroll');
@@ -47,11 +50,14 @@ export async function mountOcrDocumentEditor(root, {source, restoredState, signa
   allText.append(el('summary', 'All checked text on this page'), allTextContent);
   detail.append(selectedTitle, selectedText, allText);
   layout.append(scroll, detail);
-  host.append(toolbar, el('p', 'Original scan with checked text linked to its location. Select a marked fragment to read it; use Review text to make corrections.', 'ocr-document-hint'), status, layout);
+  const exportHint = el('p', 'The PDF keeps the page image shown here, with checked text for search and copy. Handwriting in the image stays unchanged.' + (pdf ? ' PDF annotations and form fields are not included; use Download original to keep them.' : ''), 'ocr-document-hint');
+  host.append(toolbar, el('p', 'Original scan with checked text linked to its location. Select a marked fragment to read it; use Review text to make corrections.', 'ocr-document-hint'), exportHint, status, layout);
   root.replaceChildren(host);
   const current = () => state.pages[state.currentPage];
   function controls() {
     page.disabled = review.disabled = busy || disposed;
+    downloadPdf.disabled = busy || disposed;
+    cancelExport.hidden = !exportOperation;
     downloadText.disabled = disposed;
     original.disabled = disposed;
     for (const node of boxes.children) node.disabled = busy || disposed;
@@ -109,6 +115,25 @@ export async function mountOcrDocumentEditor(root, {source, restoredState, signa
     if (disposed) return;
     try { const checked = checkedTextFile({originalName: source.name, pages: state.pages, text: state.pages.map(item => item.text).join('\n\n')}); download(checked, checked.name); }
     catch (error) { status.textContent = error.message; }
+  });
+  cancelExport.addEventListener('click', () => exportOperation?.abort());
+  downloadPdf.addEventListener('click', async () => {
+    if (busy || disposed) return;
+    const controller = new AbortController(); exportOperation = controller;
+    const cancel = () => controller.abort(); lifecycle.signal.addEventListener('abort', cancel, {once:true});
+    busy = true; controls(); status.textContent = 'Preparing PDF…';
+    try {
+      const result = await exportCheckedOcrPdf(file, structuredClone(state), {
+        signal:controller.signal,
+        onProgress:({page, total}) => { if (!disposed) status.textContent = `Preparing PDF: page ${page} of ${total}…`; },
+      });
+      if (!disposed && !controller.signal.aborted) { download(result, result.name); status.textContent = 'PDF downloaded with checked text for search and copy.'; }
+    } catch (error) {
+      if (!disposed) status.textContent = controller.signal.aborted ? 'PDF export cancelled. Your checked text is unchanged.' : `Could not export PDF: ${error.message}`;
+    } finally {
+      lifecycle.signal.removeEventListener('abort', cancel); exportOperation = null;
+      if (!disposed) { busy = false; controls(); }
+    }
   });
   review.addEventListener('click', async () => {
     if (busy || disposed) return;

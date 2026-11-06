@@ -258,6 +258,8 @@ async function exercise(context, base, mode) {
   assert.equal(await page.locator('#single-editor-host .single-review').count(), 0);
   const single = await recognize('rus');
   assert.match(single, /15 ноября/);
+  await modal().locator('.ocr-fragment-select').selectOption({index:0});
+  await modal().locator('.ocr-fragment-text').fill('Исправлено вручную 456');
   await modal().locator('.ocr-confirm').click(); await modal().locator('.ocr-use').click();
   await page.locator('#single-editor-host .ocr-document img').waitFor({state:'visible'});
   assert.ok(await page.locator('#single-editor-host .ocr-document-region').count() > 0, 'recognized positions survive the review boundary');
@@ -268,6 +270,18 @@ async function exercise(context, base, mode) {
   assert.equal(await singleDownload.failure(), null);
   assert.match(singleDownload.suggestedFilename(), /\.txt$/i);
   assert.match(await readFile(await singleDownload.path(), 'utf8'), /15 ноября/);
+  assert.match(await readFile(await singleDownload.path(), 'utf8'), /Исправлено вручную 456/);
+  const [pdfDownload] = await Promise.all([page.waitForEvent('download', {timeout:120000}), page.locator('.ocr-document-pdf-download').click()]);
+  assert.equal(await pdfDownload.failure(), null); assert.match(pdfDownload.suggestedFilename(), /\(checked OCR\)\.pdf$/);
+  const {getDocument} = await import(new URL('../dist/pdf-reader-vendor.mjs', import.meta.url));
+  const pdfLoading = getDocument({data:new Uint8Array(await readFile(await pdfDownload.path())),isEvalSupported:false,verbosity:0});
+  try {
+    const document = await pdfLoading.promise; assert.equal(document.numPages,1);
+    const content = await (await document.getPage(1)).getTextContent();
+    const text = content.items.map(item => item.str).join(' ');
+    assert.match(text,/Исправлено вручную 456/); assert.match(text,/15 ноября/);
+  } finally { await pdfLoading.destroy(); }
+  checks.push('searchable PDF downloads offline with manually corrected Cyrillic text in the website and installed extension');
   await page.reload();
   await page.locator('#header-edit').click();
   await page.locator('#single-file').setInputFiles(path.join(fixtures, 'rus-paragraphs-b.png'));

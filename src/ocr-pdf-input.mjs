@@ -125,7 +125,8 @@ export async function openPdf(file, {signal} = {}) {
           }
           const blob = await abortable(new Promise((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('PDF: could not create the page image.')), 'image/png')), localSignal);
           checkAbort(localSignal); if (destroyed) throw abortError();
-          return {blob, text, hasText: Boolean(text.trim()), width: size.width, height: size.height, dpi: size.scale * 72, region: crop, textError};
+          return {blob, text, hasText: Boolean(text.trim()), width: size.width, height: size.height,
+            pageWidth: base.width, pageHeight: base.height, dpi: size.scale * 72, region: crop, textError};
         } catch (error) {
           if (localSignal.aborted || destroyed) throw abortError();
           throw friendlyError(error);
