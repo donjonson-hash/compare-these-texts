@@ -23,7 +23,6 @@ for target in ['chrome','firefox']:
   manifest['name']='Compare Two Texts — Diff Checker'
  # Preserve the Firefox ID and permission-free offline CSP.
  files={p.name:p.read_bytes() for p in dist.iterdir() if p.is_file() and p.name not in ('robots.txt','sitemap.xml','_headers')}
- files.update({p.relative_to(dist).as_posix():p.read_bytes() for p in (dist/'ocr-assets').rglob('*') if p.is_file()})
  if target=='firefox':split_color_emoji(files)
  for name in files:
   if name.endswith('.html'):files[name]=strip_website_analytics(files[name].decode()).encode()

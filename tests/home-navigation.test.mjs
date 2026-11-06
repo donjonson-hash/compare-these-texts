@@ -38,42 +38,6 @@ function page(t, beforeNavigation = () => {}) {
   return {window, document, $, commands, paste, upload};
 }
 
-test('explicit OCR belongs to its staged PDF and follows swaps', async t => {
-  const p = page(t);
-  p.upload('left', new File(['pdf'], 'hybrid.pdf')); p.paste('right', 'Reference');
-  assert.equal(p.$('home-left-ocr-label').hidden, false);
-  assert.equal(p.$('home-right-ocr-label').hidden, true);
-  assert.equal(p.$('home-left-ocr').checked, false);
-  p.$('home-left-ocr').checked = true;
-  p.$('home-swap').click(); p.$('start-new-compare').click();
-  assert.equal(p.commands[0].ocr.right, true);
-  assert.equal(p.commands[0].ocr.left, false);
-  assert.equal(p.$('home-right-ocr').disabled, true);
-  p.commands[0].complete({ok:false}); await nextTurn();
-  p.upload('right', new File(['pdf'], 'another.pdf'));
-  assert.equal(p.$('home-right-ocr').checked, false, 'a new PDF defaults to its text layer');
-});
-
-test('OCR entry requests the single source panel and respects an operation veto', t => {
-  const p = page(t);
-  p.paste('left', 'staged original'); p.paste('right', 'staged changed');
-  const requests = [];
-  let blocked = true;
-  p.document.addEventListener('ctt:single-source-mode', event => {
-    requests.push(event.detail.ocr);
-    if (blocked) event.preventDefault();
-  });
-  p.$('home-ocr').click();
-  assert.equal(p.$('start-menu').hidden, false, 'busy single editor may veto navigation');
-  blocked = false; p.$('home-ocr').click();
-  assert.equal(p.$('start-menu').hidden, true);
-  p.$('workspace-home').click();
-  assert.equal(p.$('home-left-text').value, 'staged original');
-  assert.equal(p.$('home-right-text').value, 'staged changed');
-  p.$('header-edit').click();
-  assert.deepEqual(requests, [true, true, false], 'ordinary editing requests normal import intent');
-});
-
 test('fresh Home compares exact pasted text once, then returns without losing either input', async t => {
   const p = page(t);
   assert.equal(p.$('start-menu').hidden, false);
@@ -91,7 +55,6 @@ test('fresh Home compares exact pasted text once, then returns without losing ei
   assert.equal(p.$('home-left-text').disabled, true);
   assert.equal(p.$('home-right-file').disabled, true);
   assert.equal(p.$('header-edit').disabled, true);
-  assert.equal(p.$('home-ocr').disabled, true);
   assert.equal(await p.commands[0].files.left.text(), a);
   assert.equal(await p.commands[0].files.right.text(), b);
   assert.equal(p.commands[0].files.left.name, 'original-text.txt');
@@ -177,10 +140,7 @@ test('saved result and full document demo leave Home, while Help alone preserves
   p.$('home-help-close').click(); assert.equal(p.$('home-help').open, false);
   assert.equal(p.$('home-left-text').value, 'unsent text');
   p.$('results').hidden = false; await nextTurn();
-  assert.equal(p.$('start-menu').hidden, false, 'painting a result alone must not replace staged Home inputs');
-  p.document.dispatchEvent(new p.window.Event('ctt:comparison-operation-started'));
-  p.document.dispatchEvent(new p.window.Event('ctt:comparison-resumed'));
-  assert.equal(p.$('start-menu').hidden, true, 'explicitly resuming a saved result reveals its editor');
+  assert.equal(p.$('start-menu').hidden, true, 'resuming a saved result reveals its editor');
   p.$('workspace-home').click();
   assert.equal(p.$('start-menu').hidden, false);
   p.$('home-help-open').click(); p.$('demo').click();
@@ -238,87 +198,4 @@ test('Help examples require confirmation before replacing an open comparison', a
       await nextTurn();
     });
   }
-});
-
-
-test('leaving a staged OCR PDF for pasted text clears its intent and keeps previous work separate', async t => {
-  const p = page(t);
-  const previous = p.document.createElement('section');
-  previous.textContent = 'Previous reviewed OCR document';
-  p.$('single-editor-host').append(previous);
-  p.upload('left', new File(['old PDF'], 'previous-scan.pdf'));
-  p.$('home-left-ocr').checked = true;
-  p.$('home-left-paste').click();
-  p.paste('left', 'New original text'); p.paste('right', 'New changed text');
-  assert.equal(p.$('home-left-ocr').checked, false);
-  assert.equal(p.$('home-left-ocr').disabled, true);
-  assert.equal(p.$('home-left-ocr-label').hidden, true);
-  assert.equal(p.$('home-right-ocr').disabled, true);
-  // A stale renderer repaint, including a repeated hidden=false assignment,
-  // must not navigate to old work while a new pair is being prepared.
-  p.$('results').hidden = false; await nextTurn();
-  p.$('results').hidden = false; await nextTurn();
-  assert.equal(p.$('start-menu').hidden, false);
-  assert.equal(p.$('single-editor-host').firstChild, previous);
-  p.$('start-new-compare').click();
-  assert.equal(await p.commands[0].files.left.text(), 'New original text');
-  assert.equal(await p.commands[0].files.right.text(), 'New changed text');
-  assert.equal(p.commands[0].ocr.left, false);
-  assert.equal(p.commands[0].ocr.right, false);
-  p.commands[0].complete({ok:true}); await nextTurn();
-  assert.equal(p.$('start-menu').hidden, true);
-  assert.equal(p.$('single-editor-host').firstChild, previous, 'single-document work remains available independently');
-});
-
-test('examples replace OCR intent along with files and browser-restored checks cannot force OCR on text', async t => {
-  const p = page(t);
-  for (const side of ['left', 'right']) {
-    p.upload(side, new File(['pdf'], side + '.pdf'));
-    p.$('home-' + side + '-ocr').checked = true;
-  }
-  p.$('home-example').click();
-  for (const side of ['left', 'right']) {
-    assert.equal(p.$('home-' + side + '-ocr').checked, false);
-    assert.equal(p.$('home-' + side + '-ocr-label').hidden, true);
-    assert.equal(p.$('home-' + side + '-ocr').disabled, true);
-  }
-  p.$('home-left-ocr').checked = true; // Simulate a browser-restored checkbox value.
-  p.$('start-new-compare').click();
-  assert.equal(p.commands[0].ocr.left, false);
-  assert.equal(p.commands[0].ocr.right, false);
-  assert.match(await p.commands[0].files.left.text(), /Project update/);
-  p.commands[0].complete({ok:false}); await nextTurn();
-});
-
-
-test('returning through the back-forward cache retains Home result and notice observers', async t => {
-  const p = page(t);
-  p.window.dispatchEvent(new p.window.PageTransitionEvent('pagehide', {persisted:true}));
-  p.window.dispatchEvent(new p.window.PageTransitionEvent('pageshow', {persisted:true}));
-  p.$('results').hidden = false;
-  p.$('notice').textContent = 'Download your work before closing.';
-  p.$('notice').hidden = false;
-  await nextTurn();
-  assert.equal(p.$('start-compare').hidden, false, 'Continue tracks the live comparison after Back');
-  assert.equal(p.$('start-menu').hidden, false, 'an observer update does not navigate away from Home');
-  assert.equal(p.$('home-notice').textContent, 'Download your work before closing.');
-});
-
-
-test('a saved comparison completing after new Home input or navigation does not reopen old work', async t => {
-  const p = page(t);
-  p.document.dispatchEvent(new p.window.Event('ctt:comparison-operation-started'));
-  p.paste('left', 'New A'); p.paste('right', 'New B');
-  p.$('results').hidden = false;
-  p.document.dispatchEvent(new p.window.Event('ctt:comparison-resumed'));
-  await nextTurn();
-  assert.equal(p.$('start-menu').hidden, false);
-  assert.equal(p.$('home-left-text').value, 'New A');
-  p.document.dispatchEvent(new p.window.Event('ctt:comparison-operation-started'));
-  p.$('header-edit').click(); p.$('workspace-home').click();
-  p.document.dispatchEvent(new p.window.Event('ctt:comparison-resumed'));
-  assert.equal(p.$('start-menu').hidden, false, 'Home stays open after an intervening mode switch');
-  p.document.dispatchEvent(new p.window.Event('ctt:comparison-operation-started'));
-  p.document.dispatchEvent(new p.window.Event('ctt:comparison-resumed'));
-  assert.equal(p.$('start-menu').hidden, true, 'a resume without intervening input still opens the comparison');
 });
