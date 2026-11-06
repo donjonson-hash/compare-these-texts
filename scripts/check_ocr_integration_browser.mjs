@@ -260,9 +260,14 @@ async function exercise(context, base, mode) {
   assert.match(single, /15 ноября/);
   await modal().locator('.ocr-fragment-select').selectOption({index:0});
   await modal().locator('.ocr-fragment-text').fill('Исправлено вручную 456');
+  assert.ok(await modal().locator('.ocr-correction-layer svg path').count() > 0, 'manual edits are printed on the review page');
   await modal().locator('.ocr-confirm').click(); await modal().locator('.ocr-use').click();
   await page.locator('#single-editor-host .ocr-document img').waitFor({state:'visible'});
   assert.ok(await page.locator('#single-editor-host .ocr-document-region').count() > 0, 'recognized positions survive the review boundary');
+  assert.ok(await page.locator('.ocr-document-corrections svg path').count() > 0, 'visible corrections survive confirmation');
+  await page.locator('.ocr-document-appearance').selectOption('original');
+  assert.equal(await page.locator('.ocr-document-corrections svg').count(), 0, 'original image mode removes printed overlays');
+  await page.locator('.ocr-document-appearance').selectOption('corrected');
   const [originalDownload] = await Promise.all([page.waitForEvent('download'), page.locator('.ocr-document-original').click()]);
   assert.deepEqual(await readFile(await originalDownload.path()), await readFile(path.join(fixtures,'rus-paragraphs-a.png')), 'original scan bytes are preserved');
   const singleSave = page.locator('#single-editor-host .ocr-document-text-download');
@@ -281,7 +286,7 @@ async function exercise(context, base, mode) {
     const text = content.items.map(item => item.str).join(' ');
     assert.match(text,/Исправлено вручную 456/); assert.match(text,/15 ноября/);
   } finally { await pdfLoading.destroy(); }
-  checks.push('searchable PDF downloads offline with manually corrected Cyrillic text in the website and installed extension');
+  checks.push('visible corrections appear in review and document preview; corrected PDF downloads offline with searchable Cyrillic text');
   await page.reload();
   await page.locator('#header-edit').click();
   await page.locator('#single-file').setInputFiles(path.join(fixtures, 'rus-paragraphs-b.png'));

@@ -10,6 +10,7 @@ const payload = (name = 'scan.pdf', bytes = '%PDF original bytes') => ({version:
 
 test('OCR persistence round trip retains exact original, page position, text and coordinates', () => {
   const input = payload();
+  input.review.pages[0].regions[0].edited = true;
   const saved = validateSinglePayload(input);
   const restored = validateSinglePayload(JSON.parse(JSON.stringify(saved)));
   assert.deepEqual(restored, input);
@@ -35,6 +36,7 @@ test('OCR session rejects unapproved, malformed and out-of-page fragments', () =
     value => { value.review.pages[0].text = ''; },
     value => { value.review.pages[0].regions[0].x = Infinity; },
     value => { value.review.pages[0].regions[0].width = .95; },
+    value => { value.review.pages[0].regions[0].edited = 'true'; },
     value => { value.review.pages[0].language = 'fra'; },
     value => { value.review.pages[0].psm = '99'; },
     value => { value.review.currentPage = 2; },

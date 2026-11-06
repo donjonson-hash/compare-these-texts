@@ -4,6 +4,7 @@ import {validateOcrImage} from './ocr-image-input.mjs';
 import {validateCheckedText} from './ocr-import.mjs';
 import {enhanceOcrImage} from './ocr-enhance.mjs';
 import {normalizeOcrLayout, validateOcrRegions, layoutText} from './ocr-layout.mjs';
+import {createCorrectionOverlay} from './ocr-corrections.mjs';
 
 const preferences = new Map();
 const storageKey = side => 'ctt.ocr.preferences.' + side;
@@ -71,7 +72,8 @@ export async function reviewOcrFile(file, {side = 'left', signal, restoredPages,
   const pageScroll = el('div', undefined, 'ocr-page-scroll');
   const stage = el('div', undefined, 'ocr-image-stage'), selectionBox = el('div', undefined, 'ocr-selection-box');
   const fragmentLayer = el('div', undefined, 'ocr-fragment-layer');
-  selectionBox.hidden = true; stage.append(image, fragmentLayer, selectionBox); pageScroll.append(stage);
+  const correctionLayer = el('div', undefined, 'ocr-correction-layer'); correctionLayer.setAttribute('aria-hidden', 'true');
+  selectionBox.hidden = true; stage.append(image, correctionLayer, fragmentLayer, selectionBox); pageScroll.append(stage);
   const zoom = el('select'); zoom.className = 'ocr-zoom'; zoom.setAttribute('aria-label', 'Page zoom');
   for (const value of ['100', '150', '200']) { const option = el('option', value === '100' ? 'Fit width' : value + '%'); option.value = value; zoom.append(option); }
   zoom.addEventListener('change', () => { stage.style.width = zoom.value + '%'; drawRegion(); drawFragments(); });
@@ -107,7 +109,10 @@ export async function reviewOcrFile(file, {side = 'left', signal, restoredPages,
   const fragmentSelect = el('select'); fragmentSelect.className = 'ocr-fragment-select'; fragmentSelect.setAttribute('aria-label', 'Document fragment');
   const fragmentText = el('textarea'); fragmentText.className = 'ocr-fragment-text'; fragmentText.setAttribute('aria-label', 'Selected fragment text'); fragmentText.setAttribute('translate', 'no'); fragmentText.maxLength = MAX_CHARS;
   const fragmentHint = el('p', 'Recognize the page to select text directly on the original.', 'ocr-fragment-hint');
-  fragmentPanel.append(el('h3', 'Text at the selected position'), fragmentHint, fragmentSelect, fragmentText);
+  const correctionLabel = el('label', undefined, 'ocr-visible-correction-label'), correctionCheck = el('input');
+  correctionCheck.type = 'checkbox'; correctionCheck.className = 'ocr-visible-correction';
+  correctionLabel.append(correctionCheck, document.createTextNode(' Show this correction on the page'));
+  fragmentPanel.append(el('h3', 'Text at the selected position'), fragmentHint, fragmentSelect, fragmentText, correctionLabel);
   const plain = el('details', undefined, 'ocr-plain-text'); plain.open = true;
   plain.append(el('summary', 'Full page text (plain text)'), el('p', 'Editing the whole text removes its position links. Edit a selected fragment to keep the page layout.'), text);
   editing.append(options, el('small', 'Choose the document language. Translating the interface does not change OCR.'), status, fragmentPanel, plain, blankLabel, confirm);
@@ -152,6 +157,9 @@ export async function reviewOcrFile(file, {side = 'left', signal, restoredPages,
   function controls() {
     const page = current(), confirmed = pages.filter(p => p.confirmed).length;
     fragmentText.disabled = fragmentSelect.disabled = !ready || busy || enhancementOpen || !(page?.regions?.length);
+    correctionCheck.disabled = fragmentText.disabled;
+    correctionCheck.checked = page?.regions?.[selectedFragment]?.edited === true;
+    correctionLabel.hidden = !(page?.regions?.length);
     fragmentLayer.inert = busy || enhancementOpen || selecting;
     attachArea.disabled = busy || enhancementOpen || regionPanel.hidden || !regionText.value.trim() || !region;
     recognize.disabled = !ready || busy || enhancementOpen; stopButton.disabled = !busy;
@@ -192,14 +200,18 @@ export async function reviewOcrFile(file, {side = 'left', signal, restoredPages,
     regions.forEach((item, i) => { const option = el('option', `${i + 1}. ${item.text.slice(0, 65) || '(empty)'}`); option.value = String(i); fragmentSelect.append(option); });
     fragmentSelect.value = String(selectedFragment); fragmentText.value = regions[selectedFragment]?.text || '';
     fragmentSelect.hidden = fragmentText.hidden = !regions.length;
-    fragmentHint.textContent = regions.length ? 'Click a frame on the page to check or correct that fragment. The scan remains unchanged.' : 'No position-linked text yet. Recognize this page, or select an area and use its text at that position.';
+    fragmentHint.textContent = regions.length ? 'Edit a fragment to replace it with printed text on the page and in the corrected PDF. Untick the option below to keep the original image at this position. Open the full-size image to see the original.' : 'No position-linked text yet. Recognize this page, or select an area and use its text at that position.';
     plain.open = !regions.length;
     drawFragments(); controls();
   }
   function drawFragments() {
-    fragmentLayer.replaceChildren();
+    fragmentLayer.replaceChildren(); correctionLayer.replaceChildren();
+    correctionCheck.checked = current()?.regions?.[selectedFragment]?.edited === true;
     const bounds = imageBounds(), parent = stage.getBoundingClientRect();
     if (!bounds || !ready) return;
+    Object.assign(correctionLayer.style, {left: `${bounds.left - parent.left}px`, top: `${bounds.top - parent.top}px`, width: `${bounds.width}px`, height: `${bounds.height}px`});
+    try { correctionLayer.append(createCorrectionOverlay(current()?.regions || [], bounds.width, bounds.height, document)); }
+    catch (error) { say(`Could not show the correction: ${error.message}`); }
     (current()?.regions || []).forEach((item, i) => {
       const box = button('', 'ocr-fragment-box'); box.classList.toggle('is-selected', i === selectedFragment);
       box.setAttribute('aria-label', `Fragment ${i + 1}: ${item.text.slice(0, 100) || 'empty'}`); box.setAttribute('aria-pressed', String(i === selectedFragment));
@@ -214,12 +226,18 @@ export async function reviewOcrFile(file, {side = 'left', signal, restoredPages,
   });
   fragmentText.addEventListener('input', () => {
     const page = current(), item = page?.regions?.[selectedFragment]; if (!item || busy) return;
-    const old = item.text; item.text = fragmentText.value;
+    const old = item.text, wasEdited = item.edited; item.text = fragmentText.value; item.edited = true;
     let next;
-    try { next = layoutText(page.regions); validateCheckedText(next); } catch (error) { item.text = old; fragmentText.value = old; say(error.message); return; }
+    try { next = layoutText(page.regions); validateCheckedText(next); } catch (error) { item.text = old; if (wasEdited === undefined) delete item.edited; else item.edited = wasEdited; fragmentText.value = old; say(error.message); return; }
     page.text = text.value = next; page.blank = false; blank.checked = false;
     fragmentSelect.options[selectedFragment].textContent = `${selectedFragment + 1}. ${item.text.slice(0,65) || '(empty)'}`;
-    invalidate(); say('Fragment changed at its original position. Check and confirm this page again.');
+    invalidate(); say('Visible correction updated. Check the page preview and confirm this page again.'); drawFragments();
+  });
+  correctionCheck.addEventListener('change', () => {
+    const item = current()?.regions?.[selectedFragment]; if (!item || busy || enhancementOpen) return;
+    if (correctionCheck.checked) item.edited = true; else delete item.edited;
+    invalidate(); say(correctionCheck.checked ? 'This fragment will appear as printed text in the corrected PDF. Confirm this page again.' : 'The original image is shown at this position; the checked text is still available for search and copy. Confirm this page again.');
+    drawFragments();
   });
   attachArea.addEventListener('click', () => {
     if (attachArea.disabled) return;
@@ -234,9 +252,9 @@ export async function reviewOcrFile(file, {side = 'left', signal, restoredPages,
       if (region.x > previous.x + epsilon || region.y > previous.y + epsilon || region.x + region.width < previous.x + previous.width - epsilon || region.y + region.height < previous.y + previous.height - epsilon) {
         say('The area covers only part of an existing fragment. Edit that fragment directly, or select its whole frame.'); return;
       }
-      selectedFragment = overlapping[0]; next[selectedFragment].text = regionText.value;
+      selectedFragment = overlapping[0]; next[selectedFragment].text = regionText.value; next[selectedFragment].edited = true;
     }
-    else { selectedFragment = next.length; next.push({id: `line-${Math.max(0, ...next.map(item => Number(item.id.slice(5)))) + 1}`, ...region, text: regionText.value}); }
+    else { selectedFragment = next.length; next.push({id: `line-${Math.max(0, ...next.map(item => Number(item.id.slice(5)))) + 1}`, ...region, text: regionText.value, edited:true}); }
     try { validateOcrRegions(next); validateCheckedText(layoutText(next)); } catch(error) { say(error.message); return; }
     page.regions = next; page.text = text.value = layoutText(next); page.blank = false; blank.checked = false; page.source = 'ocr';
     regionPanel.hidden = true; rememberRegion(); invalidate(); syncFragments(); say('Area text linked to its position. Check and confirm this page again.');
@@ -473,7 +491,7 @@ export async function reviewOcrFile(file, {side = 'left', signal, restoredPages,
   function clearPreview() {
     clearEnhancement(); clearRegion();
     if (url) URL.revokeObjectURL(url);
-    url = previewBlob = null; ready = false; fragmentLayer.replaceChildren(); previewWidth = previewHeight = 0;
+    url = previewBlob = null; ready = false; fragmentLayer.replaceChildren(); correctionLayer.replaceChildren(); previewWidth = previewHeight = 0;
     image.hidden = full.hidden = true; image.removeAttribute('src'); full.removeAttribute('href');
   }
   function invalidate() { if (current()) current().confirmed = false; controls(); }

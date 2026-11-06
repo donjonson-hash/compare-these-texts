@@ -1,10 +1,11 @@
-/** Local searchable PDF: the reviewed page image plus the corrected invisible text. */
-import {PDFDocument, fontkit, pushGraphicsState, popGraphicsState, beginText, endText,
+/** Local searchable PDF: reviewed page image, printed corrections and OCR text. */
+import {PDFDocument, fontkit, rgb, pushGraphicsState, popGraphicsState, beginText, endText,
   setFontAndSize, setTextMatrix, setTextRenderingMode, showText} from './pdf-vendor.mjs';
 import fontBase64 from './pdf-font.mjs';
 import {openPdf} from './ocr-pdf-input.mjs';
 import {validateOcrImage} from './ocr-image-input.mjs';
 import {validateOcrSnapshot} from './ocr-document-model.mjs';
+import {layoutCorrections} from './ocr-corrections.mjs';
 
 const MAX_RASTER_BYTES = 64 * 1024 * 1024;
 const fail = message => { throw new Error(`OCR PDF: ${message}`); };
@@ -52,15 +53,16 @@ function drawTextLayer(page, font, regions, width, height) {
 /** Only confirmed, position-linked text is exported. The source file is never modified.
  * PDF backgrounds deliberately match the review renderer (annotations/forms excluded).
  * The old PDF text layer is discarded, so corrected words cannot coexist with stale OCR.
+ * Edited regions are printed by default; visibleCorrections:false keeps the original image.
  */
-export async function exportCheckedOcrPdf(file, snapshot, {signal, onProgress = () => {}} = {}) {
+export async function exportCheckedOcrPdf(file, snapshot, {signal, onProgress = () => {}, visibleCorrections = true} = {}) {
   checkAbort(signal);
   const state = validateOcrSnapshot(snapshot);
   for (const [index, page] of state.pages.entries()) {
     if (page.text.trim() && !page.regions.length) fail(`page ${index + 1} has no text positions. Recognize that page again and confirm it, or download checked text.`);
   }
   const pdf = await PDFDocument.create(); pdf.registerFontkit(fontkit);
-  const font = await pdf.embedFont(Uint8Array.from(atob(fontBase64), character => character.charCodeAt(0)), {subset: true, features: {liga: false}});
+  const font = await pdf.embedFont(Uint8Array.from(atob(fontBase64), character => character.charCodeAt(0)), {subset: true, features: {liga: false, kern: false}});
   const supported = new Set(font.getCharacterSet());
   for (const [index, page] of state.pages.entries()) for (const character of page.text) {
     if (character === '\n' || character === '\r') continue;
@@ -85,7 +87,18 @@ export async function exportCheckedOcrPdf(file, snapshot, {signal, onProgress = 
       if (rasterBytes > MAX_RASTER_BYTES) fail('the page images exceed 64 MiB. Split this document or download checked text.');
       const image = await pdf.embedPng(await blob.arrayBuffer()); checkAbort(signal);
       const page = pdf.addPage([width, height]); page.drawImage(image, {x: 0, y: 0, width, height});
-      drawTextLayer(page, font, state.pages[index].regions, width, height);
+      const regions = state.pages[index].regions;
+      const corrections = visibleCorrections ? layoutCorrections(regions, width, height) : [];
+      for (const {mask} of corrections) {
+        page.drawRectangle({x: mask.x, y: height - mask.y - mask.height, width: mask.width, height: mask.height, color: rgb(1, 1, 1)});
+      }
+      const correctionById = new Map(corrections.map(correction => [correction.id, correction]));
+      for (const region of regions) {
+        const correction = correctionById.get(region.id);
+        if (correction) {
+          for (const line of correction.lines) if (line.text.trim()) page.drawText(line.text, {x: line.x, y: height - line.y, size: line.size, font, color: rgb(0, 0, 0)});
+        } else drawTextLayer(page, font, [region], width, height);
+      }
       // Release each PNG decoder's raw buffers before rendering the next page.
       await image.embed(); checkAbort(signal);
     }
