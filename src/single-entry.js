@@ -2,6 +2,7 @@
 (() => {
  const $=id=>document.getElementById(id),moduleURL=new URL('single-editor.mjs',document.currentScript.src),sessionURL=new URL('single-session.mjs',document.currentScript.src);
  const ocrImportURL=new URL('ocr-import.mjs',document.currentScript.src);
+ const ocrDocumentURL=new URL('ocr-document.mjs',document.currentScript.src);
  let controller=null,view=null,generation=0,candidate=null,busy=false,operating=false,session=null,ocrEntry=false;
  const note=(text,error=false)=>{const notice=$('single-notice');notice.classList.toggle('error',error);notice.setAttribute('role',error?'alert':'status');notice.setAttribute('aria-live',error?'assertive':'polite');notice.textContent=text;notice.hidden=!text;};
  function chooseMode(next){
@@ -43,8 +44,9 @@
  async function install(payload,resuming=false){
   const ticket=++generation,abort=new AbortController(),stage=document.createElement('div');let next;setBusy(true);note(resuming?'Restoring your document…':'Opening your document…');
   try{
-   const {mountSingleEditor}=await import(moduleURL.href);
-   next=await mountSingleEditor(stage,{source:payload.source,sheet:payload.sheet,delimiter:payload.delimiter,restoredState:resuming?payload.review:undefined,signal:abort.signal,onStateChange:()=>{if(view===next)session?.changed();}});
+   const isOcr=payload.review?.kind==='ocr';
+   const mount=isOcr?(await import(ocrDocumentURL.href)).mountOcrDocumentEditor:(await import(moduleURL.href)).mountSingleEditor;
+   next=await mount(stage,{source:payload.source,sheet:payload.sheet,delimiter:payload.delimiter,restoredState:resuming||isOcr?payload.review:undefined,signal:abort.signal,onStateChange:()=>{if(view===next)session?.changed();}});
    if(ticket!==generation){abort.abort();next.dispose();return;}
    await session?.flush();if(ticket!==generation){abort.abort();next.dispose();return;}
    controller?.abort();view?.dispose();controller=abort;view=next;$('single-editor-host').replaceChildren(stage);$('single-options').hidden=true;
@@ -74,11 +76,19 @@
    let source;
    if (/\.(pdf|png|jpe?g)$/i.test(file.name)) {
     const {prepareOcrImport, probeOcrPdf} = await import(ocrImportURL.href);
-    const reviewed = await prepareOcrImport(file, {side: 'single', forceOcr: $('single-ocr').checked, probePdf: async pdf => {
+    const reviewed = await prepareOcrImport(file, {side: 'single', preserveDocument: true, forceOcr: $('single-ocr').checked, probePdf: async pdf => {
      source = await readSource(pdf);
      return probeOcrPdf(source);
     }});
     if (!reviewed) {note('');return;}
+    if (reviewed.kind === 'ocr-document') {
+     source ??= await readSource(reviewed.file);
+     await ready;if(ticket!==generation)return;
+     setBusy(false);
+     if((view?.changed||session?.hasSavedWork)&&!window.confirm(`Open “${source.name}” instead? Download your current document first if you want to keep a copy. Cancel keeps it open.`)){note('');return;}
+     await install({source,sheet:null,delimiter:',',review:{version:1,kind:'ocr',pages:reviewed.result.pages,currentPage:0}});
+     return;
+    }
     if (reviewed !== file) source = undefined;
     file = reviewed;
    }

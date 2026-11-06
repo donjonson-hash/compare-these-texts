@@ -78,6 +78,7 @@ async function exercise(context, base, mode) {
     assert.equal(await download.failure(),null);
     return {name:download.suggestedFilename(), bytes:await readFile(await download.path())};
   };
+  const openPlain = async () => { if (!(await modal().locator('.ocr-plain-text').getAttribute('open')) && !(await modal().locator('.ocr-text').isVisible())) await modal().locator('.ocr-plain-text > summary').click(); };
   const checks = run.checks;
   await uploadPair('rus-paragraphs-a.png','rus-paragraphs-b.png');
   await modalReady();
@@ -93,7 +94,7 @@ async function exercise(context, base, mode) {
   assert.equal(await modal().locator('.ocr-text').evaluate(element => element.translate),false);
   // Exercise the real module worker and real OCR without silently adopting either.
   const checkedText = a + '\nManual correction before image improvement.';
-  await modal().locator('.ocr-text').fill(checkedText);
+  await openPlain(); await modal().locator('.ocr-text').fill(checkedText);
   await modal().locator('.ocr-confirm').click();
   const openEnhancement = async () => {
     await modal().locator('.ocr-improve').click();
@@ -166,7 +167,7 @@ async function exercise(context, base, mode) {
   assert.equal(await page.locator('#results').isHidden(),true,'first approved side cannot start comparison while second is unreviewed');
   const b = await recognize('rus'); assert.match(b,/Заказчик/); assert.match(b,/18 ноября/);
   await modal().locator('.ocr-confirm').click();
-  await modal().locator('.ocr-text').fill(b+'\nReviewed manually: OCR integration fixture.');
+  await openPlain(); await modal().locator('.ocr-text').fill(b+'\nReviewed manually: OCR integration fixture.');
   assert.equal(await modal().locator('.ocr-use').isDisabled(),true,'editing revokes page approval');
   await modal().locator('.ocr-confirm').click(); await modal().locator('.ocr-use').click();
   await visualReady();
@@ -222,7 +223,7 @@ async function exercise(context, base, mode) {
   await modal().locator('.ocr-apply-area').click();
   assert.equal(await modal().locator('.ocr-text').inputValue(), 'Checked region' + scan);
   assert.equal(await modal().locator('.ocr-use').isDisabled(), true);
-  await modal().locator('.ocr-text').fill(scan);
+  await openPlain(); await modal().locator('.ocr-text').fill(scan);
   await modal().locator('.ocr-confirm').click();
   checks.push('PDF crop rendered separately; keyboard coordinates; explicit insert and approval invalidation');
   await modal().locator('.ocr-page-select').selectOption('0'); await modalReady();
@@ -253,7 +254,11 @@ async function exercise(context, base, mode) {
   const single = await recognize('rus');
   assert.match(single, /15 ноября/);
   await modal().locator('.ocr-confirm').click(); await modal().locator('.ocr-use').click();
-  const singleSave = page.locator('#single-editor-host [data-save-side="left"]');
+  await page.locator('#single-editor-host .ocr-document img').waitFor({state:'visible'});
+  assert.ok(await page.locator('#single-editor-host .ocr-document-region').count() > 0, 'recognized positions survive the review boundary');
+  const [originalDownload] = await Promise.all([page.waitForEvent('download'), page.locator('.ocr-document-original').click()]);
+  assert.deepEqual(await readFile(await originalDownload.path()), await readFile(path.join(fixtures,'rus-paragraphs-a.png')), 'original scan bytes are preserved');
+  const singleSave = page.locator('#single-editor-host .ocr-document-text-download');
   const [singleDownload] = await Promise.all([page.waitForEvent('download'), singleSave.click()]);
   assert.equal(await singleDownload.failure(), null);
   assert.match(singleDownload.suggestedFilename(), /\.txt$/i);
@@ -264,7 +269,7 @@ async function exercise(context, base, mode) {
   await modalReady();
   assert.equal(await modal().locator('.ocr-language').inputValue(), 'rus', 'explicit OCR language survives page reload');
   await modal().locator('.ocr-close').click();
-  checks.push('single-document image review opens the TXT editor and exports checked text; language persists across reload');
+  checks.push('single-document review preserves original image and locations, exports original bytes and checked text separately; language persists across reload');
 
   assert.deepEqual(run.external_requests,[],'document recognition has no external network requests');
   assert.deepEqual(run.page_errors,[]); assert.deepEqual(run.csp_errors,[],'packaged runtime must satisfy its real CSP');

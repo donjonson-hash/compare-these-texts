@@ -33,7 +33,7 @@ export async function probeOcrPdf(source) {
   }
 }
 
-export async function prepareOcrImport(file, {side = 'left', signal, forceOcr = false, probePdf, review} = {}) {
+export async function prepareOcrImport(file, {side = 'left', signal, forceOcr = false, preserveDocument = false, probePdf, review} = {}) {
   if (!file || typeof file.name !== 'string') throw new Error('Choose a document.');
   if (signal?.aborted) throw new DOMException('Import cancelled.', 'AbortError');
   if (file.size > importFileLimit(file.name)) throw new Error('File limit: PDF 20 MiB, PNG/JPEG 10 MiB, other documents 2 MiB.');
@@ -47,5 +47,8 @@ export async function prepareOcrImport(file, {side = 'left', signal, forceOcr = 
   const result = await showReview(file, {side, signal});
   if (!result) return null;
   if (signal?.aborted) throw new DOMException('Import cancelled.', 'AbortError');
-  return checkedTextFile(result);
+  // Validate the approval boundary for both consumers. Comparison still receives
+  // a text file; the document workspace retains the original image/PDF bytes.
+  const checked = checkedTextFile(result);
+  return preserveDocument ? {kind: 'ocr-document', file, result} : checked;
 }

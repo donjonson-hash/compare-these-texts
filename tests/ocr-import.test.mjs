@@ -20,6 +20,16 @@ test('scan review cancellation produces no import; a text PDF stays original', a
   const result = await prepareOcrImport(pdf,{probePdf:async()=>({needsReview:true}),review:async()=>reviewed});
   assert.equal(await result.text(), reviewed.text);
 });
+test('document OCR preserves the original scan and approved pages while comparison remains text-only', async () => {
+  const file = new File(['%PDF original scan bytes'], 'scan.pdf');
+  const result = await prepareOcrImport(file, {preserveDocument:true, forceOcr:true, review:async()=>reviewed});
+  assert.equal(result.kind, 'ocr-document');
+  assert.equal(result.file, file);
+  assert.equal(await result.file.text(), '%PDF original scan bytes');
+  assert.equal(result.result, reviewed);
+  await assert.rejects(prepareOcrImport(file, {preserveDocument:true, forceOcr:true, review:async()=>({...reviewed,pages:[{text:'unchecked',confirmed:false}]})}), /Check every page/);
+  assert.equal(await prepareOcrImport(file, {preserveDocument:true,forceOcr:true,review:async()=>null}), null);
+});
 test('explicit OCR lets a PDF with a partial text layer enter review', async () => {
   const pdf = new File(['%PDF'], 'hybrid.pdf'); let probes = 0, reviews = 0;
   const result = await prepareOcrImport(pdf, {forceOcr:true, probePdf:async()=>{probes++; return {needsReview:false};}, review:async file=>{assert.equal(file,pdf); reviews++; return reviewed;}});

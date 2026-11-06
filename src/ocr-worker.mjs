@@ -21,7 +21,8 @@ self.onmessage = async ({data: {id, action, language, psm, image, options}}) => 
       postMessage({id});
     } else if (action === 'recognize') {
       if (!worker) throw new Error('The local OCR engine is not ready.');
-      postMessage({id, data: await worker.recognize(image, options)});
+      // Tesseract 7 defaults to plain text; request line geometry explicitly.
+      postMessage({id, data: await worker.recognize(image, options, {text: true, blocks: true})});
     } else throw new Error('Unsupported local OCR operation.');
   } catch (error) { fail(error); }
 };
