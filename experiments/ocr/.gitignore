@@ -1,7 +1,0 @@
-node_modules/
-fixtures/
-results/
-__pycache__/
-*.log
-
-vendor/

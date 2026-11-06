@@ -62,13 +62,7 @@ if (!Map.prototype.getOrInsert) Object.defineProperty(Map.prototype, 'getOrInser
   ]) bundled = replaceOnce(bundled, expression, expression.replace('Math.sumPrecise', 'pdfIntegerSum'));
   bundled = '// Compatibility for integer-only font sizes and DOM lengths in older browsers.\n' +
     'const pdfIntegerSum=values=>values.reduce((sum,value)=>sum+value,0);\n' + bundled;
-  // Verify the previous release before applying the isolated render error fix.
-  if (sha256(bundled) !== '599b1521b3c10f542ef254afee75ba2d9cbda0bb8d92ca4c27eef5d7fd977da7') throw new Error('Compatibility bundle checksum mismatch');
-  // Reject readers and active renders before marking the operator stream complete.
-  // Upstream notified completion first, so oversized/invalid images could become
-  // successful blank or partial pages even with stopAtErrors enabled.
-  bundled = replaceOnce(bundled, 'if(c.operatorList){c.operatorList.lastChunk=!0;for(let u of c.renderTasks)u.operatorListChanged();this.#n()}if(c.displayReadyCapability)c.displayReadyCapability.reject(h);else if(c.opListReadCapability)c.opListReadCapability.reject(h);else throw h', 'if(c.displayReadyCapability)c.displayReadyCapability.reject(h);if(c.opListReadCapability)c.opListReadCapability.reject(h);if(c.operatorList){c.operatorList.lastChunk=!0;for(let u of c.renderTasks)u.cancel?.(h);this.#n()}');
-  const expected = '29676045ba2fc8a635a12620b0b6195cd2ec13ec410341c1fe949c3431472d28';
+  const expected = '599b1521b3c10f542ef254afee75ba2d9cbda0bb8d92ca4c27eef5d7fd977da7';
   if (sha256(bundled) !== expected) throw new Error('Final PDF.js bundle checksum mismatch; no asset was written');
   const license = await readFile(join(packagePath, 'LICENSE'));
   if (checkOnly) {

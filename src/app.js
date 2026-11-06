@@ -4,11 +4,6 @@
     try { window.cttProductEvent?.(name, parameters); } catch (_) {}
   }
   const $ = (id) => document.getElementById(id);
-  const ocrImportURL = new URL('ocr-import.mjs', document.currentScript.src);
-  async function reviewedImport(file, side, forceOcr = false) {
-    const {prepareOcrImport} = await import(ocrImportURL.href);
-    return prepareOcrImport(file, {side, forceOcr, probePdf: async pdf => window.KristinaTransport.request('/api/pdf-ocr-check', {source:{name:pdf.name,data:encode(new Uint8Array(await pdf.arrayBuffer()))}})});
-  }
   const visualModuleURL = new URL('visual-review.mjs', document.currentScript.src);
   const sheetModuleURL = new URL('sheet-review.mjs', document.currentScript.src);
   const tableReportModuleURL = new URL('report.mjs', document.currentScript.src);
@@ -217,10 +212,7 @@
     if (value) officeReset("Reading the documents and checking the data. I'll answer questions about the new comparison when it's ready.");
     officeEnable(); exportEnable();
     for (const id of ['demo', 'demo-tables', 'visual-retry', 'left-file', 'right-file', 'delimiter', 'left-key', 'right-key', 'answer']) $(id).disabled = value;
-    for (const side of ['left', 'right']) {
-      if ($(side + '-sheet')) $(side + '-sheet').disabled = value;
-      $(side + '-ocr').disabled = value;
-    }
+    for (const side of ['left', 'right']) if ($(side + '-sheet')) $(side + '-sheet').disabled = value;
     $('rules').disabled = value || !state.metadata || state.metadata.kind === 'text';
     $('compare').disabled = value;
     $('compare').textContent = value ? "Processing…" : "Apply settings";
@@ -260,7 +252,7 @@
   function sourceLabel(side, file) {
     $(side + '-filename').dataset.sourceLoaded = String(!!file);
     $(side + '-filename').textContent = file ? file.name : "Choose a file or drop it here";
-    $(side + '-meta').textContent = file ? "File selected · click to replace" : (window.KristinaTransport ? "XLSX, CSV, TXT, DOCX, PDF, PNG, JPEG" : "CSV · UTF-8 · up to 2 MiB");
+    $(side + '-meta').textContent = file ? "File selected · click to replace" : (window.KristinaTransport ? "XLSX, CSV, TXT, DOCX, PDF · up to 2 MiB" : "CSV · UTF-8 · up to 2 MiB");
   }
   function showSheets(side, sheets = [], selected = null) {
     const select = $(side + '-sheet');
@@ -369,45 +361,18 @@
   }
   async function loadFile(side, file) {
     if (!file || state.busy) return;
-    let stagedSource;
     if (/\.doc$/i.test(file.name)) { visualReview?.closeWorkspaceTools?.(); notice('Old Word files (.doc) are not supported. Open the file in Word or LibreOffice and save it as .docx, then try again.', true); $('notice').scrollIntoView({block: 'nearest'}); return; }
-    if (/\.(pdf|png|jpe?g)$/i.test(file.name) && window.KristinaTransport) {
-      const version = ++loads[side];
-      visualReview?.closeWorkspaceTools?.();
-      busy(true);
-      try {
-        const reviewed = await reviewedImport(file, side, $(side + '-ocr').checked);
-        if (!reviewed || version !== loads[side]) return;
-        if (reviewed !== file) {
-          stagedSource = {name:reviewed.name, data:encode(new Uint8Array(await reviewed.arrayBuffer()))};
-          const next = {...state.sources, [side]:stagedSource};
-          // A failed OCR replacement must retain the live editor and its Undo.
-          // Ordinary uploads still allow changing a table pair to text one side at a time.
-          if (next.left && next.right) await window.KristinaTransport.request('/api/prepare', {...next, delimiter:delimiter()});
-          if (version !== loads[side]) return;
-        }
-        file = reviewed;
-      } catch (error) {
-        if (version === loads[side]) notice("Couldn't open the file. " + error.message, true);
-        return;
-      } finally {
-        if (version === loads[side]) {
-          busy(false);
-          $(side + '-file').value = '';
-        }
-      }
-    }
     const version = ++loads[side]; clearResult(); state.sources[side] = null; state.metadata = null;
     showSheets(side); $('settings').hidden = textSourcesSelected();
     $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
     $('rules').hidden = true; $('rules').disabled = true; $('rules-empty').hidden = false; sourceLabel(side, null);
     if (file.size > MAX_FILE_BYTES) { notice("This file exceeds 2 MiB. Choose a smaller file.", true); return; }
-    if (/\.(txt|docx|pdf|png|jpe?g)$/i.test(file.name) && !window.KristinaTransport) { notice("The document engine could not load. Reload this page and try again.", true); return; }
+    if (/\.(txt|docx|pdf)$/i.test(file.name) && !window.KristinaTransport) { notice("The document engine could not load. Reload this page and try again.", true); return; }
     if (/\.(xlsx|xls|xlsm|xlsb|ods)$/i.test(file.name) && !window.KristinaTransport) { notice("The spreadsheet engine could not load. Reload this page and try again.", true); return; }
     try {
-      const source = stagedSource || {name:file.name, data:encode(new Uint8Array(await file.arrayBuffer()))};
+      const bytes = new Uint8Array(await file.arrayBuffer());
       if (version !== loads[side]) return;
-      state.sources[side] = source; sourceLabel(side, file); await prepare();
+      state.sources[side] = {name: file.name, data: encode(bytes)}; sourceLabel(side, file); await prepare();
     } catch (error) { if (version === loads[side]) { clearResult(); state.metadata = null; notice("Couldn't open the file. " + error.message, true); } }
   }
   function selectedRules() {
@@ -590,10 +555,7 @@
         $('membership').checked=saved.report.rules.fields.length===0;$('strip').checked=saved.report.rules.strip;$('mapping-panel').hidden=$('membership').checked;mapping(false);for(const row of $('field-mapping').children) if(!saved.report.rules.fields.some(field=>field[0]===row.dataset.left)){row.querySelector('.field-target').value='';row.querySelector('.field-mode').disabled=true;}updateUnmapped();$('rules').hidden=false;$('rules-empty').hidden=true;
       }
       await renderResult(saved.review);
-      if (revision !== state.revision) return;
-      document.dispatchEvent(new Event('ctt:comparison-resumed'));
-      officeDescribe(); notice();
-      if (!document.body.classList.contains('home-mode') && !$('compare-workspace').hidden) $('visual-review').scrollIntoView({block: 'start'});
+      officeDescribe(); notice(); $('visual-review').scrollIntoView({block: 'start'});
     } catch (error) {
       clearResult(); state.metadata = null;
       // Keep the stored session available for explicit deletion/recovery.
@@ -610,7 +572,7 @@
     $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
     $('rules').hidden = true; $('rules').disabled = true; $('rules-empty').hidden = false;
     $('rules-summary').textContent = "Detect automatically";
-    $('source-privacy').textContent = "Comparison starts after import and any required OCR review. Files are processed in your browser.";
+    $('source-privacy').textContent = "Comparison starts automatically. Files are processed in your browser. Up to 2 MiB per file.";
     officeReset(); notice("Session ended. Saved documents and edits have been deleted from this browser.");
   }
   // A bounded, linear prefix/suffix highlight. Preserve every original character.
@@ -902,7 +864,7 @@
   });
   document.addEventListener('ctt:home', () => restoreWorkspaceTools());
   document.addEventListener('ctt:new-comparison', event => {
-    const {files, ocr, complete} = event.detail || {};
+    const {files, complete} = event.detail || {};
     if (typeof complete !== 'function') return;
     void (async () => {
       if (state.busy) return {ok:false, message:'Wait for the current operation to finish, then try again.'};
@@ -911,12 +873,8 @@
         if (!window.KristinaTransport) throw new Error('The comparison engine could not load. Refresh the page and try again.');
         const next = {};
         for (const side of ['left', 'right']) {
-          let file = files?.[side];
-          if (!file || !/\.(docx|pdf|txt|xlsx|csv|tsv|png|jpe?g)$/i.test(file.name)) throw new Error('Choose two supported files. Old .doc files must first be saved as .docx in Word or LibreOffice.');
-          if (/\.(pdf|png|jpe?g)$/i.test(file.name)) {
-            file = await reviewedImport(file, side, ocr?.[side] === true);
-            if (!file) return {ok:false};
-          }
+          const file = files?.[side];
+          if (!file || !/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.test(file.name)) throw new Error('Choose two supported files. Old .doc files must first be saved as .docx in Word or LibreOffice.');
           if (file.size > MAX_FILE_BYTES) throw new Error('Choose files up to 2 MB each.');
           next[side] = {name:file.name, data:encode(new Uint8Array(await file.arrayBuffer()))};
         }
@@ -942,7 +900,7 @@
       const {mountSessionUI} = await import(sessionModuleURL.href);
       sessionUI = await mountSessionUI(root, {onResume: resumeSession, onFinish: finishSession,
         onOperating: value => {
-          if (value) { loads.left++; loads.right++; document.dispatchEvent(new Event('ctt:comparison-operation-started')); }
+          if (value) { loads.left++; loads.right++; }
           busy(value);
         }});
       sessionUI.setBusy(state.busy);
@@ -952,12 +910,12 @@
     }
   })() : Promise.resolve();
   if (window.KristinaTransport) {
-    $('supported-formats').textContent = "CSV/Excel tables, TXT/DOCX text, PDF and PNG/JPEG. Scanned pages and images require local OCR and your confirmation. Checked OCR text is edited and exported as text; scan layout is not retained.";
-    $('source-privacy').textContent = "Comparison starts after import and any required OCR review. Files are processed locally. PDF: 20 MiB (OCR up to 30 pages); PNG/JPEG: 10 MiB; other files: 2 MiB.";
+    $('supported-formats').textContent = "CSV/Excel tables, TXT/DOCX text, and PDFs with a text layer, including those with logos and images. Images are not compared; scans without text, forms, and comments are not supported.";
+    $('source-privacy').textContent = "Comparison starts automatically. Files are processed locally, without sending them to an LLM. Up to 2 MiB per file.";
   }
   for (const side of ['left', 'right']) {
     if (window.KristinaTransport) {
-      $(side + '-file').accept += ',.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.txt,text/plain,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf,.png,.jpg,.jpeg,image/png,image/jpeg';
+      $(side + '-file').accept += ',.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.txt,text/plain,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf';
       sourceLabel(side, null);
       const label = element('label', "Sheet to compare", 'sheet-choice'), select = element('select');
       select.id = side + '-sheet'; select.setAttribute('aria-label', "Sheet to compare " + (side === 'left' ? 'A' : 'B'));

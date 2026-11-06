@@ -72,10 +72,7 @@ for p in (root/'downloads').glob('*.zip'):
     for marker in (b'<!-- website-only -->',b'application/ld+json',b'property="og:',b'chromewebstore.google.com'):assert marker not in z.read(name),(p,name,'website-only content leaked into extension')
     if name.endswith('.html'):
      offline=Parser();offline.feed(z.read(name).decode())
-     if offline.csp:
-      expected_connect = "connect-src 'self'" if name == 'index.html' else "connect-src 'none'"
-      assert expected_connect + ';' in offline.csp,(p,name,'offline CSP')
-      assert not re.search(r"(?:https?:|\*)", offline.csp),(p,name,'remote origin in offline CSP')
+     if offline.csp:assert "connect-src 'none'" in offline.csp,(p,name,'offline CSP')
   manifest=json.loads(z.read('manifest.json'))
   is_chrome=p.name.startswith('ctt-chrome-')
   if is_chrome:
@@ -108,9 +105,6 @@ for p in (root/'downloads').glob('*.zip'):
      assert u.path in z.namelist(),(p,ref)
   if p.name in (f"ctt-chrome-{release['version']}.zip",f"ctt-firefox-{release['version']}.zip"):
    expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','sitemap.xml','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
-   expected.update(f.relative_to(root).as_posix() for f in (root/'ocr-assets').rglob('*') if f.is_file())
-   for f in (root/'ocr-assets').rglob('*'):
-    if f.is_file():assert z.read(f.relative_to(root).as_posix())==f.read_bytes(),(p,f,'OCR asset mismatch')
    if is_chrome:expected.update(localized_files)
    else:
     expected.update(firefox_emoji)

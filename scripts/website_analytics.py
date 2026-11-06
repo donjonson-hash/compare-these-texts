@@ -63,8 +63,8 @@ TAG = ('<!-- Google tag (gtag.js): website only -->\n'
 def strip_website_analytics(text):
     """Also support packaging again from an already built website."""
     return (text.replace(TAG, '')
-            .replace(" https://www.googletagmanager.com " + SCRIPT_HASH, "")
-            .replace("connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com;", "connect-src 'self';" if "wasm-unsafe-eval" in text else "connect-src 'none';")
+            .replace("script-src 'self' https://www.googletagmanager.com " + SCRIPT_HASH + ";", "script-src 'self';")
+            .replace("connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com;", "connect-src 'none';")
             .replace("img-src 'self' data: blob: https://www.googletagmanager.com https://*.google-analytics.com;", "img-src 'self' data: blob:;"))
 
 
@@ -73,9 +73,8 @@ def add_website_analytics(output):
         text = page.read_text()
         if 'googletagmanager.com/gtag/js' in text:
             raise RuntimeError(f'Duplicate Google tag in {page}')
-        text = text.replace("script-src 'self'", "script-src 'self' https://www.googletagmanager.com " + SCRIPT_HASH)
-        text = text.replace("connect-src 'none';", "connect-src 'self';")
-        text = text.replace("connect-src 'self';", "connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com;")
+        text = text.replace("script-src 'self';", "script-src 'self' https://www.googletagmanager.com " + SCRIPT_HASH + ";")
+        text = text.replace("connect-src 'none';", "connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com;")
         text = text.replace("img-src 'self' data: blob:;", "img-src 'self' data: blob: https://www.googletagmanager.com https://*.google-analytics.com;")
         if text.count('</head>') != 1:
             raise RuntimeError(f'Expected one head in {page}')
