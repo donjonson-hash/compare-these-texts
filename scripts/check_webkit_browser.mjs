@@ -1,4 +1,4 @@
-// CI regression for the browser engine used by Safari. This is WebKit on Linux,
+// CI regression for the browser engine used by Safari. This is Playwright WebKit,
 // not a claim that a particular macOS/Safari release has been tested.
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
@@ -12,7 +12,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const build = path.resolve(process.env.CTT_BUILD_DIR || path.join(root, 'dist'));
 const output = path.resolve(process.env.TEST_OUTPUT || path.join(root, 'test-output/webkit'));
 await mkdir(output, {recursive:true});
-const report = {engine:'Playwright WebKit on Linux', checks:[], page_errors:[], csp_errors:[], external_requests:[]};
+const report = {engine:`Playwright WebKit on ${process.platform}`, checks:[], page_errors:[], csp_errors:[], external_requests:[]};
 const mime = {'.html':'text/html', '.js':'text/javascript', '.mjs':'text/javascript', '.css':'text/css', '.png':'image/png', '.svg':'image/svg+xml', '.json':'application/json', '.woff2':'font/woff2', '.ttf':'font/ttf'};
 const server = createServer(async (request, response) => {
   try {

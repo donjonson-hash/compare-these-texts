@@ -65,7 +65,7 @@ jobs:
             test-output/encrypted-storage-check.json
           if-no-files-found: error
   webkit:
-    runs-on: ubuntu-latest
+    runs-on: macos-15-intel
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -79,8 +79,8 @@ jobs:
           python-version: '3.11'
       - run: npm ci --ignore-scripts
       - run: npm run build
-      - name: Install WebKit and system dependencies
-        run: npx playwright install --with-deps webkit
+      - name: Install WebKit on macOS
+        run: npx playwright install webkit
       - name: Check WebKit text highlights and saved OCR transitions
         run: node scripts/check_webkit_browser.mjs
       - name: Upload WebKit evidence
