@@ -32,6 +32,9 @@ try {
   browser = await webkit.launch({headless:true});
   context = await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
   context.setDefaultTimeout(30000);
+  // Trace frames use the native screencast protocol. Avoid page.screenshot():
+  // Playwright's WebKit screenshot preparation injects an inline `body {}`
+  // stylesheet to synchronize animations and violates this site's strict CSP.
   await context.tracing.start({screenshots:true,snapshots:true,sources:true});
   await context.route('**/*', route => {
     const url = route.request().url();
@@ -54,6 +57,7 @@ try {
   const ready = async () => {
     await page.locator('#visual-review [data-save-side="right"]').waitFor({state:'visible'});
     assert.ok(await page.locator('#single-workspace').isHidden(), 'comparison keeps the independent OCR editor hidden');
+    assert.ok(await page.locator('#single-session').isHidden(), 'comparison must not show the previous OCR document name or saved-work controls');
   };
   const saved = id => page.waitForFunction(id => document.getElementById(id)?.textContent.includes('Saved in this browser'), id);
   const textOcrControls = async () => {
@@ -130,7 +134,6 @@ try {
   await assertHighlights(nextShared, 'Цена заказа 100 рублей.', 'Цена заказа 200 рублей.', ['100','200']);
   assert.doesNotMatch(await page.locator('#visual-review').innerText(), /Previous OCR document/);
   report.checks.push('saved single OCR → Home → staged PDF OCR → Paste text instead → fresh comparison; old OCR does not replace the pair');
-  await page.screenshot({path:path.join(output,'fresh-comparison-after-ocr.png'),fullPage:true});
 
   await home(); await page.locator('#start-edit').click();
   const [download] = await Promise.all([page.waitForEvent('download'),page.locator('.ocr-document-text-download').click()]);
@@ -156,7 +159,6 @@ try {
   report.status = 'passed';
 } catch (error) {
   report.status = 'failed'; report.error = error.stack || String(error);
-  if (page) await page.screenshot({path:path.join(output,'failure.png'),fullPage:true}).catch(() => {});
   throw error;
 } finally {
   await writeFile(path.join(output,'report.json'),JSON.stringify(report,null,2)+'\n');
