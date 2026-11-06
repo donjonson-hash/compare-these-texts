@@ -151,8 +151,9 @@ async function exercise(context, base, mode) {
     return {x,y,width:Math.min(r.right,clip.right,innerWidth)-x,height:Math.min(r.bottom,clip.bottom,innerHeight-20)-y};
   });
   assert.ok(rect.width > 100 && rect.height > 100, 'pointer selection uses the visible part of the scrollable scan');
-  await page.mouse.move(rect.x + 1, rect.y + 1); await page.mouse.down();
-  await page.mouse.move(rect.x + rect.width - 1, rect.y + Math.min(rect.height - 2, 420), {steps:5}); await page.mouse.up();
+  assert.equal(await page.evaluate(({x,y}) => Boolean(document.elementFromPoint(x + 16,y + 16)?.closest('.ocr-image-stage')), rect), true, 'drag starts on the image, inside the rounded viewport');
+  await page.mouse.move(rect.x + 16, rect.y + 16); await page.mouse.down();
+  await page.mouse.move(rect.x + rect.width - 16, rect.y + Math.min(rect.height - 16, 420), {steps:5}); await page.mouse.up();
   assert.equal(await modal().locator('.ocr-recognize-area').isEnabled(), true, 'dragging creates a selectable OCR area');
   await modal().locator('.ocr-recognize-area').click();
   await modal().locator('.ocr-region-result').waitFor({state:'visible', timeout:120000});
