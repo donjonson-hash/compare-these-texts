@@ -118,7 +118,7 @@ export async function reviewOcrFile(file, {side = 'left', signal, restoredPages,
   regionPanel.append(el('p', 'Check the area result. In the page text above, place the cursor or select the text to replace, then insert.'), regionText, attachArea, applyArea);
   editing.append(regionPanel);
   columns.append(original, editing);
-  const footer = el('footer', undefined, 'ocr-review-footer'), summary = el('span'), use = button('Use checked text', 'primary'); use.classList.add('ocr-use'); footer.append(summary, use);
+  const footer = el('footer', undefined, 'ocr-review-footer'), summary = el('span'), use = button(side === 'single' ? 'Open reviewed document' : 'Use checked text', 'primary'); use.classList.add('ocr-use'); footer.append(summary, use);
   const enhancementPanel = el('section', undefined, 'ocr-enhancement-preview'); enhancementPanel.hidden = true;
   const enhancementHeading = el('h3', 'Preview improved image'); enhancementHeading.tabIndex = -1;
   const enhancementHint = el('p', 'Compare both images before recognizing. Processing can change small marks and digits. The original and your checked text stay available.');

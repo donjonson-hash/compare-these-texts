@@ -478,3 +478,13 @@ test('a separately recognized field can be attached to its page position', async
  h.$('.ocr-confirm').click();h.$('.ocr-use').click();const saved=await result;
  assert.equal(saved.pages[0].regions[0].width,0.3);assert.equal(saved.pages[0].regions[0].height,0.1);
 });
+
+test('partial area cannot erase the rest of a position-linked line', async t=>{
+ const h=await harness(t,{texts:[''],makeWorker:async()=>({recognize:async()=>({data:mappedData}),terminate:async()=>{}})}),{result}=await h.open();
+ h.$('.ocr-recognize').click();await tick();h.$('.ocr-confirm').click();
+ h.change('[data-coordinate="width"]','10');h.change('[data-coordinate="height"]','1');h.change('[data-coordinate="x"]','20');h.change('[data-coordinate="y"]','7');
+ h.$('.ocr-recognize-area').click();await tick();h.$('.ocr-region-text').value='one word';h.$('.ocr-region-text').dispatchEvent(new h.dom.window.Event('input'));
+ h.$('.ocr-attach-area').click();
+ assert.equal(h.$('.ocr-text').value,'Left column\nRight column');assert.match(h.$('.ocr-status').textContent,/only part/);assert.equal(h.$('.ocr-use').disabled,false);
+ h.$('.ocr-close').click();await result;
+});
