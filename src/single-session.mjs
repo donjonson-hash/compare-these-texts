@@ -1,11 +1,21 @@
 import {openSessionStore} from './session-store.mjs';
 import {mountSessionUI} from './session-ui.mjs';
+import {ocrSourceBytes, validateOcrSnapshot} from './ocr-document-model.mjs';
 const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
 export function validateSinglePayload(payload){
  const invalid=()=>{throw Object.assign(Error('Could not save your document: invalid data.'),{code:'invalid'});};
  if(!object(payload))invalid();
  if(payload.version!==1)throw Object.assign(Error('This document was saved by another version of Compare Two Texts.'),{code:'incompatible'});
  const s=payload.source;
+ if(payload.review?.kind==='ocr'){
+  if(payload.kind!=='single-editor'||payload.sheet!==null||![',',';','\t'].includes(payload.delimiter))invalid();
+  ocrSourceBytes(s);
+  const review=validateOcrSnapshot(payload.review);
+  if(!/\.pdf$/i.test(s.name)&&review.pages.length!==1)invalid();
+  let text;try{text=JSON.stringify(payload);}catch{invalid();}
+  if(text.length>32*1024*1024||new TextEncoder().encode(text).length>32*1024*1024)invalid();
+  return {version:1,kind:'single-editor',source:{name:s.name,data:s.data},sheet:null,delimiter:payload.delimiter,review};
+ }
  if(payload.kind!=='single-editor'||!object(s)||typeof s.name!=='string'||!s.name.trim()||s.name.length>255||! /\.(docx|pdf|txt|xlsx|csv|tsv)$/i.test(s.name)||typeof s.data!=='string'||s.data.length>4*Math.ceil(2097152/3)||s.data.length%4||!/^[A-Za-z0-9+/]*={0,2}$/.test(s.data)||!object(payload.review)||![',',';','\t'].includes(payload.delimiter))invalid();
  if(s.data.length/4*3-(s.data.endsWith('==')?2:s.data.endsWith('=')?1:0)>2097152)invalid();
  if(/\.xlsx$/i.test(s.name)&&(typeof payload.sheet!=='string'||!payload.sheet||payload.sheet.length>255))invalid();

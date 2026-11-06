@@ -38,3 +38,24 @@
 .ocr-review-dialog .ocr-enhancement-result{padding:16px;border:1px solid #aebfb6;border-radius:8px;background:#f1f7f3}
 .ocr-review-dialog .ocr-enhanced-text{box-sizing:border-box;width:100%;min-height:24vh;margin:0 0 12px;padding:12px;font:17px/1.5 ui-monospace,monospace;resize:vertical;border:1px solid #aebfb6;border-radius:8px;background:#fff;color:#142c24}
 @media(max-width:760px){.ocr-review-dialog .ocr-enhancement-images{grid-template-columns:1fr}.ocr-review-dialog .ocr-enhancement-images img{height:38vh}.ocr-review-dialog .ocr-enhancement-preview .ocr-review-options{align-items:stretch}.ocr-review-dialog .ocr-enhancement-preview button{max-width:100%;white-space:normal}}
+/* Keep the scan as the document; recognition is a position-linked review layer. */
+.ocr-review-dialog{width:min(1520px,98vw);padding:20px;max-height:96vh}
+.ocr-review-dialog .ocr-review-columns{grid-template-columns:minmax(0,1.8fr) minmax(300px,1fr);gap:22px;align-items:start}
+.ocr-review-dialog .ocr-page-scroll{max-height:72vh;overflow:auto;background:#e8eeeb;border:1px solid #dce5e0;border-radius:8px;overscroll-behavior:contain}
+.ocr-review-dialog .ocr-image-stage{width:100%;min-width:100%;line-height:0}
+.ocr-review-dialog .ocr-review-original .ocr-image-stage img{width:100%;height:auto;max-height:none;border-radius:0;outline:0;object-fit:contain}
+.ocr-review-dialog .ocr-fragment-layer{position:absolute;inset:0;pointer-events:none}
+.ocr-review-dialog .ocr-fragment-box{position:absolute;box-sizing:border-box;min-height:0;min-width:0;margin:0;padding:0;border:1px solid rgb(25 118 88 / 38%);border-radius:2px;background:transparent;pointer-events:auto;cursor:pointer}
+.ocr-review-dialog .ocr-fragment-box:hover,.ocr-review-dialog .ocr-fragment-box:focus-visible{border:2px solid #08785b;background:rgb(13 156 110 / 14%);outline:2px solid #fff}
+.ocr-review-dialog .ocr-fragment-box.is-selected{border:2px solid #08785b;background:rgb(13 156 110 / 16%)}
+.ocr-review-dialog .ocr-fragment-editor{padding:14px;border:1px solid #c5d8cc;border-radius:10px;background:#f5f9f6;margin:12px 0}
+.ocr-review-dialog .ocr-fragment-editor h3{margin:0 0 8px;font-size:1.05rem}
+.ocr-review-dialog .ocr-fragment-hint{font-size:.9rem;margin:6px 0 12px}
+.ocr-review-dialog .ocr-fragment-select{display:block;max-width:100%;width:100%;margin-bottom:12px}
+.ocr-review-dialog .ocr-fragment-text{box-sizing:border-box;width:100%;min-height:7em;padding:12px;font:17px/1.5 system-ui,sans-serif;border:1px solid #aebfb6;border-radius:6px;resize:vertical;background:white;color:#142c24}
+.ocr-review-dialog .ocr-plain-text{margin:14px 0;font-size:.9rem}
+.ocr-review-dialog .ocr-plain-text summary{cursor:pointer;padding:10px 0;font-weight:600}
+.ocr-review-dialog .ocr-text{min-height:16vh;font-size:15px}
+.ocr-review-dialog .ocr-review-editing>.ocr-review-options{margin-top:0}
+.ocr-review-dialog .ocr-review-options select{max-width:100%}
+@media(max-width:760px){.ocr-review-dialog{padding:12px}.ocr-review-dialog .ocr-review-columns{grid-template-columns:minmax(0,1fr)}.ocr-review-dialog .ocr-page-scroll{max-height:58vh}.ocr-review-dialog .ocr-fragment-text{min-height:5em}.ocr-review-dialog .ocr-review-options{gap:8px}}

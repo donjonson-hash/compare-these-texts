@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import {JSDOM} from 'jsdom';
+import * as layoutFunctions from '../src/ocr-layout.mjs';
 import {validateCheckedText} from '../src/ocr-import.mjs';
 
 const tick = () => new Promise(resolve => setImmediate(resolve));
@@ -17,7 +18,7 @@ async function harness(t, {texts = ['Page one', 'Page two'], makeWorker, loadPag
   dom.window.HTMLDialogElement.prototype.close = function() { this.open = false; this.dispatchEvent(new dom.window.Event('close')); };
   const pdf = new vm.SyntheticModule(['openPdf'], function() { this.setExport('openPdf', async () => ({
     pageCount: texts.length, destroy: async () => { destroyed.push(true); },
-    page: async (n, options) => { pageCalls.push({n, options}); if (loadPage) await loadPage(n, options); return {blob: {}, text: texts[n - 1], hasText: Boolean(texts[n - 1].trim())}; },
+    page: async (n, options) => { pageCalls.push({n, options}); if (loadPage) await loadPage(n, options); return {blob: {}, width:1000, height:1500, text: texts[n - 1], hasText: Boolean(texts[n - 1].trim())}; },
   })); }, {context});
   const runtime = new vm.SyntheticModule(['makeWorker'], function() { this.setExport('makeWorker', async (lang, logger, options) => {
     languages.push(lang); workerOptions.push(options); return makeWorker ? makeWorker(options) : {recognize: async input => { recognitionInputs.push(input); return {data: {text: 'Recognized Russian Я'}}; }, terminate: async () => {}};
@@ -26,7 +27,8 @@ async function harness(t, {texts = ['Page one', 'Page two'], makeWorker, loadPag
   const validator = new vm.SyntheticModule(['validateCheckedText'], function() { this.setExport('validateCheckedText', validateCheckedText); }, {context});
   const imageInput = new vm.SyntheticModule(['validateOcrImage'], function() { this.setExport('validateOcrImage', async () => ({})); }, {context});
   const enhancement = new vm.SyntheticModule(['enhanceOcrImage'], function() { this.setExport('enhanceOcrImage', async (blob, options) => { enhancements.push({blob, options}); return enhanceImage ? enhanceImage(blob, options) : {blob: {enhanced: true}, width: 100, height: 100}; }); }, {context});
-  await module.link(specifier => specifier.includes('ocr-enhance') ? enhancement : specifier.includes('pdf-input') ? pdf : specifier.includes('ocr-import') ? validator : specifier.includes('image-input') ? imageInput : runtime); await module.evaluate();
+  const layout = new vm.SyntheticModule(Object.keys(layoutFunctions), function() { for(const [name,value] of Object.entries(layoutFunctions)) this.setExport(name,value); }, {context});
+  await module.link(specifier => specifier.includes('ocr-layout') ? layout : specifier.includes('ocr-enhance') ? enhancement : specifier.includes('pdf-input') ? pdf : specifier.includes('ocr-import') ? validator : specifier.includes('image-input') ? imageInput : runtime); await module.evaluate();
   t.after(() => dom.window.close());
   const file = {name: 'scan.pdf', type: 'application/pdf', size: 100};
   const open = async options => { const result = module.namespace.reviewOcrFile(file, options); await tick(); return {result}; };
@@ -430,4 +432,59 @@ test('Stop while processed image decodes cannot enable recognition from a stale 
   assert.equal(h.$('.ocr-enhance-recognize').disabled, true);
   h.$('.ocr-enhance-discard').click(); assert.equal(h.$('.ocr-use').disabled, false);
   h.$('.ocr-close').click(); await result;
+});
+
+
+const mappedData = {text:'Left column\nRight column\n', blocks:[{paragraphs:[{lines:[
+  {text:'Left column\n',bbox:{x0:100,y0:100,x1:400,y1:130}},
+  {text:'Right column\n',bbox:{x0:550,y0:100,x1:900,y1:130}},
+]}]}]};
+test('position-linked fragments retain columns, edits and approvals through page navigation and reopen', async t => {
+ const h=await harness(t,{texts:['','Second page'],makeWorker:async()=>({recognize:async()=>({data:mappedData}),terminate:async()=>{}})});
+ const {result}=await h.open(); h.$('.ocr-recognize').click(); await tick();
+ assert.equal(h.$('.ocr-fragment-select').options.length,2);
+ assert.equal(h.$('.ocr-plain-text').open,false);
+ h.$('.ocr-confirm').click();
+ h.change('.ocr-fragment-select','1');
+ h.$('.ocr-fragment-text').value='Corrected right column'; h.$('.ocr-fragment-text').dispatchEvent(new h.dom.window.Event('input'));
+ assert.equal(h.$('.ocr-text').value,'Left column\nCorrected right column');
+ assert.equal(h.$('.ocr-use').disabled,true);
+ h.$('.ocr-confirm').click(); h.change('.ocr-page-select','1'); await tick(); h.$('.ocr-confirm').click();
+ h.change('.ocr-page-select','0'); await tick();
+ assert.equal(h.$('.ocr-fragment-select').options.length,2);
+ h.$('.ocr-use').click(); const saved=await result;
+ assert.equal(saved.pages[0].regions[1].x,0.55);
+ assert.equal(saved.pages[0].regions[1].text,'Corrected right column');
+ const reopened=await h.open({restoredPages:saved.pages,initialPage:0});
+ assert.equal(h.$('.ocr-fragment-select').options.length,2); assert.equal(h.$('.ocr-use').disabled,false);
+ h.$('.ocr-fragment-text').value='Cancelled edit';h.$('.ocr-fragment-text').dispatchEvent(new h.dom.window.Event('input'));h.$('.ocr-close').click();
+ assert.equal(await reopened.result,null);assert.equal(saved.pages[0].regions[0].text,'Left column');
+});
+test('unmapped OCR content is never discarded and whole-text editing removes stale coordinates', async t => {
+ let data=mappedData;
+ const h=await harness(t,{texts:[''],makeWorker:async()=>({recognize:async()=>({data}),terminate:async()=>{}})}),{result}=await h.open();
+ h.$('.ocr-recognize').click();await tick();assert.equal(h.$('.ocr-fragment-select').options.length,2);
+ h.$('.ocr-text').value='Freely reorganized text';h.$('.ocr-text').dispatchEvent(new h.dom.window.Event('input'));
+ assert.equal(h.$('.ocr-fragment-select').options.length,0);assert.equal(h.$('.ocr-plain-text').open,true);
+ data={...mappedData,text:mappedData.text+'UNLOCATED IMPORTANT CONTENT'};h.$('.ocr-recognize').click();await tick();
+ assert.equal(h.$('.ocr-text').value,data.text);assert.equal(h.$('.ocr-fragment-select').options.length,0);
+ h.$('.ocr-close').click();await result;
+});
+test('a separately recognized field can be attached to its page position', async t=>{
+ const h=await harness(t,{texts:['']}),{result}=await h.open();
+ h.change('[data-coordinate="width"]','30');h.change('[data-coordinate="height"]','10');
+ h.$('.ocr-recognize-area').click();await tick();h.$('.ocr-attach-area').click();
+ assert.equal(h.$('.ocr-text').value,'Recognized Russian Я');assert.equal(h.$('.ocr-fragment-select').options.length,1);
+ h.$('.ocr-confirm').click();h.$('.ocr-use').click();const saved=await result;
+ assert.equal(saved.pages[0].regions[0].width,0.3);assert.equal(saved.pages[0].regions[0].height,0.1);
+});
+
+test('partial area cannot erase the rest of a position-linked line', async t=>{
+ const h=await harness(t,{texts:[''],makeWorker:async()=>({recognize:async()=>({data:mappedData}),terminate:async()=>{}})}),{result}=await h.open();
+ h.$('.ocr-recognize').click();await tick();h.$('.ocr-confirm').click();
+ h.change('[data-coordinate="width"]','10');h.change('[data-coordinate="height"]','1');h.change('[data-coordinate="x"]','20');h.change('[data-coordinate="y"]','7');
+ h.$('.ocr-recognize-area').click();await tick();h.$('.ocr-region-text').value='one word';h.$('.ocr-region-text').dispatchEvent(new h.dom.window.Event('input'));
+ h.$('.ocr-attach-area').click();
+ assert.equal(h.$('.ocr-text').value,'Left column\nRight column');assert.match(h.$('.ocr-status').textContent,/only part/);assert.equal(h.$('.ocr-use').disabled,false);
+ h.$('.ocr-close').click();await result;
 });

@@ -89,7 +89,8 @@ try {
   await single.locator('#single-file').setInputFiles(hybrid); await review(single);
   await approve(single,'Checked single document');
   await single.locator('#single-current').waitFor({state:'visible'});
-  assert.match(await single.locator('#single-current').textContent(),/checked OCR/);
+  assert.equal(await single.locator('#single-current').textContent(),'synthetic-hybrid.pdf');
+  await single.locator('.ocr-document img').waitFor({state:'visible'});
   checks.push('forced hybrid PDF single editor');
   const largeCanvas = createCanvas(4001,4000);
   largeCanvas.getContext('2d').fillRect(0,0,4001,4000);
