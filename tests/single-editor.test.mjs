@@ -66,10 +66,28 @@ test('real mode switch opens one CSV, retains work on mode changes and keeps it 
  // while the app cannot determine whether an older draft exists.
  window.confirm=message=>{assert.match(message,/Open .* instead/);return true;};
  const script=new Script(await readFile(new URL('../dist/single-entry.js',import.meta.url),'utf8'),{importModuleDynamically:specifier=>specifier.endsWith('single-session.mjs')?import('../dist/single-session.mjs'):specifier.endsWith('ocr-import.mjs')?import('../dist/ocr-import.mjs'):import('../dist/single-editor.mjs')});script.runInContext(dom.getInternalVMContext());
+ window.HTMLDialogElement.prototype.close=function(){this.open=false;};
+ new Script(await readFile(new URL('../dist/navigation.js',import.meta.url),'utf8')).runInContext(dom.getInternalVMContext());
  document.querySelector('[data-work-mode="single"]').click();assert.equal(document.getElementById('single-workspace').hidden,false);assert.equal(document.getElementById('compare-workspace').hidden,true);
  async function load(name,text){const file={name,size:Buffer.byteLength(text),arrayBuffer:async()=>new TextEncoder().encode(text).buffer},field=document.getElementById('single-file');Object.defineProperty(field,'files',{value:[file],configurable:true});field.dispatchEvent(new window.Event('change'));}
- await load('one.csv','001;10\n002;20');await until(()=>!document.getElementById('single-options').hidden);assert.equal(document.getElementById('single-delimiter').value,';');document.getElementById('single-open').click();await until(()=>document.querySelector('#single-editor-host [data-cell="B2"]'));
+ await load('one.csv','001;10\n002;20');assert.equal(document.getElementById('home-ocr').disabled,true, 'OCR entry is unavailable during import');await until(()=>!document.getElementById('single-options').hidden);assert.equal(document.getElementById('single-delimiter').value,';');document.getElementById('single-open').click();await until(()=>document.querySelector('#single-editor-host [data-cell="B2"]'));
  document.querySelector('[data-side="left"][data-cell="B2"]').click();document.querySelector('[data-edit-side="left"]').value='35';document.querySelector('[data-work-mode="compare"]').click();document.querySelector('[data-work-mode="single"]').click();assert.equal(document.querySelector('[data-edit-side="left"]').value,'35');
+ const host=document.getElementById('single-editor-host'),existingEditor=host.firstChild;
+ document.getElementById('workspace-home').click();
+ document.getElementById('home-left-text').value='Comparison draft';
+ document.getElementById('home-ocr').click();
+ assert.equal(document.getElementById('single-workspace').hidden,false);
+ assert.equal(document.getElementById('single-source-panel').hidden,false);
+ assert.equal(document.getElementById('single-ocr').checked,true);
+ assert.match(document.getElementById('single-intro-copy').textContent,/Improve image/);
+ assert.equal(host.firstChild,existingEditor,'OCR entry preserves the open document and its editing state');
+ assert.equal(document.getElementById('single-current').textContent,'one.csv');
+ assert.equal(document.querySelector('[data-edit-side="left"]').value,'35');
+ document.getElementById('workspace-home').click();
+ assert.equal(document.getElementById('home-left-text').value,'Comparison draft');
+ document.getElementById('header-edit').click();
+ assert.equal(document.getElementById('single-ocr').checked,false,'ordinary editing clears the explicit OCR launch intent');
+ assert.equal(document.getElementById('single-intro-title').textContent,'Edit & export');
  document.querySelector('[data-save-side="left"]').click();await until(()=>downloads.length===1);assert.equal(await downloads[0].text(),'001;10\n002;35');window.confirm=()=>true;
  await load('bad.docx','not a zip');await until(()=>/zip|archive|Word|DOCX/i.test(document.getElementById('single-notice').textContent));assert.ok(document.querySelector('#single-editor-host [data-cell="B2"]'));assert.equal(document.getElementById('single-current').textContent,'one.csv');
  const notice=document.getElementById('single-notice');assert.ok(notice.classList.contains('error'));assert.equal(notice.getAttribute('role'),'alert');

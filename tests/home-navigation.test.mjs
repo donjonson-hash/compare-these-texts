@@ -54,6 +54,26 @@ test('explicit OCR belongs to its staged PDF and follows swaps', async t => {
   assert.equal(p.$('home-right-ocr').checked, false, 'a new PDF defaults to its text layer');
 });
 
+test('OCR entry requests the single source panel and respects an operation veto', t => {
+  const p = page(t);
+  p.paste('left', 'staged original'); p.paste('right', 'staged changed');
+  const requests = [];
+  let blocked = true;
+  p.document.addEventListener('ctt:single-source-mode', event => {
+    requests.push(event.detail.ocr);
+    if (blocked) event.preventDefault();
+  });
+  p.$('home-ocr').click();
+  assert.equal(p.$('start-menu').hidden, false, 'busy single editor may veto navigation');
+  blocked = false; p.$('home-ocr').click();
+  assert.equal(p.$('start-menu').hidden, true);
+  p.$('workspace-home').click();
+  assert.equal(p.$('home-left-text').value, 'staged original');
+  assert.equal(p.$('home-right-text').value, 'staged changed');
+  p.$('header-edit').click();
+  assert.deepEqual(requests, [true, true, false], 'ordinary editing requests normal import intent');
+});
+
 test('fresh Home compares exact pasted text once, then returns without losing either input', async t => {
   const p = page(t);
   assert.equal(p.$('start-menu').hidden, false);
@@ -71,6 +91,7 @@ test('fresh Home compares exact pasted text once, then returns without losing ei
   assert.equal(p.$('home-left-text').disabled, true);
   assert.equal(p.$('home-right-file').disabled, true);
   assert.equal(p.$('header-edit').disabled, true);
+  assert.equal(p.$('home-ocr').disabled, true);
   assert.equal(await p.commands[0].files.left.text(), a);
   assert.equal(await p.commands[0].files.right.text(), b);
   assert.equal(p.commands[0].files.left.name, 'original-text.txt');
