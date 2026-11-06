@@ -15,6 +15,7 @@
   function hasInput(side) { return !!files[side] || $('home-' + side + '-text').value.length > 0; }
   function controls() {
     start.disabled = pending || !sides.every(hasInput);
+    $('home-ocr').disabled = pending || $('single-file').disabled;
     start.textContent = pending ? 'Opening documents…' : sides.some(side => files[side]) ? 'Compare documents →' : 'Compare texts →';
     compare.disabled = edit.disabled = home.disabled = $('header-edit').disabled = $('home-example').disabled = $('home-swap').disabled = pending;
     for (const side of sides) {
@@ -103,7 +104,14 @@
   document.querySelector('[data-home-link]').addEventListener('click', showHome);
   compare.addEventListener('click', () => open('compare'));
   edit.addEventListener('click', () => open('single'));
-  $('header-edit').addEventListener('click', () => open('single'));
+  function openSingleSource(ocr) {
+    if (pending || !document.dispatchEvent(new CustomEvent('ctt:single-source-mode', {cancelable:true, detail:{ocr}}))) return;
+    open('single');
+    if (ocr) $('single-file').focus({preventScroll:true});
+  }
+  $('home-ocr').addEventListener('click', () => openSingleSource(true));
+  $('header-edit').addEventListener('click', () => openSingleSource(false));
+  document.addEventListener('ctt:single-controls', controls);
   $('home-help-open').addEventListener('click', () => help.showModal());
   $('home-help-close').addEventListener('click', () => help.close());
   for (const button of modes) button.addEventListener('click', leaveHome);

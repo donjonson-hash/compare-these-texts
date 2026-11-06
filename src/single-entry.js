@@ -2,7 +2,7 @@
 (() => {
  const $=id=>document.getElementById(id),moduleURL=new URL('single-editor.mjs',document.currentScript.src),sessionURL=new URL('single-session.mjs',document.currentScript.src);
  const ocrImportURL=new URL('ocr-import.mjs',document.currentScript.src);
- let controller=null,view=null,generation=0,candidate=null,busy=false,operating=false,session=null;
+ let controller=null,view=null,generation=0,candidate=null,busy=false,operating=false,session=null,ocrEntry=false;
  const note=(text,error=false)=>{const notice=$('single-notice');notice.classList.toggle('error',error);notice.setAttribute('role',error?'alert':'status');notice.setAttribute('aria-live',error?'assertive':'polite');notice.textContent=text;notice.hidden=!text;};
  function chooseMode(next){
   document.body.classList.toggle('single-mode',next==='single');$('single-workspace').hidden=next!=='single';$('compare-workspace').hidden=next!=='compare';
@@ -20,7 +20,7 @@
   const target=open?$('single-file'):$('single-current');target.focus({preventScroll:true});target.scrollIntoView?.({block:'center'});
  });
  $('single-new-document').addEventListener('click',()=>{if(!busy&&!operating)$('single-file').click();});
- function controls(){ $('single-new-document').disabled=$('single-source-toggle').disabled=busy||operating;$('single-open').disabled=$('single-file').disabled=$('single-ocr').disabled=busy||operating;if($('single-paste-open'))$('single-paste-open').disabled=busy||operating;$('single-editor-host').inert=busy||operating; }
+ function controls(){ $('single-new-document').disabled=$('single-source-toggle').disabled=busy||operating;$('single-open').disabled=$('single-file').disabled=$('single-ocr').disabled=busy||operating;if($('single-paste-open'))$('single-paste-open').disabled=busy||operating;$('single-editor-host').inert=busy||operating;document.dispatchEvent(new Event('ctt:single-controls')); }
  function setBusy(value){busy=value;session?.setBusy(value);controls();}
  function closeDocument(){
   generation++;controller?.abort();view?.dispose();controller=null;view=null;candidate=null;
@@ -31,6 +31,15 @@
   onOperating:value=>{operating=value;if(value)generation++;controls();if(!value&&!view)$('single-file').focus({preventScroll:true});}
  })).then(ui=>{session=ui;session.setBusy(busy);return ui;}).catch(()=>{note('Automatic saving is unavailable. Download your edits before closing this tab.',true);return null;});
  document.querySelectorAll('[data-work-mode]').forEach(button=>button.addEventListener('click',()=>chooseMode(button.dataset.workMode)));
+ document.addEventListener('ctt:single-source-mode',event=>{
+  if(busy||operating){event.preventDefault();return;}
+  const ocr=!!event.detail.ocr;
+  if(ocr||ocrEntry)$('single-ocr').checked=ocr;
+  ocrEntry=ocr;
+  $('single-intro-title').textContent=ocr?'Recognize text (OCR)':'Edit & export';
+  $('single-intro-copy').textContent=ocr?'Choose a PNG, JPEG or PDF. Preview the scan, use Improve image if needed, then recognize and check the text.':'Open a document. Edit text or fill in PDF blanks. Download or print your PDF.';
+  if(ocr)sourcePanel(true);
+ });
  async function install(payload,resuming=false){
   const ticket=++generation,abort=new AbortController(),stage=document.createElement('div');let next;setBusy(true);note(resuming?'Restoring your document…':'Opening your document…');
   try{
