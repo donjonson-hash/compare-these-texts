@@ -81,7 +81,7 @@ async function exercise(context, base, mode) {
   const checks = run.checks;
   await uploadPair('rus-paragraphs-a.png','rus-paragraphs-b.png');
   await modalReady();
-  const preview = modal().locator('img');
+  const preview = modal().locator('.ocr-review-original img');
   await page.waitForFunction(() => document.querySelector('.ocr-review-original img')?.naturalWidth > 0);
   assert.ok(await preview.isVisible());
   const [originalBounds, textBounds] = await Promise.all([preview.boundingBox(), modal().locator('.ocr-text').boundingBox()]);
@@ -91,6 +91,46 @@ async function exercise(context, base, mode) {
   assert.equal(await page.locator('#results').isHidden(),true,'unchecked OCR must not open comparison');
   const a = await recognize('rus+eng'); assert.match(a,/Заказчик/); assert.match(a,/15 ноября/);
   assert.equal(await modal().locator('.ocr-text').evaluate(element => element.translate),false);
+  // Exercise the real module worker and real OCR without silently adopting either.
+  const checkedText = a + '\nManual correction before image improvement.';
+  await modal().locator('.ocr-text').fill(checkedText);
+  await modal().locator('.ocr-confirm').click();
+  const openEnhancement = async () => {
+    await modal().locator('.ocr-improve').click();
+    await page.waitForFunction(() => !document.querySelector('.ocr-enhance-recognize').disabled, null, {timeout:60000});
+    const images = modal().locator('.ocr-enhancement-images img');
+    assert.equal(await images.count(), 2);
+    const dimensions = await images.evaluateAll(items => items.map(img => [img.naturalWidth, img.naturalHeight]));
+    assert.ok(dimensions[0][0] > 0);
+    assert.deepEqual(dimensions[0], dimensions[1], 'processing preserves image dimensions');
+    assert.equal(await modal().locator('.ocr-text').inputValue(), checkedText);
+    return images;
+  };
+  const images = await openEnhancement();
+  assert.equal(await modal().locator('.ocr-enhancement-result').isHidden(), true, 'preparing a preview does not run OCR');
+  const bounds = await images.evaluateAll(items => items.map(img => { const r = img.getBoundingClientRect(); return {x:r.x, width:r.width}; }));
+  assert.ok(bounds[0].x + bounds[0].width <= bounds[1].x, 'desktop previews sit side by side');
+  await page.screenshot({path:path.join(output,`${mode}-image-improvement-desktop.png`)});
+  await page.setViewportSize({width:390,height:844});
+  assert.equal(await modal().evaluate(el => el.scrollWidth <= el.clientWidth + 1), true, 'mobile preview has no horizontal overflow');
+  await page.screenshot({path:path.join(output,`${mode}-image-improvement-mobile.png`)});
+  await page.keyboard.press('Escape');
+  assert.equal(await modal().isVisible(), true, 'Escape exits preview before closing review');
+  assert.equal(await modal().locator('.ocr-text').inputValue(), checkedText);
+  assert.equal(await modal().locator('.ocr-use').isEnabled(), true, 'discarding preview preserves approval');
+  await page.setViewportSize(contextOptions.viewport);
+  await openEnhancement();
+  await modal().locator('.ocr-enhance-recognize').click();
+  await modal().locator('.ocr-enhance-apply').waitFor({state:'visible', timeout:120000});
+  await page.waitForFunction(() => !document.querySelector('.ocr-enhance-apply').disabled, null, {timeout:120000});
+  assert.match(await modal().locator('.ocr-enhanced-text').inputValue(), /Заказчик/);
+  assert.equal(await modal().locator('.ocr-text').inputValue(), checkedText, 'new OCR remains staged');
+  await modal().locator('.ocr-enhanced-text').fill(a);
+  await modal().locator('.ocr-enhance-apply').click();
+  assert.equal(await modal().locator('.ocr-enhancement-preview').isHidden(), true);
+  assert.equal(await modal().locator('.ocr-text').inputValue(), a, 'explicit adoption uses edited draft');
+  assert.equal(await modal().locator('.ocr-use').isDisabled(), true, 'adoption revokes old approval');
+  checks.push('real image worker; same-size original/improved previews; mobile layout; Escape preserves checked text and approval; improved OCR remains staged until explicit adoption');
   await modal().locator('.ocr-select-area').click();
   const rect = await preview.evaluate(img => {
     const r = img.getBoundingClientRect(), scale = Math.min(r.width / img.naturalWidth, r.height / img.naturalHeight);

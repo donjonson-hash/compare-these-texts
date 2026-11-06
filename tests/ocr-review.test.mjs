@@ -7,11 +7,11 @@ import {validateCheckedText} from '../src/ocr-import.mjs';
 
 const tick = () => new Promise(resolve => setImmediate(resolve));
 const deferred = () => { let resolve; const promise = new Promise(done => { resolve = done; }); return {promise, resolve}; };
-async function harness(t, {texts = ['Page one', 'Page two'], makeWorker, loadPage} = {}) {
+async function harness(t, {texts = ['Page one', 'Page two'], makeWorker, loadPage, enhanceImage} = {}) {
   const dom = new JSDOM('<button id="before">Upload</button>', {runScripts: 'outside-only'});
-  const context = dom.getInternalVMContext(), destroyed = [], revoked = [], languages = [], pageCalls = [], workerOptions = [];
+  const context = dom.getInternalVMContext(), destroyed = [], revoked = [], languages = [], pageCalls = [], workerOptions = [], enhancements = [], recognitionInputs = [];
   dom.window.TextEncoder = TextEncoder;
-  dom.window.URL.createObjectURL = () => 'blob:local-image';
+  let nextUrl = 0; dom.window.URL.createObjectURL = () => 'blob:local-image-' + ++nextUrl;
   dom.window.URL.revokeObjectURL = url => revoked.push(url);
   dom.window.HTMLDialogElement.prototype.showModal = function() { this.open = true; };
   dom.window.HTMLDialogElement.prototype.close = function() { this.open = false; this.dispatchEvent(new dom.window.Event('close')); };
@@ -20,18 +20,19 @@ async function harness(t, {texts = ['Page one', 'Page two'], makeWorker, loadPag
     page: async (n, options) => { pageCalls.push({n, options}); if (loadPage) await loadPage(n, options); return {blob: {}, text: texts[n - 1], hasText: Boolean(texts[n - 1].trim())}; },
   })); }, {context});
   const runtime = new vm.SyntheticModule(['makeWorker'], function() { this.setExport('makeWorker', async (lang, logger, options) => {
-    languages.push(lang); workerOptions.push(options); return makeWorker ? makeWorker(options) : {recognize: async () => ({data: {text: 'Recognized Russian Я'}}), terminate: async () => {}};
+    languages.push(lang); workerOptions.push(options); return makeWorker ? makeWorker(options) : {recognize: async input => { recognitionInputs.push(input); return {data: {text: 'Recognized Russian Я'}}; }, terminate: async () => {}};
   }); }, {context});
   const module = new vm.SourceTextModule(readFileSync(new URL('../src/ocr-review.mjs', import.meta.url), 'utf8'), {context});
   const validator = new vm.SyntheticModule(['validateCheckedText'], function() { this.setExport('validateCheckedText', validateCheckedText); }, {context});
   const imageInput = new vm.SyntheticModule(['validateOcrImage'], function() { this.setExport('validateOcrImage', async () => ({})); }, {context});
-  await module.link(specifier => specifier.includes('pdf-input') ? pdf : specifier.includes('ocr-import') ? validator : specifier.includes('image-input') ? imageInput : runtime); await module.evaluate();
+  const enhancement = new vm.SyntheticModule(['enhanceOcrImage'], function() { this.setExport('enhanceOcrImage', async (blob, options) => { enhancements.push({blob, options}); return enhanceImage ? enhanceImage(blob, options) : {blob: {enhanced: true}, width: 100, height: 100}; }); }, {context});
+  await module.link(specifier => specifier.includes('ocr-enhance') ? enhancement : specifier.includes('pdf-input') ? pdf : specifier.includes('ocr-import') ? validator : specifier.includes('image-input') ? imageInput : runtime); await module.evaluate();
   t.after(() => dom.window.close());
   const file = {name: 'scan.pdf', type: 'application/pdf', size: 100};
   const open = async options => { const result = module.namespace.reviewOcrFile(file, options); await tick(); return {result}; };
   const $ = selector => dom.window.document.querySelector(selector);
   const change = (selector, value) => { $(selector).value = value; $(selector).dispatchEvent(new dom.window.Event('change')); };
-  return {dom, module, open, $, change, languages, destroyed, revoked, pageCalls, workerOptions};
+  return {dom, module, open, $, change, languages, destroyed, revoked, pageCalls, workerOptions, enhancements, recognitionInputs};
 }
 
 test('review gate requires every page and editing revokes approval without losing another page', async t => {
@@ -204,5 +205,162 @@ test('invalid coordinates retain area edits for correction or page return, while
   h.change('.ocr-page-select', '1'); await tick(); h.change('.ocr-page-select', '0'); await tick();
   assert.equal(h.$('.ocr-region-result').hidden, true);
   assert.equal(h.$('.ocr-region-text').value, '');
+  h.$('.ocr-close').click(); await result;
+});
+
+test('image improvement previews both images without OCR or changing approved text', async t => {
+  const h = await harness(t, {texts: ['Already checked']}), {result} = await h.open();
+  h.$('.ocr-confirm').click();
+  const originalUrl = h.$('.ocr-review-original img').src;
+  h.$('.ocr-improve').click(); await tick();
+  assert.equal(h.enhancements.length, 1);
+  assert.equal(h.languages.length, 0, 'preview must not start recognition');
+  assert.equal(h.$('.ocr-text').value, 'Already checked');
+  assert.equal(h.$('.ocr-enhancement-preview').hidden, false);
+  assert.equal(h.dom.window.document.querySelectorAll('.ocr-enhancement-images img').length, 2);
+  assert.equal(h.$('.ocr-enhance-recognize').disabled, false);
+  assert.equal(h.$('.ocr-page-select').disabled, true);
+  assert.equal(h.$('.ocr-review-columns').hidden, true);
+  assert.equal(h.$('.ocr-enhancement-result').hidden, true);
+  h.$('.ocr-enhance-discard').click(); await tick();
+  assert.equal(h.$('.ocr-review-original img').src, originalUrl);
+  assert.equal(h.dom.window.document.querySelectorAll('dialog img').length, 1);
+  assert.equal(h.$('.ocr-use').disabled, false, 'discard must retain prior approval');
+  assert.ok(!h.revoked.includes(originalUrl), 'original remains usable after discard');
+  assert.equal(h.revoked.length, 1, 'processed preview URL released');
+  h.$('.ocr-close').click(); assert.equal(await result, null);
+});
+
+test('enhanced OCR is a draft until explicit application and uses the processed pixels', async t => {
+  const h = await harness(t, {texts: ['Original checked text']}), {result} = await h.open();
+  h.change('.ocr-language', 'rus+eng'); h.$('.ocr-confirm').click();
+  h.$('.ocr-improve').click(); await tick(); h.$('.ocr-enhance-recognize').click(); await tick();
+  assert.equal(h.languages.at(-1), 'rus+eng');
+  assert.equal(h.recognitionInputs.at(-1).enhanced, true);
+  assert.equal(h.$('.ocr-text').value, 'Original checked text');
+  assert.equal(h.$('.ocr-enhanced-text').value, 'Recognized Russian Я');
+  h.$('.ocr-enhanced-text').value = 'Manually checked new text';
+  h.$('.ocr-enhanced-text').dispatchEvent(new h.dom.window.Event('input'));
+  h.$('.ocr-enhance-apply').click();
+  assert.equal(h.$('.ocr-text').value, 'Manually checked new text');
+  assert.equal(h.$('.ocr-enhancement-preview').hidden, true);
+  assert.equal(h.$('.ocr-use').disabled, true, 'applied text needs fresh confirmation');
+  h.$('.ocr-confirm').click(); h.$('.ocr-use').click();
+  const checked = await result;
+  assert.equal(checked.text, 'Manually checked new text');
+  assert.equal(checked.pages[0].source, 'ocr');
+});
+
+test('stopping preview generation ignores late image and preserves approval', async t => {
+  const pending = deferred();
+  const h = await harness(t, {texts: ['Keep'], enhanceImage: () => pending.promise}), {result} = await h.open();
+  h.$('.ocr-confirm').click(); h.$('.ocr-improve').click(); await tick();
+  h.$('.ocr-enhance-stop').click(); await tick();
+  assert.equal(h.enhancements[0].options.signal.aborted, true);
+  assert.equal(h.$('.ocr-enhance-prepare').disabled, false);
+  pending.resolve({blob: {late: true}, width: 100, height: 100}); await tick();
+  assert.equal(h.$('.ocr-enhance-recognize').disabled, true);
+  assert.equal(h.$('.ocr-text').value, 'Keep');
+  h.$('.ocr-enhance-discard').click(); assert.equal(h.$('.ocr-use').disabled, false);
+  h.$('.ocr-close').click(); await result;
+});
+
+test('failed enhancement and failed retry recognition keep checked text and edited candidate', async t => {
+  let failImage = true, failOcr = false;
+  const h = await harness(t, {texts: ['Checked'], enhanceImage: async () => {
+    if (failImage) throw new Error('image failure'); return {blob: {}, width: 100, height: 100};
+  }, makeWorker: async () => ({recognize: async () => {
+    if (failOcr) throw new Error('OCR failure'); return {data: {text: 'Candidate'}};
+  }, terminate: async () => {}})}), {result} = await h.open();
+  h.$('.ocr-confirm').click(); h.$('.ocr-improve').click(); await tick();
+  assert.match(h.$('.ocr-enhancement-status').textContent, /image failure/);
+  assert.equal(h.$('.ocr-text').value, 'Checked');
+  failImage = false; h.$('.ocr-enhance-prepare').click(); await tick();
+  h.$('.ocr-enhance-recognize').click(); await tick();
+  h.$('.ocr-enhanced-text').value = 'Edited candidate';
+  h.$('.ocr-enhanced-text').dispatchEvent(new h.dom.window.Event('input'));
+  failOcr = true; h.$('.ocr-enhance-recognize').click(); await tick();
+  assert.match(h.$('.ocr-enhancement-status').textContent, /OCR failure/);
+  assert.equal(h.$('.ocr-enhanced-text').value, 'Edited candidate');
+  h.$('.ocr-enhance-discard').click(); assert.equal(h.$('.ocr-use').disabled, false);
+  h.$('.ocr-improve').click(); await tick();
+  assert.equal(h.$('.ocr-enhanced-text').value, 'Edited candidate');
+  h.$('.ocr-close').click(); await result;
+});
+
+test('back during enhanced recognition rejects a late OCR result', async t => {
+  const pending = deferred(); let terminated = 0;
+  const h = await harness(t, {texts: ['Keep checked'], makeWorker: async () => ({
+    recognize: () => pending.promise, terminate: async () => { terminated++; },
+  })}), {result} = await h.open();
+  h.$('.ocr-confirm').click(); h.$('.ocr-improve').click(); await tick();
+  h.$('.ocr-enhance-recognize').click(); await tick();
+  h.$('.ocr-enhance-discard').click(); await tick();
+  assert.equal(terminated, 1); assert.equal(h.workerOptions.at(-1).signal.aborted, true);
+  pending.resolve({data: {text: 'Late replacement'}}); await tick();
+  assert.equal(h.$('.ocr-text').value, 'Keep checked');
+  assert.equal(h.$('.ocr-use').disabled, false);
+  assert.equal(h.$('.ocr-enhancement-result').hidden, true);
+  h.$('.ocr-close').click(); await result;
+});
+
+test('enhanced drafts belong to their page and survive returning to that page', async t => {
+  const h = await harness(t), {result} = await h.open();
+  h.$('.ocr-improve').click(); await tick(); h.$('.ocr-enhance-recognize').click(); await tick();
+  h.$('.ocr-enhanced-text').value = 'Page one draft'; h.$('.ocr-enhanced-text').dispatchEvent(new h.dom.window.Event('input'));
+  h.$('.ocr-enhance-discard').click(); h.change('.ocr-page-select', '1'); await tick();
+  h.$('.ocr-improve').click(); await tick();
+  assert.equal(h.$('.ocr-enhancement-result').hidden, true, 'page two must not receive page one draft');
+  assert.equal(h.$('.ocr-text').value, 'Page two');
+  h.$('.ocr-enhance-discard').click(); h.change('.ocr-page-select', '0'); await tick();
+  h.$('.ocr-improve').click(); await tick();
+  assert.equal(h.$('.ocr-enhanced-text').value, 'Page one draft');
+  assert.equal(h.languages.length, 1, 'reopening preview does not rerun OCR');
+  h.$('.ocr-close').click(); await result;
+});
+
+test('Escape returns from image preview before closing document review', async t => {
+  const h = await harness(t, {texts: ['Checked']}), {result} = await h.open();
+  h.$('.ocr-confirm').click(); h.$('.ocr-improve').click(); await tick();
+  h.$('dialog').dispatchEvent(new h.dom.window.Event('cancel', {cancelable: true}));
+  assert.ok(h.$('dialog')); assert.equal(h.$('.ocr-enhancement-preview').hidden, true);
+  assert.equal(h.$('.ocr-use').disabled, false);
+  assert.equal(h.dom.window.document.activeElement, h.$('.ocr-improve'));
+  h.$('dialog').dispatchEvent(new h.dom.window.Event('cancel', {cancelable: true}));
+  assert.equal(await result, null); assert.equal(h.$('dialog'), null);
+});
+
+test('closing while enhanced OCR initializes terminates the late worker without recognition', async t => {
+  const pending = deferred(); let recognized = 0, terminated = 0;
+  const h = await harness(t, {makeWorker: () => pending.promise}), {result} = await h.open();
+  h.$('.ocr-improve').click(); await tick(); h.$('.ocr-enhance-recognize').click(); await tick();
+  h.$('.ocr-close').click(); assert.equal(await result, null);
+  pending.resolve({recognize: async () => { recognized++; }, terminate: async () => { terminated++; }}); await tick();
+  assert.equal(recognized, 0); assert.equal(terminated, 1);
+});
+
+test('an undecodable processed preview cannot be sent to OCR', async t => {
+  const h = await harness(t, {texts: ['Checked']}), {result} = await h.open();
+  h.dom.window.HTMLImageElement.prototype.decode = async function() { throw new Error('preview decode failed'); };
+  h.$('.ocr-confirm').click(); h.$('.ocr-improve').click(); await tick();
+  assert.match(h.$('.ocr-enhancement-status').textContent, /preview decode failed/);
+  assert.equal(h.$('.ocr-enhance-recognize').disabled, true);
+  assert.equal(h.$('.ocr-enhance-prepare').disabled, false);
+  assert.equal(h.languages.length, 0);
+  h.$('.ocr-enhance-discard').click(); assert.equal(h.$('.ocr-use').disabled, false);
+  h.$('.ocr-close').click(); await result;
+});
+
+test('Stop while processed image decodes cannot enable recognition from a stale preview', async t => {
+  const pending = deferred();
+  const h = await harness(t, {texts: ['Checked']}), {result} = await h.open();
+  h.dom.window.HTMLImageElement.prototype.decode = () => pending.promise;
+  h.$('.ocr-confirm').click(); h.$('.ocr-improve').click(); await tick();
+  h.$('.ocr-enhance-stop').click(); await tick();
+  assert.equal(h.$('.ocr-enhance-recognize').disabled, true);
+  assert.equal(h.$('.ocr-enhance-prepare').disabled, false);
+  pending.resolve(); await tick();
+  assert.equal(h.$('.ocr-enhance-recognize').disabled, true);
+  h.$('.ocr-enhance-discard').click(); assert.equal(h.$('.ocr-use').disabled, false);
   h.$('.ocr-close').click(); await result;
 });

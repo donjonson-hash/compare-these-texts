@@ -2,6 +2,7 @@ import {openPdf} from './ocr-pdf-input.mjs';
 import {makeWorker} from './ocr-runtime.mjs';
 import {validateOcrImage} from './ocr-image-input.mjs';
 import {validateCheckedText} from './ocr-import.mjs';
+import {enhanceOcrImage} from './ocr-enhance.mjs';
 
 const preferences = new Map();
 const storageKey = side => 'ctt.ocr.preferences.' + side;
@@ -71,7 +72,8 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
   const selectArea = button('Select area'), clearArea = button('Clear area');
   selectArea.classList.add('ocr-select-area'); selectArea.setAttribute('aria-pressed', 'false');
   clearArea.classList.add('ocr-clear-area');
-  const areaTools = el('div', undefined, 'ocr-review-options'); areaTools.append(selectArea, clearArea);
+  const improve = button('Improve image'); improve.classList.add('ocr-improve');
+  const areaTools = el('div', undefined, 'ocr-review-options'); areaTools.append(improve, selectArea, clearArea);
   const coordinates = el('details'), coordinateFields = [];
   coordinates.append(el('summary', 'Area coordinates (%)'));
   for (const [key, label] of [['x', 'Left'], ['y', 'Top'], ['width', 'Width'], ['height', 'Height']]) {
@@ -103,27 +105,50 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
   editing.append(regionPanel);
   columns.append(original, editing);
   const footer = el('footer', undefined, 'ocr-review-footer'), summary = el('span'), use = button('Use checked text', 'primary'); use.classList.add('ocr-use'); footer.append(summary, use);
-  dialog.append(header, filename, hint, nav, pdfNote, columns, footer); document.body.append(dialog);
+  const enhancementPanel = el('section', undefined, 'ocr-enhancement-preview'); enhancementPanel.hidden = true;
+  const enhancementHeading = el('h3', 'Preview improved image'); enhancementHeading.tabIndex = -1;
+  const enhancementHint = el('p', 'Compare both images before recognizing. Processing can change small marks and digits. The original and your checked text stay available.');
+  const enhancementImages = el('div', undefined, 'ocr-enhancement-images');
+  const enhancementOptions = el('div', undefined, 'ocr-review-options');
+  const enhancementPrepare = button('Prepare preview again'); enhancementPrepare.classList.add('ocr-enhance-prepare');
+  const enhancementRecognize = button('Recognize improved image', 'primary'); enhancementRecognize.classList.add('ocr-enhance-recognize');
+  const enhancementStop = button('Stop'); enhancementStop.classList.add('ocr-enhance-stop');
+  const enhancementBack = button('Back to original'); enhancementBack.classList.add('ocr-enhance-discard');
+  enhancementOptions.append(enhancementPrepare, enhancementRecognize, enhancementStop, enhancementBack);
+  const enhancementStatus = el('p', '', 'ocr-enhancement-status'); enhancementStatus.setAttribute('role', 'status');
+  const enhancementResult = el('div', undefined, 'ocr-enhancement-result'); enhancementResult.hidden = true;
+  const enhancedText = el('textarea'); enhancedText.className = 'ocr-enhanced-text'; enhancedText.setAttribute('aria-label', 'Improved image recognized text'); enhancedText.setAttribute('translate', 'no'); enhancedText.setAttribute('spellcheck', 'false'); enhancedText.setAttribute('autocorrect', 'off'); enhancedText.setAttribute('autocapitalize', 'off'); enhancedText.maxLength = MAX_CHARS;
+  const enhancementApply = button('Use this text for page', 'primary'); enhancementApply.classList.add('ocr-enhance-apply');
+  enhancementResult.append(el('p', 'Check this new text against the original. Using it will replace this page’s checked text and require confirmation again.'), enhancedText, enhancementApply);
+  enhancementPanel.append(enhancementHeading, enhancementHint, enhancementImages, enhancementOptions, enhancementStatus, enhancementResult);
+  dialog.append(header, filename, hint, nav, pdfNote, enhancementPanel, columns, footer); document.body.append(dialog);
   language.value = prefs.language; layout.value = prefs.psm;
   const lifecycle = new AbortController();
   let closed = false, busy = true, ready = false, generation = 0, worker = null, doc = null, previewBlob = null, url = null, index = 0, pages = [], operation = null;
   let region = null, selecting = false, dragStart = null;
+  let enhancementOpen = false, enhancementReady = false, enhancedBlob = null, enhancedUrl = null, enhancedImage = null, enhancedFull = null;
   let resolveResult;
   const result = new Promise(resolve => { resolveResult = resolve; });
   const current = () => pages[index];
-  const say = message => { status.textContent = message; };
+  const say = message => { status.textContent = message; if (enhancementOpen) enhancementStatus.textContent = message; };
   const makePage = () => ({text: '', loaded: false, confirmed: false, blank: false, source: 'unread', language: prefs.language, psm: prefs.psm});
   function controls() {
     const page = current(), confirmed = pages.filter(p => p.confirmed).length;
-    recognize.disabled = !ready || busy; stopButton.disabled = !busy;
-    recognizeArea.disabled = !ready || busy || !region;
-    selectArea.disabled = clearArea.disabled = !ready || busy;
-    coordinateFields.forEach(field => { field.disabled = !ready || busy; });
-    regionText.disabled = busy; applyArea.disabled = busy || regionPanel.hidden || !regionText.value.trim();
-    text.disabled = !ready || busy; blank.disabled = !ready || busy || Boolean(page?.text.trim());
-    confirm.disabled = !ready || busy || !(page?.text.trim() || page?.blank);
-    language.disabled = layout.disabled = busy; pageSelect.disabled = busy; reload.disabled = busy || !pages.length;
-    use.disabled = busy || !pages.length || pages.some(p => !p.confirmed);
+    recognize.disabled = !ready || busy || enhancementOpen; stopButton.disabled = !busy;
+    improve.disabled = !ready || busy || enhancementOpen;
+    recognizeArea.disabled = !ready || busy || enhancementOpen || !region;
+    selectArea.disabled = clearArea.disabled = !ready || busy || enhancementOpen;
+    coordinateFields.forEach(field => { field.disabled = !ready || busy || enhancementOpen; });
+    regionText.disabled = busy || enhancementOpen; applyArea.disabled = busy || enhancementOpen || regionPanel.hidden || !regionText.value.trim();
+    text.disabled = !ready || busy || enhancementOpen; blank.disabled = !ready || busy || enhancementOpen || Boolean(page?.text.trim());
+    confirm.disabled = !ready || busy || enhancementOpen || !(page?.text.trim() || page?.blank);
+    language.disabled = layout.disabled = busy || enhancementOpen; pageSelect.disabled = busy || enhancementOpen; reload.disabled = busy || enhancementOpen || !pages.length;
+    use.disabled = busy || enhancementOpen || !pages.length || pages.some(p => !p.confirmed);
+    columns.hidden = footer.hidden = enhancementOpen; nav.hidden = !isPdf || enhancementOpen;
+    enhancementPanel.hidden = !enhancementOpen;
+    enhancementPrepare.hidden = Boolean(enhancedBlob); enhancementPrepare.disabled = busy;
+    enhancementRecognize.disabled = busy || !enhancedBlob || !enhancementReady; enhancementStop.disabled = !busy;
+    enhancedText.disabled = busy; enhancementApply.disabled = busy || enhancementResult.hidden || !enhancedText.value.trim();
     summary.textContent = `${confirmed} of ${pages.length} pages checked`;
     count.textContent = pages.length ? `${index + 1} / ${pages.length}` : '';
     [...pageSelect.options].forEach((option, i) => { option.textContent = `${i + 1}${pages[i].confirmed ? ' — checked' : ''}`; });
@@ -228,8 +253,115 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
       } finally { canvas.width = canvas.height = 0; }
     } finally { bitmap.close(); }
   }
+  function clearProcessedEnhancement() {
+    if (enhancedUrl) URL.revokeObjectURL(enhancedUrl);
+    enhancedBlob = enhancedUrl = null; enhancementReady = false;
+    if (enhancedImage) { enhancedImage.hidden = true; enhancedImage.removeAttribute('src'); }
+    if (enhancedFull) { enhancedFull.hidden = true; enhancedFull.removeAttribute('href'); }
+  }
+  function clearEnhancement() {
+    clearProcessedEnhancement(); enhancedImage = enhancedFull = null;
+    enhancementOpen = false; enhancementImages.replaceChildren();
+    enhancementResult.hidden = true; enhancedText.value = ''; enhancementStatus.textContent = '';
+  }
+  function rememberEnhancedDraft() {
+    if (enhancementOpen && current() && !enhancementResult.hidden) {
+      current().enhancedDraft = {...current().enhancedDraft, text: enhancedText.value};
+    }
+  }
+  function leaveEnhancement(message = 'Original image restored. Your checked text is unchanged.') {
+    if (!enhancementOpen || closed) return;
+    rememberEnhancedDraft(); void stop(); clearEnhancement(); controls(); drawRegion(); say(message); improve.focus();
+  }
+  function addEnhancementImages() {
+    const originalFigure = el('figure'), enhancedFigure = el('figure');
+    const originalImage = el('img'); originalImage.alt = 'Original page before image improvement'; originalImage.src = url;
+    const originalFull = el('a', 'Open original full size'); originalFull.href = url; originalFull.target = '_blank'; originalFull.rel = 'noopener';
+    enhancedImage = el('img'); enhancedImage.alt = 'Improved page preview'; enhancedImage.hidden = true;
+    enhancedFull = el('a', 'Open improved image full size'); enhancedFull.target = '_blank'; enhancedFull.rel = 'noopener'; enhancedFull.hidden = true;
+    originalFigure.append(el('figcaption', 'Original'), originalImage, originalFull);
+    enhancedFigure.append(el('figcaption', 'Improved preview'), enhancedImage, enhancedFull);
+    enhancementImages.replaceChildren(originalFigure, enhancedFigure);
+  }
+  async function prepareEnhancement() {
+    if (!ready || busy || closed || !enhancementOpen || enhancedBlob) return;
+    busy = true; const ticket = ++generation; operation = new AbortController(); const operationSignal = operation.signal;
+    controls(); say('Preparing image preview…');
+    try {
+      const enhanced = await enhanceOcrImage(previewBlob, {signal: operationSignal});
+      if (closed || ticket !== generation || !enhancementOpen) return;
+      enhancedBlob = enhanced.blob; enhancedUrl = URL.createObjectURL(enhancedBlob);
+      enhancedImage.src = enhancedFull.href = enhancedUrl; enhancedImage.hidden = enhancedFull.hidden = false;
+      // Recognition stays disabled until the browser can actually display the preview.
+      if (typeof enhancedImage.decode === 'function') await enhancedImage.decode();
+      if (closed || ticket !== generation || !enhancementOpen) return;
+      enhancementReady = true;
+      say('Preview ready. Compare both images, then choose whether to recognize the improved image.');
+    } catch (error) {
+      if (!closed && ticket === generation && enhancementOpen) {
+        clearProcessedEnhancement();
+        say(`Could not improve image: ${error.message}. Your checked text is unchanged.`);
+      }
+    } finally {
+      if (!closed && ticket === generation) { busy = false; operation = null; controls(); }
+    }
+  }
+  improve.addEventListener('click', () => {
+    if (!ready || busy || closed || enhancementOpen) return;
+    rememberRegion(); selecting = false; dragStart = null; stage.classList.remove('selecting'); selectArea.setAttribute('aria-pressed', 'false');
+    enhancementOpen = true; addEnhancementImages();
+    const draft = current().enhancedDraft;
+    enhancementResult.hidden = !draft; enhancedText.value = draft?.text || '';
+    controls(); enhancementHeading.focus(); void prepareEnhancement();
+  });
+  enhancementPrepare.addEventListener('click', () => void prepareEnhancement());
+  enhancementBack.addEventListener('click', () => leaveEnhancement());
+  enhancedText.addEventListener('input', () => { rememberEnhancedDraft(); controls(); });
+  enhancementStop.addEventListener('click', async () => {
+    if (!enhancementOpen || !busy) return;
+    const pending = stop(), ticket = generation;
+    if (!enhancementReady) clearProcessedEnhancement();
+    controls();
+    say('Stopped. Your checked text and any saved draft are unchanged.');
+    await pending; if (!closed && ticket === generation) controls();
+  });
+  enhancementRecognize.addEventListener('click', async () => {
+    if (!enhancementOpen || !enhancedBlob || !enhancementReady || busy || closed) return;
+    rememberEnhancedDraft(); busy = true; const ticket = ++generation, page = current(), input = enhancedBlob;
+    operation = new AbortController(); const operationSignal = operation.signal;
+    controls(); say('Recognizing the improved image…');
+    try {
+      const nextWorker = await makeWorker(page.language, message => {
+        if (!closed && ticket === generation && enhancementOpen) say(`${message.status} ${Math.round((message.progress || 0) * 100)}%`);
+      }, {psm: page.psm, signal: operationSignal});
+      if (closed || ticket !== generation || !enhancementOpen) { await nextWorker.terminate(); return; }
+      worker = nextWorker; const {data} = await worker.recognize(input);
+      if (closed || ticket !== generation || !enhancementOpen) return;
+      if (typeof data.text !== 'string' || data.text.length > MAX_CHARS) throw new Error('Recognized page exceeds 500000 characters. Use a smaller document.');
+      page.enhancedDraft = {text: data.text, language: page.language, psm: page.psm};
+      enhancedText.value = data.text; enhancementResult.hidden = false;
+      say('New text is ready for review. Your checked page text has not changed.');
+    } catch (error) {
+      if (!closed && ticket === generation && enhancementOpen) say(`Recognition failed: ${error.message}. Your checked text and saved draft are unchanged.`);
+    } finally {
+      if (!closed && ticket === generation) {
+        const oldWorker = worker; worker = null;
+        if (oldWorker) await oldWorker.terminate().catch(() => {});
+        if (!closed && ticket === generation) { busy = false; operation = null; controls(); }
+      }
+    }
+  });
+  enhancementApply.addEventListener('click', () => {
+    if (!enhancementOpen || busy || closed || enhancementResult.hidden || !enhancedText.value.trim()) return;
+    try { validateCheckedText(enhancedText.value); } catch (error) { say(error.message); return; }
+    const page = current(); page.text = enhancedText.value; page.blank = false; page.source = 'ocr'; page.confirmed = false;
+    text.value = page.text; blank.checked = false; page.enhancedDraft = null;
+    // Application is the only enhancement action that changes checked page text.
+    void stop(); clearEnhancement(); controls(); drawRegion(); text.focus();
+    say('Improved-image text applied. Check it against the original and confirm this page again.');
+  });
   function clearPreview() {
-    clearRegion();
+    clearEnhancement(); clearRegion();
     if (url) URL.revokeObjectURL(url);
     url = previewBlob = null; ready = false;
     image.hidden = full.hidden = true; image.removeAttribute('src'); full.removeAttribute('href');
@@ -251,10 +383,10 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
   const abort = () => finish(null);
   signal?.addEventListener('abort', abort, {once: true});
   close.addEventListener('click', () => finish(null));
-  dialog.addEventListener('cancel', event => { event.preventDefault(); finish(null); });
+  dialog.addEventListener('cancel', event => { event.preventDefault(); if (enhancementOpen) leaveEnhancement(); else finish(null); });
   dialog.addEventListener('close', () => finish(null));
   async function showPage(next) {
-    if (closed || !Number.isInteger(next) || next < 0 || next >= pages.length) return;
+    if (closed || enhancementOpen || !Number.isInteger(next) || next < 0 || next >= pages.length) return;
     rememberRegion();
     const pending = stop(), ticket = generation; index = next; busy = true; clearPreview();
     operation = new AbortController(); const pageSignal = operation.signal;
@@ -275,7 +407,7 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
   pageSelect.addEventListener('change', () => void showPage(Number(pageSelect.value)));
   reload.addEventListener('click', () => void showPage(index));
   async function runRecognition(areaOnly = false) {
-    if (!ready || busy || closed) return;
+    if (!ready || busy || closed || enhancementOpen) return;
     if (areaOnly && !region) return;
     const selected = region ? {...region} : null;
     if (!areaOnly) invalidate();
@@ -307,17 +439,18 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
   }
   recognize.addEventListener('click', () => void runRecognition());
   recognizeArea.addEventListener('click', () => void runRecognition(true));
-  stopButton.addEventListener('click', async () => { const pending = stop(), ticket = generation; invalidate(); await pending; if (!closed && ticket === generation) { say(ready ? 'Recognition stopped. Check the text or recognize again.' : 'Loading stopped. Use Reload page or reopen this document.'); controls(); } });
+  stopButton.addEventListener('click', async () => { if (enhancementOpen) { enhancementStop.click(); return; } const pending = stop(), ticket = generation; invalidate(); await pending; if (!closed && ticket === generation) { say(ready ? 'Recognition stopped. Check the text or recognize again.' : 'Loading stopped. Use Reload page or reopen this document.'); controls(); } });
   text.addEventListener('input', () => { if (!current()) return; current().text = text.value; current().blank = false; blank.checked = false; invalidate(); say('Text changed. Check and confirm this page again.'); });
   blank.addEventListener('change', () => { if (current()) current().blank = blank.checked; invalidate(); });
   for (const [control, key] of [[language, 'language'], [layout, 'psm']]) control.addEventListener('change', () => {
+    if (enhancementOpen) { control.value = current()[key]; return; }
     prefs[key] = control.value; savePreferences(prefKey, prefs);
     for (const page of pages) if (page === current() || !page.loaded) page[key] = control.value;
     invalidate(); say('Setting saved. Recognize again if needed, then confirm this page.');
   });
-  confirm.addEventListener('click', () => { if (!ready || busy || !(current()?.text.trim() || current()?.blank)) return; current().confirmed = true; say(`Page ${index + 1} checked.`); controls(); });
+  confirm.addEventListener('click', () => { if (!ready || busy || enhancementOpen || !(current()?.text.trim() || current()?.blank)) return; current().confirmed = true; say(`Page ${index + 1} checked.`); controls(); });
   use.addEventListener('click', () => {
-    if (closed || busy) return;
+    if (closed || busy || enhancementOpen) return;
     try { finish(reviewedOcrResult(pages, file.name)); } catch (error) { say(error.message); }
   });
   controls(); dialog.showModal(); close.focus();
