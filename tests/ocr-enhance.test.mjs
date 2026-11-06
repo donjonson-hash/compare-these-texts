@@ -117,3 +117,54 @@ test('oversized compressed dimensions are rejected before createImageBitmap allo
   await module.evaluate(); await self.onmessage({data:{blob:new Blob([bytes])}});
   assert.equal(decodes,0); assert.equal(messages[0].type,'error'); assert.match(messages[0].message,/16000000/);
 });
+
+function metadataJpeg(width, height) {
+  const segment = new Uint8Array(65537); segment.set([0xff, 0xe2, 0xff, 0xff]);
+  const frame = new Uint8Array([0xff, 0xc0, 0, 11, 8, height >> 8, height & 255, width >> 8, width & 255, 1, 1, 0x11, 0]);
+  return new Blob([new Uint8Array([0xff, 0xd8]), ...Array(17).fill(segment), frame, new Uint8Array([0xff, 0xd9])]);
+}
+async function runImageWorker(blob) {
+  const messages = [], slices = []; let decodes = 0;
+  class TrackedBlob extends Blob {
+    slice(start, end) { slices.push([start, Math.min(end, this.size)]); return super.slice(start, end); }
+  }
+  const self = {postMessage: message => messages.push(message)};
+  const context = vm.createContext({self, Blob, Uint8Array, DataView,
+    createImageBitmap: async () => { decodes++; return {width: 64, height: 48, close() {}}; },
+    OffscreenCanvas: class {
+      getContext() { return {fillRect() {}, drawImage() {}, getImageData: () => ({data: image(64, 48, () => 255)}), putImageData() {}}; }
+      async convertToBlob() { return new Blob(['processed']); }
+    },
+    ImageData: class { constructor(data, width, height) { Object.assign(this, {data, width, height}); } },
+  });
+  const module = new vm.SourceTextModule(workerSource, {context});
+  await module.link(() => new vm.SyntheticModule(['enhancePixels', 'validateEnhanceDimensions', 'ENHANCE_LIMITS'], function() {
+    this.setExport('enhancePixels', enhancePixels); this.setExport('validateEnhanceDimensions', validateEnhanceDimensions);
+    this.setExport('ENHANCE_LIMITS', {pixels:16_000_000, bytes:64 * 1024 * 1024});
+  }, {context}));
+  await module.evaluate(); await self.onmessage({data:{blob:new TrackedBlob([blob])}});
+  return {messages, slices, decodes};
+}
+
+test('JPEG metadata beyond 1 MiB is skipped with bounded reads before enhancement', async () => {
+  const jpeg = metadataJpeg(64, 48);
+  assert.ok(jpeg.size > 1024 * 1024);
+  const {messages, slices, decodes} = await runImageWorker(jpeg);
+  assert.equal(messages[0].type, 'result'); assert.equal(decodes, 1);
+  assert.equal(messages[0].data.width, 64); assert.equal(messages[0].data.height, 48);
+  assert.ok(slices.every(([start, end]) => end - start <= 4096), 'metadata is not read into one large buffer');
+  assert.ok(slices.reduce((total, [start, end]) => total + end - start, 0) < 100000, 'APP payloads are skipped');
+});
+
+test('oversized JPEG after large metadata is rejected before decoding', async () => {
+  const {messages, decodes} = await runImageWorker(metadataJpeg(65535, 65535));
+  assert.equal(decodes, 0); assert.equal(messages[0].type, 'error'); assert.match(messages[0].message, /16000000/);
+});
+
+test('truncated JPEG segments fail before decoding', async () => {
+  const jpeg = metadataJpeg(64, 48);
+  for (const input of [jpeg.slice(0, 100), jpeg.slice(0, jpeg.size - 10), new Blob([new Uint8Array([0xff, 0xd8, 0xff])])]) {
+    const {messages, decodes} = await runImageWorker(input);
+    assert.equal(decodes, 0); assert.equal(messages[0].type, 'error'); assert.match(messages[0].message, /Incomplete/);
+  }
+});

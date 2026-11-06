@@ -125,12 +125,23 @@ async function exercise(context, base, mode) {
   await page.waitForFunction(() => !document.querySelector('.ocr-enhance-apply').disabled, null, {timeout:120000});
   assert.match(await modal().locator('.ocr-enhanced-text').inputValue(), /Заказчик/);
   assert.equal(await modal().locator('.ocr-text').inputValue(), checkedText, 'new OCR remains staged');
+  const correctedDraft = a + '\nManually corrected candidate to preserve.';
+  await modal().locator('.ocr-enhanced-text').fill(correctedDraft);
+  await modal().locator('.ocr-enhance-recognize').click();
+  await page.waitForFunction(() => !document.querySelector('.ocr-enhance-apply').disabled, null, {timeout:120000});
+  assert.notEqual(await modal().locator('.ocr-enhanced-text').inputValue(), correctedDraft);
+  await modal().locator('.ocr-enhance-discard').click();
+  await openEnhancement();
+  await modal().locator('.ocr-enhance-restore').click();
+  assert.equal(await modal().locator('.ocr-enhanced-text').inputValue(), correctedDraft,
+    'previous manually edited draft survives successful retry and reopening the preview');
+  assert.equal(await modal().locator('.ocr-text').inputValue(), checkedText);
   await modal().locator('.ocr-enhanced-text').fill(a);
   await modal().locator('.ocr-enhance-apply').click();
   assert.equal(await modal().locator('.ocr-enhancement-preview').isHidden(), true);
   assert.equal(await modal().locator('.ocr-text').inputValue(), a, 'explicit adoption uses edited draft');
   assert.equal(await modal().locator('.ocr-use').isDisabled(), true, 'adoption revokes old approval');
-  checks.push('real image worker; same-size original/improved previews; mobile layout; Escape preserves checked text and approval; improved OCR remains staged until explicit adoption');
+  checks.push('real image worker; same-size original/improved previews; mobile layout; Escape preserves checked text and approval; edited draft restored after retry and reopening; improved OCR remains staged until explicit adoption');
   await modal().locator('.ocr-select-area').click();
   const rect = await preview.evaluate(img => {
     const r = img.getBoundingClientRect(), scale = Math.min(r.width / img.naturalWidth, r.height / img.naturalHeight);

@@ -119,7 +119,9 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
   const enhancementResult = el('div', undefined, 'ocr-enhancement-result'); enhancementResult.hidden = true;
   const enhancedText = el('textarea'); enhancedText.className = 'ocr-enhanced-text'; enhancedText.setAttribute('aria-label', 'Improved image recognized text'); enhancedText.setAttribute('translate', 'no'); enhancedText.setAttribute('spellcheck', 'false'); enhancedText.setAttribute('autocorrect', 'off'); enhancedText.setAttribute('autocapitalize', 'off'); enhancedText.maxLength = MAX_CHARS;
   const enhancementApply = button('Use this text for page', 'primary'); enhancementApply.classList.add('ocr-enhance-apply');
-  enhancementResult.append(el('p', 'Check this new text against the original. Using it will replace this page’s checked text and require confirmation again.'), enhancedText, enhancementApply);
+  const enhancementRestore = button('Restore previous draft'); enhancementRestore.classList.add('ocr-enhance-restore'); enhancementRestore.hidden = true;
+  const enhancementResultActions = el('div', undefined, 'ocr-review-options'); enhancementResultActions.append(enhancementApply, enhancementRestore);
+  enhancementResult.append(el('p', 'Check this new text against the original. Using it will replace this page’s checked text and require confirmation again.'), enhancedText, enhancementResultActions);
   enhancementPanel.append(enhancementHeading, enhancementHint, enhancementImages, enhancementOptions, enhancementStatus, enhancementResult);
   dialog.append(header, filename, hint, nav, pdfNote, enhancementPanel, columns, footer); document.body.append(dialog);
   language.value = prefs.language; layout.value = prefs.psm;
@@ -147,8 +149,10 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
     columns.hidden = footer.hidden = enhancementOpen; nav.hidden = !isPdf || enhancementOpen;
     enhancementPanel.hidden = !enhancementOpen;
     enhancementPrepare.hidden = Boolean(enhancedBlob); enhancementPrepare.disabled = busy;
+    enhancementRecognize.textContent = enhancementResult.hidden ? 'Recognize improved image' : 'Recognize again';
     enhancementRecognize.disabled = busy || !enhancedBlob || !enhancementReady; enhancementStop.disabled = !busy;
     enhancedText.disabled = busy; enhancementApply.disabled = busy || enhancementResult.hidden || !enhancedText.value.trim();
+    enhancementRestore.hidden = !page?.previousEnhancedDraft; enhancementRestore.disabled = busy;
     summary.textContent = `${confirmed} of ${pages.length} pages checked`;
     count.textContent = pages.length ? `${index + 1} / ${pages.length}` : '';
     [...pageSelect.options].forEach((option, i) => { option.textContent = `${i + 1}${pages[i].confirmed ? ' — checked' : ''}`; });
@@ -338,6 +342,7 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
       worker = nextWorker; const {data} = await worker.recognize(input);
       if (closed || ticket !== generation || !enhancementOpen) return;
       if (typeof data.text !== 'string' || data.text.length > MAX_CHARS) throw new Error('Recognized page exceeds 500000 characters. Use a smaller document.');
+      page.previousEnhancedDraft = page.enhancedDraft ? {...page.enhancedDraft} : null;
       page.enhancedDraft = {text: data.text, language: page.language, psm: page.psm};
       enhancedText.value = data.text; enhancementResult.hidden = false;
       say('New text is ready for review. Your checked page text has not changed.');
@@ -351,11 +356,17 @@ export async function reviewOcrFile(file, {side = 'left', signal} = {}) {
       }
     }
   });
+  enhancementRestore.addEventListener('click', () => {
+    if (!enhancementOpen || busy || closed || !current()?.previousEnhancedDraft) return;
+    const page = current(); page.enhancedDraft = page.previousEnhancedDraft; page.previousEnhancedDraft = null;
+    enhancedText.value = page.enhancedDraft.text; enhancementResult.hidden = false;
+    controls(); enhancedText.focus(); say('Previous draft restored. Your checked page text has not changed.');
+  });
   enhancementApply.addEventListener('click', () => {
     if (!enhancementOpen || busy || closed || enhancementResult.hidden || !enhancedText.value.trim()) return;
     try { validateCheckedText(enhancedText.value); } catch (error) { say(error.message); return; }
     const page = current(); page.text = enhancedText.value; page.blank = false; page.source = 'ocr'; page.confirmed = false;
-    text.value = page.text; blank.checked = false; page.enhancedDraft = null;
+    text.value = page.text; blank.checked = false; page.enhancedDraft = page.previousEnhancedDraft = null;
     // Application is the only enhancement action that changes checked page text.
     void stop(); clearEnhancement(); controls(); drawRegion(); text.focus();
     say('Improved-image text applied. Check it against the original and confirm this page again.');

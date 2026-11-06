@@ -25,7 +25,7 @@ A first-party module worker owns the nested Tesseract worker. Aborting initializ
 
 ## Optional image preview before recognition
 
-`Improve image` opens a separate original/processed preview for the current page. It does not start OCR or change checked text. `Recognize improved image` creates an editable draft; only `Use this text for page` replaces the page text and revokes its previous approval. Back, Escape, Stop and processing failures preserve checked text. Drafts are retained per page while the dialog stays open. Full-size links let the user inspect small marks before adoption.
+`Improve image` opens a separate original/processed preview for the current page. It does not start OCR or change checked text. `Recognize improved image` creates an editable draft; only `Use this text for page` replaces the page text and revokes its previous approval. Back, Escape, Stop and processing failures preserve checked text. Drafts are retained per page while the dialog stays open. A successful repeat recognition retains the previous draft for `Restore previous draft`, including its manual corrections; failures and cancellation leave that recovery copy intact. Full-size links let the user inspect small marks before adoption.
 
 The bundled `ocr-enhance-worker.mjs` performs grayscale background normalization, capped contrast and mild sharpening locally, without resizing or binary thresholding. It inspects PNG/JPEG dimensions before decoding and limits input to 16 million pixels and 64 MiB. Abort, errors and the 60-second preparation timeout terminate the worker. Processed image URLs are released when the preview closes; processed bitmaps are not cached across pages.
 

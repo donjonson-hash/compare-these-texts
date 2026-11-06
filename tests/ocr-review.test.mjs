@@ -319,6 +319,73 @@ test('enhanced drafts belong to their page and survive returning to that page', 
   h.$('.ocr-close').click(); await result;
 });
 
+test('successful enhanced OCR keeps a manually corrected draft recoverable across page navigation', async t => {
+  let attempt = 0;
+  const h = await harness(t, {makeWorker: async () => ({recognize: async () => ({data: {text: `OCR attempt ${++attempt}`}}), terminate: async () => {}})});
+  const {result} = await h.open(); h.$('.ocr-confirm').click();
+  h.$('.ocr-improve').click(); await tick(); h.$('.ocr-enhance-recognize').click(); await tick();
+  assert.equal(h.$('.ocr-enhance-restore').hidden, true);
+  h.$('.ocr-enhanced-text').value = 'Corrected USD 100.00'; h.$('.ocr-enhanced-text').dispatchEvent(new h.dom.window.Event('input'));
+  h.$('.ocr-enhance-recognize').click(); await tick();
+  assert.equal(h.$('.ocr-enhanced-text').value, 'OCR attempt 2');
+  assert.equal(h.$('.ocr-enhance-restore').hidden, false);
+  h.$('.ocr-enhance-discard').click(); h.change('.ocr-page-select', '1'); await tick();
+  h.$('.ocr-improve').click(); await tick();
+  assert.equal(h.$('.ocr-enhance-restore').hidden, true, 'another page cannot restore this page’s draft');
+  h.$('.ocr-enhance-discard').click(); h.change('.ocr-page-select', '0'); await tick();
+  h.$('.ocr-improve').click(); await tick(); h.$('.ocr-enhance-restore').click();
+  assert.equal(h.$('.ocr-enhanced-text').value, 'Corrected USD 100.00');
+  assert.equal(h.$('.ocr-enhance-restore').hidden, true, 'one-level restoration consumes the previous draft');
+  assert.equal(h.$('.ocr-text').value, 'Page one');
+  h.$('.ocr-enhance-discard').click();
+  assert.match(h.$('.ocr-page-select').options[0].textContent, /checked/, 'restoring a draft preserves checked page approval');
+  h.$('.ocr-improve').click(); await tick();
+  assert.equal(h.$('.ocr-enhanced-text').value, 'Corrected USD 100.00');
+  h.$('.ocr-close').click(); await result;
+});
+
+test('failed or cancelled enhanced OCR cannot replace the previous draft backup', async t => {
+  let attempt = 0, mode = 'success'; const pending = deferred();
+  const h = await harness(t, {texts: ['Checked'], makeWorker: async () => ({recognize: async () => {
+    if (mode === 'failure') throw new Error('model failed');
+    if (mode === 'pending') return pending.promise;
+    return {data: {text: `Draft ${++attempt}`}};
+  }, terminate: async () => {}})});
+  const {result} = await h.open(); h.$('.ocr-confirm').click();
+  h.$('.ocr-improve').click(); await tick();
+  h.$('.ocr-enhance-recognize').click(); await tick();
+  h.$('.ocr-enhanced-text').value = 'Edited first draft'; h.$('.ocr-enhanced-text').dispatchEvent(new h.dom.window.Event('input'));
+  h.$('.ocr-enhance-recognize').click(); await tick();
+  h.$('.ocr-enhanced-text').value = 'Edited second draft'; h.$('.ocr-enhanced-text').dispatchEvent(new h.dom.window.Event('input'));
+  mode = 'failure'; h.$('.ocr-enhance-recognize').click(); await tick();
+  assert.equal(h.$('.ocr-enhanced-text').value, 'Edited second draft');
+  mode = 'pending'; h.$('.ocr-enhance-recognize').click(); await tick();
+  assert.equal(h.$('.ocr-enhance-restore').disabled, true);
+  h.$('.ocr-enhance-stop').click(); await tick();
+  pending.resolve({data: {text: 'Late cancelled draft'}}); await tick();
+  assert.equal(h.$('.ocr-enhanced-text').value, 'Edited second draft');
+  h.$('.ocr-enhance-restore').click();
+  assert.equal(h.$('.ocr-enhanced-text').value, 'Edited first draft', 'failure and Stop leave the prior successful backup intact');
+  h.$('.ocr-enhance-discard').click(); assert.equal(h.$('.ocr-use').disabled, false);
+  h.$('.ocr-close').click(); await result;
+});
+
+test('applying an enhanced draft clears its backup and still requires fresh approval', async t => {
+  const h = await harness(t, {texts: ['Checked']}), {result} = await h.open();
+  h.$('.ocr-confirm').click(); h.$('.ocr-improve').click(); await tick();
+  h.$('.ocr-enhance-recognize').click(); await tick();
+  h.$('.ocr-enhanced-text').value = 'Saved prior draft'; h.$('.ocr-enhanced-text').dispatchEvent(new h.dom.window.Event('input'));
+  h.$('.ocr-enhance-recognize').click(); await tick();
+  assert.equal(h.$('.ocr-enhance-restore').hidden, false);
+  h.$('.ocr-enhance-apply').click(); assert.equal(h.$('.ocr-use').disabled, true);
+  h.$('.ocr-improve').click(); await tick();
+  assert.equal(h.$('.ocr-enhancement-result').hidden, true);
+  assert.equal(h.$('.ocr-enhance-restore').hidden, true);
+  h.$('.ocr-enhance-recognize').click(); await tick();
+  assert.equal(h.$('.ocr-enhance-restore').hidden, true, 'new cycle must not recover a stale pre-application candidate');
+  h.$('.ocr-close').click(); await result;
+});
+
 test('Escape returns from image preview before closing document review', async t => {
   const h = await harness(t, {texts: ['Checked']}), {result} = await h.open();
   h.$('.ocr-confirm').click(); h.$('.ocr-improve').click(); await tick();
