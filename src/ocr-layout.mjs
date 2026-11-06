@@ -27,9 +27,10 @@ export function validateOcrRegions(regions) {
     if (!object(region) || typeof region.id !== 'string' || !/^line-[1-9]\d{0,5}$/.test(region.id) || ids.has(region.id)) invalid('invalid or duplicate region identifier.');
     ids.add(region.id);
     const text = checkedText(region.text);
+    if (region.edited !== undefined && typeof region.edited !== 'boolean') invalid('invalid visible correction flag.');
     characters += text.length;
     if (characters > MAX_CHARS) invalid('text regions exceed 500000 characters.');
-    return {id: region.id, text, ...rectangle(region)};
+    return {id: region.id, text, ...rectangle(region), ...(region.edited === true ? {edited: true} : {})};
   });
 }
 

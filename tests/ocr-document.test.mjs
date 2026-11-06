@@ -23,6 +23,7 @@ async function harness(t, {failRender = false, onDestroy = () => {}} = {}) {
     './ocr-review.mjs':{reviewOcrFile:async(file,options)=>{reviewOptions=options; return new Promise(resolve=>{reviewResolve=resolve;});}},
     './ocr-import.mjs':{checkedTextFile},
     './ocr-document-model.mjs':{ocrSourceBytes,validateOcrSnapshot},
+    './ocr-corrections.mjs':{createCorrectionOverlay:(regions)=>{const svg=dom.window.document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('data-edited',String(regions.filter(region=>region.edited).length));return svg;}},
     './ocr-pdf-export.mjs':{exportCheckedOcrPdf:async(file,state,options)=>{exportState=state;exportOptions=options;return new Promise((resolve,reject)=>{exportResolve=resolve;exportReject=reject;options.signal.addEventListener('abort',()=>reject(new DOMException('Cancelled','AbortError')),{once:true});});}},
   };
   const module=new vm.SourceTextModule(readFileSync(new URL('../src/ocr-document.mjs',import.meta.url),'utf8'),{context});
@@ -69,6 +70,7 @@ test('PDF download receives checked corrections and locks review until the file 
   h.resolveReview({pages});await tick();await tick();
   h.$('.ocr-document-pdf-download').click();
   assert.equal(h.exportState.pages[0].text,'Corrected 456');
+  assert.equal(h.exportOptions.visibleCorrections,true);
   assert.equal(h.$('.ocr-document-review').disabled,true);
   assert.equal(h.$('.ocr-document-page').disabled,true);
   h.exportOptions.onProgress({page:1,total:2});assert.match(h.$('.ocr-document-status').textContent,/page 1 of 2/);
@@ -76,6 +78,22 @@ test('PDF download receives checked corrections and locks review until the file 
   h.resolveExport(file);await tick();
   assert.equal(h.downloads.length,1);assert.equal(h.downloads[0].name,file.name);assert.equal(h.downloads[0].blob,file);
   assert.equal(h.$('.ocr-document-review').disabled,false);assert.equal(h.$('.ocr-document-export-cancel').hidden,true);
+});
+test('visible edits survive review and the appearance selector controls both preview and PDF',async t=>{
+  const h=await harness(t);
+  h.$('.ocr-document-review').click();const pages=state().pages;
+  pages[0].text='Corrected 456';pages[0].regions[0]={...region,text:'Corrected 456',edited:true};
+  h.resolveReview({pages});await tick();await tick();
+  assert.equal(h.view.snapshot().pages[0].regions[0].edited,true);
+  assert.equal(h.$('.ocr-document-corrections svg').getAttribute('data-edited'),'1');
+  const appearance=h.$('.ocr-document-appearance');appearance.value='original';appearance.dispatchEvent(new h.dom.window.Event('change'));
+  assert.equal(h.$('.ocr-document-corrections svg'),null);
+  h.$('.ocr-document-pdf-download').click();assert.equal(h.exportOptions.visibleCorrections,false);assert.equal(appearance.disabled,true);
+  h.resolveExport(new File(['%PDF-original'],'scan.pdf'));await tick();
+  appearance.value='corrected';appearance.dispatchEvent(new h.dom.window.Event('change'));
+  assert.equal(h.$('.ocr-document-corrections svg').getAttribute('data-edited'),'1');
+  assert.match(h.$('.ocr-document-pdf-download').textContent,/corrected PDF/);
+  assert.equal(h.view.snapshot().pages[0].regions[0].edited,true);
 });
 test('cancelled or failed PDF export preserves the document and never downloads a partial file',async t=>{
   const h=await harness(t), before=JSON.stringify(h.view.snapshot());

@@ -10,7 +10,7 @@ const tick = () => new Promise(resolve => setImmediate(resolve));
 const deferred = () => { let resolve; const promise = new Promise(done => { resolve = done; }); return {promise, resolve}; };
 async function harness(t, {texts = ['Page one', 'Page two'], makeWorker, loadPage, enhanceImage} = {}) {
   const dom = new JSDOM('<button id="before">Upload</button>', {runScripts: 'outside-only'});
-  const context = dom.getInternalVMContext(), destroyed = [], revoked = [], languages = [], pageCalls = [], workerOptions = [], enhancements = [], recognitionInputs = [];
+  const context = dom.getInternalVMContext(), destroyed = [], revoked = [], languages = [], pageCalls = [], workerOptions = [], enhancements = [], recognitionInputs = [], correctionRenders = [];
   dom.window.TextEncoder = TextEncoder;
   let nextUrl = 0; dom.window.URL.createObjectURL = () => 'blob:local-image-' + ++nextUrl;
   dom.window.URL.revokeObjectURL = url => revoked.push(url);
@@ -28,13 +28,19 @@ async function harness(t, {texts = ['Page one', 'Page two'], makeWorker, loadPag
   const imageInput = new vm.SyntheticModule(['validateOcrImage'], function() { this.setExport('validateOcrImage', async () => ({})); }, {context});
   const enhancement = new vm.SyntheticModule(['enhanceOcrImage'], function() { this.setExport('enhanceOcrImage', async (blob, options) => { enhancements.push({blob, options}); return enhanceImage ? enhanceImage(blob, options) : {blob: {enhanced: true}, width: 100, height: 100}; }); }, {context});
   const layout = new vm.SyntheticModule(Object.keys(layoutFunctions), function() { for(const [name,value] of Object.entries(layoutFunctions)) this.setExport(name,value); }, {context});
-  await module.link(specifier => specifier.includes('ocr-layout') ? layout : specifier.includes('ocr-enhance') ? enhancement : specifier.includes('pdf-input') ? pdf : specifier.includes('ocr-import') ? validator : specifier.includes('image-input') ? imageInput : runtime); await module.evaluate();
+  const corrections = new vm.SyntheticModule(['createCorrectionOverlay'], function() { this.setExport('createCorrectionOverlay', (regions,width,height,doc) => {
+    correctionRenders.push({regions:JSON.parse(JSON.stringify(regions)),width,height});
+    const svg = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    for (const region of regions.filter(item => item.edited)) { const text = doc.createElementNS('http://www.w3.org/2000/svg', 'text'); text.textContent=region.text; svg.append(text); }
+    return svg;
+  }); }, {context});
+  await module.link(specifier => specifier.includes('ocr-corrections') ? corrections : specifier.includes('ocr-layout') ? layout : specifier.includes('ocr-enhance') ? enhancement : specifier.includes('pdf-input') ? pdf : specifier.includes('ocr-import') ? validator : specifier.includes('image-input') ? imageInput : runtime); await module.evaluate();
   t.after(() => dom.window.close());
   const file = {name: 'scan.pdf', type: 'application/pdf', size: 100};
   const open = async options => { const result = module.namespace.reviewOcrFile(file, options); await tick(); return {result}; };
   const $ = selector => dom.window.document.querySelector(selector);
   const change = (selector, value) => { $(selector).value = value; $(selector).dispatchEvent(new dom.window.Event('change')); };
-  return {dom, module, open, $, change, languages, destroyed, revoked, pageCalls, workerOptions, enhancements, recognitionInputs};
+  return {dom, module, open, $, change, languages, destroyed, revoked, pageCalls, workerOptions, enhancements, recognitionInputs, correctionRenders};
 }
 
 test('review gate requires every page and editing revokes approval without losing another page', async t => {
@@ -455,6 +461,8 @@ test('position-linked fragments retain columns, edits and approvals through page
  h.$('.ocr-use').click(); const saved=await result;
  assert.equal(saved.pages[0].regions[1].x,0.55);
  assert.equal(saved.pages[0].regions[1].text,'Corrected right column');
+ assert.equal(saved.pages[0].regions[1].edited,true);
+ assert.equal(saved.pages[0].regions[0].edited,undefined);
  const reopened=await h.open({restoredPages:saved.pages,initialPage:0});
  assert.equal(h.$('.ocr-fragment-select').options.length,2); assert.equal(h.$('.ocr-use').disabled,false);
  h.$('.ocr-fragment-text').value='Cancelled edit';h.$('.ocr-fragment-text').dispatchEvent(new h.dom.window.Event('input'));h.$('.ocr-close').click();
@@ -477,6 +485,38 @@ test('a separately recognized field can be attached to its page position', async
  assert.equal(h.$('.ocr-text').value,'Recognized Russian Я');assert.equal(h.$('.ocr-fragment-select').options.length,1);
  h.$('.ocr-confirm').click();h.$('.ocr-use').click();const saved=await result;
  assert.equal(saved.pages[0].regions[0].width,0.3);assert.equal(saved.pages[0].regions[0].height,0.1);
+ assert.equal(saved.pages[0].regions[0].edited,true);
+});
+
+test('editing a fragment immediately redraws its visible correction and can restore the original appearance', async t=>{
+ const h=await harness(t,{texts:[''],makeWorker:async()=>({recognize:async()=>({data:mappedData}),terminate:async()=>{}})}),{result}=await h.open();
+ const image=h.$('.ocr-image-stage img'), stage=h.$('.ocr-image-stage');
+ Object.defineProperty(image,'naturalWidth',{value:1000});Object.defineProperty(image,'naturalHeight',{value:1500});
+ image.getBoundingClientRect=()=>({left:20,top:30,width:500,height:750});stage.getBoundingClientRect=()=>({left:10,top:20,width:500,height:750});
+ h.$('.ocr-recognize').click();await tick();
+ assert.equal(h.$('.ocr-visible-correction').checked,false);
+ h.$('.ocr-fragment-text').value='Исправлено вручную';h.$('.ocr-fragment-text').dispatchEvent(new h.dom.window.Event('input'));
+ assert.equal(h.$('.ocr-visible-correction').checked,true);
+ assert.equal(h.$('.ocr-correction-layer').textContent,'Исправлено вручную');
+ assert.equal(h.$('.ocr-correction-layer').style.left,'10px');assert.equal(h.$('.ocr-correction-layer').style.top,'10px');
+ assert.deepEqual([h.correctionRenders.at(-1).width,h.correctionRenders.at(-1).height],[500,750]);
+ h.$('.ocr-confirm').click();assert.equal(h.$('.ocr-use').disabled,false);
+ h.$('.ocr-visible-correction').click();assert.equal(h.$('.ocr-use').disabled,true);
+ assert.equal(h.$('.ocr-correction-layer').textContent,'');assert.equal(h.$('.ocr-fragment-text').value,'Исправлено вручную');
+ h.$('.ocr-confirm').click();h.$('.ocr-use').click();const saved=await result;
+ assert.equal(saved.pages[0].regions[0].edited,undefined);assert.match(saved.text,/Исправлено вручную/);
+ const reopened=await h.open({restoredPages:saved.pages});
+ assert.equal(h.$('.ocr-visible-correction').checked,false);
+ h.$('.ocr-visible-correction').click();assert.equal(h.$('.ocr-visible-correction').checked,true);
+ h.$('.ocr-confirm').click();h.$('.ocr-use').click();assert.equal((await reopened.result).pages[0].regions[0].edited,true);
+});
+
+test('invalid fragment text restores both text and the original visible-correction flag', async t=>{
+ const h=await harness(t,{texts:[''],makeWorker:async()=>({recognize:async()=>({data:mappedData}),terminate:async()=>{}})}),{result}=await h.open();
+ h.$('.ocr-recognize').click();await tick();
+ h.$('.ocr-fragment-text').value='bad\0text';h.$('.ocr-fragment-text').dispatchEvent(new h.dom.window.Event('input'));
+ assert.equal(h.$('.ocr-fragment-text').value,'Left column');assert.equal(h.$('.ocr-visible-correction').checked,false);
+ h.$('.ocr-confirm').click();h.$('.ocr-use').click();assert.equal((await result).pages[0].regions[0].edited,undefined);
 });
 
 test('partial area cannot erase the rest of a position-linked line', async t=>{

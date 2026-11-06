@@ -4,6 +4,8 @@ import {createCanvas, DOMMatrix, ImageData, Path2D, loadImage} from '@napi-rs/ca
 import {PDFDocument, rgb} from '../src/pdf-vendor.mjs';
 import {exportCheckedOcrPdf} from '../src/ocr-pdf-export.mjs';
 import {openPdf} from '../src/ocr-pdf-input.mjs';
+import {layoutCorrections, createCorrectionOverlay} from '../src/ocr-corrections.mjs';
+import {JSDOM} from 'jsdom';
 
 function browserCanvas(t) {
   const globals = {DOMMatrix, ImageData, Path2D, document: {createElement() {
@@ -111,4 +113,85 @@ test('export cancellation stops before decoding and between PDF pages without re
     signal: during.signal, onProgress: value => { progress.push(value.page); if (value.page === 2) during.abort(); },
   }), {name: 'AbortError'});
   assert.deepEqual(progress, [1, 2]);
+});
+
+test('visible corrections replace printed and handwritten ink only inside edited boxes and remain searchable once', async t => {
+  browserCanvas(t);
+  // Both sides are whole raster pixels at 300 dpi, avoiding resampling noise.
+  const pdf = await PDFDocument.create(), page = pdf.addPage([240, 168]);
+  page.drawRectangle({x:0,y:0,width:240,height:168,color:rgb(.94,.92,.84)});
+  page.drawText('Old printed text', {x:25,y:124,size:15});
+  // Pen-like strokes exercise removal of non-text image content as well.
+  for (let i=0;i<7;i++) page.drawLine({start:{x:28+i*18,y:64},end:{x:40+i*18,y:82},thickness:3,color:rgb(.1,.2,.6)});
+  page.drawText('REMOVE ME', {x:25,y:20,size:10});
+  const file = new File([await pdf.save()], 'mixed-ink.pdf');
+  const regions = [region('Исправлено 123',{id:'line-1',x:.1,y:.1,width:.7,height:.2,edited:true}),
+    region('USSR',{id:'line-2',x:.1,y:.45,width:.7,height:.2,edited:true}),
+    region('',{id:'line-3',x:.1,y:.8,width:.7,height:.1,edited:true})];
+  const state = snapshot([checked(regions)]);
+  const exported = await exportCheckedOcrPdf(file,state), unchanged = await exportCheckedOcrPdf(file,state,{visibleCorrections:false});
+  const source = await openPdf(file), output = await openPdf(exported), originalView = await openPdf(unchanged);
+  try {
+    const before = await source.page(1), after = await output.page(1);
+    const a = await pixelData(before.blob), b = await pixelData(after.blob);
+    const changes = regions.map(()=>0);
+    const masks = layoutCorrections(regions,after.width,after.height).map(correction=>correction.mask);
+    for(let y=0;y<after.height;y++)for(let x=0;x<after.width;x++){
+      const offset=(y*after.width+x)*4;
+      if (a[offset]===b[offset]&&a[offset+1]===b[offset+1]&&a[offset+2]===b[offset+2]) continue;
+      const index=masks.findIndex(r=>x>=r.x-2&&x<=r.x+r.width+2&&y>=r.y-2&&y<=r.y+r.height+2);
+      assert.notEqual(index,-1,'the original image outside the declared correction masks is unchanged'); changes[index]++;
+    }
+    assert.ok(changes.every(count=>count>100),'every edited ink region visibly changes, including deletion');
+    const deletionOffset=(Math.floor(.85*after.height)*after.width+Math.floor(.3*after.width))*4;
+    assert.deepEqual([...b.slice(deletionOffset,deletionOffset+4)],[255,255,255,255]);
+    assert.equal(after.text.split('Исправлено 123').length-1,1);assert.equal(after.text.split('USSR').length-1,1);
+    assert.ok(!after.text.includes('Old printed')&&!after.text.includes('REMOVE ME'));
+    assert.ok(Buffer.from(await pixelData((await originalView.page(1)).blob)).equals(Buffer.from(a)),'original-image mode keeps all original ink');
+  } finally { await source.destroy();await output.destroy();await originalView.destroy(); }
+});
+
+test('preview paths and PDF layout share bounded uniform fitting, multiline text and explicit unsupported-character errors', () => {
+  const regions=[region('Очень длинная исправленная строка\nSecond line',{edited:true}),region('Unchanged',{id:'line-2',y:.6})];
+  const [correction]=layoutCorrections(regions,600,900), {rect}=correction;
+  assert.equal(correction.lines.length,2);assert.equal(correction.lines[0].size,correction.lines[1].size);
+  for(const line of correction.lines)for(const {glyph,x} of line.glyphs){
+    const box=glyph.bbox;if(![box.minX,box.maxX,box.minY,box.maxY].every(Number.isFinite))continue;
+    assert.ok(line.x+(x+box.minX)*line.scale>=rect.x-1e-6);
+    assert.ok(line.x+(x+box.maxX)*line.scale<=rect.x+rect.width+1e-6);
+    assert.ok(line.y-box.maxY*line.scale>=rect.y-1e-6);
+    assert.ok(line.y-box.minY*line.scale<=rect.y+rect.height+1e-6);
+  }
+  const dom=new JSDOM('');
+  try{
+    const svg=createCorrectionOverlay(regions,600,900,dom.window.document);
+    assert.equal(svg.getAttribute('viewBox'),'0 0 600 900');assert.equal(svg.querySelectorAll('rect').length,1);
+    assert.ok(svg.querySelectorAll('path').length>10);assert.equal(svg.querySelectorAll('text,style,script,image').length,0);
+    const overlap=createCorrectionOverlay([region('First',{edited:true}),region('Second',{id:'line-2',x:.2,edited:true})],600,900,dom.window.document);
+    assert.deepEqual([...overlap.children].map(node=>node.localName),['rect','rect','g','g'],'all masks precede all text even when OCR frames overlap');
+    assert.equal(createCorrectionOverlay([region('Legacy')],600,900,dom.window.document).children.length,0);
+    assert.throws(()=>createCorrectionOverlay([region('🚀',{edited:true})],600,900,dom.window.document),/cannot be printed/);
+  }finally{dom.window.close();}
+});
+
+test('a small correction halo covers tight OCR ink edges but stops before neighbouring regions and page edges', () => {
+  const main=region('Corrected',{x:.1,y:.2,width:.5,height:.04,edited:true});
+  const alone=layoutCorrections([main],600,840)[0];
+  assert.ok(alone.mask.x<alone.rect.x&&alone.mask.y<alone.rect.y);
+  assert.ok(alone.mask.x+alone.mask.width>alone.rect.x+alone.rect.width);
+  assert.ok(alone.mask.y+alone.mask.height>alone.rect.y+alone.rect.height);
+  assert.ok(alone.rect.x-alone.mask.x<=alone.rect.height*.06+1e-9);
+  // A neighbour only 0.3 page units away limits expansion to half that gap.
+  const near=region('Adjacent',{id:'line-2',x:.6005,y:.2,width:.1,height:.04});
+  const constrained=layoutCorrections([main,near],600,840)[0];
+  assert.ok(constrained.mask.x+constrained.mask.width<near.x*600);
+  assert.ok(Math.abs(constrained.mask.x+constrained.mask.width-(360+.15))<1e-7);
+  assert.deepEqual(constrained.rect,alone.rect,'padding never changes text placement');
+  const edge=layoutCorrections([region('',{x:0,y:0,width:1,height:1,edited:true})],600,840)[0];
+  assert.deepEqual(edge.mask,{x:0,y:0,width:600,height:840});
+  const dom=new JSDOM('');
+  try{
+    const svg=createCorrectionOverlay([main],600,840,dom.window.document),mask=svg.querySelector('rect');
+    for(const [key,value]of Object.entries(alone.mask))assert.equal(Number(mask.getAttribute(key)),value);
+  }finally{dom.window.close();}
 });

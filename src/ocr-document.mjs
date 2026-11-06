@@ -4,6 +4,7 @@ import {reviewOcrFile} from './ocr-review.mjs';
 import {checkedTextFile} from './ocr-import.mjs';
 import {ocrSourceBytes, validateOcrSnapshot} from './ocr-document-model.mjs';
 import {exportCheckedOcrPdf} from './ocr-pdf-export.mjs';
+import {createCorrectionOverlay} from './ocr-corrections.mjs';
 
 const el = (tag, text, className) => {
   const node = document.createElement(tag);
@@ -33,34 +34,44 @@ export async function mountOcrDocumentEditor(root, {source, restoredState, signa
   const zoom = el('select'); zoom.setAttribute('aria-label', 'Document zoom');
   for (const [value, label] of [['100', 'Fit width'], ['150', '150%'], ['200', '200%']]) { const option = el('option', label); option.value = value; zoom.append(option); }
   const review = button('Review text', 'ocr-document-review');
+  const appearance = el('select'); appearance.className = 'ocr-document-appearance'; appearance.setAttribute('aria-label', 'Page and PDF appearance');
+  for (const [value, label] of [['corrected', 'Visible corrections'], ['original', 'Original image']]) { const option = el('option', label); option.value = value; appearance.append(option); }
   const original = button('Download original', 'ocr-document-original');
   const downloadText = button('Download checked text', 'ocr-document-text-download');
-  const downloadPdf = button('Download PDF with OCR text', 'ocr-document-pdf-download');
+  const downloadPdf = button('Download corrected PDF', 'ocr-document-pdf-download');
   const cancelExport = button('Cancel PDF export', 'ocr-document-export-cancel'); cancelExport.hidden = true;
-  toolbar.append(page, zoom, review, downloadPdf, original, downloadText, cancelExport);
+  toolbar.append(page, zoom, review, appearance, downloadPdf, original, downloadText, cancelExport);
   const status = el('p', '', 'ocr-document-status'); status.setAttribute('role', 'status');
   const layout = el('div', undefined, 'ocr-document-layout');
   const scroll = el('div', undefined, 'ocr-document-scroll');
   const stage = el('div', undefined, 'ocr-document-stage'), image = el('img'), boxes = el('div', undefined, 'ocr-document-boxes');
   image.alt = 'Original document page'; image.hidden = true;
-  stage.append(image, boxes); scroll.append(stage);
+  const corrections = el('div', undefined, 'ocr-document-corrections'); corrections.setAttribute('aria-hidden', 'true');
+  stage.append(image, corrections, boxes); scroll.append(stage);
   const detail = el('aside', undefined, 'ocr-document-detail');
   const selectedTitle = el('h3', 'Checked text'), selectedText = el('p', '', 'ocr-document-selected-text'); selectedText.setAttribute('translate', 'no');
   const allText = el('details'), allTextContent = el('pre'); allTextContent.setAttribute('translate', 'no');
   allText.append(el('summary', 'All checked text on this page'), allTextContent);
   detail.append(selectedTitle, selectedText, allText);
   layout.append(scroll, detail);
-  const exportHint = el('p', 'The PDF keeps the page image shown here, with checked text for search and copy. Handwriting in the image stays unchanged.' + (pdf ? ' PDF annotations and form fields are not included; use Download original to keep them.' : ''), 'ocr-document-hint');
-  host.append(toolbar, el('p', 'Original scan with checked text linked to its location. Select a marked fragment to read it; use Review text to make corrections.', 'ocr-document-hint'), exportHint, status, layout);
+  const exportHint = el('p', 'Visible corrections replace edited fragments with printed text on a white background in the page and PDF. Choose Original image to keep the scan appearance with searchable OCR text.' + (pdf ? ' PDF annotations and form fields are not included; use Download original to keep them.' : ''), 'ocr-document-hint');
+  host.append(toolbar, el('p', 'Select a marked fragment to read it; use Review text to correct it. For earlier text-only edits, enable Show this correction on the page in Review text.', 'ocr-document-hint'), exportHint, status, layout);
   root.replaceChildren(host);
   const current = () => state.pages[state.currentPage];
   function controls() {
-    page.disabled = review.disabled = busy || disposed;
+    page.disabled = review.disabled = appearance.disabled = busy || disposed;
     downloadPdf.disabled = busy || disposed;
     cancelExport.hidden = !exportOperation;
     downloadText.disabled = disposed;
     original.disabled = disposed;
     for (const node of boxes.children) node.disabled = busy || disposed;
+  }
+  function drawCorrections() {
+    corrections.replaceChildren();
+    downloadPdf.textContent = appearance.value === 'corrected' ? 'Download corrected PDF' : 'Download PDF with OCR text';
+    if (appearance.value !== 'corrected') return '';
+    try { corrections.append(createCorrectionOverlay(current().regions, image.naturalWidth || 1, image.naturalHeight || 1)); return ''; }
+    catch (error) { return `Could not display corrections: ${error.message}`; }
   }
   function drawBoxes() {
     boxes.replaceChildren(); selected = null;
@@ -81,7 +92,7 @@ export async function mountOcrDocumentEditor(root, {source, restoredState, signa
   }
   function releaseImage() {
     if (url) URL.revokeObjectURL(url);
-    url = null; image.hidden = true; image.removeAttribute('src'); boxes.replaceChildren();
+    url = null; image.hidden = true; image.removeAttribute('src'); boxes.replaceChildren(); corrections.replaceChildren();
   }
   async function showPage(index, persist = false, rejectFailure = false) {
     if (disposed || !Number.isInteger(index) || index < 0 || index >= state.pages.length) return;
@@ -95,7 +106,7 @@ export async function mountOcrDocumentEditor(root, {source, restoredState, signa
       if (typeof image.decode === 'function') await image.decode();
       if (disposed || ticket !== generation) return;
       image.hidden = false; drawBoxes();
-      status.textContent = `Page ${index + 1} of ${state.pages.length} · checked`;
+      status.textContent = drawCorrections() || `Page ${index + 1} of ${state.pages.length} · checked`;
       scroll.scrollTop = scroll.scrollLeft = 0;
       if (persist) onStateChange();
     } catch (error) {
@@ -110,6 +121,10 @@ export async function mountOcrDocumentEditor(root, {source, restoredState, signa
   }
   page.addEventListener('change', () => { if (!busy) void showPage(Number(page.value), true); });
   zoom.addEventListener('change', () => { stage.style.width = zoom.value + '%'; });
+  appearance.addEventListener('change', () => {
+    if (busy || disposed) return;
+    status.textContent = drawCorrections() || (appearance.value === 'corrected' ? 'Showing visible corrections. PDF export uses this view.' : 'Showing the original image. PDF export keeps this image with checked text for search and copy.');
+  });
   original.addEventListener('click', () => { if (!disposed) download(file, file.name); });
   downloadText.addEventListener('click', () => {
     if (disposed) return;
@@ -125,9 +140,10 @@ export async function mountOcrDocumentEditor(root, {source, restoredState, signa
     try {
       const result = await exportCheckedOcrPdf(file, structuredClone(state), {
         signal:controller.signal,
+        visibleCorrections:appearance.value === 'corrected',
         onProgress:({page, total}) => { if (!disposed) status.textContent = `Preparing PDF: page ${page} of ${total}…`; },
       });
-      if (!disposed && !controller.signal.aborted) { download(result, result.name); status.textContent = 'PDF downloaded with checked text for search and copy.'; }
+      if (!disposed && !controller.signal.aborted) { download(result, result.name); status.textContent = appearance.value === 'corrected' ? 'PDF downloaded with visible corrections and searchable text.' : 'PDF downloaded with the original image and checked text for search and copy.'; }
     } catch (error) {
       if (!disposed) status.textContent = controller.signal.aborted ? 'PDF export cancelled. Your checked text is unchanged.' : `Could not export PDF: ${error.message}`;
     } finally {

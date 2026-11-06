@@ -63,3 +63,12 @@ test('oversized text and nested layout output are bounded before conversion', ()
   const regions = [{id:'line-1',text:'x'.repeat(250000),x:0,y:0,width:1,height:.2},{id:'line-2',text:'x'.repeat(250000),x:0,y:.3,width:1,height:.2}];
   assert.throws(() => layoutText(regions), /500000/, 'separating newlines also count towards the output limit');
 });
+
+test('visible correction flags survive validation while legacy regions keep their original appearance', () => {
+ const base={id:'line-1',text:'Исправлено',x:.1,y:.2,width:.4,height:.05};
+ assert.deepEqual(validateOcrRegions([base]),[base]);
+ assert.deepEqual(validateOcrRegions([{...base,edited:true}]),[{...base,edited:true}]);
+ assert.deepEqual(validateOcrRegions([{...base,edited:false}]),[base]);
+ for(const edited of ['true',1,null,{}]) assert.throws(()=>validateOcrRegions([{...base,edited}]),/correction flag/);
+ assert.equal(layoutText([{...base,edited:true}]),'Исправлено');
+});

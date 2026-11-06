@@ -590,7 +590,10 @@
         $('membership').checked=saved.report.rules.fields.length===0;$('strip').checked=saved.report.rules.strip;$('mapping-panel').hidden=$('membership').checked;mapping(false);for(const row of $('field-mapping').children) if(!saved.report.rules.fields.some(field=>field[0]===row.dataset.left)){row.querySelector('.field-target').value='';row.querySelector('.field-mode').disabled=true;}updateUnmapped();$('rules').hidden=false;$('rules-empty').hidden=true;
       }
       await renderResult(saved.review);
-      officeDescribe(); notice(); $('visual-review').scrollIntoView({block: 'start'});
+      if (revision !== state.revision) return;
+      document.dispatchEvent(new Event('ctt:comparison-resumed'));
+      officeDescribe(); notice();
+      if (!document.body.classList.contains('home-mode') && !$('compare-workspace').hidden) $('visual-review').scrollIntoView({block: 'start'});
     } catch (error) {
       clearResult(); state.metadata = null;
       // Keep the stored session available for explicit deletion/recovery.
@@ -939,7 +942,7 @@
       const {mountSessionUI} = await import(sessionModuleURL.href);
       sessionUI = await mountSessionUI(root, {onResume: resumeSession, onFinish: finishSession,
         onOperating: value => {
-          if (value) { loads.left++; loads.right++; }
+          if (value) { loads.left++; loads.right++; document.dispatchEvent(new Event('ctt:comparison-operation-started')); }
           busy(value);
         }});
       sessionUI.setBusy(state.busy);
