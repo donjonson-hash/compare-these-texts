@@ -144,12 +144,16 @@ async function exercise(context, base, mode) {
   assert.equal(await modal().locator('.ocr-use').isDisabled(), true, 'adoption revokes old approval');
   checks.push('real image worker; same-size original/improved previews; mobile layout; Escape preserves checked text and approval; edited draft restored after retry and reopening; improved OCR remains staged until explicit adoption');
   await modal().locator('.ocr-select-area').click();
+  await modal().locator('.ocr-page-scroll').evaluate(el => { el.scrollTop = el.scrollLeft = 0; el.scrollIntoView({block:'start'}); });
   const rect = await preview.evaluate(img => {
-    const r = img.getBoundingClientRect(), scale = Math.min(r.width / img.naturalWidth, r.height / img.naturalHeight);
-    return {x:r.x + (r.width - img.naturalWidth * scale) / 2, y:r.y + (r.height - img.naturalHeight * scale) / 2, width:img.naturalWidth*scale, height:img.naturalHeight*scale};
+    const r = img.getBoundingClientRect(), clip = img.closest('.ocr-page-scroll').getBoundingClientRect();
+    const x = Math.max(r.left,clip.left,0), y = Math.max(r.top,clip.top,0);
+    return {x,y,width:Math.min(r.right,clip.right,innerWidth)-x,height:Math.min(r.bottom,clip.bottom,innerHeight-20)-y};
   });
+  assert.ok(rect.width > 100 && rect.height > 100, 'pointer selection uses the visible part of the scrollable scan');
   await page.mouse.move(rect.x + 1, rect.y + 1); await page.mouse.down();
-  await page.mouse.move(rect.x + rect.width - 1, rect.y + Math.min(rect.height - 1, 420), {steps:5}); await page.mouse.up();
+  await page.mouse.move(rect.x + rect.width - 1, rect.y + Math.min(rect.height - 2, 420), {steps:5}); await page.mouse.up();
+  assert.equal(await modal().locator('.ocr-recognize-area').isEnabled(), true, 'dragging creates a selectable OCR area');
   await modal().locator('.ocr-recognize-area').click();
   await modal().locator('.ocr-region-result').waitFor({state:'visible', timeout:120000});
   assert.match(await modal().locator('.ocr-region-text').inputValue(), /Заказчик/);
