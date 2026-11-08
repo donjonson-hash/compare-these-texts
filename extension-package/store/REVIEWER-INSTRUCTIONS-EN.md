@@ -1,8 +1,12 @@
-# Reviewer instructions — Compare Two Texts 0.37.6
+# Reviewer instructions — Compare Two Texts 0.37.9 candidate
 
-No account, sign-in, payment, API key or external AI service is required. The
-editor and welcome page are in English. Synthetic examples are built in, so
-review does not require private documents.
+No account, sign-in, payment, API key or external AI service is required for
+the extension workflow. These instructions use the English control names; the
+interface language can be selected separately. Synthetic examples are built
+in, so review does not require private documents. The candidate defines
+52 interface locales; their release readiness requires a strict build with
+complete catalogs. Consult its
+final verification report for browser and installed-package test results.
 
 ## Open the extension
 
@@ -11,6 +15,25 @@ review does not require private documents.
 2. Choose **Open workspace**. The toolbar icon can also open the workspace.
 3. Use **Getting started** in the editor footer to reopen the welcome page.
    **Try an example** on that page opens the synthetic document comparison.
+
+## Review interface language
+
+1. Use the language selector to choose English, Russian and an available
+   right-to-left language, then return to English for the steps below.
+2. Verify labels and help change while the example document contents, filenames,
+   sheet names and A/B comparison direction stay unchanged.
+3. Make an unsaved edit, change language and confirm the edit remains. Reopen
+   the workspace and check the selected language and the resumable draft.
+4. Repeat the language switch offline in the installed extension: translations
+   are packaged locally. No document translation or remote translation call is
+   part of this runtime workflow.
+
+Language coverage and parameter checks are technical checks, not certification
+of translation quality. The candidate includes machine-translated interface
+strings with selective AI review and AI-authored copy; these checks are not
+human native-speaker certification, and not every locale has been reviewed by
+a native speaker. PDF report labels may use English where the bundled font/shaping
+cannot render the chosen language; a notice is shown before export.
 
 ## Compare and edit documents
 

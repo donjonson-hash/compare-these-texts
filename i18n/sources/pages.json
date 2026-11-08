@@ -306,7 +306,7 @@
   "Illustrative contract comparison, not a live document",
   "Illustrative record in two sheets:",
   "Illustrative text extracted from two versions:",
-  "Images and visual formatting are not compared. DOCX footnotes, endnotes and comments are not imported. The editor interface is in English.",
+  "Images and visual formatting are not compared. DOCX footnotes, endnotes and comments are not imported.",
   "Impact on the total",
   "In Finder, press <0>⌘⇧G</0>. Open <1></1>. Create the <2></2> folder if it does not exist.",
   "In Google Docs, open one document and choose <0>Tools</0>, then <1>Compare documents</1>. Select the second document and confirm. Google Docs creates a new document that shows the differences as suggestions.",

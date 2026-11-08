@@ -7,8 +7,9 @@ export function mountTaskpane(document, adapter) {
   const translate = source => document.defaultView?.cttI18n?.t(source) ?? source;
   const status = (message, error = false, guidance = '') => {
     const target = $('status'), primary = document.createElement('span');
-    target.replaceChildren(primary);
     const i18n = document.defaultView?.cttI18n;
+    i18n?.unbindText?.(target);
+    target.replaceChildren(primary);
     if (error && i18n) i18n.bindError(primary, message);
     else if (i18n) i18n.bindText(primary, message);
     else primary.textContent = message;
@@ -64,8 +65,13 @@ export function mountTaskpane(document, adapter) {
 }
 
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  const fail = message => { if (window.cttI18n) window.cttI18n.bindError(document.getElementById('status'), message);
-    else document.getElementById('status').textContent = message; document.getElementById('status').dataset.error = 'true'; };
+  const fail = message => {
+    const status = document.getElementById('status'), text = document.createElement('span');
+    window.cttI18n?.unbindText(status);
+    status.replaceChildren(text);
+    if (window.cttI18n) window.cttI18n.bindError(text, message); else text.textContent = message;
+    status.dataset.error = 'true';
+  };
   if (!window.Office?.onReady) fail('Microsoft Office.js could not load. Open this panel inside Word with an internet connection.');
   else {
     const timeout = window.setTimeout(() => fail('Word has not connected. Open this panel through the installed Word add-in; check your connection or reload the add-in.'), 15000);

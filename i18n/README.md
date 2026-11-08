@@ -1,6 +1,6 @@
 # Interface localization — 0.37.9 draft
 
-Status: implementation and partial AI-reviewed translations are prepared. This is **not a complete 52-locale release**. Do not merge, deploy or upload the candidate until every catalog is complete and the full validation gates pass.
+Status: implementation is prepared; 34 of 52 locale catalogs are complete, including English. External translation is paused after Google HTTP 429. This is **not a complete 52-locale release**. Do not merge, deploy or upload the candidate until every catalog is complete and the full validation gates pass.
 
 ## Coverage and data boundaries
 
@@ -15,16 +15,16 @@ Generated assistant answers keep the language used when they were created. Newly
 - `sources/*.json`: explicit English UI strings contributed by feature owners.
 - `source.json`: deterministic SHA-256-prefix IDs mapped to English strings.
 - `catalogs/<locale>.json`: translated values keyed by those IDs.
-- `overrides/<locale>.json`: reviewed corrections, applied after the base catalog.
+- `overrides/<locale>.json`: priority corrections and validated recoveries, applied after the base catalog. Provenance differs: these include model-authored edits and machine-translated recovery records; their presence is not proof of human review.
 - Numeric rich-text slots and named parameters must survive translation exactly.
 
 Run `python3 scripts/build_i18n.py --collect` after changing English UI strings. Normal builds validate all 51 non-English catalogs before writing any localized modules. Missing keys, unknown keys, blank values, malformed slots and changed parameters stop the build. `--allow-incomplete` is for development only and is never used by the release build.
 
-Existing translations are AI-authored and checked for key/placeholder integrity, not certified by native speakers. The initial subset covers Russian, Ukrainian, German and French, plus selected core strings in Arabic, Hebrew, Japanese, Korean and both Chinese locales; the rest of the interface still requires translation and review.
+Catalog preparation combines Google machine translation, focused model-authored editorial corrections, and structurally validated recovery of translation batches. None of these records is certified by native speakers. Complete catalogs currently cover 34 locales including English; Marathi is partial and 17 further locale catalogs still need their remaining messages. Google returned HTTP 429 during preparation and again after a pause; external requests were stopped with completed work preserved. The target remains all 52 locales. This draft must not be published as a completed localization.
 
-## External translation approval
+## External translation authorization
 
-On 2026-11-08 automatic approval review rejected sending the project's UI catalog to a public Google translation service without explicit user authorization. The batch operation was stopped before any successful catalog translation. No user documents are part of this proposed operation. The optional `scripts/translate_ui.py` utility is disabled unless its explicit external-transfer flag is supplied. Do not retry external translation until authorization is provided. The translation service would be used only during preparation; no network translator is added to the shipped application.
+The owner explicitly authorized Google translation of UI labels, messages and help on 2026-11-08 after reviewing the external-transfer scope. The optional `scripts/translate_ui.py` utility sends only these project UI strings; it never reads or sends user documents. It runs during preparation, not inside the shipped application. Translation results and source hashes are recorded in `translation-metadata.json`. Output remains machine translation requiring editorial review; structural validation does not establish native-language quality.
 
 ## Verification before release
 

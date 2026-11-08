@@ -135,3 +135,25 @@ test('Word Russian messages remain separate from document text and retained draf
   assert.equal(document.getElementById('apply').disabled, true);
   dom.window.close();
 });
+
+
+test('late Word connection replaces the startup error binding without losing the live status on a language switch', async () => {
+  const dom = new JSDOM(fs.readFileSync(new URL('../src/word-addin/taskpane.html', import.meta.url), 'utf8'), {runScripts:'outside-only'});
+  dom.window.eval(fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8'));
+  const document=dom.window.document;
+  const api=dom.window.cttCreateI18n({document,autoStart:false,storage:null,loadCatalog:async()=>({
+    'Word has not connected.':'Word не подключён.',
+    'Review the replacement. Apply writes it into the selected Word passage.':'Проверьте замену перед применением.'
+  })});
+  dom.window.cttI18n=api;
+  api.bindError(document.getElementById('status'),'Word has not connected.');
+  const ui=mountTaskpane(document,{async load(){return {original:'Original document text'};}});
+  await ui.load();document.getElementById('edited').value='My unsaved correction';ui.preview();
+  const currentStatus=document.getElementById('status').firstElementChild;
+  await api.setLocale('ru');
+  assert.equal(document.getElementById('status').firstElementChild,currentStatus);
+  assert.equal(document.getElementById('status').textContent,'Проверьте замену перед применением.');
+  assert.equal(document.getElementById('edited').value,'My unsaved correction');
+  assert.equal(document.getElementById('apply').disabled,false);
+  dom.window.close();
+});

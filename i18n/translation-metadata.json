@@ -1,9 +1,9 @@
 {
   "provider": "Google Translate public translate_a/single (client=gtx)",
   "kind": "machine translation; human review required",
-  "requested_at": "2026-11-08T07:23:09.655211+00:00",
-  "source_sha256": "9892d4ac3042eb0d5373437f189d86b98b2887791c926bc88ed2d62a220e6e40",
-  "source_messages": 2048,
+  "requested_at": "2026-11-08T08:09:04.242469+00:00",
+  "source_sha256": "671a879961219911291d45693093cc723dd633d6c4c3d99257425093cee556d7",
+  "source_messages": 2134,
   "regional_mapping": {
     "es_419": "es (provider base-language output; regional editorial review pending)",
     "pt_PT": "pt-PT",
@@ -13,10 +13,223 @@
     "zh_TW": "zh-TW"
   },
   "protected": "Public product names, URLs, placeholders, line breaks; strict structural validation; no user documents transmitted",
-  "status": "blocked_before_success",
-  "review_reason": "Automatic approval review rejected sending project-derived UI catalogs to a public translation provider without explicit user authorization.",
-  "counters": {
-    "successful_messages": 0
+  "status": "paused_provider_rate_limit",
+  "checkpoint_at": "2026-11-08T08:23:06.378897+00:00",
+  "pause_reason": "Google returned HTTP 429 during translation and on one bounded retry after a pause. All external translation requests stopped; completed records retained.",
+  "checkpoint_source_sha256": "d16201a0d9d3ce85101c8f120e150c8513c12a404b7cf1a2c6bdd7690d563e8e",
+  "checkpoint_source_messages": 2133,
+  "effective_coverage_including_overrides": {
+    "en": {
+      "present": 2133,
+      "missing": 0
+    },
+    "am": {
+      "present": 2133,
+      "missing": 0
+    },
+    "ar": {
+      "present": 2133,
+      "missing": 0
+    },
+    "bg": {
+      "present": 2133,
+      "missing": 0
+    },
+    "bn": {
+      "present": 2133,
+      "missing": 0
+    },
+    "ca": {
+      "present": 2133,
+      "missing": 0
+    },
+    "cs": {
+      "present": 2133,
+      "missing": 0
+    },
+    "da": {
+      "present": 2133,
+      "missing": 0
+    },
+    "de": {
+      "present": 2133,
+      "missing": 0
+    },
+    "el": {
+      "present": 2133,
+      "missing": 0
+    },
+    "es": {
+      "present": 2133,
+      "missing": 0
+    },
+    "es_419": {
+      "present": 2133,
+      "missing": 0
+    },
+    "et": {
+      "present": 2133,
+      "missing": 0
+    },
+    "fa": {
+      "present": 2133,
+      "missing": 0
+    },
+    "fi": {
+      "present": 2133,
+      "missing": 0
+    },
+    "fil": {
+      "present": 2133,
+      "missing": 0
+    },
+    "fr": {
+      "present": 2133,
+      "missing": 0
+    },
+    "gu": {
+      "present": 2133,
+      "missing": 0
+    },
+    "he": {
+      "present": 2133,
+      "missing": 0
+    },
+    "hi": {
+      "present": 2133,
+      "missing": 0
+    },
+    "hr": {
+      "present": 2133,
+      "missing": 0
+    },
+    "hu": {
+      "present": 2133,
+      "missing": 0
+    },
+    "id": {
+      "present": 2133,
+      "missing": 0
+    },
+    "it": {
+      "present": 2133,
+      "missing": 0
+    },
+    "ja": {
+      "present": 2133,
+      "missing": 0
+    },
+    "kn": {
+      "present": 2133,
+      "missing": 0
+    },
+    "ko": {
+      "present": 2133,
+      "missing": 0
+    },
+    "lt": {
+      "present": 2133,
+      "missing": 0
+    },
+    "lv": {
+      "present": 2133,
+      "missing": 0
+    },
+    "ml": {
+      "present": 2133,
+      "missing": 0
+    },
+    "mr": {
+      "present": 1990,
+      "missing": 143
+    },
+    "ms": {
+      "present": 3,
+      "missing": 2130
+    },
+    "nl": {
+      "present": 40,
+      "missing": 2093
+    },
+    "no": {
+      "present": 3,
+      "missing": 2130
+    },
+    "pl": {
+      "present": 3,
+      "missing": 2130
+    },
+    "pt_BR": {
+      "present": 40,
+      "missing": 2093
+    },
+    "pt_PT": {
+      "present": 40,
+      "missing": 2093
+    },
+    "ro": {
+      "present": 3,
+      "missing": 2130
+    },
+    "ru": {
+      "present": 2133,
+      "missing": 0
+    },
+    "sk": {
+      "present": 3,
+      "missing": 2130
+    },
+    "sl": {
+      "present": 3,
+      "missing": 2130
+    },
+    "sr": {
+      "present": 3,
+      "missing": 2130
+    },
+    "sv": {
+      "present": 3,
+      "missing": 2130
+    },
+    "sw": {
+      "present": 3,
+      "missing": 2130
+    },
+    "ta": {
+      "present": 3,
+      "missing": 2130
+    },
+    "te": {
+      "present": 3,
+      "missing": 2130
+    },
+    "th": {
+      "present": 3,
+      "missing": 2130
+    },
+    "tr": {
+      "present": 3,
+      "missing": 2130
+    },
+    "uk": {
+      "present": 2133,
+      "missing": 0
+    },
+    "vi": {
+      "present": 3,
+      "missing": 2130
+    },
+    "zh_CN": {
+      "present": 2133,
+      "missing": 0
+    },
+    "zh_TW": {
+      "present": 2133,
+      "missing": 0
+    }
   },
-  "stopped_at": "2026-11-08T07:23:45.687048+00:00"
+  "complete_locales_including_english": 34,
+  "remaining_translation_records": 36242,
+  "review": "Targeted model-authored corrections and structural/English-residue heuristics; no native-speaker certification. Overrides also contain machine-translated recovery records.",
+  "release_ready": false
 }

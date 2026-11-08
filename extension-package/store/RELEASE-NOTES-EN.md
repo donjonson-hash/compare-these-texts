@@ -1,3 +1,45 @@
+# Compare Two Texts 0.37.9 — localization candidate
+
+Prepared 8 November 2026. This is candidate documentation, not a statement of
+publication, Chrome Web Store approval or completion of the final validation.
+The candidate defines 52 language and regional variants, including English.
+Their release readiness is established by the strict build and final checks. The normal build strictly requires complete catalogs and valid
+placeholders. Browser and installed-package results belong in the final
+verification report; this document does not assert that those checks passed.
+
+- Prepare 52 sets of Chrome listing names, short descriptions and full
+  descriptions. Preserve the English name and short description; retain and
+  update existing translations and add 30 missing locales.
+- Add a shared local interface-language layer for the welcome page, launcher,
+  workspace, help and public guides, with language selection and right-to-left
+  presentation where required. The separate Word and Google Docs panels use
+  the same locale scope.
+- Keep interface translation separate from user content. Document text,
+  filenames, sheet names, comparison direction and calculations are not
+  translated. Language selection must preserve unsaved edits and saved work.
+- Prepare translated strings during development, including owner-authorized
+  machine translation of project interface labels, messages and help. This is
+  not a runtime translation service and does not send user documents for
+  translation. Machine-translated interface strings receive selective AI
+  review, not human native-speaker certification. AI-authored store copy and
+  structural checks also do not replace native-language editorial review.
+- Retain the Mac/WebKit fixes and changed-word highlighting introduced in
+  0.37.8. Localization does not introduce a Safari extension package or claim
+  certification for every Safari release.
+- Keep the extension's document comparison and editing local and offline,
+  without new document-upload requirements. OCR remains removed. PDF requires
+  a text layer and retains its documented layout, form and comment limitations.
+- Keep the Word task-pane and Google Docs Apps Script integrations as separately
+  installed pilots with separate privacy terms. They are not automatically
+  installed by Chrome or newly published to an Office marketplace.
+
+Interface catalogs, placeholder checks, Chromium/WebKit behavior, offline
+operation and report exports remain release gates. PDF report labels may use
+English when the bundled font/shaping does not support the selected language;
+the interface explains this before export. The authoritative software license
+remains in English. Screenshots and video have not been translated into 52
+versions by this change.
+
 # Compare Two Texts 0.37.8 — Mac navigation and document-editor add-ins
 
 - Restore precise changed-word highlighting for text and Word documents, including edits, Undo and restored work.
@@ -76,7 +118,7 @@ not a claim that the listing is published or approved.
 - Updated welcome guidance for single-document editing and PDF preview.
 - Added editor/PDF screenshots and bound image checksums to the exact installation ZIP.
 
-## Included in the candidate
+## Included in the historical 0.37.6 candidate
 
 - A document-first Edit & export workspace with **Open new document** and
   **Document options**, plus preservation of the current document when a
@@ -85,8 +127,8 @@ not a claim that the listing is published or approved.
   page numbers and plain horizontal rules. Calibri/Carlito text uses an offline
   compatible font; supported color emoji remain available.
 - A local first-install welcome page, toolbar launcher and Getting started link.
-- Current English listing copy, 22 localized metadata catalogs and 22 full
-  descriptions. The editor and welcome page remain English.
+- At that release, English listing copy, 22 localized metadata catalogs and
+  22 full descriptions were included. Current 0.37.9 locale counts are above.
 - Store images, icons, privacy explanations and reviewer instructions.
 
 ## Scope

@@ -868,7 +868,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
         const locale = globalThis.cttI18n?.getLocale() || 'en';
         pdfLabelsInEnglish = pdfReportLocale(locale) !== locale;
         if (!current()) return;
-        if (pdfLabelsInEnglish) exportStatus(uiMessage('Preparing PDF report… Its headings and labels will use English because this PDF exporter does not yet support the selected language. Document text is kept unchanged.'));
+        if (pdfLabelsInEnglish) exportStatus(uiMessage('Preparing PDF report… Its headings and labels will use English because this PDF exporter does not yet support the selected language. Original document text is not translated.'));
       }
       // Export has its own cancellation scope so a new comparison stays independent.
       const result = await window.KristinaTransport.request('/api/export', {report, format}, {signal: requestController.signal});
@@ -879,7 +879,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       try { document.body.append(link); link.click(); }
       finally { link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
       recordProductEvent('document_download', {file_format: format, workspace: 'comparison'});
-      exportStatus(pdfLabelsInEnglish ? uiMessage('PDF report sent to your browser for download. Its headings and labels use English; document text is kept unchanged.') : uiMessage('{0} report sent to your browser for download.', {0: format.toUpperCase()}));
+      exportStatus(pdfLabelsInEnglish ? uiMessage('PDF report sent to your browser for download. Its headings and labels use English; original document text is not translated.') : uiMessage('{0} report sent to your browser for download.', {0: format.toUpperCase()}));
     } catch (error) {
       if (!current() || error?.name === 'AbortError') return;
       const detail = typeof error?.message === 'string' && /^(?:[A-Za-zА-Яа-яЁё]|(?:XLSX|PDF)[: -])/.test(error.message) ? ' ' + error.message.slice(0, 240) : " Try downloading again or save the HTML report.";
@@ -958,7 +958,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       $(side + '-file').accept += ',.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.txt,text/plain,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf';
       sourceLabel(side, null);
       const label = element('label', uiMessage("Sheet to compare"), 'sheet-choice'), select = element('select');
-      select.id = side + '-sheet'; uiSetAttr(select, 'aria-label', uiMessage("Sheet to compare {0}", { 0: side === 'left' ? uiMessage("A") : uiMessage("B") }));
+      select.id = side + '-sheet'; uiSetAttr(select, 'aria-label', uiMessage("Sheet to compare {0}", { 0: side === 'left' ? 'A' : 'B' }));
       label.hidden = true; label.append(select); $(side + '-drop').after(label);
       select.addEventListener('change', () => {
         if (!state.sources[side] || state.busy) return;

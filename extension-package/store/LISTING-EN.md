@@ -1,6 +1,6 @@
 # Compare Two Texts — English Chrome Web Store listing
 
-Release candidate **0.37.6**, prepared 30 October 2026. This document supplies
+Release candidate **0.37.9**, prepared 8 November 2026. This document supplies
 copy for submission; it does not claim store publication or approval.
 `localizations.json` and `descriptions/en.txt` are the canonical copy inputs.
 
@@ -48,21 +48,23 @@ PRIVATE BY DESIGN
 - Drafts expire after seven days without use. Website and extension drafts are stored separately.
 
 GOOD TO KNOW
-- Files up to 2 MiB each. The editor interface is in English.
+- Files up to 2 MiB each. Document contents are not translated.
 - PDFs need a text layer: scanned images and OCR are not supported. Interactive PDF form fields and comments are not supported.
 - Images and formatting are not compared. Complex PDF or Word layouts may export as text only, and Word layout may differ from Microsoft Word.
 - DOCX footnotes, endnotes and comments are not imported; move them into the main text of a copy first.
 - Spreadsheet comparison needs one header row, no merged cells and values instead of formulas.
 
+Optional pilot add-ins for Word and Google Docs are installed separately and have their own privacy terms. This extension does not install them automatically.
+
 Also available on the web at comparetwotexts.pro. Questions or ideas? Use the support link on this page.
 
 ## Dashboard references — do not paste into the full description
 
-The full description above contains 2,741 Unicode characters
-(2,741 UTF-16 code units), excluding its final newline.
+The full description above contains 2,903 Unicode characters
+(2,903 UTF-16 code units), excluding its final newline.
 Copy `descriptions/en.txt` as-is into the description field.
 
-- Primary language: English. The editor and welcome page are in English.
+- Primary listing language: English. Interface language is a separate setting; control names in these instructions use the English labels.
 - Category suggestion: Productivity, if offered by the current dashboard.
 - Homepage: https://comparetwotexts.pro/
 - Support: https://comparetwotexts.pro/support/
@@ -73,7 +75,25 @@ Copy `descriptions/en.txt` as-is into the description field.
 - Additional document-comparison tools: **All tools → Review & edit / Files & settings / Reports**.
 - Undo is available; do not advertise an application-level Redo command.
 
-22 localized metadata catalogs and 22 full descriptions are prepared. These
-localize the listing and Chrome metadata, not the editor. Screenshots use
-synthetic examples. Keep the same extension item ID when updating an existing
-listing. The store-kit ZIP is a materials bundle; upload its inner Chrome ZIP.
+52 localized metadata catalogs and 52 full descriptions are prepared. The
+0.37.9 candidate defines the same 52 interface locales, including English.
+Their release readiness is established by the strict build and final checks. The normal build requires complete catalogs and valid placeholders.
+Installed-package and browser test results are recorded separately in the final
+verification report; this listing reference does not claim those checks passed.
+
+Translations include AI-authored store copy and machine-translated interface
+strings with selective AI review. Placeholder and coverage checks do not
+establish native-language quality; this is not human certification, and not
+all locales have been reviewed by native speakers. Translation
+services are used during preparation, not for document processing in the
+installed extension. The extension does not translate document contents.
+
+Screenshots use synthetic examples and are not supplied in 52 translated
+versions. Keep the same extension item ID when updating an existing listing.
+The store-kit ZIP is a materials bundle; upload its inner Chrome ZIP. Optional
+Word and Google Docs pilot add-ins are installed separately and have separate
+privacy terms. No OCR or automatic add-in installation is advertised.
+
+PDF report labels may use English when the bundled font or text shaping does
+not support the selected language; the interface explains this before export.
+The authoritative software license remains in English.

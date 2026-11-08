@@ -33,6 +33,8 @@ assert (root/'LICENSE.txt').read_bytes()==(root.parent/'LICENSE').read_bytes(), 
 assert '<!-- CTT-LICENSE -->' not in (root/'terms/index.html').read_text(), 'license was not rendered'
 subprocess.run(['node',str(root.parent/'scripts/check_source_policy.mjs')],check=True)
 subprocess.run(['python3',str(root.parent/'scripts/verify_vendor.py')],check=True)
+subprocess.run(['python3',str(root.parent/'scripts/check_i18n_quality.py')],check=True)
+subprocess.run(['python3',str(root.parent/'scripts/check_i18n_sides.py')],check=True)
 class Parser(HTMLParser):
  def __init__(self): super().__init__(); self.refs=[]; self.ids=[]; self.csp=''; self.canonicals=[]; self.descriptions=[]; self.h1_count=0; self.scripts=[]; self.resources=[]; self.robots=[]; self.inline_scripts=0
  def handle_starttag(self,tag,attrs):
