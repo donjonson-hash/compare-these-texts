@@ -1,3 +1,12 @@
+# Compare Two Texts 0.37.8 — Mac navigation and document-editor add-ins
+
+- Restore precise changed-word highlighting for text and Word documents, including edits, Undo and restored work.
+- Keep saved Edit & export controls inside their workspace. Delayed resume operations cannot reopen an old document over a new comparison; Home observers survive browser back/forward cache.
+- Restore the macOS WebKit regression gate alongside the installed Chromium extension checks. This covers the browser engine, not certification of every Safari release or a Safari extension package.
+- Add an Office add-ins entry from the welcome page and workspace help. Include the existing Google Docs Apps Script prototype and instructions for separate installation.
+- Provide a new Microsoft Word task-pane pilot with explicit selection, edit, preview and apply. It requires separate installation in a compatible Word host; it is not installed automatically by Chrome and is not published in Microsoft Marketplace.
+- Keep the Chrome extension permission-free and offline. Office integrations have separate data handling, described before installation. Integrated OCR remains removed.
+
 # Version 0.37.7 — Getting started
 
 - Redesigned the local welcome page around PDF comparison, private contract review and a three-step first workflow.

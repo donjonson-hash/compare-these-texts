@@ -7,6 +7,8 @@ import {createFinalCheck} from './final-check.mjs';
 import {createReviewQueue} from './review-queue.mjs';
 import {mountNumberReview} from './number-review.mjs';
 import {recordProductEvent} from './product-events.mjs';
+import {diffTextSegments} from './text-diff.mjs';
+import {markTextChanges} from './text-highlights.mjs';
 /* Documents first: original pages, local corrections, and two editable versions. */
 const sides = ['left', 'right'];
 const letter = side => side === 'left' ? 'A' : 'B';
@@ -102,6 +104,8 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   const hasFill = () => !!fillState?.fields.length;
   const fillCurrent = () => !hasFill() || fillState.signature === fillSignature();
   const typingTimers = {}; let diffKeys = new Set();
+  const paragraphHighlights = new WeakMap();
+  let highlightRevision = null, highlightSegments = new Map(), highlightEntries = {};
   const alive = () => !disposed && !signal?.aborted;
   const scrollPositions = {left: {top: 0, left: 0}, right: {top: 0, left: 0}};
   let restoring = true;
@@ -546,6 +550,39 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     }).map(group => group.key));
   }
   function different(group) { return !single && !!group && diffKeys.has(group.key); }
+  function refreshTextHighlights() {
+    if (single) return;
+    const revision = sides.map(side => drafts[side].revision).join(':');
+    if (highlightRevision !== revision) {
+      highlightRevision = revision; highlightSegments = new Map(); highlightEntries = {};
+      for (const side of sides) {
+        const entries = new Map(); highlightEntries[side] = entries;
+        for (const entry of drafts[side].entries()) {
+          if (!entries.has(entry.key)) entries.set(entry.key, []);
+          const list = entries.get(entry.key), previous = list.at(-1);
+          list.push({...entry, offset: previous ? previous.offset + previous.text.length + 1 : 0});
+        }
+      }
+      const budget = {used: 0, fallback: 0};
+      for (const group of groups) {
+        const text = side => (highlightEntries[side].get(group.key) || []).map(entry => entry.text).join('\n');
+        highlightSegments.set(group.key, diffTextSegments(text('left'), text('right'), budget));
+      }
+    }
+    for (const node of root.querySelectorAll('.visual-paragraph[data-group]')) {
+      const info = paragraphHighlights.get(node); if (!info) continue;
+      const entries = highlightEntries[info.side].get(node.dataset.group) || [];
+      const current = entries[info.ordinal];
+      const segments = entries.length && diffKeys.has(node.dataset.group) ? highlightSegments.get(node.dataset.group)?.[info.side] : undefined;
+      const offset = info.aggregate ? 0 : current?.offset || 0;
+      const expected = info.aggregate ? entries.map(entry => entry.text).join('\n') : current?.text ?? '';
+      if (!info.highlighted || info.segments !== segments || info.offset !== offset || info.expected !== expected) {
+        markTextChanges(info.content, segments, offset, expected);
+        Object.assign(info, {highlighted: true, segments, offset, expected});
+      }
+      node.classList.toggle('is-moved', different(byKey.get(node.dataset.group)) && byKey.get(node.dataset.group)?.category === 'moved');
+    }
+  }
   function differences() { return groups.filter(different); }
   let assistantEquality = {textsEqual: false, structureDiffers: false};
   function getAssistantContext() {
@@ -581,6 +618,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       node.classList.toggle('is-selected', node.dataset.group === selected);
       node.classList.toggle('is-reviewed', reviewQueue.has(node.dataset.group) && reviewQueue.reviewed(node.dataset.group));
     }
+    refreshTextHighlights();
     finder?.refresh();
   }
   function updateReviewProgress() {
@@ -908,6 +946,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
         }
         const projected = model ? projectWord(model, docxSequence(side), {rowPlan: drafts[side].rowPlan?.()}) : null;
         const entries = projected ? projected.blocks : drafts[side].entries();
+        const paragraphOrdinals = new Map();
         function paragraph(entry) {
           const p = el(entry.heading ? `h${entry.heading}` : 'p', undefined, 'visual-paragraph');
           style(p, entry.style);
@@ -936,6 +975,9 @@ export async function mountVisualReview(root, {report, sources, single = false, 
           else content.append(document.createTextNode(entry.text));
           if (!content.hasChildNodes()) content.append(el('br'));
           if (entry.key) {
+            const ordinal = paragraphOrdinals.get(entry.key) || 0;
+            paragraphOrdinals.set(entry.key, ordinal + 1);
+            paragraphHighlights.set(p, {content, side, ordinal, aggregate: !!model && !drafts[side].rowPlan});
             p.dataset.group = entry.key; p.tabIndex = 0; p.setAttribute('role', 'button'); p.setAttribute('aria-label', `Edit${single ? '' : ' '+letter(side)}: ${entry.list ? entry.list.label + ' ' : ''}${entry.text.slice(0, 100) || "Empty paragraph"}`);
             p.addEventListener('click', () => select(entry.key, side));
             p.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); select(entry.key, side); } });

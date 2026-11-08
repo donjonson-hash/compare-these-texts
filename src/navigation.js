@@ -7,7 +7,7 @@
   const files = {left:null, right:null};
   const sides = ['left', 'right'];
   const help = $('home-help');
-  let pending = false;
+  let pending = false, navigationRevision = 0, resumeNavigation = null;
   function notice(text = '', error = false) {
     const node = $('home-notice'); node.textContent = text; node.hidden = !text;
     node.classList.toggle('error', error);
@@ -35,7 +35,7 @@
     else if (!/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.test(file.name)) error = 'Choose a DOCX, PDF, TXT, XLSX, CSV or TSV file.';
     else if (file.size > 2 * 1024 * 1024) error = 'Choose a file up to 2 MB.';
     if (error) notice(error, true);
-    else { files[side] = file; notice(); }
+    else { navigationRevision++; files[side] = file; notice(); }
     controls();
   }
   function updateResume() {
@@ -74,14 +74,15 @@
   for (const side of sides) {
     const input = $('home-' + side + '-file'), zone = $('home-' + side + '-drop'), field = $('home-' + side + '-text');
     input.addEventListener('change', () => { choose(side, input.files[0]); input.value = ''; });
-    field.addEventListener('input', () => { notice(); controls(); });
-    $('home-' + side + '-paste').addEventListener('click', () => { if (pending) return; files[side] = null; notice(); controls(); field.focus(); });
+    field.addEventListener('input', () => { navigationRevision++; notice(); controls(); });
+    $('home-' + side + '-paste').addEventListener('click', () => { if (pending) return; navigationRevision++; files[side] = null; notice(); controls(); field.focus(); });
     zone.addEventListener('dragover', event => { if (!event.dataTransfer.types.includes('Files')) return; event.preventDefault(); if (!pending) zone.classList.add('dragging'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('dragging'));
     zone.addEventListener('drop', event => { if (!event.dataTransfer.files.length) return; event.preventDefault(); zone.classList.remove('dragging'); choose(side, event.dataTransfer.files[0]); });
   }
   $('home-swap').addEventListener('click', () => {
     if (pending) return;
+    navigationRevision++;
     [files.left, files.right] = [files.right, files.left];
     const left = $('home-left-text'), right = $('home-right-text');
     [left.value, right.value] = [right.value, left.value]; notice(); controls();
@@ -89,7 +90,7 @@
   $('home-example').addEventListener('click', () => {
     if (pending) return;
     if (sides.some(hasInput) && !window.confirm('Replace the texts or files on this start screen with an example? Your open comparison will stay unchanged.')) return;
-    files.left = files.right = null;
+    navigationRevision++; files.left = files.right = null;
     $('home-left-text').value = 'Project update\nLaunch date: October 24\nBudget: $2,500\nThe page is ready for review.';
     $('home-right-text').value = 'Project update\nLaunch date: October 28\nBudget: $2,800\nThe page is ready for review.\nMobile checks completed.';
     notice(); controls(); $('home-left-text').focus();
@@ -101,7 +102,8 @@
   $('header-edit').addEventListener('click', () => open('single'));
   $('home-help-open').addEventListener('click', () => help.showModal());
   $('home-help-close').addEventListener('click', () => help.close());
-  for (const button of modes) button.addEventListener('click', leaveHome);
+  for (const button of modes) button.addEventListener('click', () => { navigationRevision++; leaveHome(); });
+  document.addEventListener('ctt:home', () => { navigationRevision++; });
   // Help can be opened during editing. Do not let its examples silently replace
   // an active comparison, partially loaded sources or a saved comparison.
   for (const id of ['demo', 'demo-tables']) $(id).addEventListener('click', event => {
@@ -113,11 +115,14 @@
     open('compare');
   }, {capture:true});
   const saved = $('saved-session'); if (saved) menu.before(saved);
-  // A saved comparison can be resumed from Home without hiding its restored result.
-  const observer = new MutationObserver(() => {
-    updateResume();
-    if (!pending && document.body.classList.contains('home-mode') && !$('results').hidden) open('compare');
+  // Result painting may finish after the user has returned Home. Only an
+  // explicit successful resume may navigate away from staged new inputs.
+  document.addEventListener('ctt:comparison-operation-started', () => { resumeNavigation = navigationRevision; });
+  document.addEventListener('ctt:comparison-resumed', () => {
+    const requested = resumeNavigation === navigationRevision; resumeNavigation = null;
+    if (requested && !pending && document.body.classList.contains('home-mode')) open('compare');
   });
+  const observer = new MutationObserver(updateResume);
   observer.observe($('results'), {attributes:true, attributeFilter:['hidden']});
   // The packaged welcome guard reports through the existing workspace notice.
   // Surface that warning on Home as well, where the comparison is still hidden.
@@ -128,6 +133,8 @@
   const noticeObserver = new MutationObserver(mirrorNotice);
   noticeObserver.observe(workspaceNotice, {attributes:true, childList:true, subtree:true, characterData:true});
   mirrorNotice();
-  window.addEventListener('pagehide', () => { observer.disconnect(); noticeObserver.disconnect(); }, {once:true});
+  window.addEventListener('pagehide', event => {
+    if (!event.persisted) { observer.disconnect(); noticeObserver.disconnect(); }
+  });
   controls(); updateResume();
 })();

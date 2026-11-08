@@ -40,6 +40,15 @@ def build():
         paragraphs.append(f"<{tag}>{html.escape(text)}</{tag}>")
     terms_page.write_text(template.replace(marker, "\n".join(paragraphs)))
     (OUTPUT / "downloads").mkdir()
+    # This document-bound Apps Script package is installed separately in Google
+    # Docs. Ship the same verified sources and instructions on the site and in
+    # the browser package; never execute them inside the offline workspace.
+    google_archive = Path(subprocess.check_output(
+        [sys.executable, str(ROOT / "google-docs/build.py")], text=True).strip())
+    shutil.copyfile(google_archive, OUTPUT / "downloads" / google_archive.name)
+    for source, destination in [('README.md', 'google-docs-setup-en.md'),
+                                ('README-RU.md', 'google-docs-setup-ru.md')]:
+        shutil.copyfile(ROOT / "google-docs" / source, OUTPUT / "downloads" / destination)
     subprocess.run([sys.executable, str(ROOT / "scripts/package_extension.py")], check=True)
     # Keep remote scripts and website CSP permissions out of offline extensions.
     add_website_analytics(OUTPUT)

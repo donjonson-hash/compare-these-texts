@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="TaskPaneApp">
+  <Id>78954e7f-bfb1-454d-9870-5530b685d3a7</Id>
+  <Version>0.1.0.0</Version>
+  <ProviderName>Compare Two Texts</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Compare Two Texts — Word pilot"/>
+  <Description DefaultValue="Edit one selected passage, preview the replacement and apply it in Word. Pilot with text and formatting checks."/>
+  <IconUrl DefaultValue="https://comparetwotexts.pro/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://comparetwotexts.pro/icon-store-128.png"/>
+  <SupportUrl DefaultValue="https://comparetwotexts.pro/word-addin/"/>
+  <Hosts><Host Name="Document"/></Hosts>
+  <Requirements><Sets><Set Name="WordApi" MinVersion="1.4"/></Sets></Requirements>
+  <DefaultSettings><SourceLocation DefaultValue="https://comparetwotexts.pro/word-addin/taskpane.html"/></DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>

@@ -1,11 +1,15 @@
 /* Independent local draft; switching modes retains both workspaces. */
 (() => {
  const $=id=>document.getElementById(id),moduleURL=new URL('single-editor.mjs',document.currentScript.src),sessionURL=new URL('single-session.mjs',document.currentScript.src);
- let controller=null,view=null,generation=0,candidate=null,busy=false,operating=false,session=null;
+ let controller=null,view=null,generation=0,candidate=null,busy=false,operating=false,session=null,navigationRevision=0,operationNavigation=null;
  const note=(text,error=false)=>{const notice=$('single-notice');notice.classList.toggle('error',error);notice.setAttribute('role',error?'alert':'status');notice.setAttribute('aria-live',error?'assertive':'polite');notice.textContent=text;notice.hidden=!text;};
  function chooseMode(next){
   document.body.classList.toggle('single-mode',next==='single');$('single-workspace').hidden=next!=='single';$('compare-workspace').hidden=next!=='compare';
   for(const button of document.querySelectorAll('[data-work-mode]'))button.setAttribute('aria-pressed',String(button.dataset.workMode===next));if(next==='single')view?.restoreViewport?.();
+ }
+ function focusDocument(){
+  if(document.body.classList.contains('home-mode')||$('single-workspace').hidden)return;
+  const current=$('single-current');current.focus({preventScroll:true});current.scrollIntoView?.({block:'start'});
  }
  function sourcePanel(open){
   $('single-source-panel').hidden=!!view&&!open;
@@ -26,10 +30,11 @@
   $('single-editor-host').replaceChildren();$('single-options').hidden=true;$('single-current').textContent='';$('single-current').hidden=true;note('');sourcePanel(true);
  }
  const ready=import(sessionURL.href).then(({mountSingleSession})=>mountSingleSession($('single-session'),{
-  onResume:async payload=>{await install(payload,true);chooseMode('single');$('single-current').focus({preventScroll:true});$('single-current').scrollIntoView?.({block:'start'});},onFinish:closeDocument,
-  onOperating:value=>{operating=value;if(value)generation++;controls();if(!value&&!view)$('single-file').focus({preventScroll:true});}
+  onResume:async payload=>{const navigation=operationNavigation??navigationRevision;await install(payload,true);if(navigation===navigationRevision){chooseMode('single');focusDocument();}},onFinish:closeDocument,
+  onOperating:value=>{operating=value;if(value){operationNavigation=navigationRevision;generation++;}else operationNavigation=null;controls();if(!value&&!view&&!document.body.classList.contains('home-mode')&&!$('single-workspace').hidden)$('single-file').focus({preventScroll:true});}
  })).then(ui=>{session=ui;session.setBusy(busy);return ui;}).catch(()=>{note('Automatic saving is unavailable. Download your edits before closing this tab.',true);return null;});
- document.querySelectorAll('[data-work-mode]').forEach(button=>button.addEventListener('click',()=>chooseMode(button.dataset.workMode)));
+ document.querySelectorAll('[data-work-mode]').forEach(button=>button.addEventListener('click',()=>{navigationRevision++;chooseMode(button.dataset.workMode);}));
+ document.addEventListener('ctt:home',()=>{navigationRevision++;});
  async function install(payload,resuming=false){
   const ticket=++generation,abort=new AbortController(),stage=document.createElement('div');let next;setBusy(true);note(resuming?'Restoring your document…':'Opening your document…');
   try{
@@ -42,7 +47,7 @@
    // Bind to the opened file, never the candidate for a later replacement.
    const {source,sheet,delimiter}=payload;
    session?.activate(()=>({version:1,kind:'single-editor',source,sheet:sheet||null,delimiter,review:next.snapshot()}));
-   const paste=$('single-paste');if(paste)paste.open=false;const destination=$('single-current');destination.scrollIntoView?.({block:'start'});destination.focus?.({preventScroll:true});
+   const paste=$('single-paste');if(paste)paste.open=false;focusDocument();
   }catch(error){abort.abort();next?.dispose();if(ticket===generation)note(resuming?error.message:`Could not open “${payload.source.name}”. ${error.message}${view?' Your current document is still open.':''}`,true);if(resuming)throw error;}
   finally{if(ticket===generation)setBusy(false);}
  }
