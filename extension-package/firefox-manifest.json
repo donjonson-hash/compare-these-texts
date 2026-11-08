@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Compare Two Texts — Diff Checker",
-  "version": "0.37.6",
+  "version": "0.37.7",
   "homepage_url": "https://comparetwotexts.pro/",
   "description": "Compare two texts, Word, PDF and Excel files side by side. Find differences, edit and export. Works offline, no file uploads.",
   "icons": {
