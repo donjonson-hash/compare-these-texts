@@ -42,6 +42,8 @@ def social_meta(text):
 
 def add_social_meta(output):
     for page in sorted(output.rglob("*.html")):
+        if page.relative_to(output).parts[0] == "word-addin":
+            continue
         text = page.read_text()
         if 'property="og:' in text:
             raise RuntimeError(f"Duplicate social metadata in {page}")

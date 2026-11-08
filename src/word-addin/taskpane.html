@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compare Two Texts for Word — pilot</title>
+<meta name="description" content="Review and apply an edit to selected text inside Microsoft Word. Pilot add-in with explicit preview and stale-selection checks.">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://officeapis.public.onecdn.static.microsoft; style-src 'self'; img-src 'self' data:; connect-src https://officeapis.public.onecdn.static.microsoft; base-uri 'none'; form-action 'none'">
+<link rel="stylesheet" href="taskpane.css">
+<script src="https://officeapis.public.onecdn.static.microsoft/1/office.js"></script>
+<script type="module" src="taskpane.mjs"></script>
+</head><body>
+<main>
+<p class="eyebrow">WORD ADD-IN · PILOT 0.1.0</p><h1>Edit selected text</h1>
+<p>Select one consistently formatted passage in an ordinary Word paragraph. Load it here, edit, preview, then apply.</p>
+<button id="load" type="button" disabled>Load selected text</button>
+<p id="status" role="status" aria-live="polite">Connecting to Word. This panel works when installed as a Word add-in.</p>
+<section id="editor" hidden>
+<details><summary>Original selected text</summary><div id="original" class="text-box"></div></details>
+<label for="edited">Your edit</label><textarea id="edited" maxlength="4000" rows="8" spellcheck="true" aria-describedby="limit"></textarea>
+<p id="limit" class="muted">One paragraph; up to 4,000 UTF-16 units (most letters use one; many emoji use two). No line breaks.</p>
+<div class="actions"><button id="review" type="button" disabled>Preview changes</button><button id="apply" type="button" class="primary" disabled>Apply to Word</button></div>
+<section id="changes" hidden><h2>Review the replacement</h2><p class="muted">Removed text is crossed out; added text is underlined. This previews one replacement from the first to the last changed character.</p><div id="preview" class="text-box"></div></section>
+</section>
+<details class="limits"><summary>How saving and privacy work</summary><p>Apply writes to your selected passage. Save and Undo work through Word. Keep the original passage selected until you apply. Avoid simultaneous edits by collaborators.</p><p>The panel loads from Compare Two Texts; Microsoft supplies Office.js. Our add-in code does not send document text to a server or AI service, and does not store drafts. Word’s own cloud saving and data handling still apply.</p><p>Pilot: ordinary body text only. Tables, lists, links, fields, bookmarks, comments, content controls and Track Changes are unsupported. Mixed formatting within the selection is rejected. A change to the original text, formatting or selection requires loading it again.</p><p>Native Word testing on your device is still required. Use a test copy for your first check.</p></details>
+<p class="muted"><a href="https://comparetwotexts.pro/word-addin/" target="_blank" rel="noopener noreferrer">Setup and limitations</a></p>
+</main></body></html>

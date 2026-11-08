@@ -9,7 +9,7 @@ const GUIDES = ['/compare-word-documents/', '/compare-pdf-files/', '/compare-exc
 
 function pages(dir = dist) {
   return readdirSync(dir, {withFileTypes: true}).flatMap(entry => {
-    if (entry.isDirectory()) return entry.name === 'downloads' || entry.name === 'release' ? [] : pages(new URL(entry.name + '/', dir));
+    if (entry.isDirectory()) return ['downloads', 'release', 'word-addin'].includes(entry.name) ? [] : pages(new URL(entry.name + '/', dir));
     return entry.name.endsWith('.html') ? [new URL(entry.name, dir)] : [];
   });
 }
