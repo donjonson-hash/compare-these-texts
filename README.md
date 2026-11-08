@@ -46,7 +46,7 @@ page layouts remain restricted; PDF export does not silently discard those parts
 The 0.37.4 candidate opens a local welcome page on first installation. Updates
 leave existing tabs alone. **Getting started** in the extension footer opens
 the guide separately; **Try an example** leaves an existing saved comparison
-available to resume. The 0.37.9 draft adds offline interface localization; complete language catalogs are still pending. See `i18n/README.md` before building or publishing this draft.
+available to resume. The 0.37.9 draft adds offline interface localization with full catalog coverage. Language-quality issues are still open. See `i18n/README.md` before preparing a store build.
 
 **Word & Google Docs add-ins** in Getting started, Help and the workspace footer
 opens an installation hub for editing selected text directly in those programs.

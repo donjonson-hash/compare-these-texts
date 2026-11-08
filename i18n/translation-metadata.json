@@ -1,23 +1,313 @@
 {
-  "provider": "Google Translate public translate_a/single (client=gtx)",
-  "kind": "machine translation; human review required",
-  "requested_at": "2026-11-08T08:09:04.242469+00:00",
-  "source_sha256": "671a879961219911291d45693093cc723dd633d6c4c3d99257425093cee556d7",
-  "source_messages": 2134,
-  "regional_mapping": {
-    "es_419": "es (provider base-language output; regional editorial review pending)",
-    "pt_PT": "pt-PT",
-    "pt_BR": "pt",
-    "fil": "tl",
-    "zh_CN": "zh-CN",
-    "zh_TW": "zh-TW"
+  "status": "draft_editorial_quality_blocked",
+  "source_sha256": "d16201a0d9d3ce85101c8f120e150c8513c12a404b7cf1a2c6bdd7690d563e8e",
+  "source_messages": 2133,
+  "previous_checkpoint": {
+    "provider": "Google Translate public translate_a/single (client=gtx)",
+    "status": "paused_provider_rate_limit",
+    "checkpoint_at": "2026-11-08T08:23:06.378897+00:00",
+    "effective_coverage_including_overrides": {
+      "en": {
+        "present": 2133,
+        "missing": 0
+      },
+      "am": {
+        "present": 2133,
+        "missing": 0
+      },
+      "ar": {
+        "present": 2133,
+        "missing": 0
+      },
+      "bg": {
+        "present": 2133,
+        "missing": 0
+      },
+      "bn": {
+        "present": 2133,
+        "missing": 0
+      },
+      "ca": {
+        "present": 2133,
+        "missing": 0
+      },
+      "cs": {
+        "present": 2133,
+        "missing": 0
+      },
+      "da": {
+        "present": 2133,
+        "missing": 0
+      },
+      "de": {
+        "present": 2133,
+        "missing": 0
+      },
+      "el": {
+        "present": 2133,
+        "missing": 0
+      },
+      "es": {
+        "present": 2133,
+        "missing": 0
+      },
+      "es_419": {
+        "present": 2133,
+        "missing": 0
+      },
+      "et": {
+        "present": 2133,
+        "missing": 0
+      },
+      "fa": {
+        "present": 2133,
+        "missing": 0
+      },
+      "fi": {
+        "present": 2133,
+        "missing": 0
+      },
+      "fil": {
+        "present": 2133,
+        "missing": 0
+      },
+      "fr": {
+        "present": 2133,
+        "missing": 0
+      },
+      "gu": {
+        "present": 2133,
+        "missing": 0
+      },
+      "he": {
+        "present": 2133,
+        "missing": 0
+      },
+      "hi": {
+        "present": 2133,
+        "missing": 0
+      },
+      "hr": {
+        "present": 2133,
+        "missing": 0
+      },
+      "hu": {
+        "present": 2133,
+        "missing": 0
+      },
+      "id": {
+        "present": 2133,
+        "missing": 0
+      },
+      "it": {
+        "present": 2133,
+        "missing": 0
+      },
+      "ja": {
+        "present": 2133,
+        "missing": 0
+      },
+      "kn": {
+        "present": 2133,
+        "missing": 0
+      },
+      "ko": {
+        "present": 2133,
+        "missing": 0
+      },
+      "lt": {
+        "present": 2133,
+        "missing": 0
+      },
+      "lv": {
+        "present": 2133,
+        "missing": 0
+      },
+      "ml": {
+        "present": 2133,
+        "missing": 0
+      },
+      "mr": {
+        "present": 1990,
+        "missing": 143
+      },
+      "ms": {
+        "present": 3,
+        "missing": 2130
+      },
+      "nl": {
+        "present": 40,
+        "missing": 2093
+      },
+      "no": {
+        "present": 3,
+        "missing": 2130
+      },
+      "pl": {
+        "present": 3,
+        "missing": 2130
+      },
+      "pt_BR": {
+        "present": 40,
+        "missing": 2093
+      },
+      "pt_PT": {
+        "present": 40,
+        "missing": 2093
+      },
+      "ro": {
+        "present": 3,
+        "missing": 2130
+      },
+      "ru": {
+        "present": 2133,
+        "missing": 0
+      },
+      "sk": {
+        "present": 3,
+        "missing": 2130
+      },
+      "sl": {
+        "present": 3,
+        "missing": 2130
+      },
+      "sr": {
+        "present": 3,
+        "missing": 2130
+      },
+      "sv": {
+        "present": 3,
+        "missing": 2130
+      },
+      "sw": {
+        "present": 3,
+        "missing": 2130
+      },
+      "ta": {
+        "present": 3,
+        "missing": 2130
+      },
+      "te": {
+        "present": 3,
+        "missing": 2130
+      },
+      "th": {
+        "present": 3,
+        "missing": 2130
+      },
+      "tr": {
+        "present": 3,
+        "missing": 2130
+      },
+      "uk": {
+        "present": 2133,
+        "missing": 0
+      },
+      "vi": {
+        "present": 3,
+        "missing": 2130
+      },
+      "zh_CN": {
+        "present": 2133,
+        "missing": 0
+      },
+      "zh_TW": {
+        "present": 2133,
+        "missing": 0
+      }
+    }
   },
-  "protected": "Public product names, URLs, placeholders, line breaks; strict structural validation; no user documents transmitted",
-  "status": "paused_provider_rate_limit",
-  "checkpoint_at": "2026-11-08T08:23:06.378897+00:00",
-  "pause_reason": "Google returned HTTP 429 during translation and on one bounded retry after a pause. All external translation requests stopped; completed records retained.",
-  "checkpoint_source_sha256": "d16201a0d9d3ce85101c8f120e150c8513c12a404b7cf1a2c6bdd7690d563e8e",
-  "checkpoint_source_messages": 2133,
+  "local_draft_generation": {
+    "runtime": "CTranslate2 4.8.5 and SentencePiece 0.2.3, offline inference",
+    "argos_models": {
+      "ms": "1.9",
+      "no": "1.9",
+      "nl": "1.8",
+      "pl": "1.9",
+      "ro": "1.9",
+      "sk": "1.9",
+      "sl": "1.9",
+      "sv": "1.5",
+      "sw": "1.11",
+      "th": "1.9",
+      "vi": "1.9"
+    },
+    "turkish_model": "WindyTranslate/translate-windy-hplt-en-tr (CC-BY 4.0)",
+    "m2m_model": "auralmira/m2m100-418m-ct2-int8 for sr",
+    "indic_model": "adalat-ai/ct2-rotary-indictrans2-en-indic-dist-200M for ta and te",
+    "portuguese_model": "gow-solucoes/opus-mt-en-pt-ct2, conversion of Helsinki-NLP/opus-mt-tc-big-en-pt (CC-BY 4.0)",
+    "status": "machine-generated drafts with targeted AI-authored repairs; material issues remain under review",
+    "machine_records_by_locale": {
+      "ms": 2114,
+      "nl": 2089,
+      "no": 2126,
+      "pl": 2130,
+      "pt_BR": 2093,
+      "pt_PT": 2093,
+      "ro": 2122,
+      "sk": 2128,
+      "sl": 2128,
+      "sr": 2130,
+      "sv": 2116,
+      "sw": 2122,
+      "ta": 2130,
+      "te": 2130,
+      "th": 2130,
+      "tr": 2130,
+      "vi": 2121
+    },
+    "targeted_repairs_by_locale": {
+      "am": 4,
+      "ar": 4,
+      "bg": 2,
+      "bn": 1,
+      "ca": 3,
+      "cs": 2,
+      "da": 2,
+      "de": 2,
+      "el": 3,
+      "es": 3,
+      "es_419": 3,
+      "et": 3,
+      "fa": 3,
+      "fi": 3,
+      "fil": 1,
+      "fr": 2,
+      "gu": 3,
+      "he": 3,
+      "hi": 3,
+      "hr": 1,
+      "hu": 3,
+      "id": 2,
+      "it": 2,
+      "ja": 2,
+      "kn": 2,
+      "ko": 2,
+      "lt": 4,
+      "lv": 3,
+      "ml": 1,
+      "mr": 210,
+      "ms": 103,
+      "nl": 29,
+      "no": 59,
+      "pl": 14,
+      "pt_BR": 185,
+      "pt_PT": 583,
+      "ro": 28,
+      "sk": 22,
+      "sl": 17,
+      "sr": 50,
+      "sv": 34,
+      "sw": 78,
+      "ta": 199,
+      "te": 198,
+      "th": 95,
+      "tr": 170,
+      "vi": 52,
+      "zh_CN": 2,
+      "zh_TW": 2
+    }
+  },
   "effective_coverage_including_overrides": {
     "en": {
       "present": 2133,
@@ -140,84 +430,84 @@
       "missing": 0
     },
     "mr": {
-      "present": 1990,
-      "missing": 143
+      "present": 2133,
+      "missing": 0
     },
     "ms": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "nl": {
-      "present": 40,
-      "missing": 2093
+      "present": 2133,
+      "missing": 0
     },
     "no": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "pl": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "pt_BR": {
-      "present": 40,
-      "missing": 2093
+      "present": 2133,
+      "missing": 0
     },
     "pt_PT": {
-      "present": 40,
-      "missing": 2093
+      "present": 2133,
+      "missing": 0
     },
     "ro": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "ru": {
       "present": 2133,
       "missing": 0
     },
     "sk": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "sl": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "sr": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "sv": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "sw": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "ta": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "te": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "th": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "tr": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "uk": {
       "present": 2133,
       "missing": 0
     },
     "vi": {
-      "present": 3,
-      "missing": 2130
+      "present": 2133,
+      "missing": 0
     },
     "zh_CN": {
       "present": 2133,
@@ -227,9 +517,5 @@
       "present": 2133,
       "missing": 0
     }
-  },
-  "complete_locales_including_english": 34,
-  "remaining_translation_records": 36242,
-  "review": "Targeted model-authored corrections and structural/English-residue heuristics; no native-speaker certification. Overrides also contain machine-translated recovery records.",
-  "release_ready": false
+  }
 }

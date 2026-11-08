@@ -1,9 +1,12 @@
 {
-  "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
   "fd922bdb30c6": "Avota {1} ieraksta {0} kolonnā {2} ievadiet decimālskaitli, izmantojot ciparus 0–9 un punktu kā decimālatdalītāju; mērvienības apstipriniet atsevišķi.",
   "619880112496": "Atšķirt lielos un mazos burtus",
-  "11da7c54a17a": "{0}: {1}rinda {2}{3}",
-  "0f27b2200fa0": "{0}rinda {1}{2}",
+  "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
+  "cf816c3fcce2": "Darbojas Google infrastruktūrā. Lietotāja tvēruma CacheService uz laiku saglabā atlasīto tekstu un visu atlasīto rindkopu nešifrētā veidā, kā arī formatējuma un atlases metadatus. Pieprasītais kešatmiņas kalpošanas laiks: 15 minūtes; Google var to izlikt agrāk. Nav LLM vai trešās puses servera zvanu.",
+  "36874a6cd00c": "Saglabātie dokumentu nosaukumi, oriģinālie faili, labojumi, atbalstītā atsaukšanas vēsture un pārskati tiek šifrēti ar <0>AES-GCM-256</0>, pirms tie tiek ierakstīti pārlūkprogrammas krātuvē. Katram saglabātajam ierakstam ir nejauši ģenerēta atslēga un vienreizēja šifrēšanas vērtība (nonce). Atslēga nav iegūstama, izmantojot Web Crypto API, un tā tiek glabāta tajā pašā pārlūkprogrammas profilā, lai jūs varētu atsākt bez paroles. Krātuves versija, pārskatīšanas identifikatori un darbības/derīguma laiki paliek nešifrēti.",
   "8effbd65c9ff": "Atbalstīto komandu piemēri (angļu valodā): {0}",
-  "993153d8bb89": "Šī versija nevērtē līgumu, ziņojumu vai grāmatu saturu."
+  "087a259abc34": "Google Docs prototips darbojas caur Google Apps Script Google infrastruktūrā, un tam ir nepieciešama autorizācija un interneta savienojums. Tas nolasa aktīvās dokumenta cilnes pamattekstu, lai pārbaudītu izmaiņas. Google lietotāja tvēruma kešatmiņas pakalpojums īslaicīgi saglabā atlasīto tekstu, tā rindkopu, formatējumu un pozīcijas datus nešifrētā veidā ar pieprasīto kalpošanas laiku 15 minūtes; Google var to izlikt agrāk. Aizverot sānjoslu, šis kešatmiņas ieraksts netiek izdzēsts. Neviens LLM vai izstrādātāja serveris nesaņem dokumenta tekstu. Pārlūka paplašinājuma tikai lokālā apstrāde un šifrētie uzmetuma paziņojumi neapraksta šo Google mitināto pievienojumprogrammu. Pirms instalācijas pakotnes iespējošanas izlasiet sadaļu par datu apstrādi.",
+  "993153d8bb89": "Šī versija nevērtē līgumu, ziņojumu vai grāmatu saturu.",
+  "11da7c54a17a": "{0}: {1}rinda {2}{3}",
+  "0f27b2200fa0": "{0}rinda {1}{2}"
 }

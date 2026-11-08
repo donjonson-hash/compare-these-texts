@@ -71,7 +71,10 @@ async function assertPicker(page) {
 async function downloadText(page, scope, side) {
   const [download] = await Promise.all([page.waitForEvent('download'), page.locator(`${scope} [data-save-side="${side}"]`).click()]);
   assert.match(download.suggestedFilename(), /\.txt$/i, 'plain text remains a TXT export');
-  return readFile(await download.path(), 'utf8');
+  const exported = await readFile(await download.path(), 'utf8');
+  // TXT export closes the final block with LF. Compare the document body without that delimiter.
+  assert.ok(exported.endsWith('\n'), 'TXT export closes the final block with LF');
+  return exported.slice(0, -1);
 }
 async function assertComparison(page, a, b, marks) {
   // Typing deliberately removes stale marks until the live preview catches up.

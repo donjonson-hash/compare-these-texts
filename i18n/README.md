@@ -1,6 +1,6 @@
 # Interface localization — 0.37.9 draft
 
-Status: implementation is prepared; 34 of 52 locale catalogs are complete, including English. External translation is paused after Google HTTP 429. This is **not a complete 52-locale release**. Do not merge, deploy or upload the candidate until every catalog is complete and the full validation gates pass.
+All 52 locale catalogs have entries for all 2,133 source messages. This checkpoint remains a draft. The language-quality gate flags damaged output, and editorial review identified changes of meaning, especially in Swahili. Keep the current store releases until the translated interface passes the quality and browser gates.
 
 ## Coverage and data boundaries
 
@@ -20,7 +20,7 @@ Generated assistant answers keep the language used when they were created. Newly
 
 Run `python3 scripts/build_i18n.py --collect` after changing English UI strings. Normal builds validate all 51 non-English catalogs before writing any localized modules. Missing keys, unknown keys, blank values, malformed slots and changed parameters stop the build. `--allow-incomplete` is for development only and is never used by the release build.
 
-Catalog preparation combines Google machine translation, focused model-authored editorial corrections, and structurally validated recovery of translation batches. None of these records is certified by native speakers. Complete catalogs currently cover 34 locales including English; Marathi is partial and 17 further locale catalogs still need their remaining messages. Google returned HTTP 429 during preparation and again after a pause; external requests were stopped with completed work preserved. The target remains all 52 locales. This draft must not be published as a completed localization.
+Preparation used the previously saved translations, offline machine translation for the remaining catalogs, and focused editorial corrections. Model sources and per-locale coverage are recorded in `translation-metadata.json`. The product ships the strings only. It does not include any of the translation models or invoke them at runtime. Structural checks validate labels, parameters, formatting and known corruption patterns. A native speaker has not reviewed every locale.
 
 ## External translation authorization
 

@@ -1,8 +1,11 @@
 {
-  "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
   "fd922bdb30c6": "Sisestage allika {1} kirje {0} veergu {2} kümnendarv, kasutades numbreid 0–9 ja kümnenderaldajana punkti; kinnitage mõõtühikud eraldi.",
-  "11da7c54a17a": "{0}: {1}rida {2}{3}",
-  "0f27b2200fa0": "{0}rida {1}{2}",
+  "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
+  "cf816c3fcce2": "Töötab Google infrastruktuuris. Kasutaja ulatusega CacheService salvestab ajutiselt valitud teksti ja kogu valitud lõigu krüpteerimata kujul ning vormingu ja valiku metaandmed. Vahemälu nõutav eluiga: 15 minutit; Google võib selle varem välja tõsta. LLM-i ega kolmanda osapoole serverikõnesid pole.",
+  "36874a6cd00c": "Salvestatud dokumentide nimed, originaalfailid, muudatused, toetatud tagasivõtmiste ajalugu ja aruanded krüpteeritakse enne brauseri salvestusruumi kirjutamist koodiga <0>AES-GCM-256</0>. Igal salvestatud kirjel on juhuslikult loodud võti ja ühekordne krüpteerimisväärtus (nonce). Võtit ei saa Web Crypto API kaudu ekstraheerida ja seda hoitakse samas brauseriprofiilis, nii et saate jätkata ilma paroolita. Salvestusversioon, versiooni identifikaatorid ja tegevuse/aegumisajad jäävad krüptimata.",
   "8effbd65c9ff": "Toetatud käskude näited (inglise keeles): {0}",
-  "993153d8bb89": "See versioon ei hinda lepingute, aruannete ega raamatute sisu."
+  "087a259abc34": "Google Docs prototüüp töötab Google Apps Script kaudu Google infrastruktuuris ning nõuab autoriseerimist ja Interneti-ühendust. See loeb aktiivse dokumendi vahekaardi keha, et kontrollida muudatusi. Google kasutaja ulatusega CacheService salvestab ajutiselt valitud teksti, selle lõigu, vormingu ja asukoha andmed krüpteerimata kujul, nõutava elueaga 15 minutit; Google võib selle varem välja tõsta. Külgriba sulgemine seda vahemälu kirjet ei kustuta. Ükski LLM või arendaja server ei saa dokumendi teksti vastu. Brauseri laienduse lokaalne töötlemine ja krüptitud mustandi avaldused ei kirjelda seda Google hostitud lisandmoodulit. Enne installipaketi lubamist lugege läbi selle andmetöötluse jaotis.",
+  "993153d8bb89": "See versioon ei hinda lepingute, aruannete ega raamatute sisu.",
+  "11da7c54a17a": "{0}: {1}rida {2}{3}",
+  "0f27b2200fa0": "{0}rida {1}{2}"
 }

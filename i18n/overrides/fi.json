@@ -1,11 +1,14 @@
 {
-  "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
-  "11da7c54a17a": "{0}: {1}rivi {2}{3}",
-  "0f27b2200fa0": "{0}rivi {1}{2}",
-  "8effbd65c9ff": "Esimerkkejä tuetuista komennoista (englanniksi): {0}",
-  "993153d8bb89": "Tämä versio ei arvioi sopimusten, raporttien tai kirjojen sisältöä.",
   "2de40e2f92d8": "Ero. Muokkaa{0}: {1}",
+  "249f877f7b32": "Muokkaa B",
   "3c1f21250a61": "Muokkaa{0}: {1}",
   "ae1c349b541e": "Muokkaa{0}: {1}{2}",
-  "249f877f7b32": "Muokkaa B"
+  "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
+  "cf816c3fcce2": "Toimii Google:n infrastruktuurissa. Käyttäjän laajuinen CacheService tallentaa väliaikaisesti valitun tekstin ja koko valitun kappaleen salaamattomana tekstinä sekä muotoilun ja valinnan metatiedot. Pyydetty välimuistin käyttöikä: 15 minuuttia; Google voi häätää sen aikaisemmin. Ei LLM- tai kolmannen osapuolen palvelinkutsuja.",
+  "36874a6cd00c": "Tallennettujen asiakirjojen nimet, alkuperäiset tiedostot, muokkaukset, tuettu kumoamishistoria ja raportit salataan <0>AES-GCM-256</0>:lla ennen kuin ne kirjoitetaan selaimen tallennustilaan. Jokaisella tallennetulla tietueella on satunnaisesti luotu avain ja kertakäyttöinen salausarvo (nonce). Avainta ei voi purkaa Web Crypto API:n kautta, ja se säilytetään samassa selainprofiilissa, jotta voit jatkaa ilman salasanaa. Tallennusversio, versioiden tunnisteet ja toiminta-/vanhentumisajat pysyvät salaamattomina.",
+  "8effbd65c9ff": "Esimerkkejä tuetuista komennoista (englanniksi): {0}",
+  "087a259abc34": "Google Docs-prototyyppi kulkee Google Apps Script:n kautta Google:n infrastruktuurissa ja vaatii valtuutuksen ja Internet-yhteyden. Se lukee aktiivisen asiakirjan välilehden tekstin tarkistaakseen muutokset. Google:n käyttäjälaajuinen CacheService tallentaa valitun tekstin, sen kappaleen, muotoilun ja sijaintitiedot tilapäisesti salaamattomana tekstinä, pyydettynä 15 minuutin käyttöiän. Google voi häätää sen aikaisemmin. Sivupalkin sulkeminen ei poista välimuistimerkintää. Mikään LLM tai kehittäjäpalvelin ei vastaanota asiakirjan tekstiä. Selainlaajennuksen paikallinen käsittely ja salatut luonnokset eivät kuvaa tätä Google-isännöityä apuohjelmaa. Lue asennuspaketin tietojenkäsittelyosa ennen sen käyttöönottoa.",
+  "993153d8bb89": "Tämä versio ei arvioi sopimusten, raporttien tai kirjojen sisältöä.",
+  "11da7c54a17a": "{0}: {1}rivi {2}{3}",
+  "0f27b2200fa0": "{0}rivi {1}{2}"
 }

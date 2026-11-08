@@ -1,8 +1,12 @@
 {
   "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
+  "cf816c3fcce2": "Veikia Google infrastruktūroje. Vartotojo aprėptis CacheService laikinai išsaugo pasirinktą tekstą ir visą pasirinktą pastraipą nešifruotu pavidalu, taip pat formatavimo ir pasirinkimo metaduomenis. Reikalingas talpyklos veikimo laikas: 15 minučių; Google gali jį iškeldinti anksčiau. Jokių LLM ar trečiosios šalies serverio skambučių.",
+  "36874a6cd00c": "Išsaugotų dokumentų pavadinimai, originalūs failai, redagavimai, palaikoma anuliavimo istorija ir ataskaitos užšifruojami naudojant <0>AES-GCM-256</0>, prieš įrašant į naršyklės saugyklą. Kiekvienam išsaugotam įrašui atsitiktinai sugeneruojamas raktas ir vienkartinė šifravimo reikšmė (nonce). Raktas nėra ištraukiamas per Web Crypto API ir yra tame pačiame naršyklės profilyje, kad galėtumėte tęsti be slaptažodžio. Saugyklos versija, taisymo identifikatoriai ir veiklos / galiojimo laikas lieka nešifruoti.",
+  "8effbd65c9ff": "Palaikomų komandų pavyzdžiai (anglų kalba): {0}",
+  "087a259abc34": "Google Docs prototipas veikia per Google Apps Script Google infrastruktūroje ir jam reikalingas leidimas bei interneto ryšys. Jis nuskaito aktyvaus dokumento skirtuko turinį, kad patikrintų, ar nėra pakeitimų. Google vartotojo apimties talpyklos paslauga laikinai išsaugo pasirinktą tekstą, jo pastraipą, formatavimo ir padėties duomenis nešifruotu pavidalu, o reikalaujama 15 minučių trukmės trukmė; Google gali jį iškeldinti anksčiau. Uždarius šoninę juostą tas talpyklos įrašas neištrinamas. Joks LLM arba kūrėjo serveris negauna dokumento teksto. Naršyklės plėtinio tik vietinis apdorojimas ir šifruoto juodraščio pareiškimai neaprašo šio Google priglobto priedo. Prieš įjungdami perskaitykite diegimo paketo duomenų tvarkymo skyrių.",
+  "993153d8bb89": "Ši versija nevertina sutarčių, ataskaitų ar knygų turinio.",
+  "3807a668acb4": "Galiojantys senesnių versijų juodraščiai užšifruojami, kai jie atidaromi šioje versijoje. Jei nepavyksta šifruoti arba išsaugoti, programa rodo klaidą ir nepakeičia senojo juodraščio nauju grynojo teksto išsaugojimu. Esamas juodraštis paliekamas nepažeistas. Ištrynus juodraštį arba pasibaigus jo galiojimo laikui, pašalinamas jo saugomas turinys ir šifravimo raktas; tai nėra saugaus ištrynimo iš disko arba atsarginių kopijų garantija.",
   "742b91c6231c": "{0}: A {1} → B {2}; B − A: {3}.{4}",
   "11da7c54a17a": "{0}: {1}eilutė {2}{3}",
-  "0f27b2200fa0": "{0}eilutė {1}{2}",
-  "8effbd65c9ff": "Palaikomų komandų pavyzdžiai (anglų kalba): {0}",
-  "993153d8bb89": "Ši versija nevertina sutarčių, ataskaitų ar knygų turinio."
+  "0f27b2200fa0": "{0}eilutė {1}{2}"
 }

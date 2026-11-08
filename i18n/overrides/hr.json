@@ -1,8 +1,9 @@
 {
   "29f088378736": "<0>A — Izvornik:</0> Plaćanje dospijeva u roku od <1>30 dana</1>.",
+  "19dc5cac7b55": "<0>Font Noto Emoji</0>",
   "b08c750907ff": "Uskladi A s B",
   "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
-  "19dc5cac7b55": "<0>Font Noto Emoji</0>",
+  "36874a6cd00c": "Spremljeni nazivi dokumenata, izvorne datoteke, izmjene, podržana povijest poništavanja i izvješća šifrirani su pomoću <0>AES-GCM-256</0> prije nego što se zapišu u pohranu preglednika. Svaki spremljeni zapis ima nasumično generirani ključ i jednokratnu vrijednost za šifriranje (nonce). Ključ se ne može izvući putem Web Crypto API-ja i čuva se u istom profilu preglednika tako da možete nastaviti bez lozinke. Verzija pohrane, identifikatori revizije i vrijeme aktivnosti/isteka ostaju nekriptirani.",
   "3708a23be4bf": "Odaberite tekst u jednom odlomku, uredite ga ovdje, zatim pregledajte i primijenite promjene.",
   "15800643bdc5": "Odaberite tekst na aktivnoj kartici dokumenta.",
   "745a9baec248": "Odaberite stupac koji označava istu stavku u obje datoteke, primjerice SKU ili ID. Pronađeno je nekoliko mogućih identifikatora.",
@@ -20,6 +21,7 @@
   "6947d9014125": "Navedite postojeći stupac u izvoru {0} umjesto {1}.",
   "e117d7608c1d": "Uočite promjene u tekstu koji se može odabrati, uključujući ugovorne odredbe, datume i iznose.",
   "b73a7629fc04": "Zapažanja o stilu",
+  "8effbd65c9ff": "Primjeri podržanih naredbi (na engleskom): {0}",
   "c3f758dd3c02": "Podržane datoteke: DOCX, tekstualni PDF, TXT, XLSX, CSV i TSV, do 2 MB po datoteci. Stare .doc datoteke najprije treba spremiti kao .docx. Neke strukture dokumenata i skenirani PDF-ovi nisu podržani; alat objašnjava ograničenja pri otvaranju datoteke.",
   "088925651133": "Tablica {0}, redak {1}, stupac {2}, odlomak {3}",
   "6d3fa29d3e64": "Tablice, popisi, zaglavlja i podnožja, poveznice, polja, knjižne oznake, komentari, kontrole sadržaja, ugrađeni objekti, prijelomi odlomaka i praćenje promjena nisu podržani. Odabrani odlomak smije sadržavati samo običan tekst. Odabir koji obuhvaća različito oblikovanje znakova odbija se; svaku jednoliko oblikovanu cjelinu uredite zasebno.",
@@ -96,6 +98,7 @@
   "a477b87f1e99": "Ovaj odjeljak ima nepodržanu geometriju teksta.",
   "60510ffbd7dc": "Ovaj odjeljak nedostaje",
   "80f22eea8825": "Ovaj se odjeljak podudara ✓",
+  "993153d8bb89": "Ova verzija ne procjenjuje sadržaj ugovora, izvješća ni knjiga.",
   "51c220bcb395": "Pokušajte odabrati i kopirati rečenicu u svojem pregledniku PDF-ova. Svaka stranica mora sadržavati upotrebljiv tekst: prazna stranica ili skenirana stranica bez tekstualnog sloja zaustavlja uvoz. Compare Two Texts ne provodi OCR. Svaki PDF smije imati najviše 2 MiB (2.097.152 bajta) i najviše 100 stranica. Za složene datoteke vrijede dodatna ograničenja obrade; pročitajte obavijest ako se datoteka ne može otvoriti.",
   "1bd4735ef876": "Za ovu pilot-verziju isključite praćenje promjena ili upotrijebite Wordove alate za pregled.",
   "c39d235976e3": "Poništi izmjenu u {0}",
@@ -198,7 +201,5 @@
   "2fbc5d08ac9a": "broj ćelija ne odgovara mreži tablice.",
   "977de411ace5": "dokument sadrži više od 2.000 tekstualnih blokova. Podijelite ga na manje datoteke.",
   "11da7c54a17a": "{0}: {1}redak {2}{3}",
-  "0f27b2200fa0": "{0}redak {1}{2}",
-  "8effbd65c9ff": "Primjeri podržanih naredbi (na engleskom): {0}",
-  "993153d8bb89": "Ova verzija ne procjenjuje sadržaj ugovora, izvješća ni knjiga."
+  "0f27b2200fa0": "{0}redak {1}{2}"
 }

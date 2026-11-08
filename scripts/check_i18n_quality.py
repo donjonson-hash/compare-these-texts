@@ -37,6 +37,8 @@ TOKEN_PATTERN = re.compile(r'ZXQ\s*\d*\s*QXZ|ZXQ\d|\dQXZ|__\s*CTT[_\s]*P\s*\d+\s
 PLACEHOLDER_PATTERN = re.compile(r'\{\w+\}')
 SLOT_PATTERN = re.compile(r'</?\d+>')
 URL_PATTERN = re.compile(r'https?://[^\s<>]+')
+DECODE_ARTIFACT_PATTERN = re.compile('[⁇\ufffd]')
+REPEATED_WORD_PATTERN = re.compile(r'\b([^\W\d_]+)(?:[\s,·;.!?]+\1){7}\b', re.I)
 EXTENSION_PATTERN = re.compile(r'\.(?:docx|doc|pdf|xlsx|xls|csv|tsv|txt|json|zip|xml|html|mjs|js)\b', re.I)
 TECHNICAL_PATTERN = re.compile(r'\b(?:TSV|UTF-?16|USD|EUR|GBP|RUB|CAD|AUD|CHF|JPY|CNY|SHA-?256|SHA|XML|SVG|CSS|HTTP|HTTPS|CSP|API|BOM|CRLF|LF|RTL|LTR|ID|IDs|OK|MB|KB|GB|px|pt|ISO|UTF-?8|PDFKit|PDFium|Tesseract|PDF\.js|pdf-lib|IndexedDB|localStorage)\b')
 # Language-related scripts are a coarse sanity check only. Latin-language
@@ -139,6 +141,10 @@ def audit(catalog_root, sample_limit=12):
                 finding(key, 'protected_token_residue', 'Temporary translation marker is still present.', 'error')
             if code == 'en':
                 continue
+            if DECODE_ARTIFACT_PATTERN.search(value) and not DECODE_ARTIFACT_PATTERN.search(source):
+                finding(key, 'decoder_artifact', 'A translation decoder replacement character is visible.', 'error')
+            if len(value) > max(len(source) * 5, len(source) + 160) or REPEATED_WORD_PATTERN.search(value):
+                finding(key, 'runaway_translation', 'Translation repeats a word or expands far beyond the source length.', 'error')
             if same_text(source, value):
                 if prose(source):
                     finding(key, 'unchanged_english_prose', 'English prose is unchanged; review untranslated text or valid shared vocabulary.')
@@ -168,6 +174,10 @@ def audit(catalog_root, sample_limit=12):
             translated_urls = Counter(URL_PATTERN.findall(value))
             if source_urls != translated_urls:
                 finding(key, 'url_literal_changed', 'A literal URL changed.', 'error')
+            source_domains = Counter(DOMAIN_PATTERN.findall(URL_PATTERN.sub(' ', source)))
+            translated_domains = Counter(DOMAIN_PATTERN.findall(URL_PATTERN.sub(' ', value)))
+            if source_domains != translated_domains:
+                finding(key, 'domain_literal_changed', 'A literal domain outside a URL changed.', 'error')
             if Counter(EXTENSION_PATTERN.findall(source)) != Counter(EXTENSION_PATTERN.findall(value)):
                 finding(key, 'extension_literal_changed', 'A filename extension changed; inspect labels and code examples.')
             if source.count('\n') != value.count('\n'):

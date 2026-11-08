@@ -2,6 +2,16 @@
 
 This is implementation evidence, not approval of a translated release.
 
+## Full-coverage checkpoint
+
+- Catalog coverage reached 52 of 52 locales with 2,133 messages per locale.
+- Local test run with actual translated catalogs passed all 277 extension tests and all 17 Google Docs tests.
+- A temporary installation in desktop Firefox passed offline comparison, Russian welcome, Arabic RTL and a switch to Japanese that kept the original text and highlighted differences.
+- The language-quality gate remains open. Automated checks catch visible decoder placeholders, runaway repetition, damaged markup and altered literal addresses. Targeted editorial review found additional wording and meaning errors. Swahili needs substantial revision.
+- The installed Chromium and macOS WebKit checks still need to run on the release candidate. The current local Chromium runner cannot create the required Unix socket.
+
+## Earlier draft checks
+
 - Source policy: passed.
 - Chrome store copy: 52 metadata entries and 52 complete descriptions; field-length and locale-set checks passed.
 - Actual-source i18n engine/build, report and Word unit tests: 31 passed.
