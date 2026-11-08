@@ -112,3 +112,13 @@ test('an unrelated body edit invalidates the selection; oversized tabs fail clos
     assert.equal(a.state.writes,0);
   }
 });
+
+test('native menu uses account language without reading or mutating document data', () => {
+  const localized = source.replace('/* CTT_MENU_I18N */ {}', JSON.stringify({ru:{'Edit selected text':'Изменить выделенный текст'}}));
+  let label, language = 'ru-RU';
+  const menu = {addItem(value, callback) { label = value; assert.equal(callback, 'showEditor'); return this; }, addToUi() {}};
+  const context = vm.createContext({Session:{getActiveUserLocale:()=>language}, DocumentApp:{getUi:()=>({createMenu:()=>menu})}});
+  vm.runInContext(localized, context);
+  context.onOpen(); assert.equal(label, 'Изменить выделенный текст');
+  language = 'unknown'; context.onOpen(); assert.equal(label, 'Edit selected text');
+});

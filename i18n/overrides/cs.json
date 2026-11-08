@@ -1,0 +1,12 @@
+{
+  "2de40e2f92d8": "Rozdíl. Upravit{0}: {1}",
+  "3c1f21250a61": "Upravit{0}: {1}",
+  "ae1c349b541e": "Upravit{0}: {1}{2}",
+  "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
+  "cf816c3fcce2": "Běží v infrastruktuře Google. CacheService s uživatelským rozsahem dočasně ukládá vybraný text a celý vybraný odstavec v nešifrované podobě plus metadata formátování a výběru. Požadovaná životnost mezipaměti: 15 minut; Google jej může vypudit dříve. Žádná volání LLM nebo serverů třetích stran.",
+  "8effbd65c9ff": "Příklady podporovaných příkazů (v angličtině): {0}",
+  "087a259abc34": "Prototyp Google Docs běží přes Google Apps Script v infrastruktuře Google a vyžaduje autorizaci a připojení k internetu. Přečte tělo aktivní karty dokumentu a zkontroluje změny. CacheService Google v uživatelském rozsahu dočasně ukládá vybraný text, odstavec, ve kterém se nachází, formátování a údaje o poloze v nešifrované podobě s požadovanou životností 15 minut; Google jej může vypudit dříve. Zavřením postranního panelu se tato položka mezipaměti nesmaže. Žádný LLM nebo vývojářský server neobdrží text dokumentu. Pouze místní zpracování a šifrované koncepty rozšíření prohlížeče tento doplněk hostovaný Google nepopisují. Před povolením instalačního balíčku si přečtěte část o zpracování dat.",
+  "993153d8bb89": "Tato verze neposuzuje obsah smluv, zpráv ani knih.",
+  "11da7c54a17a": "{0}: {1}řádek {2}{3}",
+  "0f27b2200fa0": "{0}řádek {1}{2}"
+}

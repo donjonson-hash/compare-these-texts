@@ -1,7 +1,6 @@
-# Chrome Web Store privacy fields — Compare Two Texts 0.37.4
+# Chrome Web Store privacy fields — Compare Two Texts 0.37.9 candidate
 
-Prepared 24 October 2026 against the packaged extension's local processing and
-storage behavior. These are submission answers, not evidence that the Chrome
+Updated 8 November 2026 for the localization candidate, retaining the extension's local processing and storage disclosures. These are submission answers, not evidence that the Chrome
 Web Store form has already been completed or accepted.
 
 ## Single purpose description — ready to paste
@@ -27,6 +26,20 @@ The extension handles document names and contents that the user chooses to open,
 Comparison and single-document drafts are saved separately in local browser storage. Their full document payloads are encrypted with AES-GCM-256 before persistence, using a fresh nonce and a non-extractable key stored in the local browser profile. Revision identifiers and activity/expiry timestamps are not encrypted. The local key enables password-free resume and does not protect against code running in an unlocked profile. Downloaded documents are not encrypted by this feature. Valid older drafts are migrated when loaded; a migration failure preserves the old record and displays an error. They can contain original files, edits, supported undo history and view settings. Saved work expires after seven days without opening or saving it and is removed when the app is next opened. The user can delete saved work in the app, removing both the encrypted payload and its stored key. Website and extension drafts are separate and do not sync. Downloaded files remain where the user saves them until the user deletes them.
 
 Document data is not transmitted to the developer, a comparison server or an AI service. There is no analytics or diagnostic telemetry, no advertising use and no sale of document data. Opening the public website or GitHub support is optional. Information a user voluntarily submits to GitHub is handled there under GitHub's policy; public issue reports are visible to others.
+
+## Localization and separate integrations
+
+Interface language files are prepared during development and packaged locally.
+The owner-authorized external translation step handles project labels, messages
+and help, not user documents. The installed extension does not send document
+contents or interface strings to a translation service. A chosen interface
+locale is stored locally; document contents are not translated.
+
+These answers describe the Chrome extension. Optional Word and Google Docs
+pilot add-ins require separate installation and have separate data handling
+and privacy terms disclosed before installation. They are not automatically
+installed by Chrome. Do not apply this extension's offline-processing statement
+to those integrations.
 
 ## Data-usage checkboxes — publisher verification
 

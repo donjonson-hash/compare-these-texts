@@ -1,4 +1,4 @@
-# Compare Two Texts for Microsoft Word — pilot 0.1.0
+# Compare Two Texts for Microsoft Word — pilot 0.2.0
 
 Source: `src/word-addin/`. Hosted setup: https://comparetwotexts.pro/word-addin/ .
 

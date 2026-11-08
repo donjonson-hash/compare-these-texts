@@ -17,7 +17,7 @@ PROCESSAMENTO LOCAL
 Os documentos são processados no seu dispositivo. A extensão funciona offline e não envia seus documentos a um servidor para comparar ou editar. Os rascunhos do site e da extensão são salvos separadamente, sem sincronização automática. Baixe uma cópia do trabalho concluído.
 
 ANTES DE COMEÇAR
-- A interface do editor está atualmente em inglês. As descrições traduzidas na loja não alteram o idioma do editor.
+- O conteúdo dos documentos não é traduzido.
 - Cada arquivo de entrada pode ter até 2 MiB.
 - Os PDFs precisam de uma camada de texto: imagens digitalizadas sem texto não são compatíveis e não há reconhecimento óptico de caracteres (OCR). Espaços destinados ao preenchimento à mão são diferentes dos campos interativos de formulários PDF. Campos interativos e comentários em PDF não são compatíveis.
 - Imagens e formatação não são comparadas. A preservação do layout do PDF depende do documento; layouts complexos podem exigir uma exportação somente de texto. O layout de arquivos Word pode ser diferente do exibido no Microsoft Word.
@@ -25,3 +25,7 @@ ANTES DE COMEÇAR
 - A comparação de dois arquivos de planilha exige uma única linha de cabeçalho, nenhuma célula mesclada e valores no lugar de fórmulas.
 
 Comece pelo exemplo de documento ou de CSV / Excel incluído para experimentar o fluxo de trabalho antes de abrir seus próprios arquivos.
+
+Os rascunhos são criptografados localmente com AES-GCM-256; a chave fica no perfil do navegador. Não é um cofre protegido por senha, e os arquivos baixados não são criptografados. Os rascunhos expiram após sete dias sem uso.
+
+Os suplementos piloto opcionais para Word e Google Docs são instalados separadamente e têm condições de privacidade próprias. Esta extensão não os instala automaticamente.

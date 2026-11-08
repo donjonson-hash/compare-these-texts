@@ -1,0 +1,11 @@
+{
+  "b08c750907ff": "Fes que A coincideixi amb B",
+  "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
+  "cf816c3fcce2": "S'executa a la infraestructura de Google. El CacheService, limitat a cada usuari, emmagatzema temporalment el text seleccionat i el paràgraf seleccionat complet en text no xifrat, a més de metadades de format i selecció. Durada de la memòria cau sol·licitada: 15 minuts; Google pot desallotjar-lo abans. No hi ha trucades de servidor de LLM ni de tercers.",
+  "36874a6cd00c": "Els noms dels documents desats, els fitxers originals, les edicions, l'historial de desfers compatibles i els informes es xifren amb <0>AES-GCM-256</0> abans de ser escrits a l'emmagatzematge del navegador. Cada registre desat té una clau i un valor de xifratge d’un sol ús (nonce), generats aleatòriament. La clau no es pot extreure a través de l'API Web Crypto i es manté al mateix perfil del navegador perquè pugueu reprendre sense contrasenya. La versió d'emmagatzematge, els identificadors de revisió i els temps d'activitat/caducitat romanen sense xifrar.",
+  "8effbd65c9ff": "Exemples d’ordres admeses (en anglès): {0}",
+  "087a259abc34": "El prototip Google Docs passa per Google Apps Script a la infraestructura de Google i requereix autorització i connexió a Internet. Llegeix el cos de la pestanya del document actiu per comprovar si hi ha canvis. El servei de memòria cau d'abast de l'usuari de Google emmagatzema temporalment el text seleccionat, el seu paràgraf, les dades de format i posició en text no xifrat, amb una vida útil sol·licitada de 15 minuts; Google pot desallotjar-lo abans. Tancar la barra lateral no s'elimina l'entrada de la memòria cau. Cap servidor LLM o desenvolupador rep el text del document. El processament local i les declaracions d'esborrany xifrades de l'extensió del navegador no descriuen aquest complement allotjat per Google. Llegiu la secció de gestió de dades del paquet d'instal·lació abans d'activar-lo.",
+  "993153d8bb89": "Aquesta versió no avalua el contingut de contractes, informes ni llibres.",
+  "11da7c54a17a": "{0}: {1}fila {2}{3}",
+  "0f27b2200fa0": "{0}fila {1}{2}"
+}

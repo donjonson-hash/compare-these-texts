@@ -4,9 +4,7 @@ from pathlib import Path
 import unicodedata
 
 ROOT = Path(__file__).resolve().parents[1]
-LOCALES = frozenset(('en', 'de', 'fr', 'es', 'es_419', 'it', 'nl', 'sv', 'da',
-                     'no', 'fi', 'ar', 'id', 'ru', 'pt_BR', 'pt_PT', 'ja',
-                     'fil', 'vi', 'tr', 'th', 'ko'))
+LOCALES = frozenset(entry['code'] for entry in json.loads((ROOT / 'i18n/locales.json').read_text()))
 
 
 def load_localizations():

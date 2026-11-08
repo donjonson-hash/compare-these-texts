@@ -17,7 +17,7 @@ PEMROSESAN LOKAL
 Dokumen diproses di perangkat Anda. Ekstensi bekerja secara offline dan tidak mengunggah dokumen Anda ke server untuk dibandingkan atau diedit. Draf di situs web dan ekstensi disimpan secara terpisah, tanpa sinkronisasi otomatis. Unduh salinan pekerjaan Anda setelah selesai.
 
 SEBELUM MEMULAI
-- Antarmuka editor saat ini menggunakan bahasa Inggris. Terjemahan deskripsi toko tidak mengubah bahasa editor.
+- Isi dokumen tidak diterjemahkan.
 - Ukuran setiap file masukan maksimal 2 MiB.
 - PDF harus memiliki lapisan teks: gambar hasil pemindaian tanpa teks tidak didukung dan OCR tidak tersedia. Bagian kosong tercetak berbeda dari kolom formulir PDF interaktif; kolom interaktif dan komentar PDF tidak didukung.
 - Gambar dan pemformatan tidak dibandingkan. Kemampuan mempertahankan tata letak PDF bergantung pada dokumennya; tata letak yang rumit mungkin memerlukan ekspor teks saja. Tata letak Word mungkin berbeda dari tampilan di Microsoft Word.
@@ -25,3 +25,7 @@ SEBELUM MEMULAI
 - Perbandingan spreadsheet dari dua file memerlukan satu baris header, tanpa sel gabungan, dan nilai sebagai pengganti rumus.
 
 Mulailah dengan contoh dokumen atau CSV / Excel bawaan untuk mencoba alur kerja sebelum membuka file Anda sendiri.
+
+Draf dienkripsi secara lokal dengan AES-GCM-256; kunci tetap berada di profil browser. Ini bukan brankas yang dilindungi kata sandi dan file yang diunduh tidak dienkripsi. Draf kedaluwarsa setelah tujuh hari tanpa penggunaan.
+
+Add-in percontohan opsional untuk Word dan Google Docs dipasang secara terpisah dan memiliki ketentuan privasi sendiri. Ekstensi ini tidak memasangnya secara otomatis.

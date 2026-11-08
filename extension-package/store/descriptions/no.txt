@@ -17,7 +17,7 @@ LOKAL BEHANDLING
 Dokumentene behandles på enheten din. Utvidelsen fungerer uten internett og laster ikke opp dokumentene dine til en server for sammenligning eller redigering. Utkast på nettstedet og i utvidelsen lagres separat, uten automatisk synkronisering. Last ned en kopi av det ferdige arbeidet ditt.
 
 FØR DU BEGYNNER
-- Redigeringsgrensesnittet er foreløpig på engelsk. Oversatte butikkbeskrivelser endrer ikke språket i redigeringsverktøyet.
+- Innholdet i dokumentene oversettes ikke.
 - Hver inndatafil kan være opptil 2 MiB.
 - PDF-filer må ha et tekstlag: skannede bilder uten tekst støttes ikke, og det finnes ingen OCR. Trykte, tomme linjer er ikke det samme som interaktive PDF-skjemafelt; interaktive felt og PDF-kommentarer støttes ikke.
 - Bilder og formatering sammenlignes ikke. Om PDF-oppsettet kan bevares, avhenger av dokumentet; komplekse oppsett kan kreve eksport som ren tekst. Word-oppsettet kan avvike fra Microsoft Word.
@@ -25,3 +25,7 @@ FØR DU BEGYNNER
 - Sammenligning av to regnearkfiler krever én overskriftsrad, ingen sammenslåtte celler og verdier i stedet for formler.
 
 Begynn med det innebygde dokumenteksemplet eller CSV-/Excel-eksemplet for å prøve arbeidsflyten før du åpner dine egne filer.
+
+Utkast krypteres lokalt med AES-GCM-256; nøkkelen blir i nettleserprofilen. Dette er ikke et passordbeskyttet hvelv, og nedlastede filer er ikke kryptert. Utkast utløper etter sju dager uten bruk.
+
+De valgfrie pilottilleggene for Word og Google Docs installeres separat og har egne personvernvilkår. Denne utvidelsen installerer dem ikke automatisk.

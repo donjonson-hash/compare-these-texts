@@ -1,10 +1,11 @@
+import {uiMessage, uiError, uiSetText, uiSetAttr, uiTranslate} from './ui-text.mjs';
 import {openSessionStore} from './session-store.mjs';
 
 // One saved comparison. Writes are serialized; only committed transactions say “saved”.
 export async function mountSessionUI(root, {onResume, onFinish, onOperating = () => {}, openStore = openSessionStore, single = false}) {
   const node = (tag, text, className) => {
     const item = document.createElement(tag);
-    if (text) item.textContent = text;
+    if (text) uiSetText(item, text);
     if (className) item.className = className;
     return item;
   };
@@ -14,13 +15,13 @@ export async function mountSessionUI(root, {onResume, onFinish, onOperating = ()
   root.className = 'session-panel'; root.hidden = true;
   const info = node('div', '', 'session-info'), title = node('strong'), names = node('p', '', 'session-names');
   const status = node('p', '', 'session-status'); status.setAttribute('role', 'status');
-  const retention = node('p', 'Encrypted on this device. Saved for 7 days after opening or saving. Download files you want to keep.', 'hint');
+  const retention = node('p', uiMessage("Encrypted on this device. Saved for 7 days after opening or saving. Download files you want to keep."), 'hint');
   const actions = node('div', '', 'session-actions');
-  const resume = button(single ? "Continue editing" : "Continue →", resumeSaved, 'button primary'); resume.id = (single ? 'single-' : '') + 'session-resume';
-  const remove = button(single ? "Delete saved work" : "Finish and delete", finish); remove.id = (single ? 'single-' : '') + 'session-delete';
-  const retry = button("Retry saving", retrySave); retry.hidden = true; retry.id = (single ? 'single-' : '') + 'session-retry';
+  const resume = button(single ? uiMessage("Continue editing") : uiMessage("Continue →"), resumeSaved, 'button primary'); resume.id = (single ? 'single-' : '') + 'session-resume';
+  const remove = button(single ? uiMessage("Delete saved work") : uiMessage("Finish and delete"), finish); remove.id = (single ? 'single-' : '') + 'session-delete';
+  const retry = button(uiMessage("Retry saving"), retrySave); retry.hidden = true; retry.id = (single ? 'single-' : '') + 'session-retry';
   const savedDetails = node('details', '', 'session-details');
-  const savedSummary = node('summary', 'Saved work');
+  const savedSummary = node('summary', uiMessage("Saved work"));
   const savedBody = node('div', '', 'session-details-body');
   savedBody.append(retention, remove); savedDetails.append(savedSummary, savedBody);
   status.id = (single ? 'single-' : '') + 'session-status'; info.append(title, names, status); actions.append(resume, retry, savedDetails); root.append(info, actions);
@@ -32,28 +33,28 @@ export async function mountSessionUI(root, {onResume, onFinish, onOperating = ()
     root.hidden = !active() && !row.payload && !failed && !corrupt;
     root.classList.toggle('session-active', active());
     title.hidden = active();
-    title.textContent = single ? (active() ? "Your document" : "Continue editing your document") : active() ? "Your work will be saved here" : "Continue working on documents";
+    uiSetText(title, single ? active() ? uiMessage("Your document") : uiMessage("Continue editing your document") : active() ? uiMessage("Your work will be saved here") : uiMessage("Continue working on documents"));
     const sources = active() ? lastPayload?.sources : row.payload?.sources;
-    names.textContent = single ? (active() ? lastPayload?.source?.name : row.payload?.source?.name) || '' : sources ? `A · ${sources.left.name}   ↔   B · ${sources.right.name}` : '';
+    uiSetText(names, single ? (active() ? lastPayload?.source?.name : row.payload?.source?.name || '') : sources ? uiMessage("A · {0}   ↔   B · {1}", { 0: sources.left.name, 1: sources.right.name }) : '');
     names.hidden = single ? !names.textContent : !sources || active();
     resume.hidden = active() || !row.payload || corrupt || !!failed;
     resume.disabled = remove.disabled = busy || operating;
     remove.hidden = !store || (!active() && !row.payload && row.token === null && !corrupt);
-    retry.textContent = active() ? 'Retry saving' : 'Retry restoring';
+    uiSetText(retry, active() ? uiMessage("Retry saving") : uiMessage("Retry restoring"));
     retry.hidden = !failed || ['corrupt', 'incompatible'].includes(failed.code) || (active() && failed.code === 'conflict');
     retry.disabled = busy || operating;
     root.classList.toggle('session-error', !!failed);
   }
   function showError(error) {
     failed = error;
-    if (error.code === 'conflict') status.textContent = active() ? "Your work changed in another tab. These edits were not saved automatically—download them before closing." : "Saved work changed in another tab. Retry restoring to load the latest version.";
-    else if (error.code === 'corrupt' || error.code === 'incompatible') status.textContent = "Couldn't restore saved work. You can delete it and add your documents again.";
-    else if (error.encryptionUnavailable) status.textContent = active() ? "Couldn't encrypt and save your draft. Download your documents before closing. Try again on the HTTPS website or in the installed extension." : "Couldn't restore your draft. Retry restoring on the HTTPS website or in the installed extension.";
-    else status.textContent = active() ? "Couldn't save your work in this browser. Try saving again or download your documents before closing." : "Couldn't restore saved work in this browser. Retry restoring before opening another document.";
+    if (error.code === 'conflict') uiSetText(status, active() ? uiMessage("Your work changed in another tab. These edits were not saved automatically—download them before closing.") : uiMessage("Saved work changed in another tab. Retry restoring to load the latest version."));
+    else if (error.code === 'corrupt' || error.code === 'incompatible') uiSetText(status, uiMessage("Couldn't restore saved work. You can delete it and add your documents again."));
+    else if (error.encryptionUnavailable) uiSetText(status, active() ? uiMessage("Couldn't encrypt and save your draft. Download your documents before closing. Try again on the HTTPS website or in the installed extension.") : uiMessage("Couldn't restore your draft. Retry restoring on the HTTPS website or in the installed extension."));
+    else uiSetText(status, active() ? uiMessage("Couldn't save your work in this browser. Try saving again or download your documents before closing.") : uiMessage("Couldn't restore saved work in this browser. Retry restoring before opening another document."));
     paint();
   }
   function savedStatus() {
-    status.textContent = active() ? "Saved in this browser ✓" : "Your documents and edits are still saved in this browser.";
+    uiSetText(status, active() ? uiMessage("Saved in this browser ✓") : uiMessage("Your documents and edits are still saved in this browser."));
   }
   function drain() {
     if (running || failed || !pending || disposed) return running;
@@ -76,7 +77,7 @@ export async function mountSessionUI(root, {onResume, onFinish, onOperating = ()
     if (!getPayload || operating || disposed) return;
     try { lastPayload = getPayload(); pending = lastPayload; }
     catch (error) { showError(error); return; }
-    if (!failed) { status.textContent = "Saving…"; paint(); void drain(); }
+    if (!failed) { uiSetText(status, uiMessage("Saving…")); paint(); void drain(); }
   }
   async function retrySave() {
     if (busy || operating || disposed) return;
@@ -122,7 +123,7 @@ export async function mountSessionUI(root, {onResume, onFinish, onOperating = ()
       await running;
       row = await store.clear(row.token); loaded = true;
       pending = lastPayload = null; getPayload = null; failed = null; corrupt = false;
-      await onFinish(); status.textContent = '';
+      await onFinish(); uiSetText(status, '');
     } catch (error) { showError(error); }
     finally { operating = false; onOperating(false); paint(); }
   }

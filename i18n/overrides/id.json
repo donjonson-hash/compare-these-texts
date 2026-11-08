@@ -1,0 +1,16 @@
+{
+  "b8eabea5a934": "A «{0}» → B «{1}»",
+  "9406abdb65c2": "Catatan data A",
+  "9ecde9a229a0": "Catatan data B",
+  "95449705131f": "Pencocokan kunci: A {0} ↔ B {1}.",
+  "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
+  "cf816c3fcce2": "Berjalan di infrastruktur Google. CacheService cakupan pengguna untuk sementara menyimpan teks yang dipilih dan paragraf lengkap yang dipilih dalam bentuk teks tanpa enkripsi, ditambah metadata pemformatan dan pemilihan. Masa pakai cache yang diminta: 15 menit; Google dapat mengeluarkannya lebih awal. Tidak ada panggilan server LLM atau pihak ketiga.",
+  "8effbd65c9ff": "Contoh perintah yang didukung (dalam bahasa Inggris): {0}",
+  "087a259abc34": "Prototipe Google Docs berjalan melalui Google Apps Script di infrastruktur Google dan memerlukan otorisasi dan koneksi internet. Itu membaca isi tab dokumen aktif untuk memeriksa perubahan. CacheService cakupan pengguna Google untuk sementara menyimpan teks yang dipilih, paragraf, pemformatan, dan data posisinya dalam bentuk teks tanpa enkripsi, dengan masa pakai yang diminta selama 15 menit; Google dapat mengeluarkannya lebih awal. Menutup sidebar tidak menghapus entri cache tersebut. Tidak ada LLM atau server pengembang yang menerima teks dokumen. Pernyataan pemrosesan lokal dan draf terenkripsi dari ekstensi browser tidak menjelaskan add-in yang dihosting Google ini. Baca bagian penanganan data paket instalasi sebelum mengaktifkannya.",
+  "993153d8bb89": "Versi ini tidak menilai isi kontrak, laporan, atau buku.",
+  "a430210e24c4": "{0}: A {1} → B {2}; B − A: {3} {4}.",
+  "742b91c6231c": "{0}: A {1} → B {2}; B − A: {3}.{4}",
+  "925348196ea8": "{0}: A {1} → B {2}; perubahan B − A: {3}{4}.",
+  "6e9fe4a5d33b": "• A {0} = {1}; B {2} = {3} — {4} ({5}).",
+  "ddff1461e1c3": "• A {0} ↔ B {1} — {2}."
+}

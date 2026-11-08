@@ -17,7 +17,7 @@ LOKAL BEHANDLING
 Dokumenterne behandles på din enhed. Udvidelsen fungerer offline og uploader ikke dine dokumenter til en server for at sammenligne eller redigere dem. Kladder på hjemmesiden og i udvidelsen gemmes separat uden automatisk synkronisering. Download en kopi af dit færdige arbejde.
 
 FØR DU STARTER
-- Editorens brugerflade er i øjeblikket på engelsk. Oversatte butiksbeskrivelser ændrer ikke editorens sprog.
+- Dokumenternes indhold oversættes ikke.
 - Hver inputfil må højst fylde 2 MiB.
 - PDF-filer skal have et tekstlag: scannede billeder uden tekst understøttes ikke, og der er ingen OCR. Trykte tomme linjer er ikke det samme som interaktive PDF-formularfelter; interaktive felter og PDF-kommentarer understøttes ikke.
 - Billeder og formatering sammenlignes ikke. Om PDF-layoutet kan bevares, afhænger af dokumentet; komplekse layouts kan kræve eksport som ren tekst. Word-layoutet kan afvige fra Microsoft Word.
@@ -25,3 +25,7 @@ FØR DU STARTER
 - Sammenligning af to regnearksfiler kræver én overskriftsrække, ingen flettede celler og værdier i stedet for formler.
 
 Start med det indbyggede dokumenteksempel eller CSV-/Excel-eksempel for at prøve arbejdsgangen, før du åbner dine egne filer.
+
+Kladder krypteres lokalt med AES-GCM-256; nøglen bliver i browserprofilen. Dette er ikke en adgangskodebeskyttet boks, og downloadede filer er ikke krypterede. Kladder udløber efter syv dage uden brug.
+
+De valgfrie pilottilføjelsesprogrammer til Word og Google Docs installeres separat og har egne privatlivsvilkår. Denne udvidelse installerer dem ikke automatisk.

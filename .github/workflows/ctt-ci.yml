@@ -43,6 +43,16 @@ jobs:
         run: node scripts/check_webkit_browser.mjs
         env:
           BROWSER_ENGINE: chromium
+      - name: Check translated website and installed extension offline
+        run: node scripts/check_i18n_browser.mjs
+        env:
+          BROWSER_ENGINE: chromium
+      - name: Upload Chromium language evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ctt-chromium-languages-${{ github.sha }}
+          path: test-output/i18n-chromium/
       - name: Upload Chromium navigation evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -84,6 +94,17 @@ jobs:
         run: node scripts/check_webkit_browser.mjs
         env:
           PLAYWRIGHT_MODULE: playwright-webkit-check
+      - name: Check translated website in WebKit
+        run: node scripts/check_i18n_browser.mjs
+        env:
+          BROWSER_ENGINE: webkit
+          PLAYWRIGHT_MODULE: playwright-webkit-check
+      - name: Upload WebKit language evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ctt-webkit-languages-${{ github.sha }}
+          path: test-output/i18n-webkit/
       - name: Upload WebKit evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

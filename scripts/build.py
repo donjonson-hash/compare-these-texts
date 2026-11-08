@@ -8,6 +8,7 @@ import subprocess
 import sys
 from website_analytics import add_website_analytics
 from website_meta import add_social_meta
+from build_i18n import collect, build as build_i18n
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src"
@@ -25,6 +26,8 @@ def build():
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     shutil.copytree(SOURCE, OUTPUT)
+    collect()
+    build_i18n(OUTPUT)
     # One authoritative license supplies the website and every downloadable copy.
     license_text = (ROOT / "LICENSE").read_text()
     shutil.copyfile(ROOT / "LICENSE", OUTPUT / "LICENSE.txt")
@@ -68,6 +71,7 @@ def build():
         "build_command": "npm ci --ignore-scripts && npm run build",
         "source_files_sha256": {str(p.relative_to(SOURCE)): sha256(p) for p in sorted(SOURCE.rglob("*")) if p.is_file()},
         "license_sha256": sha256(ROOT / "LICENSE"),
+        "localization_files_sha256": {str(p.relative_to(ROOT)): sha256(p) for p in sorted((ROOT / "i18n").rglob("*.json"))},
         "archives_sha256": {p.name: sha256(p) for p in sorted((OUTPUT / "downloads").glob("*.zip"))},
     }
     (OUTPUT / "release").mkdir()

@@ -1,16 +1,20 @@
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlparse,urljoin
-import io,json,zipfile,subprocess,re,uuid
+import io,json,zipfile,subprocess,re,uuid,importlib.util
 import xml.etree.ElementTree as ET
-from store_metadata import message_files
+from store_metadata import LOCALES, message_files
 from website_analytics import SCRIPT_HASH, TAG
 from firefox_package import split_color_emoji, MODULE_LIMIT
 root=Path(__file__).resolve().parents[1]/'dist'
 release=json.loads((root.parent/'release.json').read_text())
 localized_files=message_files()
 offline_guides=('compare-word-documents','compare-pdf-files','compare-excel-files','compare-csv-files','office-addins')
-google_archive='compare-these-texts-google-docs-0.1.0.zip'
+google_archive='compare-these-texts-google-docs-0.2.0.zip'
+google_spec=importlib.util.spec_from_file_location('google_addin_build',root.parent/'google-docs/build.py')
+google_builder=importlib.util.module_from_spec(google_spec)
+google_spec.loader.exec_module(google_builder)
+google_files=google_builder.rendered_files()
 office_downloads=(google_archive,'google-docs-setup-en.md','google-docs-setup-ru.md')
 word_pages={'word-addin/index.html','word-addin/taskpane.html'}
 firefox_emoji={'emoji-color-vendor.mjs':(root.parent/'src/emoji-color-vendor.mjs').read_bytes()}
@@ -29,6 +33,8 @@ assert (root/'LICENSE.txt').read_bytes()==(root.parent/'LICENSE').read_bytes(), 
 assert '<!-- CTT-LICENSE -->' not in (root/'terms/index.html').read_text(), 'license was not rendered'
 subprocess.run(['node',str(root.parent/'scripts/check_source_policy.mjs')],check=True)
 subprocess.run(['python3',str(root.parent/'scripts/verify_vendor.py')],check=True)
+subprocess.run(['python3',str(root.parent/'scripts/check_i18n_quality.py')],check=True)
+subprocess.run(['python3',str(root.parent/'scripts/check_i18n_sides.py')],check=True)
 class Parser(HTMLParser):
  def __init__(self): super().__init__(); self.refs=[]; self.ids=[]; self.csp=''; self.canonicals=[]; self.descriptions=[]; self.h1_count=0; self.scripts=[]; self.resources=[]; self.robots=[]; self.inline_scripts=0
  def handle_starttag(self,tag,attrs):
@@ -67,7 +73,7 @@ for p in root.rglob('*.html'):
   assert "base-uri 'none'" in parser.csp and "form-action 'none'" in parser.csp,(p,'Word CSP base/form restrictions')
   if relative=='word-addin/taskpane.html':
    assert not parser.canonicals,(p,'task pane is not an SEO page')
-   assert len(parser.scripts)==2 and {urljoin(canonical,src) for src in parser.scripts}=={'https://officeapis.public.onecdn.static.microsoft/1/office.js','https://comparetwotexts.pro/word-addin/taskpane.mjs'},(p,'unexpected Word scripts')
+   assert len(parser.scripts)==3 and {urljoin(canonical,src) for src in parser.scripts}=={'https://officeapis.public.onecdn.static.microsoft/1/office.js','https://comparetwotexts.pro/word-addin/taskpane.mjs','https://comparetwotexts.pro/i18n.js'},(p,'unexpected Word scripts')
    directives={item.strip().split()[0]:item.strip().split()[1:] for item in parser.csp.split(';') if item.strip()}
    assert directives.get('default-src')==["'none'"],(p,'Word default CSP')
    assert set(directives.get('script-src',[]))=={"'self'",'https://officeapis.public.onecdn.static.microsoft'},(p,'Word script CSP')
@@ -76,7 +82,7 @@ for p in root.rglob('*.html'):
    assert all(not urlparse(ref).scheme or ref=='https://officeapis.public.onecdn.static.microsoft/1/office.js' for ref in parser.resources),(p,'unexpected external Word resource')
   else:
    assert parser.canonicals==[canonical],(p,'Word setup canonical')
-   assert not parser.scripts and "connect-src 'none'" in parser.csp,(p,'Word setup is a static guide')
+   assert len(parser.scripts)==1 and urljoin(canonical,parser.scripts[0])=='https://comparetwotexts.pro/i18n.js' and "connect-src 'none'" in parser.csp,(p,'Word setup is a static guide')
  else:
   assert not relative.startswith('word-addin/'),(p,'unknown Word page requires explicit validation')
   assert parser.canonicals==[canonical],(p,'canonical mismatch')
@@ -121,10 +127,9 @@ for node in office.iter():
    assert target.is_file(),(word_manifest,'manifest URL has no deployed resource',value)
 def check_google_archive(data,label):
  with zipfile.ZipFile(io.BytesIO(data)) as archive:
-  sources={name:root.parent/'google-docs'/name for name in ('Code.gs','Sidebar.html','appsscript.json','README.md','README-RU.md')}
-  sources['LICENSE.txt']=root.parent/'LICENSE'
+  sources=google_files
   assert set(archive.namelist())==set(sources) and len(archive.namelist())==len(sources),(label,'Google Docs archive closure')
-  for name,source in sources.items():assert archive.read(name)==source.read_bytes(),(label,name,'Google Docs source differs')
+  for name,source in sources.items():assert archive.read(name)==source,(label,name,'Google Docs source differs')
   manifest=json.loads(archive.read('appsscript.json'))
   assert manifest['runtimeVersion']=='V8' and not manifest.get('dependencies'),(label,'Google runtime/dependencies')
   assert set(manifest['oauthScopes'])=={'https://www.googleapis.com/auth/documents.currentonly','https://www.googleapis.com/auth/script.container.ui'},(label,'Google Docs scopes')
@@ -149,9 +154,12 @@ for p in (root/'downloads').glob('*.zip'):
     if name.endswith('.html'):
      offline=Parser();offline.feed(z.read(name).decode())
      if offline.csp:assert "connect-src 'none'" in offline.csp,(p,name,'offline CSP')
+  locale_modules={name for name in z.namelist() if re.fullmatch(r'i18n-[a-zA-Z_0-9]+\.mjs',name)}
+  assert locale_modules=={f'i18n-{code}.mjs' for code in LOCALES},(p,'localized module set mismatch')
   manifest=json.loads(z.read('manifest.json'))
   is_chrome=p.name.startswith('ctt-chrome-')
   if is_chrome:
+   assert {name for name in z.namelist() if name.startswith('_locales/')}==set(localized_files),(p,'Chrome metadata locale set mismatch')
    assert manifest['default_locale']=='en'
    for field,key in (('name','extensionName'),('description','extensionDescription')):
     assert manifest[field]=='__MSG_'+key+'__'

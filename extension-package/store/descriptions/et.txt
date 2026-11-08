@@ -1,0 +1,21 @@
+Compare Two Texts võrdleb teksti, lepingu või dokumendi kahte versiooni ja näitab muudatusi. Ava kaks faili, vaata erinevusi kõrvuti, muuda tulemust ning laadi see alla või prindi. Sisseehitatud näidetega saad töövoogu proovida oma dokumente avamata.
+
+VÕIMALUSED
+- TXT, Word DOCX, tekstikihiga PDF, CSV/TSV ja Excel XLSX. Lisatud, kustutatud ja muudetud tekst tõstetakse esile; liigu erinevuste vahel ja muuda teksti võrdlusvaates.
+- Tabelites vali leht ja veerud, seo read tunnuse järgi, muuda väärtusi ning kopeeri puuduv rida A-st B-sse.
+- Kontrolli muutunud summasid ja protsente tekstis, Wordis ja toetatud PDF-failides.
+- Muuda ja ekspordi ka üksikut dokumenti. Täida toetatud PDF-failide trükitud lüngad või lisa teksti.
+- Ekspordi DOCX PDF-iks koos eelvaate, toetatud päiste, jaluste ja leheküljenumbritega.
+
+PRIVAATSUS JA KEELED
+Laiendus töötab võrguühenduseta. Dokumente töödeldakse sinu seadmes ning neid ei laadita võrdlemiseks ega muutmiseks serverisse. Mustandid salvestatakse kohapeal AES-GCM-256 krüpteeringuga; võti jääb brauseriprofiili. See ei ole parooliga kaitstud seif ning allalaaditud failid pole krüpteeritud. Mustandid aeguvad pärast seitset kasutuseta päeva. Veebisait ja laiendus hoiavad mustandeid eraldi.
+Dokumentide sisu ei tõlgita.
+Valikulised Wordi ja Google Docsi proovilisandmoodulid paigaldatakse eraldi ning neile kehtivad eraldi privaatsustingimused. See laiendus ei paigalda neid automaatselt.
+
+PIIRANGUD
+- Iga fail kuni 2 MiB. PDF vajab tekstikihti: skannitud pilte, OCR-i, interaktiivseid vormivälju ega PDF-kommentaare ei toetata.
+- Pilte ja vormindust ei võrrelda. Keerulise küljendusega dokument võib eksportimisel jääda ainult tekstiks; Wordi küljendus võib Microsoft Wordi omast erineda.
+- DOCX-i allmärkusi, lõpumärkusi ja kommentaare ei impordita. Tõsta need esmalt dokumendi koopias põhiteksti.
+- Tabelivõrdlus vajab üht päiserida, ühendamata lahtreid ja valemeid asendavaid väärtusi.
+
+Veebiversioon: comparetwotexts.pro. Küsimuste korral kasuta selle lehe tugilinki.

@@ -7,18 +7,19 @@ import {JSDOM} from 'jsdom';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const {version} = JSON.parse(readFileSync(new URL('../release.json', import.meta.url), 'utf8'));
-const googleZip = 'compare-these-texts-google-docs-0.1.0.zip';
+const googleZip = 'compare-these-texts-google-docs-0.2.0.zip';
 
-test('Google Docs download is the unchanged prototype in the website and both browser packages', () => {
+test('Google Docs download is the deterministic localized prototype in the website and both browser packages', () => {
   const result = execFileSync('python3', ['-c', `
-import io,json,pathlib,sys,zipfile
+import io,json,pathlib,sys,zipfile,importlib.util
 root=pathlib.Path(sys.argv[1]);version=sys.argv[2];name=sys.argv[3]
 archive=(root/'dist/downloads'/name).read_bytes()
-expected={n:root/'google-docs'/n for n in ['Code.gs','Sidebar.html','appsscript.json','README.md','README-RU.md']}
-expected['LICENSE.txt']=root/'LICENSE'
+spec=importlib.util.spec_from_file_location('google_addin_build',root/'google-docs/build.py')
+builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
+expected=builder.rendered_files()
 with zipfile.ZipFile(io.BytesIO(archive)) as z:
     assert set(z.namelist())==set(expected)
-    for filename,source in expected.items():assert z.read(filename)==source.read_bytes(),filename
+    for filename,source in expected.items():assert z.read(filename)==source,filename
     manifest=json.loads(z.read('appsscript.json'))
     assert set(manifest['oauthScopes'])=={'https://www.googleapis.com/auth/documents.currentonly','https://www.googleapis.com/auth/script.container.ui'}
 for target in ['chrome','firefox']:

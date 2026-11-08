@@ -17,7 +17,7 @@ PAIKALLINEN KÄSITTELY
 Asiakirjat käsitellään omalla laitteellasi. Laajennus toimii ilman verkkoyhteyttä eikä lähetä asiakirjojasi palvelimelle vertailua tai muokkausta varten. Verkkosivuston ja laajennuksen luonnokset tallennetaan erikseen, eikä niitä synkronoida automaattisesti. Lataa kopio valmiista työstäsi.
 
 ENNEN KUIN ALOITAT
-- Muokkaustyökalun käyttöliittymä on toistaiseksi englanniksi. Käännetyt kauppakuvaukset eivät muuta työkalun kieltä.
+- Asiakirjojen sisältöä ei käännetä.
 - Kukin avattava tiedosto saa olla enintään 2 MiB.
 - PDF-tiedostoissa on oltava tekstikerros: skannattuja kuvia ilman tekstiä ei tueta, eikä OCR-tekstintunnistusta ole. Painetut tyhjät kohdat ovat eri asia kuin interaktiiviset PDF-lomakekentät. Interaktiivisia kenttiä ja PDF-kommentteja ei tueta.
 - Kuvia ja muotoiluja ei verrata. PDF-asettelun säilyminen riippuu asiakirjasta; monimutkainen asettelu voi vaatia viennin pelkkänä tekstinä. Word-asettelu voi poiketa Microsoft Wordin asettelusta.
@@ -25,3 +25,7 @@ ENNEN KUIN ALOITAT
 - Kahden laskentataulukkotiedoston vertailu edellyttää yhtä otsikkoriviä, erillisiä soluja ilman yhdistämisiä ja arvoja kaavojen sijaan.
 
 Aloita sisäänrakennetusta asiakirja- tai CSV-/Excel-esimerkistä ja kokeile työnkulkua ennen omien tiedostojesi avaamista.
+
+Luonnokset salataan paikallisesti AES-GCM-256-menetelmällä; avain jää selainprofiiliin. Tämä ei ole salasanalla suojattu holvi, eikä ladattuja tiedostoja salata. Luonnokset vanhenevat seitsemän päivän käyttämättömyyden jälkeen.
+
+Valinnaiset Wordin ja Google Docsin kokeilulisäosat asennetaan erikseen, ja niillä on omat tietosuojaehdot. Tämä laajennus ei asenna niitä automaattisesti.

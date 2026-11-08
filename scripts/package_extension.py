@@ -1,4 +1,4 @@
-"""Package the site's English offline engine for Chrome and Firefox."""
+"""Package the site's localized offline engine for Chrome and Firefox."""
 from pathlib import Path
 import json,zipfile,re
 from store_metadata import message_files
@@ -12,7 +12,7 @@ website=release['homepage_url'].rstrip('/')+'/'
 extension_url=website+'extension/'
 localized_files=message_files()
 guides=['compare-word-documents','compare-pdf-files','compare-excel-files','compare-csv-files']
-office_downloads=['compare-these-texts-google-docs-0.1.0.zip','google-docs-setup-en.md','google-docs-setup-ru.md']
+office_downloads=['compare-these-texts-google-docs-0.2.0.zip','google-docs-setup-en.md','google-docs-setup-ru.md']
 
 def offline_page(content):
  # Shared help and file guides must stay inside the installed package, including
@@ -20,6 +20,7 @@ def offline_page(content):
  content=strip_website_analytics(content)
  routes={'/':'index.html','/style.css':'style.css','/site.css':'site.css',
          '/guides.css':'guides.css','/favicon.svg':'favicon.svg',
+         '/i18n.css':'i18n.css',
          '/privacy/':'privacy.html','/support/':'support.html','/terms/':'terms.html',
          '/LICENSE.txt':'LICENSE.txt','/extension/':'welcome.html',
          '/office-addins/':'office-addins.html','/office-addins.css':'office-addins.css'}
@@ -28,8 +29,8 @@ def offline_page(content):
  for before,after in routes.items():
   content=content.replace('href="'+before+'"','href="'+after+'"')
   if before!='/':content=content.replace('href="'+website.rstrip('/')+before+'"','href="'+after+'"')
- content=content.replace('src="/favicon.svg"','src="favicon.svg"')
- content=content.replace('>Extension</a>','>Getting started</a>').replace('>Get the extension</a>','>Getting started</a>')
+ content=content.replace('src="/favicon.svg"','src="favicon.svg"').replace('src="/i18n.js"','src="i18n.js"')
+ content=content.replace('>Extension</a>','>Getting started</a>').replace('>Get the extension</a>','>Getting started</a>').replace('data-i18n-text="Extension"','data-i18n-text="Getting started"').replace('data-i18n-text="Get the extension"','data-i18n-text="Getting started"')
  content=re.sub(r'<a\b[^>]*href="https://chromewebstore\.google\.com/[^\"]*"[^>]*>.*?</a>','',content,flags=re.S)
  content=re.sub(r'<link\b[^>]*rel="canonical"[^>]*>','',content)
  return content
@@ -54,15 +55,14 @@ for target in ['chrome','firefox']:
  html=re.sub(re.escape(WEBSITE_ONLY[0])+'.*?'+re.escape(WEBSITE_ONLY[1]),'',files['index.html'].decode(),flags=re.S)
  html=html.replace('href="/"','href="index.html"').replace('href="/site.css"','href="site.css"').replace('href="/favicon.svg"','href="favicon.svg"').replace('src="/favicon.svg"','src="favicon.svg"')
  html=html.replace('href="/extension/"',f'href="{extension_url}"').replace('href="/privacy/"','href="privacy.html"').replace('href="/support/"','href="support.html"').replace('href="/terms/"','href="terms.html"')
- html=html.replace('>Extension</a>','>Website</a>').replace(f'href="{extension_url}">Website',f'href="{website}">Website')
+ html=html.replace('>Extension</a>','>Website</a>').replace('>Get the extension</a>','>Website</a>').replace('data-i18n-text="Get the extension"','data-i18n-text="Website"').replace('data-i18n-text="Extension"','data-i18n-text="Website"').replace(f'href="{extension_url}"',f'href="{website}"')
  html=re.sub(r'<a href="(https://[^"]+)"',r'<a href="\1" target="_blank" rel="noopener noreferrer"',html)
  html=html.replace('</head>', '<script type="module" src="welcome-entry.mjs"></script></head>')
- html=html.replace('<a href="support.html">More help &amp; feedback</a>', '<p class="home-help-copy">Want to edit inside Word or Google Docs? <a href="office-addins.html" target="_blank" rel="noopener noreferrer">Set up the separate add-in prototypes</a>. Installation and data handling differ from this local workspace.</p><a href="support.html">More help &amp; feedback</a>')
- html=html.replace('<nav aria-label="Footer navigation">', '<nav aria-label="Footer navigation"><a id="getting-started" href="welcome.html" target="_blank" rel="noopener noreferrer">Getting started</a><a href="office-addins.html" target="_blank" rel="noopener noreferrer">Word &amp; Google Docs add-ins</a><a href="compare-word-documents.html" target="_blank" rel="noopener noreferrer">File comparison guide</a>')
+ html=re.sub(r'(<nav aria-label="Footer navigation"[^>]*>)', lambda match: match.group(1)+'<a id="getting-started" href="welcome.html" target="_blank" rel="noopener noreferrer" data-i18n-text="Getting started">Getting started</a><a href="office-addins.html" target="_blank" rel="noopener noreferrer" data-i18n-text="Word &amp; Google Docs add-ins">Word &amp; Google Docs add-ins</a><a href="compare-word-documents.html" target="_blank" rel="noopener noreferrer" data-i18n-text="File comparison guide">File comparison guide</a>', html)
  files['index.html']=html.encode();files['manifest.json']=(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n').encode()
  for page in ['privacy','support','terms','office-addins',*guides]:
   content=offline_page((dist/page/'index.html').read_text())
-  if page=='support':content=content.replace('>Compare two Word documents</a>','>Word &amp; Google Docs guide</a>')
+  if page=='support':content=content.replace('>Compare two Word documents</a>','>Word &amp; Google Docs guide</a>').replace('data-i18n-text="Compare two Word documents"','data-i18n-text="Word &amp; Google Docs guide"')
   files[page+'.html']=content.encode()
  # License notices are sibling files in the offline package.
  files['terms.html']=re.sub(rb'href="/([^/"<>]+\.txt)"',rb'href="\1"',files['terms.html'])
