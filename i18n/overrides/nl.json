@@ -14,6 +14,8 @@
   "85b2d98d3892": "Compare Two Texts — startpagina",
   "0b0fee91a8d4": "Documenten vergelijken",
   "31fbef162594": "Doorgaan",
+  "422f24539e15": "Verder bewerken",
+  "f1559c45162e": "Vorige vergelijking voortzetten",
   "66c7457a65f9": "Documentzoom",
   "d6eafe823591": "Downloaden",
   "6183be0883d2": "PDF downloaden",
@@ -63,6 +65,7 @@
   "8fbf773e2980": "Deze invoegtoepassingen vereisen een internetverbinding en verwerken gegevens op hun eigen manier. Google Apps Script verwerkt tekst op de infrastructuur van Google en slaat de geselecteerde alinea tijdelijk onversleuteld op in de cache. Lees de installatiepagina voordat je deze modus kiest.",
   "3bd8a742eb62": "Dit beschermt de opgeslagen documentgegevens. De functie biedt geen kluis die met een wachtwoord is beveiligd. Iemand die code kan uitvoeren in je ontgrendelde browserprofiel kan nog steeds toegang krijgen tot je concepten. Documenten worden tijdens het werken in het geheugen ontsleuteld. Gedownloade bestanden worden door deze functie niet versleuteld.",
   "993153d8bb89": "Deze versie beoordeelt de inhoud van contracten, rapporten of boeken niet.",
+  "2530c04512b7": "Een voorbeeld proberen",
   "a8283ade3185": "Ongedaan maken",
   "403e555cd16d": "A gebruiken",
   "3807a668acb4": "Geldige concepten uit oudere versies worden versleuteld wanneer je ze in deze versie opent. Als versleutelen of opslaan mislukt, toont de app een foutmelding en vervangt die het oude concept niet door een nieuwe onversleutelde versie. Het bestaande concept blijft intact. Bij verwijdering of verval van een concept worden de opgeslagen inhoud en versleutelingssleutel verwijderd. Dit biedt geen garantie op veilige verwijdering van schijf of uit back-ups."

@@ -6,8 +6,8 @@ release or submit a listing for review.
 
 ## Candidate status and language scope
 
-The candidate defines 52 interface locales and includes 52 prepared store
-locale sets: English and 51 translations, including regional Spanish,
+The candidate defines 51 interface locales and includes 51 prepared store
+locale sets: English and 50 translations, including regional Spanish,
 Portuguese and Chinese variants. Interface release readiness must be confirmed
 by the strict build and final verification report. The normal build strictly requires complete interface catalogs and
 valid placeholders; missing translations stop the build. Installed-package
@@ -28,8 +28,8 @@ extension. Translation provenance is recorded with the interface catalogs.
 | Content | Input |
 | --- | --- |
 | Version and English name/short description | Repository `release.json` |
-| All 52 names and short descriptions | `localizations.json` |
-| All 52 full descriptions | `descriptions/<locale>.txt` |
+| All 51 names and short descriptions | `localizations.json` |
+| All 51 full descriptions | `descriptions/<locale>.txt` |
 | English dashboard reference | `LISTING-EN.md` |
 | Release changes and limitations | `RELEASE-NOTES-EN.md` |
 | Russian submission instructions | `SUBMISSION-RU.md`, `LOCALIZATION-RU.md` |
@@ -52,7 +52,7 @@ capture hashes and release provenance; it fails if that evidence belongs to a
 different ZIP. Packaging does not itself certify native translation quality.
 
 The resulting file is `artifacts/ctt-0.37.9-store-kit.zip`. It contains the inner
-`ctt-chrome-0.37.9.zip`, a separate Firefox ZIP, 52 metadata JSON files and 52
+`ctt-chrome-0.37.9.zip`, a separate Firefox ZIP, 51 metadata JSON files and 51
 full-description TXT files, reference copy, screenshots and checksums. Upload
 **only the inner Chrome ZIP** to the existing Chrome Web Store item. Do not
 upload the whole materials bundle or the Firefox ZIP as a Chrome extension.
@@ -60,7 +60,7 @@ upload the whole materials bundle or the Firefox ZIP as a Chrome extension.
 Chrome `_locales` files supply extension metadata. Full store descriptions are
 pasted separately in the dashboard; the description TXT files are not included
 in the runtime ZIP. The welcome page and interface modules must be packaged in
-the extension itself. Screenshots and video are not provided in 52 translated
+the extension itself. Screenshots and video are not provided in 51 translated
 versions by this change.
 
 ## Claims to retain

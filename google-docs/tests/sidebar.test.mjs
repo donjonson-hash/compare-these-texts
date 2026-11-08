@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {JSDOM} from 'jsdom';
 
 const html = readFileSync(new URL('../Sidebar.html', import.meta.url), 'utf8');
+const localeCodes = JSON.parse(readFileSync(new URL('../../i18n/locales.json', import.meta.url), 'utf8')).map(locale => locale.code);
 function setup(original = 'A short sentence.', translations = null) {
   const calls = [];
   const dom = new JSDOM(html, {runScripts: 'dangerously', beforeParse(window) {
@@ -129,6 +130,6 @@ test('embedded locale switch updates sidebar labels and status without losing a 
   assert.equal($('preview').textContent, preview);
   assert.equal($('apply').disabled, false);
   assert.equal(calls.filter(call => call.method === 'apply').length, 0);
-  assert.equal($('ui-language').options.length, 52);
+  assert.deepEqual(Array.from($('ui-language').options, option => option.value), localeCodes);
   dom.window.close();
 });

@@ -1,10 +1,10 @@
 # Interface localization — 0.37.9 draft
 
-All 52 locale catalogs have entries for all 2,133 source messages. This checkpoint remains a draft. The language-quality gate flags damaged output, and editorial review identified changes of meaning, especially in Swahili. Keep the current store releases until the translated interface passes the quality and browser gates.
+The release candidate covers 51 locales, including English, with 2,133 source messages in each catalog. Swahili is deferred after the language-quality review.
 
 ## Coverage and data boundaries
 
-`locales.json` defines 52 Chrome-compatible locales, including English. Regional English variants fall back to English. Spanish, Portuguese and Chinese have regional variants. This is a locale count, not a claim of 52 distinct languages.
+`locales.json` defines 51 Chrome-compatible locales, including English. Regional English variants fall back to English. Spanish, Portuguese and Chinese have regional variants. This is a locale count, not a claim of 51 distinct languages.
 
 `src/i18n.js` loads packaged local modules and stores only the chosen locale in localStorage. Explicit bindings cover welcome, guides, workspace controls, messages and the separate Word/Google Docs panels. The engine never scans document content for translation. User text, filenames, sheet names, comparison direction and calculations remain unchanged. Switching languages does not reload the page.
 
@@ -18,7 +18,7 @@ Generated assistant answers keep the language used when they were created. Newly
 - `overrides/<locale>.json`: priority corrections and validated recoveries, applied after the base catalog. Provenance differs: these include model-authored edits and machine-translated recovery records; their presence is not proof of human review.
 - Numeric rich-text slots and named parameters must survive translation exactly.
 
-Run `python3 scripts/build_i18n.py --collect` after changing English UI strings. Normal builds validate all 51 non-English catalogs before writing any localized modules. Missing keys, unknown keys, blank values, malformed slots and changed parameters stop the build. `--allow-incomplete` is for development only and is never used by the release build.
+Run `python3 scripts/build_i18n.py --collect` after changing English UI strings. Normal builds validate all 50 non-English catalogs before writing any localized modules. Missing keys, unknown keys, blank values, malformed slots and changed parameters stop the build. `--allow-incomplete` is for development only and is never used by the release build.
 
 Preparation used the previously saved translations, offline machine translation for the remaining catalogs, and focused editorial corrections. Model sources and per-locale coverage are recorded in `translation-metadata.json`. The product ships the strings only. It does not include any of the translation models or invoke them at runtime. Structural checks validate labels, parameters, formatting and known corruption patterns. A native speaker has not reviewed every locale.
 

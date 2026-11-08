@@ -1,8 +1,15 @@
 {
   "71b2d2213d20": "(Tomt textblock)",
   "ab76a8a45f4b": "<0>comparetwotexts.pro</0>, <1>comparethesetexts.com</1> och varje installerat tillägg har separat lagring i webbläsaren. Ett utkast som sparas i en arbetsyta visas inte i de andra eller på en annan enhet. Om du vill flytta ett dokument laddar du ned det och öppnar det i den andra arbetsytan. Ta bort sparat arbete från varje arbetsyta där du har använt det, särskilt på en dator som du delar med andra.",
+  "31e392d1c037": "Tillämpa",
+  "19766ed6ccb2": "Avbryt",
+  "7d9eb7acb13e": "Stäng",
   "8a380228ec35": "Compare Two Texts (CTT) läser filerna eller texten du väljer att öppna, inklusive dokumentnamn, text, tabeller och bilder som stöds. Uppgifterna används för att visa skillnader, tillämpa dina ändringar och förbereda filer för nedladdning. Dokumentinnehållet behandlas i din webbläsare och laddas inte upp till utvecklaren, en jämförelseserver eller en AI-tjänst.",
+  "f1559c45162e": "Fortsätt föregående jämförelse",
   "5260f6b2fa9f": "Ta bort rad",
+  "d6eafe823591": "Ladda ned",
+  "6183be0883d2": "Ladda ned PDF",
+  "f85babcedda6": "Redigera och konvertera",
   "58ad1f9f73f2": "Redigera. Exportera. Kontrollera.",
   "f19974d2fe57": "Anpassa till sidbredd",
   "76363a64dcfa": "Navigering i sidfoten",
@@ -15,6 +22,7 @@
   "e8371d6519e6": "Manuell installation krävs. Tilläggen använder en internetanslutning och har egen datahantering. Offlinebearbetningen och de krypterade utkasten i webbläsarens arbetsyta gäller inte för dem.",
   "619880112496": "Skilj på stora och små bokstäver",
   "ea42301d9d10": "Öppna inställningarna för Word-tillägget",
+  "75b9c754eb4f": "Öppna nytt dokument",
   "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
   "6737d783d177": "Klistra in text i A och B eller välj <0>Ladda upp fil</0> för varje sida. Välj sedan <1>Jämför</1>. Använd <2>Nästa skillnad</2> för att gå mellan ändringarna. När du jämför Word, PDF eller text kan du markera ett avsnitt för att redigera det eller starta en granskning och välja <3>Använd A</3> eller <4>Behåll B</4>.",
   "3bdf9c3fb67c": "Granska och redigera",
@@ -33,7 +41,9 @@
   "6ce0d09f731a": "Markeringen har upphört att gälla. Läs in och granska den igen.",
   "993153d8bb89": "Den här versionen bedömer inte innehållet i avtal, rapporter eller böcker.",
   "d5cdfcf7ff75": "Överkant",
+  "a8283ade3185": "Ångra",
   "1ddb9bf30d5b": "Ångra senaste ändringen",
+  "d99bcd78b586": "Ladda upp fil",
   "403e555cd16d": "Använd A",
   "3807a668acb4": "Giltiga utkast från äldre versioner krypteras när de öppnas i den här versionen. Om krypteringen eller sparandet misslyckas visar appen ett fel och ersätter inte det gamla utkastet med en ny, okrypterad version. Det befintliga utkastet lämnas orört. När ett utkast raderas eller upphör att gälla tas det sparade innehållet och krypteringsnyckeln bort. Det garanterar inte säker radering från disken eller från säkerhetskopior."
 }

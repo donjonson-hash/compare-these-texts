@@ -1,5 +1,5 @@
 {
-  "status": "draft_editorial_quality_blocked",
+  "status": "release_candidate_without_swahili",
   "source_sha256": "d16201a0d9d3ce85101c8f120e150c8513c12a404b7cf1a2c6bdd7690d563e8e",
   "source_messages": 2133,
   "previous_checkpoint": {
@@ -228,7 +228,6 @@
       "sk": "1.9",
       "sl": "1.9",
       "sv": "1.5",
-      "sw": "1.11",
       "th": "1.9",
       "vi": "1.9"
     },
@@ -236,7 +235,7 @@
     "m2m_model": "auralmira/m2m100-418m-ct2-int8 for sr",
     "indic_model": "adalat-ai/ct2-rotary-indictrans2-en-indic-dist-200M for ta and te",
     "portuguese_model": "gow-solucoes/opus-mt-en-pt-ct2, conversion of Helsinki-NLP/opus-mt-tc-big-en-pt (CC-BY 4.0)",
-    "status": "machine-generated drafts with targeted AI-authored repairs; material issues remain under review",
+    "status": "Offline machine translation with focused editorial corrections",
     "machine_records_by_locale": {
       "ms": 2114,
       "nl": 2089,
@@ -249,7 +248,6 @@
       "sl": 2128,
       "sr": 2130,
       "sv": 2116,
-      "sw": 2122,
       "ta": 2130,
       "te": 2130,
       "th": 2130,
@@ -298,7 +296,6 @@
       "sl": 17,
       "sr": 50,
       "sv": 34,
-      "sw": 78,
       "ta": 199,
       "te": 198,
       "th": 95,
@@ -481,10 +478,6 @@
       "present": 2133,
       "missing": 0
     },
-    "sw": {
-      "present": 2133,
-      "missing": 0
-    },
     "ta": {
       "present": 2133,
       "missing": 0
@@ -517,5 +510,8 @@
       "present": 2133,
       "missing": 0
     }
+  },
+  "release_excluded_locales": {
+    "sw": "Deferred after the quality review found recurring meaning and rendering errors."
   }
 }

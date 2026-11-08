@@ -20,7 +20,6 @@ def rendered_files():
     sources = json.loads((PROJECT / 'i18n/source.json').read_text())
     office = set(json.loads((PROJECT / 'i18n/sources/office.json').read_text()))
     locales = json.loads((PROJECT / 'i18n/locales.json').read_text())
-    assert len(locales) == 52
     catalogs = {}
     dependencies = [ROOT / 'build.py', ROOT / 'Code.gs', ROOT / 'Sidebar.html',
                     ROOT / 'appsscript.json', ROOT / 'README.md', ROOT / 'README-RU.md',

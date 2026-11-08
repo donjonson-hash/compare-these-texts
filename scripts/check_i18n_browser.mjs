@@ -12,6 +12,7 @@ const engine = process.env.BROWSER_ENGINE || 'chromium';
 assert.ok(['chromium', 'webkit'].includes(engine));
 const playwright = await import(process.env.PLAYWRIGHT_MODULE || (engine === 'webkit' ? 'playwright-webkit-check' : 'playwright'));
 const root = fileURLToPath(new URL('../', import.meta.url));
+const localeCodes = JSON.parse(await readFile(path.join(root, 'i18n', 'locales.json'), 'utf8')).map(locale => locale.code);
 const build = path.resolve(process.env.CTT_BUILD_DIR || path.join(root, 'dist'));
 const output = path.resolve(process.env.TEST_OUTPUT || path.join(root, 'test-output', 'i18n-' + engine));
 await mkdir(output, {recursive:true});
@@ -64,9 +65,7 @@ async function switchLanguage(page, locale) {
 }
 async function assertPicker(page) {
   const values = await page.locator('[data-i18n-selector] option').evaluateAll(options => options.map(option => option.value));
-  assert.equal(values.length, 52, 'all 52 UI languages are available in the shipped picker');
-  assert.equal(new Set(values).size, 52, 'the picker has no duplicate languages');
-  for (const code of ['en','ru','ar','ja','de']) assert.ok(values.includes(code));
+  assert.deepEqual(values, localeCodes, 'the shipped picker matches the canonical release locales');
 }
 async function downloadText(page, scope, side) {
   const [download] = await Promise.all([page.waitForEvent('download'), page.locator(`${scope} [data-save-side="${side}"]`).click()]);

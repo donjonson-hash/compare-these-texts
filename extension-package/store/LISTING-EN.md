@@ -75,8 +75,8 @@ Copy `descriptions/en.txt` as-is into the description field.
 - Additional document-comparison tools: **All tools → Review & edit / Files & settings / Reports**.
 - Undo is available; do not advertise an application-level Redo command.
 
-52 localized metadata catalogs and 52 full descriptions are prepared. The
-0.37.9 candidate defines the same 52 interface locales, including English.
+51 localized metadata catalogs and 51 full descriptions are prepared. The
+0.37.9 candidate defines the same 51 interface locales, including English.
 Their release readiness is established by the strict build and final checks. The normal build requires complete catalogs and valid placeholders.
 Installed-package and browser test results are recorded separately in the final
 verification report; this listing reference does not claim those checks passed.
@@ -88,7 +88,7 @@ all locales have been reviewed by native speakers. Translation
 services are used during preparation, not for document processing in the
 installed extension. The extension does not translate document contents.
 
-Screenshots use synthetic examples and are not supplied in 52 translated
+Screenshots use synthetic examples and are not supplied in 51 translated
 versions. Keep the same extension item ID when updating an existing listing.
 The store-kit ZIP is a materials bundle; upload its inner Chrome ZIP. Optional
 Word and Google Docs pilot add-ins are installed separately and have separate

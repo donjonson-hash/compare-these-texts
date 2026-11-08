@@ -4,7 +4,7 @@ No account, sign-in, payment, API key or external AI service is required for
 the extension workflow. These instructions use the English control names; the
 interface language can be selected separately. Synthetic examples are built
 in, so review does not require private documents. The candidate defines
-52 interface locales; their release readiness requires a strict build with
+51 interface locales; their release readiness requires a strict build with
 complete catalogs. Consult its
 final verification report for browser and installed-package test results.
 

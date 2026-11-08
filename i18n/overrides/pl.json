@@ -1,8 +1,13 @@
 {
   "ab76a8a45f4b": "<0>comparetwotexts.pro</0>, <1>comparethesetexts.com</1> i każde zainstalowane rozszerzenie korzystają z osobnego miejsca w pamięci przeglądarki. Wersja robocza zapisana w jednym obszarze roboczym nie pojawi się w pozostałych ani na innym urządzeniu. Aby przenieść dokument, pobierz go i otwórz w drugim obszarze roboczym. Usuń zapisane materiały z każdego obszaru roboczego, w którym były używane, zwłaszcza na komputerze współdzielonym.",
   "8a380228ec35": "Compare Two Texts (CTT) odczytuje wybrane przez Ciebie pliki lub tekst, w tym nazwy dokumentów, tekst, tabele i obsługiwane obrazy. Używa tych danych do pokazywania różnic, wprowadzania zmian i przygotowywania plików do pobrania. Zawartość dokumentów jest przetwarzana w Twojej przeglądarce i nie jest wysyłana do twórcy rozszerzenia, na serwer porównawczy ani do usługi AI.",
+  "6183be0883d2": "Pobierz PDF",
+  "f85babcedda6": "Edytuj i konwertuj",
+  "eda7f6b0d33d": "Edytuj i eksportuj",
+  "d6efba104f32": "Zachowaj B",
   "e8371d6519e6": "Wymagana jest ręczna instalacja. Te dodatki korzystają z połączenia z internetem i mają własne zasady przetwarzania danych. Przetwarzanie offline i szyfrowanie wersji roboczych w obszarze roboczym przeglądarki nie dotyczą tych dodatków.",
   "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
+  "3bdf9c3fb67c": "Przejrzyj i edytuj",
   "cf816c3fcce2": "Działa w infrastrukturze Google. Usługa CacheService przechowuje tymczasowo w pamięci podręcznej danego użytkownika zaznaczony tekst oraz cały zaznaczony akapit w postaci niezaszyfrowanej, razem z metadanymi formatowania i zaznaczenia. Żądany czas przechowywania w pamięci podręcznej wynosi 15 minut. Google może usunąć wpis wcześniej. Nie są wysyłane żadne żądania do modeli językowych (LLM) ani do serwerów podmiotów trzecich.",
   "36874a6cd00c": "Nazwy zapisanych dokumentów, oryginalne pliki, zmiany, obsługiwana historia cofania i raporty są szyfrowane za pomocą <0>AES-GCM-256</0> przed zapisaniem w pamięci przeglądarki. Każdy zapisany rekord ma losowo wygenerowany klucz i wartość jednorazową szyfrowania (nonce). Klucza nie można wyeksportować przez Web Crypto API. Jest przechowywany w tym samym profilu przeglądarki, co pozwala wznowić pracę bez hasła. Wersja formatu zapisu, identyfikatory rewizji oraz daty i godziny aktywności i wygaśnięcia pozostają niezaszyfrowane.",
   "8effbd65c9ff": "Przykłady obsługiwanych poleceń (po angielsku): {0}",
@@ -15,5 +20,8 @@
   "8fbf773e2980": "Te dodatki wymagają połączenia z internetem i mają własne zasady przetwarzania danych. Google Apps Script przetwarza tekst w infrastrukturze Google i tymczasowo zapisuje zaznaczony akapit w pamięci podręcznej w postaci niezaszyfrowanej. Przed wybraniem tego trybu przeczytaj instrukcje na stronie instalacji.",
   "3bd8a742eb62": "To zabezpieczenie chroni zapisaną reprezentację dokumentu. Nie jest to sejf zabezpieczony hasłem. Osoba, która może uruchomić kod w odblokowanym profilu przeglądarki, nadal może uzyskać dostęp do Twoich wersji roboczych. Podczas pracy dokumenty są odszyfrowywane w pamięci. Pobrane pliki nie są szyfrowane przez tę funkcję.",
   "993153d8bb89": "Ta wersja nie ocenia treści umów, raportów ani książek.",
+  "2530c04512b7": "Wypróbuj przykład",
+  "d99bcd78b586": "Prześlij plik",
+  "403e555cd16d": "Użyj A",
   "3807a668acb4": "Prawidłowe wersje robocze z wcześniejszych wersji programu są szyfrowane przy otwarciu w tej wersji. Jeśli szyfrowanie lub zapisywanie się nie powiedzie, aplikacja wyświetli błąd i nie zastąpi poprzedniej wersji roboczej nową, niezaszyfrowaną kopią. Istniejąca wersja robocza pozostanie nienaruszona. Usunięcie lub wygaśnięcie wersji roboczej powoduje usunięcie zapisanej treści i klucza szyfrowania. Nie stanowi to gwarancji bezpiecznego wymazania z dysku ani z kopii zapasowych."
 }

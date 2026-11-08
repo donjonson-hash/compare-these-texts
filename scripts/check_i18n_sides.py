@@ -206,7 +206,7 @@ def audit(catalog_root, selected=None, allow_incomplete=False):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--catalog-root', type=Path, default=ROOT / 'i18n')
-    parser.add_argument('--locales', help='Comma-separated locale codes; defaults to all 51 translations')
+    parser.add_argument('--locales', help='Comma-separated locale codes; defaults to all configured translations')
     parser.add_argument('--allow-incomplete', action='store_true', help='Audit present entries during preparation; never use for release validation')
     parser.add_argument('--json', type=Path, help='Optional complete JSON findings report')
     args = parser.parse_args()

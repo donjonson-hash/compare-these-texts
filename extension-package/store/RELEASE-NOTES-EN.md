@@ -2,12 +2,12 @@
 
 Prepared 8 November 2026. This is candidate documentation, not a statement of
 publication, Chrome Web Store approval or completion of the final validation.
-The candidate defines 52 language and regional variants, including English.
+The candidate defines 51 language and regional variants, including English.
 Their release readiness is established by the strict build and final checks. The normal build strictly requires complete catalogs and valid
 placeholders. Browser and installed-package results belong in the final
 verification report; this document does not assert that those checks passed.
 
-- Prepare 52 sets of Chrome listing names, short descriptions and full
+- Prepare 51 sets of Chrome listing names, short descriptions and full
   descriptions. Preserve the English name and short description; retain and
   update existing translations and add 30 missing locales.
 - Add a shared local interface-language layer for the welcome page, launcher,
@@ -37,7 +37,7 @@ Interface catalogs, placeholder checks, Chromium/WebKit behavior, offline
 operation and report exports remain release gates. PDF report labels may use
 English when the bundled font/shaping does not support the selected language;
 the interface explains this before export. The authoritative software license
-remains in English. Screenshots and video have not been translated into 52
+remains in English. Screenshots and video have not been translated into 51
 versions by this change.
 
 # Compare Two Texts 0.37.8 — Mac navigation and document-editor add-ins

@@ -3,7 +3,7 @@ from html.parser import HTMLParser
 from urllib.parse import urlparse,urljoin
 import io,json,zipfile,subprocess,re,uuid,importlib.util
 import xml.etree.ElementTree as ET
-from store_metadata import message_files
+from store_metadata import LOCALES, message_files
 from website_analytics import SCRIPT_HASH, TAG
 from firefox_package import split_color_emoji, MODULE_LIMIT
 root=Path(__file__).resolve().parents[1]/'dist'
@@ -154,9 +154,12 @@ for p in (root/'downloads').glob('*.zip'):
     if name.endswith('.html'):
      offline=Parser();offline.feed(z.read(name).decode())
      if offline.csp:assert "connect-src 'none'" in offline.csp,(p,name,'offline CSP')
+  locale_modules={name for name in z.namelist() if re.fullmatch(r'i18n-[a-zA-Z_0-9]+\.mjs',name)}
+  assert locale_modules=={f'i18n-{code}.mjs' for code in LOCALES},(p,'localized module set mismatch')
   manifest=json.loads(z.read('manifest.json'))
   is_chrome=p.name.startswith('ctt-chrome-')
   if is_chrome:
+   assert {name for name in z.namelist() if name.startswith('_locales/')}==set(localized_files),(p,'Chrome metadata locale set mismatch')
    assert manifest['default_locale']=='en'
    for field,key in (('name','extensionName'),('description','extensionDescription')):
     assert manifest[field]=='__MSG_'+key+'__'

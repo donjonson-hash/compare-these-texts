@@ -21,7 +21,7 @@ No web-app deployment, API key, or OAuth client ID is needed for this test. The 
 
 ## Interface language
 
-The packaged sidebar contains 52 interface languages and uses the browser language initially. Change **Language** in the sidebar to remember a preference in this browser when storage is available. The Google Docs menu uses your Google account language and updates when the document reloads. Document text, edits and difference previews are never translated. No translation service or additional permission is used. Install the three files from the ZIP: the repository sources are build inputs, not the localized distribution.
+The packaged sidebar contains 51 interface languages and uses the browser language initially. Change **Language** in the sidebar to remember a preference in this browser when storage is available. The Google Docs menu uses your Google account language and updates when the document reloads. Document text, edits and difference previews are never translated. No translation service or additional permission is used. Install the three files from the ZIP: the repository sources are build inputs, not the localized distribution.
 
 ## Use
 

@@ -14,13 +14,12 @@ function setup(html='', options={}) {
 }
 const ru = {Save:'Сохранить',Language:'Язык','{0} pages':'{0} страниц','Could not read {file}.':'Не удалось прочитать {file}.','Open <0>help <1>now</1></0>.':'Открыть <0>справку <1>сейчас</1></0>.','Use <0></0>.':'Используйте <0></0>.'};
 
-test('52 canonical locales, regional normalization and malformed input rejection',async()=>{
+test('canonical release locales, regional normalization and malformed input rejection',async()=>{
   const {api}=setup();
   const metadata=JSON.parse(await readFile(new URL('../i18n/locales.json',import.meta.url),'utf8'));
-  assert.equal(api.locales.length,52);
   assert.deepEqual(JSON.parse(JSON.stringify(api.locales)),metadata);
   for(const [value,expected] of Object.entries({'en-US':'en','nb-NO':'no','pt-PT':'pt_PT','pt-BR':'pt_BR','zh-Hant-HK':'zh_TW','zh-SG':'zh_CN','es-MX':'es_419','es-ES':'es','iw':'he'})) assert.equal(api.normalizeLocale(value),expected);
-  for(const value of ['../../evil','https://evil.test/a','en<script>','',null,{},'xx']) assert.equal(api.normalizeLocale(value),null);
+  for(const value of ['../../evil','https://evil.test/a','en<script>','',null,{},'xx','sw','sw-KE']) assert.equal(api.normalizeLocale(value),null);
 });
 
 test('switching updates explicit UI bindings without changing document text, inputs or A/B order',async()=>{
@@ -31,7 +30,7 @@ test('switching updates explicit UI bindings without changing document text, inp
   assert.equal(document.querySelector('#a').textContent,'Save');
   assert.equal(document.querySelector('#b').textContent,'Language');
   assert.equal(textarea.value,'Save'); assert.equal(textarea.selectionStart,1); assert.equal(textarea.selectionEnd,3);
-  assert.equal(document.querySelector('select').options.length,52);
+  assert.deepEqual(Array.from(document.querySelector('select').options, option => option.value), Array.from(api.locales, locale => locale.code));
   assert.equal(document.querySelector('select').value,'ru');
   await api.setLocale('ar');
   assert.equal(document.documentElement.dir,'rtl');
