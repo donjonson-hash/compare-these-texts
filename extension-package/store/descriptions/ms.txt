@@ -1,0 +1,21 @@
+Compare Two Texts membandingkan dua versi teks, kontrak atau dokumen dan menunjukkan perubahan. Buka dua fail, semak perbezaan sebelah menyebelah, sunting kemudian muat turun atau cetak hasilnya. Contoh terbina dalam membolehkan anda mencuba tanpa dokumen sendiri.
+
+CIRI
+- TXT, Word DOCX, PDF dengan lapisan teks, CSV/TSV dan Excel XLSX. Teks yang ditambah, dipadam dan diubah ditandakan; beralih antara perbezaan dan sunting terus dalam ruang perbandingan.
+- Untuk hamparan, pilih helaian dan lajur, padankan baris mengikut pengecam, sunting nilai dan salin baris yang tiada dari A ke B.
+- Semak perubahan amaun dan peratusan dalam teks, Word dan PDF yang disokong.
+- Sunting dan eksport satu dokumen. Isi ruang kosong bercetak atau tambah teks dalam PDF yang disokong.
+- Eksport DOCX kepada PDF dengan pratonton, pengepala, pengaki dan nombor halaman yang disokong.
+
+PRIVASI DAN BAHASA
+Sambungan berfungsi di luar talian. Dokumen diproses pada peranti anda tanpa dimuat naik ke pelayan untuk perbandingan atau penyuntingan. Draf disimpan secara setempat dan disulitkan dengan AES-GCM-256; kunci kekal dalam profil pelayar. Ini bukan peti simpanan berkata laluan dan fail yang dimuat turun tidak disulitkan. Draf tamat tempoh selepas tujuh hari tanpa penggunaan. Laman web dan sambungan menyimpan draf secara berasingan.
+Kandungan dokumen tidak diterjemahkan.
+Tambahan perintis pilihan untuk Word dan Google Docs dipasang secara berasingan dan mempunyai syarat privasi tersendiri. Sambungan ini tidak memasangnya secara automatik.
+
+BATASAN
+- Sehingga 2 MiB setiap fail. PDF memerlukan lapisan teks: imej imbasan, OCR, medan borang interaktif dan komen PDF tidak disokong.
+- Imej dan pemformatan tidak dibandingkan. Susun atur rumit mungkin dieksport sebagai teks sahaja; susun atur Word mungkin berbeza daripada Microsoft Word.
+- Nota kaki, nota hujung dan komen DOCX tidak diimport. Pindahkannya dahulu ke teks utama dalam salinan dokumen.
+- Perbandingan hamparan memerlukan satu baris pengepala, tiada sel digabungkan dan nilai menggantikan formula.
+
+Versi web: comparetwotexts.pro. Untuk pertanyaan, gunakan pautan sokongan pada halaman ini.

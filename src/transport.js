@@ -20,7 +20,7 @@
         worker.onmessage = ({data}) => data.ok ? finish(null, data.result) : finish(new Error(data.error));
         worker.onerror = (event) => { event.preventDefault(); finish(new Error("Couldn't start processing in your browser. Reload this page.")); };
         worker.onmessageerror = () => finish(new Error("Couldn't retrieve the processing results."));
-        try { worker.postMessage({path, payload}); } catch (error) { finish(error); }
+        try { worker.postMessage({path, payload, locale: globalThis.cttI18n?.getLocale() || 'en'}); } catch (error) { finish(error); }
       });
     }
   });

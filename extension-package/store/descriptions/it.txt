@@ -17,7 +17,7 @@ ELABORAZIONE LOCALE
 I documenti vengono elaborati sul tuo dispositivo. L'estensione funziona offline e non carica i documenti su un server per confrontarli o modificarli. Le bozze del sito e dell'estensione vengono salvate separatamente, senza sincronizzazione automatica. Scarica una copia del lavoro completato.
 
 PRIMA DI INIZIARE
-- L'interfaccia dell'editor è attualmente in inglese. Le descrizioni tradotte nello store non cambiano la lingua dell'editor.
+- Il contenuto dei documenti non viene tradotto.
 - Ogni file in ingresso può avere una dimensione massima di 2 MiB.
 - I PDF devono contenere un livello di testo: le immagini scansionate prive di testo non sono supportate e non è disponibile il riconoscimento ottico dei caratteri (OCR). Gli spazi previsti per la compilazione a mano sono diversi dai campi interattivi dei moduli PDF. I campi interattivi e i commenti PDF non sono supportati.
 - Le immagini e la formattazione non vengono confrontate. Il mantenimento dell'impaginazione PDF dipende dal documento; le impaginazioni complesse possono richiedere l'esportazione del solo testo. L'impaginazione dei file Word può differire da quella di Microsoft Word.
@@ -25,3 +25,7 @@ PRIMA DI INIZIARE
 - Il confronto di due file di fogli di calcolo richiede una sola riga di intestazione, nessuna cella unita e valori al posto delle formule.
 
 Inizia dall'esempio di documento o di CSV / Excel integrato per provare il flusso di lavoro prima di aprire i tuoi file.
+
+Le bozze sono cifrate localmente con AES-GCM-256; la chiave rimane nel profilo del browser. Non è una cassaforte protetta da password e i file scaricati non sono cifrati. Le bozze scadono dopo sette giorni senza utilizzo.
+
+I componenti aggiuntivi pilota facoltativi per Word e Google Docs si installano separatamente e hanno condizioni sulla privacy proprie. Questa estensione non li installa automaticamente.

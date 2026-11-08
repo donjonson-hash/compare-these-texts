@@ -17,7 +17,7 @@ PROCESAMIENTO LOCAL
 Los documentos se procesan en tu dispositivo. La extensión funciona sin conexión y no sube tus documentos a un servidor para compararlos o editarlos. Los borradores del sitio web y de la extensión se guardan por separado, sin sincronización automática. Descarga una copia de tu trabajo terminado.
 
 ANTES DE EMPEZAR
-- La interfaz del editor está actualmente en inglés. Las descripciones traducidas de la tienda no cambian el idioma del editor.
+- El contenido de los documentos no se traduce.
 - Cada archivo de entrada puede tener un tamaño máximo de 2 MiB.
 - Los PDF necesitan una capa de texto: las imágenes escaneadas sin texto no son compatibles y no hay reconocimiento óptico de caracteres (OCR). Los espacios previstos para escribir a mano no son campos interactivos de formulario PDF. No se admiten campos interactivos ni comentarios PDF.
 - No se comparan imágenes ni formatos. La conservación de la maquetación del PDF depende del documento; las maquetaciones complejas pueden requerir una exportación de solo texto. La presentación de los archivos Word puede diferir de la de Microsoft Word.
@@ -25,3 +25,7 @@ ANTES DE EMPEZAR
 - Para comparar dos archivos de hoja de cálculo, se necesita una única fila de encabezado, sin celdas combinadas y con valores en lugar de fórmulas.
 
 Empieza con el ejemplo de documento o de CSV / Excel incluido para probar el proceso antes de abrir tus propios archivos.
+
+Los borradores se cifran localmente con AES-GCM-256; la clave permanece en el perfil del navegador. No es una caja fuerte protegida con contraseña y los archivos descargados no están cifrados. Los borradores caducan tras siete días sin uso.
+
+Los complementos piloto opcionales para Word y Google Docs se instalan por separado y tienen sus propias condiciones de privacidad. Esta extensión no los instala automáticamente.

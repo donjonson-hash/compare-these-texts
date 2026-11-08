@@ -17,7 +17,7 @@ LOKAL BEARBETNING
 Dokumenten bearbetas på din enhet. Tillägget fungerar offline och laddar inte upp dina dokument till en server för jämförelse eller redigering. Utkast på webbplatsen och i tillägget lagras separat, utan automatisk synkronisering. Ladda ned en kopia av ditt färdiga arbete.
 
 INNAN DU BÖRJAR
-- Redigerarens gränssnitt är för närvarande på engelska. Översatta beskrivningar i butiken ändrar inte redigerarens språk.
+- Dokumentens innehåll översätts inte.
 - Varje indatafil får vara högst 2 MiB.
 - PDF-filer måste ha ett textlager: skannade bilder utan text stöds inte, och OCR saknas. Tryckta tomrader är inte samma sak som interaktiva PDF-formulärfält; interaktiva fält och PDF-kommentarer stöds inte.
 - Bilder och formatering jämförs inte. Om PDF-layouten kan bevaras beror på dokumentet; komplexa layouter kan kräva export som enbart text. Word-layouten kan skilja sig från Microsoft Word.
@@ -25,3 +25,7 @@ INNAN DU BÖRJAR
 - För att jämföra två kalkylbladsfiler krävs en enda rubrikrad, inga sammanfogade celler och värden i stället för formler.
 
 Börja med det inbyggda dokumentexemplet eller CSV-/Excel-exemplet för att prova arbetsflödet innan du öppnar dina egna filer.
+
+Utkast krypteras lokalt med AES-GCM-256; nyckeln stannar i webbläsarprofilen. Detta är inget lösenordsskyddat valv och nedladdade filer är inte krypterade. Utkast upphör att gälla efter sju dagar utan användning.
+
+De valfria pilottilläggen för Word och Google Docs installeras separat och har egna integritetsvillkor. Det här tillägget installerar dem inte automatiskt.

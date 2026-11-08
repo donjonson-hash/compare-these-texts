@@ -110,3 +110,28 @@ test('Word panel treats document text as text rather than markup', async () => {
   assert.match(dom.window.document.getElementById('preview').textContent, /script/);
   dom.window.close();
 });
+
+test('Word Russian messages remain separate from document text and retained drafts', async () => {
+  const html = fs.readFileSync(new URL('../src/word-addin/taskpane.html', import.meta.url), 'utf8');
+  const dom = new JSDOM(html), document = dom.window.document;
+  const messages = {
+    'No changes to apply.': 'Нет изменений.',
+    'The selection changed. Load the intended passage again.': 'Выделение изменилось. Загрузите его снова.',
+    'Your draft remains here for copying. Reload the selection before another attempt.': 'Черновик можно скопировать.',
+  };
+  const t = text => messages[text] || text;
+  dom.window.cttI18n = {t, bindText(node, source) { node.textContent = t(source); }, bindError(node, source) { node.textContent = t(source); }};
+  const calls = [];
+  const adapter = {async load() { return {original:'No changes to apply.'}; }, async apply(value) { calls.push(value); throw new Error('The selection changed. Load the intended passage again.'); }};
+  const ui = mountTaskpane(document, adapter), field = document.getElementById('edited');
+  await ui.load(); ui.preview();
+  assert.equal(document.getElementById('status').textContent, 'Нет изменений.');
+  assert.equal(field.value, 'No changes to apply.');
+  assert.equal(document.getElementById('preview').textContent, 'No changes to apply.');
+  field.value = 'A handwritten correction.'; ui.preview(); await ui.apply();
+  assert.deepEqual(calls, ['A handwritten correction.']);
+  assert.equal(document.getElementById('status').textContent, 'Выделение изменилось. Загрузите его снова. Черновик можно скопировать.');
+  assert.equal(field.value, 'A handwritten correction.');
+  assert.equal(document.getElementById('apply').disabled, true);
+  dom.window.close();
+});

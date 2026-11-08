@@ -4,10 +4,14 @@ import {readFileSync} from 'node:fs';
 import {JSDOM} from 'jsdom';
 
 const html = readFileSync(new URL('../Sidebar.html', import.meta.url), 'utf8');
-function setup(original = 'A short sentence.') {
+function setup(original = 'A short sentence.', translations = null) {
   const calls = [];
   const dom = new JSDOM(html, {runScripts: 'dangerously', beforeParse(window) {
     window.confirm = () => true;
+    if (translations) {
+      const t = text => translations[text] || text;
+      window.cttI18n = {t, bindText(node, source) { node.textContent = t(source); }, bindError(node, source) { node.textContent = t(source); }};
+    }
     const runner = {
       withSuccessHandler(fn) { this.success = fn; return this; },
       withFailureHandler(fn) { this.failure = fn; return this; },
@@ -80,5 +84,51 @@ test('failed reload cannot apply a previously previewed passage', () => {
   assert.equal($('edited').value, 'Old passage edit.');
   $('apply').click();
   assert.equal(calls.filter(c => c.method === 'apply').length, 0);
+  dom.window.close();
+});
+
+test('Russian interface messages do not translate selected text, drafts or write arguments', () => {
+  const source = 'No changes to apply.';
+  const {dom, $, edit, calls} = setup(source, {
+    'Edit the selected text, then preview your changes.': 'Измените выделенный текст, затем проверьте правки.',
+    'No changes to apply.': 'Нет изменений.',
+    'The paragraph changed.': 'Абзац изменился.',
+    'Your draft remains here. Copy it if needed, then select the passage and load it again.': 'Черновик сохранён в панели.',
+  });
+  assert.equal($('status').textContent, 'Измените выделенный текст, затем проверьте правки.');
+  assert.equal($('original').textContent, source);
+  assert.equal($('edited').value, source);
+  $('review').click();
+  assert.equal($('status').textContent, 'Нет изменений.');
+  assert.equal($('preview').textContent, source);
+  edit('No changes to apply. Updated.'); $('review').click(); $('apply').click();
+  assert.equal(calls.at(-1).args[1], 'No changes to apply. Updated.');
+  calls.at(-1).failure({message:'The paragraph changed.'});
+  assert.equal($('status').textContent, 'Абзац изменился. Черновик сохранён в панели.');
+  assert.equal($('edited').value, 'No changes to apply. Updated.');
+  assert.equal($('apply').disabled, true);
+  dom.window.close();
+});
+
+test('embedded locale switch updates sidebar labels and status without losing a reviewed draft', async () => {
+  const {dom, $, edit, calls} = setup('An English original.');
+  const engine = readFileSync(new URL('../../src/i18n.js', import.meta.url), 'utf8');
+  dom.window.CTT_I18N_EMBEDDED = {ru:{
+    'Apply to document':'Применить к документу',
+    'Review the highlighted change, then apply it to the document.':'Проверьте правки и примените их.',
+  }};
+  dom.window.eval(engine);
+  await dom.window.cttI18n.ready;
+  edit('An English correction.'); $('review').click();
+  const preview = $('preview').textContent;
+  assert.equal($('apply').disabled, false);
+  await dom.window.cttI18n.setLocale('ru');
+  assert.equal($('apply').textContent, 'Применить к документу');
+  assert.equal($('status').textContent, 'Проверьте правки и примените их.');
+  assert.equal($('edited').value, 'An English correction.');
+  assert.equal($('preview').textContent, preview);
+  assert.equal($('apply').disabled, false);
+  assert.equal(calls.filter(call => call.method === 'apply').length, 0);
+  assert.equal($('ui-language').options.length, 52);
   dom.window.close();
 });

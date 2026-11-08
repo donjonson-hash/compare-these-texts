@@ -1,4 +1,4 @@
-# Compare Two Texts for Google Docs — prototype 0.1.0
+# Compare Two Texts for Google Docs — prototype 0.2.0
 
 Select a passage in Google Docs, edit it in a sidebar, preview removed and added text, and apply the change to the original document. No file download or upload to the Chrome extension is needed.
 
@@ -8,7 +8,7 @@ This is a document-bound Apps Script prototype, not a published Google Workspace
 
 This proprietary prototype is free for personal and internal work use. Installation by copying the unmodified files into Apps Script and making the necessary project settings is permitted. Distribution, sale, and code modifications require permission except as allowed by applicable law or third-party licenses. See the full [license](../LICENSE), included as `LICENSE.txt` in the ZIP archive.
 
-1. Extract `compare-these-texts-google-docs-0.1.0.zip`.
+1. Extract `compare-these-texts-google-docs-0.2.0.zip`.
 2. Open an editable test copy of a native Google Doc in a desktop browser. Convert a DOCX copy to Google Docs format first if needed.
 3. Choose **Extensions → Apps Script**. Replace the default `Code.gs` with the packaged file.
 4. Choose **+ → HTML**, name the file **Sidebar**, and replace its contents with `Sidebar.html`.
@@ -18,6 +18,10 @@ This proprietary prototype is free for personal and internal work use. Installat
 8. If the selection does not load automatically, select it again and click **Load selected text**.
 
 No web-app deployment, API key, or OAuth client ID is needed for this test. The script is bound to the current document; its manifest requests only `documents.currentonly` and `script.container.ui` scopes.
+
+## Interface language
+
+The packaged sidebar contains 52 interface languages and uses the browser language initially. Change **Language** in the sidebar to remember a preference in this browser when storage is available. The Google Docs menu uses your Google account language and updates when the document reloads. Document text, edits and difference previews are never translated. No translation service or additional permission is used. Install the three files from the ZIP: the repository sources are build inputs, not the localized distribution.
 
 ## Use
 

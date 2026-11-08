@@ -5,86 +5,206 @@
   },
   "de": {
     "name": "Compare Two Texts — Texte vergleichen und bearbeiten",
-    "description": "Texte und Dokumente vergleichen, Unterschiede erkennen und direkt bearbeiten. Lokal auf deinem Gerät. Oberfläche auf Englisch."
+    "description": "Texte und Dokumente vergleichen, Unterschiede erkennen und direkt bearbeiten. Lokal auf deinem Gerät."
   },
   "fr": {
     "name": "Compare Two Texts — Comparateur de texte et éditeur",
-    "description": "Comparez et modifiez vos textes et documents sur votre appareil. Repérez les différences. Interface en anglais."
+    "description": "Comparez et modifiez vos textes et documents sur votre appareil. Repérez les différences."
   },
   "es": {
     "name": "Compare Two Texts — Comparar textos y editar",
-    "description": "Compara y edita textos y documentos en tu dispositivo. Detecta las diferencias. Interfaz en inglés."
+    "description": "Compara y edita textos y documentos en tu dispositivo. Detecta las diferencias."
   },
   "es_419": {
     "name": "Compare Two Texts — Comparar textos y editar",
-    "description": "Compara y edita textos y documentos en tu dispositivo. Encuentra las diferencias. Interfaz en inglés."
+    "description": "Compara y edita textos y documentos en tu dispositivo. Encuentra las diferencias."
   },
   "it": {
     "name": "Compare Two Texts — Confronta testi e modifica",
-    "description": "Confronta e modifica testi e documenti sul tuo dispositivo. Individua le differenze. Interfaccia in inglese."
+    "description": "Confronta e modifica testi e documenti sul tuo dispositivo. Individua le differenze."
   },
   "nl": {
     "name": "Compare Two Texts — Teksten vergelijken en bewerken",
-    "description": "Vergelijk en bewerk teksten en documenten op je apparaat. Bekijk de verschillen. Interface in het Engels."
+    "description": "Vergelijk en bewerk teksten en documenten op je apparaat. Bekijk de verschillen."
   },
   "sv": {
     "name": "Compare Two Texts — Jämför och redigera texter",
-    "description": "Jämför och redigera texter och dokument på din enhet. Se skillnaderna. Gränssnitt på engelska."
+    "description": "Jämför och redigera texter och dokument på din enhet. Se skillnaderna."
   },
   "da": {
     "name": "Compare Two Texts — Sammenlign og rediger tekster",
-    "description": "Sammenlign og rediger tekster og dokumenter på din enhed. Se forskellene. Brugerflade på engelsk."
+    "description": "Sammenlign og rediger tekster og dokumenter på din enhed. Se forskellene."
   },
   "no": {
     "name": "Compare Two Texts — Sammenlign og rediger tekster",
-    "description": "Sammenlign og rediger tekster og dokumenter på enheten din. Se forskjellene. Grensesnitt på engelsk."
+    "description": "Sammenlign og rediger tekster og dokumenter på enheten din. Se forskjellene."
   },
   "fi": {
     "name": "Compare Two Texts — Vertaa ja muokkaa tekstejä",
-    "description": "Vertaa ja muokkaa tekstejä ja asiakirjoja omalla laitteellasi. Näe erot. Käyttöliittymä englanniksi."
+    "description": "Vertaa ja muokkaa tekstejä ja asiakirjoja omalla laitteellasi. Näe erot."
   },
   "ar": {
     "name": "Compare Two Texts — مقارنة النصوص وتحريرها",
-    "description": "قارن النصوص والمستندات جنبًا إلى جنب، واعرض الفروق وعدّل النص. تتم المعالجة على جهازك. الواجهة باللغة الإنجليزية."
+    "description": "قارن النصوص والمستندات جنبًا إلى جنب، واعرض الفروق وعدّل النص. تتم المعالجة على جهازك."
   },
   "id": {
     "name": "Compare Two Texts — Bandingkan dan edit teks",
-    "description": "Bandingkan teks dan dokumen berdampingan, lihat perbedaan, lalu edit. Pemrosesan di perangkat Anda. Antarmuka bahasa Inggris."
+    "description": "Bandingkan teks dan dokumen berdampingan, lihat perbedaan, lalu edit. Pemrosesan di perangkat Anda."
   },
   "ru": {
     "name": "Compare Two Texts — Сравнение текстов и правка",
-    "description": "Сравнивайте тексты и документы рядом, находите отличия и вносите правки. Обработка на устройстве. Интерфейс на английском."
+    "description": "Сравнивайте тексты и документы рядом, находите отличия и вносите правки. Обработка на устройстве."
   },
   "pt_BR": {
     "name": "Compare Two Texts — Comparar textos e editar",
-    "description": "Compare e edite textos e documentos no seu dispositivo. Identifique as diferenças. Interface em inglês."
+    "description": "Compare e edite textos e documentos no seu dispositivo. Identifique as diferenças."
   },
   "pt_PT": {
     "name": "Compare Two Texts — Comparar textos e editar",
-    "description": "Compare e edite textos e documentos no seu dispositivo. Veja as diferenças. Interface em inglês."
+    "description": "Compare e edite textos e documentos no seu dispositivo. Veja as diferenças."
   },
   "ja": {
     "name": "Compare Two Texts — テキスト比較・編集",
-    "description": "テキストや文書を左右に並べて比較し、違いを確認して編集。処理はお使いの端末内で行われます。画面は英語です。"
+    "description": "テキストや文書を左右に並べて比較し、違いを確認して編集。処理はお使いの端末内で行われます。"
   },
   "fil": {
     "name": "Compare Two Texts — Paghambingin at i-edit ang teksto",
-    "description": "Paghambingin ang teksto at dokumento, tingnan ang pagkakaiba at i-edit. Sa device mo ang pagproseso. Ingles ang interface."
+    "description": "Paghambingin ang teksto at dokumento, tingnan ang pagkakaiba at i-edit. Sa device mo ang pagproseso."
   },
   "vi": {
     "name": "Compare Two Texts — So sánh văn bản và chỉnh sửa",
-    "description": "So sánh văn bản, tài liệu cạnh nhau, xem khác biệt và chỉnh sửa. Xử lý trên thiết bị của bạn. Giao diện tiếng Anh."
+    "description": "So sánh văn bản, tài liệu cạnh nhau, xem khác biệt và chỉnh sửa. Xử lý trên thiết bị của bạn."
   },
   "tr": {
     "name": "Compare Two Texts — Metin karşılaştırma ve düzenleme",
-    "description": "Metin ve belgeleri yan yana karşılaştırın, farkları görün ve düzenleyin. İşlemler cihazınızda yapılır. Arayüz İngilizcedir."
+    "description": "Metin ve belgeleri yan yana karşılaştırın, farkları görün ve düzenleyin. İşlemler cihazınızda yapılır."
   },
   "th": {
     "name": "Compare Two Texts — เปรียบเทียบและแก้ไขข้อความ",
-    "description": "เทียบข้อความและเอกสารแบบวางคู่กัน ดูความต่างและแก้ไข ประมวลผลบนอุปกรณ์ของคุณ อินเทอร์เฟซภาษาอังกฤษ"
+    "description": "เทียบข้อความและเอกสารแบบวางคู่กัน ดูความต่างและแก้ไข ประมวลผลบนอุปกรณ์ของคุณ"
   },
   "ko": {
     "name": "Compare Two Texts — 텍스트 비교 및 편집",
-    "description": "텍스트와 문서를 나란히 비교하고 차이를 확인하며 편집하세요. 처리는 사용 중인 기기에서 이루어집니다. 인터페이스는 영어입니다."
+    "description": "텍스트와 문서를 나란히 비교하고 차이를 확인하며 편집하세요. 처리는 사용 중인 기기에서 이루어집니다."
+  },
+  "am": {
+    "name": "Compare Two Texts — ጽሑፎችን ያወዳድሩ እና ያርትዑ",
+    "description": "ጽሑፎችን፣ Word፣ PDF እና Excel ፋይሎችን ያወዳድሩ። ልዩነቶችን ያግኙ፣ ያርትዑ እና ያውርዱ። ሰነዶች በመሣሪያዎ ላይ ይሠራሉ።"
+  },
+  "bg": {
+    "name": "Compare Two Texts — Сравняване и редактиране на текст",
+    "description": "Сравнявайте текст, Word, PDF и Excel. Откривайте разлики, редактирайте и експортирайте. Локална обработка без качване."
+  },
+  "bn": {
+    "name": "Compare Two Texts — লেখা তুলনা ও সম্পাদনা",
+    "description": "লেখা, Word, PDF ও Excel ফাইল তুলনা করুন। পার্থক্য খুঁজুন, সম্পাদনা ও রপ্তানি করুন। ফাইল আপলোড ছাড়াই কাজ করে।"
+  },
+  "ca": {
+    "name": "Compare Two Texts — Compara i edita textos",
+    "description": "Compara textos, Word, PDF i Excel. Troba diferències, edita i exporta. Processament al teu dispositiu, sense pujar fitxers."
+  },
+  "cs": {
+    "name": "Compare Two Texts — Porovnání a úpravy textů",
+    "description": "Porovnávejte texty, Word, PDF a Excel. Najděte rozdíly, upravujte a exportujte. Zpracování v zařízení bez nahrávání souborů."
+  },
+  "el": {
+    "name": "Compare Two Texts — Σύγκριση και επεξεργασία κειμένων",
+    "description": "Συγκρίνετε κείμενα, Word, PDF και Excel. Βρείτε διαφορές, επεξεργαστείτε και εξαγάγετε. Τοπικά, χωρίς μεταφόρτωση αρχείων."
+  },
+  "et": {
+    "name": "Compare Two Texts — Tekstide võrdlemine ja muutmine",
+    "description": "Võrdle tekste, Wordi, PDF- ja Exceli faile. Leia erinevused, muuda ja ekspordi. Töötab sinu seadmes faile üles laadimata."
+  },
+  "fa": {
+    "name": "Compare Two Texts — مقایسه و ویرایش متن",
+    "description": "متن و فایل Word، PDF و Excel را مقایسه کنید. تفاوتها را بیابید، ویرایش و خروجی بگیرید. پردازش محلی، بدون بارگذاری فایل."
+  },
+  "gu": {
+    "name": "Compare Two Texts — લખાણની સરખામણી અને સંપાદન",
+    "description": "લખાણ, Word, PDF અને Excel ફાઇલો સરખાવો. તફાવતો શોધો, સંપાદિત કરો અને નિકાસ કરો. ફાઇલો અપલોડ કર્યા વિના કામ કરે છે."
+  },
+  "he": {
+    "name": "Compare Two Texts — השוואה ועריכה של טקסטים",
+    "description": "השוו טקסטים וקובצי Word, PDF ו-Excel. מצאו הבדלים, ערכו וייצאו. עיבוד במכשיר שלכם, ללא העלאת קבצים."
+  },
+  "hi": {
+    "name": "Compare Two Texts — पाठ की तुलना और संपादन",
+    "description": "पाठ, Word, PDF और Excel फ़ाइलों की तुलना करें। अंतर खोजें, संपादित करें और निर्यात करें। फ़ाइलें अपलोड नहीं होतीं।"
+  },
+  "hr": {
+    "name": "Compare Two Texts — Usporedba i uređivanje tekstova",
+    "description": "Usporedite tekst, Word, PDF i Excel. Pronađite razlike, uredite i izvezite. Obrada na vašem uređaju bez slanja datoteka."
+  },
+  "hu": {
+    "name": "Compare Two Texts — Szövegek összehasonlítása",
+    "description": "Hasonlítson össze szöveget, Word-, PDF- és Excel-fájlt. Keressen eltéréseket, szerkesszen és exportáljon. Helyi feldolgozás."
+  },
+  "kn": {
+    "name": "Compare Two Texts — ಪಠ್ಯ ಹೋಲಿಕೆ ಮತ್ತು ಸಂಪಾದನೆ",
+    "description": "ಪಠ್ಯ, Word, PDF ಮತ್ತು Excel ಫೈಲ್ ಹೋಲಿಸಿ. ವ್ಯತ್ಯಾಸ ಹುಡುಕಿ, ಸಂಪಾದಿಸಿ ಮತ್ತು ರಫ್ತು ಮಾಡಿ. ಫೈಲ್ ಅಪ್ಲೋಡ್ ಇಲ್ಲ, ಸಾಧನದಲ್ಲೇ ಸಂಸ್ಕರಣೆ."
+  },
+  "lt": {
+    "name": "Compare Two Texts — Tekstų palyginimas ir taisymas",
+    "description": "Palyginkite tekstus, Word, PDF ir Excel failus. Raskite skirtumus, taisykite ir eksportuokite. Apdorojama įrenginyje."
+  },
+  "lv": {
+    "name": "Compare Two Texts — Tekstu salīdzināšana un rediģēšana",
+    "description": "Salīdziniet tekstus, Word, PDF un Excel failus. Atrodiet atšķirības, rediģējiet un eksportējiet. Bez failu augšupielādes."
+  },
+  "ml": {
+    "name": "Compare Two Texts — എഴുത്ത് താരതമ്യവും തിരുത്തലും",
+    "description": "എഴുത്ത്, Word, PDF, Excel ഫയലുകൾ താരതമ്യം ചെയ്യൂ. വ്യത്യാസം കണ്ടെത്തി തിരുത്തൂ. ഫയലുകൾ അപ്ലോഡ് ചെയ്യേണ്ടതില്ല."
+  },
+  "mr": {
+    "name": "Compare Two Texts — मजकूर तुलना आणि संपादन",
+    "description": "मजकूर, Word, PDF आणि Excel फाइल्सची तुलना करा. फरक शोधा, संपादित करा आणि निर्यात करा. फाइल्स अपलोड होत नाहीत."
+  },
+  "ms": {
+    "name": "Compare Two Texts — Banding dan sunting teks",
+    "description": "Bandingkan teks, Word, PDF dan Excel. Cari perbezaan, sunting dan eksport. Pemprosesan pada peranti tanpa muat naik fail."
+  },
+  "pl": {
+    "name": "Compare Two Texts — Porównywanie i edycja tekstów",
+    "description": "Porównuj teksty, Word, PDF i Excel. Znajdź różnice, edytuj i eksportuj. Przetwarzanie na urządzeniu bez wysyłania plików."
+  },
+  "ro": {
+    "name": "Compare Two Texts — Compară și editează texte",
+    "description": "Compară texte, Word, PDF și Excel. Găsește diferențe, editează și exportă. Procesare pe dispozitiv, fără încărcarea fișierelor."
+  },
+  "sk": {
+    "name": "Compare Two Texts — Porovnávanie a úprava textov",
+    "description": "Porovnávajte texty, Word, PDF a Excel. Nájdite rozdiely, upravujte a exportujte. Spracovanie v zariadení bez nahrávania súborov."
+  },
+  "sl": {
+    "name": "Compare Two Texts — Primerjava in urejanje besedil",
+    "description": "Primerjajte besedila, Word, PDF in Excel. Poiščite razlike, uredite in izvozite. Obdelava v napravi brez nalaganja datotek."
+  },
+  "sr": {
+    "name": "Compare Two Texts — Поређење и уређивање текстова",
+    "description": "Поредите текстове, Word, PDF и Excel. Пронађите разлике, уредите и извезите. Обрада на уређају без отпремања датотека."
+  },
+  "sw": {
+    "name": "Compare Two Texts — Linganisha na hariri maandishi",
+    "description": "Linganisha maandishi, Word, PDF na Excel. Pata tofauti, hariri na hamisha faili. Huchakatwa kwenye kifaa bila kupakia faili."
+  },
+  "ta": {
+    "name": "Compare Two Texts — உரை ஒப்பீடும் திருத்தமும்",
+    "description": "உரை, Word, PDF, Excel கோப்புகளை ஒப்பிடுங்கள். வேறுபாடுகளை அறிந்து திருத்தி ஏற்றுமதி செய்யுங்கள். கோப்புகள் பதிவேற்றப்படாது."
+  },
+  "te": {
+    "name": "Compare Two Texts — పాఠ్య పోలిక మరియు సవరణ",
+    "description": "పాఠ్యం, Word, PDF, Excel ఫైళ్లను పోల్చండి. తేడాలు కనుగొని, సవరించి ఎగుమతి చేయండి. ఫైళ్లను అప్లోడ్ చేయాల్సిన అవసరం లేదు."
+  },
+  "uk": {
+    "name": "Compare Two Texts — Порівняння та редагування текстів",
+    "description": "Порівнюйте тексти, Word, PDF та Excel. Знаходьте відмінності, редагуйте й експортуйте. Локальна обробка без завантаження файлів."
+  },
+  "zh_CN": {
+    "name": "Compare Two Texts — 文本对比与编辑",
+    "description": "并排比较文本、Word、PDF 和 Excel 文件，查找差异、编辑并导出。扩展程序在本机离线处理，无需上传文档。"
+  },
+  "zh_TW": {
+    "name": "Compare Two Texts — 文字比較與編輯",
+    "description": "並排比較文字、Word、PDF 和 Excel 檔案，找出差異、編輯並匯出。擴充功能在本機離線處理，無須上傳文件。"
   }
 }

@@ -17,7 +17,7 @@ LOKALE VERWERKING
 Documenten worden op je apparaat verwerkt. De extensie werkt offline en uploadt je documenten niet naar een server om ze te vergelijken of te bewerken. Concepten op de website en in de extensie worden apart opgeslagen, zonder automatische synchronisatie. Download een kopie van je afgeronde werk.
 
 VOORDAT JE BEGINT
-- De interface van de editor is momenteel in het Engels. Vertaalde beschrijvingen in de winkel veranderen de taal van de editor niet.
+- De inhoud van documenten wordt niet vertaald.
 - Invoerbestanden mogen elk maximaal 2 MiB groot zijn.
 - Pdf's hebben een tekstlaag nodig: gescande afbeeldingen zonder tekst worden niet ondersteund en er is geen tekstherkenning (OCR). Voorgedrukte ruimtes om met de hand in te vullen zijn iets anders dan interactieve pdf-formuliervelden. Interactieve velden en pdf-opmerkingen worden niet ondersteund.
 - Afbeeldingen en opmaak worden niet vergeleken. Of de pdf-indeling behouden blijft, hangt af van het document; complexe indelingen kunnen een export met alleen tekst vereisen. De indeling van Word-bestanden kan afwijken van die in Microsoft Word.
@@ -25,3 +25,7 @@ VOORDAT JE BEGINT
 - Het vergelijken van twee spreadsheetbestanden vereist één koprij, geen samengevoegde cellen en waarden in plaats van formules.
 
 Probeer de werkwijze eerst met het ingebouwde document- of CSV-/Excel-voorbeeld voordat je je eigen bestanden opent.
+
+Concepten worden lokaal versleuteld met AES-GCM-256; de sleutel blijft in het browserprofiel. Dit is geen kluis met wachtwoord en gedownloade bestanden zijn niet versleuteld. Concepten verlopen na zeven dagen zonder gebruik.
+
+De optionele proefinvoegtoepassingen voor Word en Google Docs worden apart geïnstalleerd en hebben eigen privacyvoorwaarden. Deze extensie installeert ze niet automatisch.

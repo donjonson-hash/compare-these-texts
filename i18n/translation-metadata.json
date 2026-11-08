@@ -1,0 +1,22 @@
+{
+  "provider": "Google Translate public translate_a/single (client=gtx)",
+  "kind": "machine translation; human review required",
+  "requested_at": "2026-11-08T07:23:09.655211+00:00",
+  "source_sha256": "9892d4ac3042eb0d5373437f189d86b98b2887791c926bc88ed2d62a220e6e40",
+  "source_messages": 2048,
+  "regional_mapping": {
+    "es_419": "es (provider base-language output; regional editorial review pending)",
+    "pt_PT": "pt-PT",
+    "pt_BR": "pt",
+    "fil": "tl",
+    "zh_CN": "zh-CN",
+    "zh_TW": "zh-TW"
+  },
+  "protected": "Public product names, URLs, placeholders, line breaks; strict structural validation; no user documents transmitted",
+  "status": "blocked_before_success",
+  "review_reason": "Automatic approval review rejected sending project-derived UI catalogs to a public translation provider without explicit user authorization.",
+  "counters": {
+    "successful_messages": 0
+  },
+  "stopped_at": "2026-11-08T07:23:45.687048+00:00"
+}

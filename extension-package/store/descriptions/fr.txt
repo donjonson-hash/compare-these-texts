@@ -17,7 +17,7 @@ TRAITEMENT LOCAL
 Les documents sont traités sur votre appareil. L'extension fonctionne hors connexion et ne transfère pas vos documents vers un serveur pour les comparer ou les modifier. Les brouillons du site et de l'extension sont enregistrés séparément, sans synchronisation automatique. Téléchargez une copie de votre travail terminé.
 
 AVANT DE COMMENCER
-- L'interface de l'éditeur est actuellement en anglais. Les descriptions traduites dans la boutique ne changent pas la langue de l'éditeur.
+- Le contenu des documents n'est pas traduit.
 - Chaque fichier importé peut peser jusqu'à 2 Mio (2 MiB).
 - Les PDF doivent contenir une couche de texte : les images numérisées sans texte ne sont pas prises en charge et aucune reconnaissance optique de caractères (OCR) n'est proposée. Les espaces prévus pour être remplis à la main sont différents des champs interactifs de formulaire PDF. Les champs interactifs et les commentaires PDF ne sont pas pris en charge.
 - Les images et la mise en forme ne sont pas comparées. La conservation de la mise en page PDF dépend du document ; les mises en page complexes peuvent nécessiter un export en texte seul. La mise en page des fichiers Word peut différer de celle de Microsoft Word.
@@ -25,3 +25,7 @@ AVANT DE COMMENCER
 - La comparaison de deux fichiers de tableur nécessite une seule ligne d'en-tête, aucune cellule fusionnée et des valeurs à la place des formules.
 
 Commencez avec l'exemple de document ou de tableau CSV / Excel intégré pour essayer le fonctionnement avant d'ouvrir vos propres fichiers.
+
+Les brouillons sont chiffrés localement avec AES-GCM-256 ; la clé reste dans le profil du navigateur. Ce n'est pas un coffre-fort protégé par mot de passe et les fichiers téléchargés ne sont pas chiffrés. Les brouillons expirent après sept jours sans utilisation.
+
+Les compléments pilotes facultatifs pour Word et Google Docs s'installent séparément et ont leurs propres conditions de confidentialité. Cette extension ne les installe pas automatiquement.

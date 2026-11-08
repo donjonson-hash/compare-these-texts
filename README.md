@@ -46,7 +46,7 @@ page layouts remain restricted; PDF export does not silently discard those parts
 The 0.37.4 candidate opens a local welcome page on first installation. Updates
 leave existing tabs alone. **Getting started** in the extension footer opens
 the guide separately; **Try an example** leaves an existing saved comparison
-available to resume. The editor and welcome page remain English.
+available to resume. The 0.37.9 draft adds offline interface localization; complete language catalogs are still pending. See `i18n/README.md` before building or publishing this draft.
 
 **Word & Google Docs add-ins** in Getting started, Help and the workspace footer
 opens an installation hub for editing selected text directly in those programs.
@@ -65,7 +65,7 @@ The installed package also includes the Word/Google Docs file comparison guide
 and related PDF, Excel and CSV guides offline. For this separate file workflow,
 download Google Docs versions as DOCX and compare the local copies.
 
-The Chrome package includes 22 localized metadata catalogs. Full store
+The Chrome package targets 52 localized metadata catalogs. Full store
 descriptions, five icon sizes, five actual screenshots, two promotional images
 and Russian submission instructions are assembled with `npm run package:store`
 after building and running `npm run store:assets`. The result is `artifacts/ctt-0.37.6-store-kit.zip`; unpack it

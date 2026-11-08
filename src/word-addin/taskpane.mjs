@@ -4,7 +4,20 @@ import {validateText, previewReplacement} from './policy.mjs';
 export function mountTaskpane(document, adapter) {
   const $ = id => document.getElementById(id);
   let snapshot = null, reviewed = null, busy = false;
-  const status = (message, error = false) => { $('status').textContent = message; $('status').dataset.error = String(error); };
+  const translate = source => document.defaultView?.cttI18n?.t(source) ?? source;
+  const status = (message, error = false, guidance = '') => {
+    const target = $('status'), primary = document.createElement('span');
+    target.replaceChildren(primary);
+    const i18n = document.defaultView?.cttI18n;
+    if (error && i18n) i18n.bindError(primary, message);
+    else if (i18n) i18n.bindText(primary, message);
+    else primary.textContent = message;
+    if (guidance) {
+      const help = document.createElement('span'); target.append(document.createTextNode(' '), help);
+      if (i18n) i18n.bindText(help, guidance); else help.textContent = guidance;
+    }
+    target.dataset.error = String(error);
+  };
   function controls() {
     $('load').disabled = busy; $('edited').disabled = busy;
     $('edited').readOnly = !snapshot;
@@ -13,7 +26,7 @@ export function mountTaskpane(document, adapter) {
   }
   async function load() {
     if (busy) return;
-    if (!$('editor').hidden && $('edited').value !== $('original').textContent && !document.defaultView.confirm('Discard this unapplied draft and load the current Word selection?')) return;
+    if (!$('editor').hidden && $('edited').value !== $('original').textContent && !document.defaultView.confirm(translate('Discard this unapplied draft and load the current Word selection?'))) return;
     busy = true; reviewed = null; snapshot = null; controls(); $('changes').hidden = true;
     status('Loading the selected passage…');
     try {
@@ -41,7 +54,7 @@ export function mountTaskpane(document, adapter) {
     if (busy || !snapshot || reviewed === null || reviewed !== $('edited').value || reviewed === snapshot.original) return;
     busy = true; controls(); status('Checking the original passage and applying your edit…');
     try { const result = await adapter.apply($('edited').value, reviewed); $('original').textContent = $('edited').value; status(result.message); }
-    catch (error) { status((error.message || 'Word could not apply the edit.') + ' Your draft remains here for copying. Reload the selection before another attempt.', true); }
+    catch (error) { status(error.message || 'Word could not apply the edit.', true, 'Your draft remains here for copying. Reload the selection before another attempt.'); }
     finally { snapshot = null; reviewed = null; busy = false; controls(); }
   }
   $('load').addEventListener('click', load); $('review').addEventListener('click', preview); $('apply').addEventListener('click', apply);
@@ -51,7 +64,8 @@ export function mountTaskpane(document, adapter) {
 }
 
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  const fail = message => { document.getElementById('status').textContent = message; document.getElementById('status').dataset.error = 'true'; };
+  const fail = message => { if (window.cttI18n) window.cttI18n.bindError(document.getElementById('status'), message);
+    else document.getElementById('status').textContent = message; document.getElementById('status').dataset.error = 'true'; };
   if (!window.Office?.onReady) fail('Microsoft Office.js could not load. Open this panel inside Word with an internet connection.');
   else {
     const timeout = window.setTimeout(() => fail('Word has not connected. Open this panel through the installed Word add-in; check your connection or reload the add-in.'), 15000);

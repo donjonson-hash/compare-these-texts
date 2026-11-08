@@ -1,3 +1,4 @@
+import {uiMessage, uiError, uiSetText, uiSetAttr, uiTranslate} from './ui-text.mjs';
 import {scanRepetitions,observationKey,validateStyleKept} from './repetition-scan.mjs';
 // Optional, local observations about repeated syntax; never an authorship score.
 const rules = [
@@ -29,13 +30,13 @@ export function scanStyle(entries) {
  }
  groups.push(...repeated.groups);groups.partial=repeated.partial;return groups;
 }
-const el=(tag,text)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;return node;};
+const el=(tag,text)=>{const node=document.createElement(tag);if(text!==undefined)uiSetText(node, text);return node;};
 export function mountStyleReview(host,{entries,revision,choose,kept:restored,onChange=()=>{}}) {
  const kept=new Set(validateStyleKept(restored));
- const panel=el('section');panel.className='wording-review';panel.dataset.styleReview='';panel.setAttribute('aria-label','Style observations');
- const title=el('h3','Style observations');title.tabIndex=-1;
+ const panel=el('section');panel.className='wording-review';panel.dataset.styleReview='';uiSetAttr(panel, 'aria-label', uiMessage("Style observations"));
+ const title=el('h3',uiMessage("Style observations"));title.tabIndex=-1;
  const status=el('p');status.setAttribute('role','status');
- const content=el('div'),hint=el('p','Local checks for repeated phrases, sentence openings and “не …, а …” / “not … but …”. Repeats may be intentional. This check does not determine AI authorship.');hint.className='hint';
+ const content=el('div'),hint=el('p',uiMessage("Local checks for repeated phrases, sentence openings and “не …, а …” / “not … but …”. Repeats may be intentional. This check does not determine AI authorship."));hint.className='hint';
  panel.append(title,status,content,hint);host.append(panel);
  let seen=-1,disposed=false,timer=null;
  function render() {
@@ -43,25 +44,25 @@ export function mountStyleReview(host,{entries,revision,choose,kept:restored,onC
   const current=revision();seen=current;content.replaceChildren();
   const groups=scanStyle(entries()),active=new Set(groups.map(observationKey));
   for(const key of kept)if(!active.has(key))kept.delete(key);
-  status.textContent=(groups.length?'Review repeated wording. Keep it or edit individual passages. Choices are saved with your draft and reset when a related passage changes.':'No repeated wording found by these checks. Other aspects of style have not been checked.')+(groups.partial?' Phrase and opening checks cover only the first 20,000 words.':'');
+  uiSetText(status, uiMessage('{0}{1}', {0: groups.length ? uiMessage('Review repeated wording. Keep it or edit individual passages. Choices are saved with your draft and reset when a related passage changes.') : uiMessage('No repeated wording found by these checks. Other aspects of style have not been checked.'), 1: groups.partial ? uiMessage(' Phrase and opening checks cover only the first 20,000 words.') : ''}));
   let groupCount=0;
-  const moreGroups=el('button','Show more observations');moreGroups.type='button';moreGroups.className='button secondary';
+  const moreGroups=el('button',uiMessage("Show more observations"));moreGroups.type='button';moreGroups.className='button secondary';
   function showGroups(){
    for(const group of groups.slice(groupCount,groupCount+20)){
     const identity=observationKey(group),section=el('section');section.dataset.styleKind=group.kind;
-    const heading=el('h4',`${group.kind==='opening'?'Sentence opening':group.kind==='phrase'?'Repeated phrase':'Repeated construction'}: “${group.label}” — ${group.hits.length} occurrences`),list=el('ol');
+    const heading=el('h4',uiMessage("{0}: “{1}” — {2} occurrences", { 0: group.kind==='opening' ? uiMessage("Sentence opening") : group.kind==='phrase' ? uiMessage("Repeated phrase") : uiMessage("Repeated construction"), 1: group.label, 2: group.hits.length })),list=el('ol');
     const keep=el('button');keep.type='button';keep.className='button secondary';keep.dataset.styleKeep='';
-    section.append(heading,el('p',group.explanation),keep,list);content.insertBefore(section,moreGroups);
+    section.append(heading,el('p',uiError(group.explanation)),keep,list);content.insertBefore(section,moreGroups);
     let shown=0;
-    const more=el('button','Show more occurrences');more.type='button';more.className='button secondary';more.dataset.styleMore='';
-    function paintKeep(){const accepted=kept.has(identity);keep.setAttribute('aria-pressed',String(accepted));keep.textContent=accepted?'Pattern kept — review again':'Keep this pattern';list.hidden=accepted;more.hidden=accepted||shown===group.hits.length;}
+    const more=el('button',uiMessage("Show more occurrences"));more.type='button';more.className='button secondary';more.dataset.styleMore='';
+    function paintKeep(){const accepted=kept.has(identity);keep.setAttribute('aria-pressed',String(accepted));uiSetText(keep, accepted ? uiMessage("Pattern kept — review again") : uiMessage("Keep this pattern"));list.hidden=accepted;more.hidden=accepted||shown===group.hits.length;}
     keep.addEventListener('click',()=>{if(disposed)return;if(revision()!==current){render();return;}if(kept.has(identity))kept.delete(identity);else kept.add(identity);paintKeep();onChange();});
     function showMore(){
      const next=Math.min(shown+20,group.hits.length);
      for(const hit of group.hits.slice(shown,next)){
       const row=el('li'),preview=el('p');preview.append(document.createTextNode((hit.start>35?'…':'')+hit.text.slice(Math.max(0,hit.start-35),hit.start)),el('mark',hit.text.slice(hit.start,hit.end)),document.createTextNode(hit.text.slice(hit.end,hit.end+35)+(hit.end+35<hit.text.length?'…':'')));
-      const edit=el('button','Edit this passage');edit.type='button';edit.className='button secondary';edit.dataset.styleEdit='';
-      edit.addEventListener('click',async()=>{if(disposed)return;if(revision()!==current){render();status.textContent='Text changed. Choose an updated passage.';return;}edit.disabled=true;try{await choose(hit,current);}catch(error){if(!disposed)status.textContent=error.message;}finally{if(!disposed&&edit.isConnected)edit.disabled=false;}});
+      const edit=el('button',uiMessage("Edit this passage"));edit.type='button';edit.className='button secondary';edit.dataset.styleEdit='';
+      edit.addEventListener('click',async()=>{if(disposed)return;if(revision()!==current){render();uiSetText(status, uiMessage("Text changed. Choose an updated passage."));return;}edit.disabled=true;try{await choose(hit,current);}catch(error){if(!disposed)uiSetText(status, uiError(error.message));}finally{if(!disposed&&edit.isConnected)edit.disabled=false;}});
       row.append(preview,edit);list.append(row);
      }
      shown=next;paintKeep();

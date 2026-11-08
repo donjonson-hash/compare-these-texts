@@ -1,0 +1,21 @@
+A Compare Two Texts két szöveg-, szerződés- vagy dokumentumváltozatot hasonlít össze, és megmutatja a módosításokat. Nyisson meg két fájlt, nézze át az eltéréseket egymás mellett, szerkessze, majd töltse le vagy nyomtassa ki az eredményt. A beépített példákkal saját dokumentum nélkül is kipróbálhatja.
+
+FUNKCIÓK
+- TXT, Word DOCX, szövegréteges PDF, CSV/TSV és Excel XLSX. A hozzáadott, törölt és módosított szöveg kiemelése; léptetés az eltérések között és közvetlen szerkesztés.
+- Táblázatoknál válasszon munkalapot és oszlopokat, párosítsa a sorokat azonosító szerint, szerkessze az értékeket, és másoljon hiányzó sort A-ból B-be.
+- Ellenőrizze az összegek és százalékok változásait szövegben, Wordben és támogatott PDF-ekben.
+- Egyetlen dokumentumot is szerkeszthet és exportálhat. Támogatott PDF-ekben kitöltheti a nyomtatott üres helyeket, vagy szöveget adhat hozzá.
+- DOCX exportálása PDF-be előnézettel, támogatott fejlécekkel, láblécekkel és oldalszámokkal.
+
+ADATVÉDELEM ÉS NYELVEK
+A bővítmény internetkapcsolat nélkül működik. A dokumentumok feldolgozása az eszközön történik; összehasonlításhoz és szerkesztéshez nem kerülnek kiszolgálóra. A helyi piszkozatok AES-GCM-256 titkosítást kapnak; a kulcs a böngészőprofilban marad. Ez nem jelszavas széf, és a letöltött fájlok nincsenek titkosítva. A piszkozatok hét nap használat nélkül lejárnak. A webhely és a bővítmény külön tárolja őket.
+A dokumentumok tartalmát nem fordítja le.
+A választható Word- és Google Docs-próbabővítmények külön telepítendők, és külön adatvédelmi feltételeik vannak. Ez a bővítmény nem telepíti őket automatikusan.
+
+KORLÁTOZÁSOK
+- Fájlonként legfeljebb 2 MiB. A PDF-hez szövegréteg szükséges: a beolvasott képek, az OCR, az interaktív űrlapmezők és a PDF-megjegyzések nem támogatottak.
+- Képeket és formázást nem hasonlít össze. Az összetett elrendezés exportáláskor egyszerű szöveggé válhat; a Word-elrendezés eltérhet a Microsoft Wordben látottól.
+- A DOCX lábjegyzetei, végjegyzetei és megjegyzései nem importálhatók. Előbb helyezze őket egy másolat főszövegébe.
+- Táblázatok összehasonlításához egy fejlécsor, egyesítetlen cellák és képletek helyett értékek szükségesek.
+
+Webes változat: comparetwotexts.pro. Kérdéseivel használja az oldal támogatási hivatkozását.

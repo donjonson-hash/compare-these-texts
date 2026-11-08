@@ -27,33 +27,46 @@
   </style>
 </head>
 <body>
-  <h1>Compare Two Texts</h1>
-  <p>Select text in one paragraph, edit it here, then preview and apply your changes.</p>
-  <button id="load" type="button">Load selected text</button>
+  <h1 translate="no">Compare Two Texts</h1>
+  <label for="ui-language" data-i18n-text="Language">Language</label>
+  <select id="ui-language" data-i18n-selector aria-label="Language" data-i18n-attr="aria-label"></select>
+  <p data-i18n-text="Select text in one paragraph, edit it here, then preview and apply your changes.">Select text in one paragraph, edit it here, then preview and apply your changes.</p>
+  <button id="load" type="button" data-i18n-text="Load selected text">Load selected text</button>
   <div id="status" role="status" aria-live="polite">Loading selected text…</div>
   <section id="editor" hidden>
-    <details><summary>Original text</summary><div id="original"></div></details>
-    <label for="edited">Your edit</label>
-    <textarea id="edited" maxlength="4000" spellcheck="true" aria-describedby="limit"></textarea>
-    <p id="limit" class="muted">One paragraph, up to 4,000 characters. No line breaks.</p>
+    <details><summary data-i18n-text="Original text">Original text</summary><div id="original" translate="no" dir="auto"></div></details>
+    <label for="edited" data-i18n-text="Your edit">Your edit</label>
+    <textarea id="edited" translate="no" dir="auto" maxlength="4000" spellcheck="true" aria-describedby="limit"></textarea>
+    <p id="limit" class="muted" data-i18n-text="One paragraph, up to 4,000 characters. No line breaks.">One paragraph, up to 4,000 characters. No line breaks.</p>
     <div class="actions">
-      <button id="review" type="button">Preview changes</button>
-      <button id="apply" class="primary" type="button" disabled>Apply to document</button>
+      <button id="review" type="button" data-i18n-text="Preview changes">Preview changes</button>
+      <button id="apply" class="primary" type="button" disabled data-i18n-text="Apply to document">Apply to document</button>
     </div>
-    <section id="changes" hidden aria-label="Changes">
-      <p class="muted">Removed text is crossed out. Added text is underlined.</p>
-      <div id="preview"></div>
+    <section id="changes" hidden aria-label="Changes" data-i18n-attr="aria-label">
+      <p class="muted" data-i18n-text="Removed text is crossed out. Added text is underlined.">Removed text is crossed out. Added text is underlined.</p>
+      <div id="preview" translate="no" dir="auto"></div>
     </section>
   </section>
-  <p class="muted">Prototype 0.1.0 · Uses Google Apps Script. No document upload to Compare Two Texts.</p>
-  <button id="close" type="button">Close</button>
+  <p class="muted" data-i18n-text="Prototype 0.2.0 · Uses Google Apps Script. No document upload to Compare Two Texts.">Prototype 0.2.0 · Uses Google Apps Script. No document upload to Compare Two Texts.</p>
+  <button id="close" type="button" data-i18n-text="Close">Close</button>
+  <!-- CTT_EMBEDDED_I18N -->
   <script>
     'use strict';
     const $ = id => document.getElementById(id);
     let snapshot = null, reviewed = null, busy = false;
-    function status(message, error = false) {
-      $('status').textContent = message;
-      $('status').dataset.error = String(error);
+    const translate = source => window.cttI18n?.t(source) ?? source;
+    function status(message, error = false, guidance = '') {
+      const target = $('status'), primary = document.createElement('span');
+      target.replaceChildren(primary);
+      const i18n = window.cttI18n;
+      if (error && i18n) i18n.bindError(primary, message);
+      else if (i18n) i18n.bindText(primary, message);
+      else primary.textContent = message;
+      if (guidance) {
+        const help = document.createElement('span'); target.append(document.createTextNode(' '), help);
+        if (i18n) i18n.bindText(help, guidance); else help.textContent = guidance;
+      }
+      target.dataset.error = String(error);
     }
     function controls() {
       $('load').disabled = busy;
@@ -72,7 +85,7 @@
     }
     function load() {
       if (busy) return;
-      if (!$('editor').hidden && $('edited').value !== $('original').textContent && !window.confirm('Discard your unapplied edit and load the current selection?')) return;
+      if (!$('editor').hidden && $('edited').value !== $('original').textContent && !window.confirm(translate('Discard your unapplied edit and load the current selection?'))) return;
       snapshot = null; reviewed = null; $('changes').hidden = true;
       busy = true; controls(); status('Loading selected text…');
       google.script.run.withSuccessHandler(result => {
@@ -113,11 +126,11 @@
       google.script.run.withSuccessHandler(result => {
         busy = false; snapshot = null; reviewed = null;
         $('original').textContent = $('edited').value;
-        status(result.message + ' Select another passage and click Load selected text to continue.'); controls();
+        status(result.message, false, 'Select another passage and click Load selected text to continue.'); controls();
       }).withFailureHandler(error => {
         // Keep the draft visible, but never repeat an uncertain write with the same token.
         busy = false; snapshot = null; reviewed = null;
-        status((error.message || String(error)) + ' Your draft remains here. Copy it if needed, then select the passage and load it again.', true); controls();
+        status(error.message || String(error), true, 'Your draft remains here. Copy it if needed, then select the passage and load it again.'); controls();
       }).applyEdit(snapshot.token, reviewed);
     }
     $('load').addEventListener('click', load);
