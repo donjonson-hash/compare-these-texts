@@ -1,6 +1,15 @@
 // Packaged extension only: consume a one-time launch request without replacing saved work.
 export async function launchWelcomeExample({document, location, history, readSavedComparison}) {
   const url = new URL(location.href);
+  if (url.searchParams.get('welcome-mode') === 'edit') {
+    url.searchParams.delete('welcome-mode');
+    url.searchParams.delete('welcome-example');
+    history.replaceState(history.state, '', url.href);
+    // Opening the existing single-document workspace does not load a file or
+    // replace saved work, so it needs no comparison-store check.
+    document.getElementById('header-edit')?.click();
+    return;
+  }
   if (url.searchParams.get('welcome-example') !== '1') return;
   url.searchParams.delete('welcome-example');
   history.replaceState(history.state, '', url.href);

@@ -1,3 +1,10 @@
+# Version 0.37.7 — Getting started
+
+- Redesigned the local welcome page around PDF comparison, private contract review and a three-step first workflow.
+- Added a direct Edit & export entry for one document.
+- Kept sample launch, pinning help, PDF limitations and encrypted draft details visible.
+- Comparison and editing engines remain the 0.37.6 baseline; no OCR or new permissions.
+
 # Compare Two Texts 0.37.6 — submission notes
 
 This package prepares the current extension for Chrome Web Store review. It is
