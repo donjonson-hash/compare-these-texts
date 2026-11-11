@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync, existsSync, readdirSync} from 'node:fs';
 import {JSDOM} from 'jsdom';
+import {execFileSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 
 const dist = new URL('../dist/', import.meta.url);
 const STORE = 'https://chromewebstore.google.com/detail/kclhfaiampafehfhhlejeeefhdhocfcg';
@@ -119,4 +121,26 @@ test('Word guide answers the how-to searches for Word and Google Docs', () => {
   assert.ok(headings.includes('compare documents in microsoft word'));
   assert.ok(headings.includes('compare two google docs'));
   assert.ok(headings.includes('which method should you use?'));
+});
+
+test('home page explains text comparison in English for search, outside the offline extension', () => {
+  const doc = load(new URL('index.html', dist));
+  const about = doc.querySelector('#home-about');
+  assert.ok(about, 'home explanation');
+  assert.equal(about.getAttribute('lang'), 'en');
+  assert.equal(about.getAttribute('dir'), 'ltr');
+  assert.ok(doc.querySelector('#start-menu').contains(about), 'shown on the start screen only');
+  assert.match(about.querySelector('h2').textContent.toLowerCase(), /compare two texts/);
+  const text = about.textContent.replace(/\s+/g, ' ');
+  assert.match(text.toLowerCase(), /text difference checker/);
+  const words = text.split(' ').filter(Boolean).length;
+  assert.ok(words >= 400 && words <= 900, `${words} words`);
+  assert.ok(about.querySelectorAll('details').length >= 4, 'FAQ entries');
+  for (const guide of GUIDES) assert.ok(about.querySelector(`a[href="${guide}"]`), guide);
+  assert.ok(about.querySelector('a[href="/privacy/"]'));
+  // Website-only: the packaged extension index never carries this block.
+  const inspect = "import sys,zipfile;print(int(b'home-about' in zipfile.ZipFile(sys.argv[1]).read('index.html')))";
+  const release = JSON.parse(readFileSync(new URL('../release.json', import.meta.url), 'utf8'));
+  const leaked = execFileSync('python3', ['-c', inspect, fileURLToPath(new URL(`downloads/ctt-chrome-${release.version}.zip`, dist))], {encoding: 'utf8'}).trim();
+  assert.equal(leaked, '0');
 });
