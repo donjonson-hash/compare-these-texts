@@ -34,5 +34,10 @@
   "a8283ade3185": "Vrátiť späť",
   "d99bcd78b586": "Nahrať súbor",
   "403e555cd16d": "Použiť A",
-  "3807a668acb4": "Platné koncepty zo starších verzií sa pri otvorení v tejto verzii zašifrujú. Ak šifrovanie alebo ukladanie zlyhá, aplikácia zobrazí chybu a nenahradí starý koncept novou nezašifrovanou verziou. Existujúci koncept zostane nezmenený. Odstránením konceptu alebo uplynutím jeho platnosti sa odstráni uložený obsah aj šifrovací kľúč. Nejde o záruku bezpečného vymazania z disku alebo záloh."
+  "3807a668acb4": "Platné koncepty zo starších verzií sa pri otvorení v tejto verzii zašifrujú. Ak šifrovanie alebo ukladanie zlyhá, aplikácia zobrazí chybu a nenahradí starý koncept novou nezašifrovanou verziou. Existujúci koncept zostane nezmenený. Odstránením konceptu alebo uplynutím jeho platnosti sa odstráni uložený obsah aj šifrovací kľúč. Nejde o záruku bezpečného vymazania z disku alebo záloh.",
+  "c411521a56dc": "DOCX: podporované sú iba správne uzavreté polia HYPERLINK s výsledkom vo forme obyčajného textu v jednom odseku. Ostatné polia preveďte na obyčajný text.",
+  "62acf48aa07d": "DOCX: tento obrázok v staršom formáte nie je podporovaný. Použite vložený obrázok PNG alebo JPEG bez orezania, otočenia či iných grafických efektov.",
+  "68296252c8f3": "Export do PDF nie je dostupný pre obrázok v polohovacom rámčeku. Stiahnite Word (.docx), aby ste zachovali jeho umiestnenie.",
+  "a8c633859588": "Pri stiahnutí vo formáte Word sa polia hypertextových odkazov v DOCX prevedú na svoj viditeľný text. Text a jeho formátovanie zostanú zachované; pole a jeho odkaz sa odstránia.",
+  "c3944f77efa4": "Vložené obrázky v staršom formáte sa zobrazujú v poradí dokumentu a zachovajú sa pri stiahnutí vo formáte Word. Ich umiestnenie sa neporovnáva; export do PDF nie je dostupný pre rozloženia s obrázkami v polohovacích rámčekoch."
 }

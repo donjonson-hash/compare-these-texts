@@ -298,10 +298,16 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       heading.insertBefore(print,save);
     }
     panel.append(heading); if(single){panel.hidden=side==='right';heading.querySelector('.letter').hidden=true;menu.hidden=true;}
+    if(models[side]?.hyperlinkFields){
+      const note=el('p',uiMessage("DOCX hyperlink fields are converted to their visible text when downloading Word. Text and text styling are preserved; the field and its link are removed."),'docx-coverage-note');note.dataset.docxFieldNote=side;panel.append(note);
+    }
+    const pdfLimitation=models[side]?.pdfUnsupported?.[0];
+    if(pdfLimitation&&outputFormat){const option=outputFormat.querySelector('option[value="pdf"]');option.disabled=true;uiSetAttr(option, 'title', uiMessage('{0}', {0:uiError(pdfLimitation)}));}
+    if(pdfLimitation&&!models[side]?.headersFooters?.length){
+      const note=el('p',uiError(pdfLimitation),'docx-coverage-note');note.dataset.docxLayoutNote=side;panel.append(note);
+    }
     if (models[side]?.headersFooters?.length) {
       const complexLayout=models[side].headersFooters.some(part=>part.complexLayout);
-      const pdfLimitation=models[side].pdfUnsupported?.[0];
-      if(pdfLimitation&&outputFormat){const option=outputFormat.querySelector('option[value="pdf"]');option.disabled=true;uiSetAttr(option, 'title', uiMessage('{0}', {0:uiError(pdfLimitation)}));}
       const note=el('p',(pdfLimitation ? uiError(pdfLimitation) : uiMessage("Body text only. Headers/footers kept unchanged, not compared. PDF includes supported headers/footers.")),'docx-coverage-note');
       note.dataset.docxPeripheralNote=side;
       const details=el('details',undefined,'docx-peripheral-parts');details.dataset.docxPeripheral=side;

@@ -10,5 +10,10 @@
   "087a259abc34": "Google Docs-prototyyppi kulkee Google Apps Script:n kautta Google:n infrastruktuurissa ja vaatii valtuutuksen ja Internet-yhteyden. Se lukee aktiivisen asiakirjan välilehden tekstin tarkistaakseen muutokset. Google:n käyttäjälaajuinen CacheService tallentaa valitun tekstin, sen kappaleen, muotoilun ja sijaintitiedot tilapäisesti salaamattomana tekstinä, pyydettynä 15 minuutin käyttöiän. Google voi häätää sen aikaisemmin. Sivupalkin sulkeminen ei poista välimuistimerkintää. Mikään LLM tai kehittäjäpalvelin ei vastaanota asiakirjan tekstiä. Selainlaajennuksen paikallinen käsittely ja salatut luonnokset eivät kuvaa tätä Google-isännöityä apuohjelmaa. Lue asennuspaketin tietojenkäsittelyosa ennen sen käyttöönottoa.",
   "993153d8bb89": "Tämä versio ei arvioi sopimusten, raporttien tai kirjojen sisältöä.",
   "11da7c54a17a": "{0}: {1}rivi {2}{3}",
-  "0f27b2200fa0": "{0}rivi {1}{2}"
+  "0f27b2200fa0": "{0}rivi {1}{2}",
+  "c411521a56dc": "DOCX: vain asianmukaisesti suljetut HYPERLINK-kentät, joiden tulos on pelkkää tekstiä yhdessä kappaleessa, ovat tuettuja. Muunna muut kentät tavalliseksi tekstiksi.",
+  "62acf48aa07d": "DOCX: tätä vanhanmuotoista kuvaa ei tueta. Käytä upotettua PNG- tai JPEG-kuvaa ilman rajausta, kiertoa tai muita grafiikkatehosteita.",
+  "68296252c8f3": "Sijoittelukehyksessä olevan kuvan PDF-vienti ei ole käytettävissä. Lataa Word (.docx), jotta kuvan sijainti säilyy.",
+  "a8c633859588": "Word-muodossa ladattaessa DOCX-hyperlinkkikentät muunnetaan niiden näkyväksi tekstiksi. Teksti ja sen muotoilu säilyvät; kenttä ja sen linkki poistetaan.",
+  "c3944f77efa4": "Vanhanmuotoiset upotetut kuvat näytetään asiakirjan järjestyksessä ja säilytetään Word-latauksissa. Niiden sijoittelua ei verrata; PDF-vienti ei ole käytettävissä asetteluissa, joissa kuvia on sijoittelukehyksissä."
 }

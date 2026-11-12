@@ -44,5 +44,10 @@
   "a8283ade3185": "Deshacer",
   "403e555cd16d": "Usar A",
   "11da7c54a17a": "{0}: {1}fila {2}{3}",
-  "0f27b2200fa0": "{0}fila {1}{2}"
+  "0f27b2200fa0": "{0}fila {1}{2}",
+  "c411521a56dc": "DOCX: solo se admiten campos HYPERLINK con inicio y fin correctamente emparejados y un resultado de texto sin formato en un único párrafo. Convierte los demás campos en texto sin formato.",
+  "62acf48aa07d": "DOCX: esta imagen en formato antiguo no es compatible. Utiliza una imagen PNG o JPEG incrustada, sin recortes, rotación ni otros efectos gráficos.",
+  "68296252c8f3": "La exportación a PDF no está disponible para una imagen en un marco de posicionamiento. Descarga Word (.docx) para conservar su posición.",
+  "a8c633859588": "Al descargar en formato Word, los campos de hipervínculo del DOCX se convierten en su texto visible. Se conservan el texto y su formato; se eliminan el campo y su enlace.",
+  "c3944f77efa4": "Las imágenes incrustadas en formato antiguo se muestran en el orden del documento y se conservan al descargar en formato Word. No se compara su posición; la exportación a PDF no está disponible para diseños con imágenes en marcos de posicionamiento."
 }

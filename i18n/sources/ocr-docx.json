@@ -1,0 +1,7 @@
+[
+  "DOCX: only balanced HYPERLINK fields with a plain-text result in one paragraph are supported. Convert other fields to plain text.",
+  "DOCX: this legacy picture is not supported. Use an embedded PNG or JPEG image without cropping, rotation or other drawing effects.",
+  "PDF export is unavailable for a framed image. Download Word (.docx) to preserve its position.",
+  "DOCX hyperlink fields are converted to their visible text when downloading Word. Text and text styling are preserved; the field and its link are removed.",
+  "Legacy embedded pictures are shown in document order and preserved in Word downloads. Their positioning is not compared; PDF export is unavailable for framed picture layouts."
+]

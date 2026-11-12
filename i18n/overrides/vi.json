@@ -53,5 +53,10 @@
   "306486dca7d5": "Dùng toàn bộ nội dung A trong B",
   "3807a668acb4": "Các bản nháp hợp lệ từ phiên bản cũ được mã hóa khi mở trong phiên bản này. Nếu mã hóa hoặc lưu không thành công, ứng dụng hiển thị lỗi và không thay bản nháp cũ bằng bản ghi mới không mã hóa. Bản nháp hiện có vẫn nguyên vẹn. Việc xóa bản nháp hoặc để bản nháp hết hạn sẽ loại bỏ nội dung đã lưu và khóa mã hóa của bản nháp. Điều này không bảo đảm dữ liệu được xóa an toàn khỏi ổ đĩa hoặc bản sao lưu.",
   "247dd5fe61a1": "Bản B khớp với văn bản trích xuất từ A, kể cả thứ tự các phần.",
-  "86bcbf307ff0": "{0} phần trong A · {1} phần trong B. Đang hiển thị văn bản trích xuất mà không giữ bố cục gốc."
+  "86bcbf307ff0": "{0} phần trong A · {1} phần trong B. Đang hiển thị văn bản trích xuất mà không giữ bố cục gốc.",
+  "c411521a56dc": "DOCX: Chỉ hỗ trợ trường HYPERLINK có dấu bắt đầu và kết thúc khớp nhau, với kết quả dạng văn bản thuần trong một đoạn. Hãy chuyển các trường khác thành văn bản thuần.",
+  "62acf48aa07d": "DOCX: Không hỗ trợ hình ảnh định dạng cũ này. Hãy dùng ảnh PNG hoặc JPEG được nhúng, không cắt xén, xoay hoặc áp dụng hiệu ứng vẽ khác.",
+  "68296252c8f3": "Không thể xuất PDF cho ảnh nằm trong khung. Hãy tải Word (.docx) để giữ nguyên vị trí của ảnh.",
+  "a8c633859588": "Khi tải Word, các trường siêu liên kết DOCX được chuyển thành văn bản hiển thị của chúng. Văn bản và định dạng chữ được giữ lại; trường và liên kết của nó bị loại bỏ.",
+  "c3944f77efa4": "Ảnh nhúng định dạng cũ được hiển thị theo thứ tự trong tài liệu và được giữ lại trong tệp Word tải xuống. Vị trí của ảnh không được so sánh; không thể xuất PDF cho bố cục có ảnh nằm trong khung."
 }

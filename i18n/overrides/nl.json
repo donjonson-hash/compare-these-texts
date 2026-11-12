@@ -68,5 +68,10 @@
   "2530c04512b7": "Een voorbeeld proberen",
   "a8283ade3185": "Ongedaan maken",
   "403e555cd16d": "A gebruiken",
-  "3807a668acb4": "Geldige concepten uit oudere versies worden versleuteld wanneer je ze in deze versie opent. Als versleutelen of opslaan mislukt, toont de app een foutmelding en vervangt die het oude concept niet door een nieuwe onversleutelde versie. Het bestaande concept blijft intact. Bij verwijdering of verval van een concept worden de opgeslagen inhoud en versleutelingssleutel verwijderd. Dit biedt geen garantie op veilige verwijdering van schijf of uit back-ups."
+  "3807a668acb4": "Geldige concepten uit oudere versies worden versleuteld wanneer je ze in deze versie opent. Als versleutelen of opslaan mislukt, toont de app een foutmelding en vervangt die het oude concept niet door een nieuwe onversleutelde versie. Het bestaande concept blijft intact. Bij verwijdering of verval van een concept worden de opgeslagen inhoud en versleutelingssleutel verwijderd. Dit biedt geen garantie op veilige verwijdering van schijf of uit back-ups.",
+  "c411521a56dc": "DOCX: alleen correct afgesloten HYPERLINK-velden met een resultaat als platte tekst binnen één alinea worden ondersteund. Zet andere velden om naar gewone tekst.",
+  "62acf48aa07d": "DOCX: deze afbeelding in een ouder formaat wordt niet ondersteund. Gebruik een ingesloten PNG- of JPEG-afbeelding zonder bijsnijden, rotatie of andere grafische effecten.",
+  "68296252c8f3": "PDF-export is niet beschikbaar voor een afbeelding in een positioneringskader. Download Word (.docx) om de positie te behouden.",
+  "a8c633859588": "Bij het downloaden in Word-formaat worden DOCX-hyperlinkvelden omgezet naar hun zichtbare tekst. De tekst en de tekstopmaak blijven behouden; het veld en de bijbehorende link worden verwijderd.",
+  "c3944f77efa4": "Ingesloten afbeeldingen in een ouder formaat worden in documentvolgorde weergegeven en blijven behouden in Word-downloads. Hun positionering wordt niet vergeleken; PDF-export is niet beschikbaar voor indelingen met afbeeldingen in positioneringskaders."
 }

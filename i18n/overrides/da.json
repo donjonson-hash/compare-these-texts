@@ -15,5 +15,10 @@
   "ccf10f1d869b": "Værktøjet sammenligner understøttet tekst- og tabelindhold. Det sammenligner ikke al Word-formatering og erstatter ikke Registrer ændringer i Microsoft Word. Billeder sammenlignes ikke, og sidehoveder, sidefødder og noter kan ikke redigeres direkte i visningen. Visse komplekse strukturer kan være begrænsede; læs de meddelelser, der vises for din fil.",
   "993153d8bb89": "Denne version vurderer ikke indholdet af kontrakter, rapporter eller bøger.",
   "11da7c54a17a": "{0}: {1}række {2}{3}",
-  "0f27b2200fa0": "{0}række {1}{2}"
+  "0f27b2200fa0": "{0}række {1}{2}",
+  "c411521a56dc": "DOCX: Kun korrekt afsluttede HYPERLINK-felter med et resultat som almindelig tekst i ét afsnit understøttes. Konvertér andre felter til almindelig tekst.",
+  "62acf48aa07d": "DOCX: Dette billede i ældre format understøttes ikke. Brug et indlejret PNG- eller JPEG-billede uden beskæring, rotation eller andre grafiske effekter.",
+  "68296252c8f3": "Eksport til PDF er ikke tilgængelig for et billede i en placeringsramme. Download Word (.docx) for at bevare dets placering.",
+  "a8c633859588": "Når du downloader i Word-format, konverteres DOCX-hyperlinkfelter til deres synlige tekst. Teksten og dens formatering bevares; feltet og dets link fjernes.",
+  "c3944f77efa4": "Indlejrede billeder i ældre format vises i dokumentets rækkefølge og bevares ved download i Word-format. Deres placering sammenlignes ikke; eksport til PDF er ikke tilgængelig for layout med billeder i placeringsrammer."
 }

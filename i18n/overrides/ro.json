@@ -45,5 +45,10 @@
   "403e555cd16d": "Folosește A",
   "3807a668acb4": "Ciornele valide din versiunile anterioare sunt criptate când sunt deschise în această versiune. Dacă criptarea sau salvarea eșuează, aplicația afișează o eroare și nu înlocuiește vechea ciornă cu o nouă copie salvată în clar. Ciorna existentă rămâne intactă. Ștergerea sau expirarea unei ciorne elimină conținutul stocat și cheia de criptare. Aceasta nu garantează ștergerea în siguranță de pe disc sau din copiile de rezervă.",
   "181cd7b708d9": "XLSX, CSV, TXT, DOCX, PDF · până la 2 MiB",
-  "0674c5d0e565": "{0}: sursa depășește 2 MiB"
+  "0674c5d0e565": "{0}: sursa depășește 2 MiB",
+  "c411521a56dc": "DOCX: sunt acceptate doar câmpurile HYPERLINK închise corect, cu un rezultat de text simplu într-un singur paragraf. Convertiți celelalte câmpuri în text simplu.",
+  "62acf48aa07d": "DOCX: această imagine în format vechi nu este acceptată. Folosiți o imagine PNG sau JPEG încorporată, fără decupare, rotire sau alte efecte grafice.",
+  "68296252c8f3": "Exportul în PDF nu este disponibil pentru o imagine într-un cadru de poziționare. Descărcați Word (.docx) pentru a-i păstra poziția.",
+  "a8c633859588": "La descărcarea în format Word, câmpurile de hyperlink din DOCX sunt convertite în textul lor vizibil. Textul și formatarea sa sunt păstrate; câmpul și linkul său sunt eliminate.",
+  "c3944f77efa4": "Imaginile încorporate în format vechi sunt afișate în ordinea documentului și păstrate la descărcarea în format Word. Poziționarea lor nu este comparată; exportul în PDF nu este disponibil pentru aranjamente cu imagini în cadre de poziționare."
 }

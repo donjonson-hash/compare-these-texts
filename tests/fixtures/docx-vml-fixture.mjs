@@ -1,0 +1,10 @@
+import {docx,W} from './text-fixture.mjs';
+export const V='urn:schemas-microsoft-com:vml',O='urn:schemas-microsoft-com:office:office',R='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+export const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAVSURBVAiZY2RgYPjPgASYGNAAhgAAL50BBXGaZ2IAAAAASUVORK5CYII=','base64');
+const formulas=['if lineDrawn pixelLineWidth 0','sum @0 1 0','sum 0 0 @1','prod @2 1 2','prod @3 21600 pixelWidth','prod @3 21600 pixelHeight','sum @0 0 1','prod @6 1 2','prod @7 21600 pixelWidth','sum @8 21600 0','prod @7 21600 pixelHeight','sum @10 21600 0'];
+export const vmlPicture=`<w:pict xmlns:v="${V}" xmlns:o="${O}" xmlns:r="${R}"><v:shapetype id="_x0000_t75" coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f"><v:stroke joinstyle="miter"/><v:formulas>${formulas.map(eqn=>`<v:f eqn="${eqn}"/>`).join('')}</v:formulas><v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/><o:lock v:ext="edit" aspectratio="t"/></v:shapetype><v:shape id="picture1" type="#_x0000_t75" style="width:72pt;height:54pt;"><v:imagedata r:id="embedded" r:href="duplicate"/></v:shape></w:pict>`;
+export function vmlFixture({picture=vmlPicture,frame=false,body,relationships,extra={}}={}){
+ const xml=`<w:document xmlns:w="${W}" xmlns:r="${R}"><w:body>${body??`<w:p>${frame?'<w:pPr><w:framePr w:h="1080" w:wrap="notBeside" w:vAnchor="text" w:hAnchor="text" w:y="1"/></w:pPr>':''}<w:r>${picture}</w:r></w:p><w:p><w:r><w:t>Original caption</w:t></w:r></w:p>`}</w:body></w:document>`;
+ const rels=relationships??`<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="embedded" Type="${R}/image" Target="media/picture.png"/><Relationship Id="duplicate" Type="${R}/image" Target="media/picture.png" TargetMode="External"/></Relationships>`;
+ return {name:'synthetic-ocr-picture.docx',data:Buffer.from(docx([],{xml,extraEntries:{'word/media/picture.png':png,'word/_rels/document.xml.rels':rels,...extra}})).toString('base64')};
+}

@@ -426,5 +426,10 @@
   "1b234880a819": "{0} Unterschiede müssen noch geprüft werden.",
   "c95faf2ecd0b": "{0} Unterschiede zu prüfen.",
   "11da7c54a17a": "{0}: {1}Zeile {2}{3}",
-  "0f27b2200fa0": "{0}Zeile {1}{2}"
+  "0f27b2200fa0": "{0}Zeile {1}{2}",
+  "c411521a56dc": "DOCX: Es werden nur korrekt abgeschlossene HYPERLINK-Felder mit einem Ergebnis als Klartext innerhalb eines Absatzes unterstützt. Wandeln Sie andere Felder in normalen Text um.",
+  "62acf48aa07d": "DOCX: Dieses Bild im älteren Format wird nicht unterstützt. Verwenden Sie ein eingebettetes PNG- oder JPEG-Bild ohne Zuschnitt, Drehung oder andere Grafikeffekte.",
+  "68296252c8f3": "Für ein Bild in einem Positionsrahmen ist der PDF-Export nicht verfügbar. Laden Sie Word (.docx) herunter, um seine Position beizubehalten.",
+  "a8c633859588": "Beim Herunterladen im Word-Format werden Hyperlink-Felder in DOCX in ihren sichtbaren Text umgewandelt. Text und Textformatierung bleiben erhalten; das Feld und sein Link werden entfernt.",
+  "c3944f77efa4": "Eingebettete Bilder im älteren Format werden in der Dokumentreihenfolge angezeigt und beim Herunterladen im Word-Format beibehalten. Ihre Positionierung wird nicht verglichen; für Layouts mit Bildern in Positionsrahmen ist der PDF-Export nicht verfügbar."
 }

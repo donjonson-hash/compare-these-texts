@@ -41,5 +41,10 @@
   "087a259abc34": "Il prototipo Google Docs funziona attraverso Google Apps Script nell'infrastruttura di Google e richiede l'autorizzazione e una connessione Internet. Legge il corpo della scheda del documento attivo per verificare le modifiche. Il CacheService con ambito utente di Google memorizza temporaneamente il testo selezionato, il relativo paragrafo, la formattazione e i dati di posizione in chiaro, con una durata richiesta di 15 minuti; Google potrebbe sfrattarlo prima. La chiusura della barra laterale non elimina la voce della cache. Nessun server LLM o sviluppatore riceve il testo del documento. L'elaborazione solo locale dell'estensione del browser e le dichiarazioni di bozza crittografata non descrivono questo componente aggiuntivo ospitato su Google. Leggere la sezione sulla gestione dei dati del pacchetto di installazione prima di abilitarlo.",
   "993153d8bb89": "Questa versione non valuta il contenuto di contratti, rapporti o libri.",
   "a8283ade3185": "Annulla modifica",
-  "403e555cd16d": "Usa A"
+  "403e555cd16d": "Usa A",
+  "c411521a56dc": "DOCX: sono supportati solo i campi HYPERLINK con marcatori di inizio e fine correttamente abbinati e un risultato di testo semplice in un unico paragrafo. Converti gli altri campi in testo semplice.",
+  "62acf48aa07d": "DOCX: questa immagine in formato precedente non è supportata. Usa un’immagine PNG o JPEG incorporata, senza ritaglio, rotazione o altri effetti grafici.",
+  "68296252c8f3": "L’esportazione PDF non è disponibile per un’immagine in una cornice di posizionamento. Scarica Word (.docx) per conservarne la posizione.",
+  "a8c633859588": "Durante il download in formato Word, i campi collegamento ipertestuale del DOCX vengono convertiti nel loro testo visibile. Il testo e la sua formattazione vengono conservati; il campo e il relativo collegamento vengono rimossi.",
+  "c3944f77efa4": "Le immagini incorporate in formato precedente vengono mostrate nell’ordine del documento e conservate nei download Word. Il loro posizionamento non viene confrontato; l’esportazione PDF non è disponibile per impaginazioni con immagini in cornici di posizionamento."
 }

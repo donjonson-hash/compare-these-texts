@@ -8,5 +8,10 @@
   "3807a668acb4": "Galiojantys senesnių versijų juodraščiai užšifruojami, kai jie atidaromi šioje versijoje. Jei nepavyksta šifruoti arba išsaugoti, programa rodo klaidą ir nepakeičia senojo juodraščio nauju grynojo teksto išsaugojimu. Esamas juodraštis paliekamas nepažeistas. Ištrynus juodraštį arba pasibaigus jo galiojimo laikui, pašalinamas jo saugomas turinys ir šifravimo raktas; tai nėra saugaus ištrynimo iš disko arba atsarginių kopijų garantija.",
   "742b91c6231c": "{0}: A {1} → B {2}; B − A: {3}.{4}",
   "11da7c54a17a": "{0}: {1}eilutė {2}{3}",
-  "0f27b2200fa0": "{0}eilutė {1}{2}"
+  "0f27b2200fa0": "{0}eilutė {1}{2}",
+  "c411521a56dc": "DOCX: palaikomi tik tinkamai uždaryti HYPERLINK laukai, kurių rezultatas yra paprastas tekstas vienoje pastraipoje. Kitus laukus paverskite paprastu tekstu.",
+  "62acf48aa07d": "DOCX: šis seno formato paveikslėlis nepalaikomas. Naudokite įterptą PNG arba JPEG paveikslėlį be apkarpymo, pasukimo ar kitų grafinių efektų.",
+  "68296252c8f3": "Paveikslėlio pozicionavimo rėmelyje negalima eksportuoti į PDF. Atsisiųskite Word (.docx), kad išsaugotumėte jo padėtį.",
+  "a8c633859588": "Atsisiunčiant Word formatu, DOCX hipersaitų laukai paverčiami jų matomu tekstu. Tekstas ir jo formatavimas išsaugomi; laukas ir jo saitas pašalinami.",
+  "c3944f77efa4": "Įterpti seno formato paveikslėliai rodomi dokumento tvarka ir išsaugomi atsisiunčiant Word formatu. Jų padėtis nelyginama; maketų su paveikslėliais pozicionavimo rėmeliuose negalima eksportuoti į PDF."
 }

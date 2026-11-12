@@ -6,6 +6,19 @@ import {readDocxVisual,writeDocxVisual} from '../dist/docx-visual.mjs';
 import {unzipDocument} from '../dist/text-zip.mjs';
 import {emptyNotesFixture as fixture,notes,relationships} from './fixtures/docx-empty-notes-fixture.mjs';
 const source=bytes=>({name:'template-notes.docx',data:Buffer.from(bytes).toString('base64')});
+test('OCR markerless separator templates are inert and survive edit/export unchanged',async()=>{
+ const extra=Object.fromEntries(['footnote','endnote'].map(kind=>[`word/${kind}s.xml`,`<w:${kind}s xmlns:w="${W}"><w:${kind} w:id="0" w:type="separator"><w:p><w:r/></w:p></w:${kind}><w:${kind} w:id="1" w:type="continuationSeparator"><w:p><w:r/></w:p></w:${kind}></w:${kind}s>`]));
+ const src=fixture(extra),before=await unzipDocument(Buffer.from(src.data,'base64'));
+ assert.deepEqual((await readTextSource(src)).blocks.map(b=>b.text),['Original body']);
+ const changed=await writeDocxVisual(src,[{record:1,text:'Revised OCR text'}]);
+ assert.deepEqual((await readTextSource(source(changed))).blocks.map(b=>b.text),['Revised OCR text']);
+ const after=await unzipDocument(changed);
+ for(const path of Object.keys(extra))assert.deepEqual(after.get(path),before.get(path));
+ for(const replacement of ['<w:r><w:t>Hidden note</w:t></w:r>','<w:r><w:footnoteRef/></w:r>','<w:r><w:object/></w:r>']){
+  await assert.rejects(()=>readTextSource(fixture({...extra,'word/footnotes.xml':extra['word/footnotes.xml'].replace('<w:r/>',replacement)})),/footnotes or endnotes/);
+ }
+ await assert.rejects(()=>readTextSource(fixture({...extra,'word/footnotes.xml':extra['word/footnotes.xml'].replace('w:id="1"','w:id="0"')})),/footnotes or endnotes/);
+});
 test('Word separator-only note templates import and remain byte-identical after body editing',async()=>{
  const src=fixture();assert.deepEqual((await readTextSource(src)).blocks.map(b=>b.text),['Original body']);
  assert.equal((await readDocxVisual(src)).blocks.length,1);

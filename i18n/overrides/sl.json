@@ -27,5 +27,10 @@
   "2530c04512b7": "Poskusi primer",
   "d99bcd78b586": "Naloži datoteko",
   "403e555cd16d": "Uporabi A",
-  "3807a668acb4": "Veljavni osnutki iz starejših različic se ob odprtju v tej različici šifrirajo. Če šifriranje ali shranjevanje ne uspe, aplikacija prikaže napako in starega osnutka ne nadomesti z novo nešifrirano različico. Obstoječi osnutek ostane nedotaknjen. Če osnutek izbrišete ali poteče, se odstranita shranjena vsebina in šifrirni ključ. To ne zagotavlja varnega izbrisa z diska ali iz varnostnih kopij."
+  "3807a668acb4": "Veljavni osnutki iz starejših različic se ob odprtju v tej različici šifrirajo. Če šifriranje ali shranjevanje ne uspe, aplikacija prikaže napako in starega osnutka ne nadomesti z novo nešifrirano različico. Obstoječi osnutek ostane nedotaknjen. Če osnutek izbrišete ali poteče, se odstranita shranjena vsebina in šifrirni ključ. To ne zagotavlja varnega izbrisa z diska ali iz varnostnih kopij.",
+  "c411521a56dc": "DOCX: podprta so samo pravilno zaključena polja HYPERLINK z rezultatom v navadnem besedilu v enem odstavku. Druga polja pretvorite v navadno besedilo.",
+  "62acf48aa07d": "DOCX: ta slika v starejši obliki ni podprta. Uporabite vdelano sliko PNG ali JPEG brez obrezovanja, vrtenja ali drugih grafičnih učinkov.",
+  "68296252c8f3": "Izvoz v PDF ni na voljo za sliko v okvirju za pozicioniranje. Prenesite Word (.docx), da ohranite njen položaj.",
+  "a8c633859588": "Pri prenosu v obliki Word se polja hiperpovezav v DOCX pretvorijo v svoje vidno besedilo. Besedilo in njegovo oblikovanje se ohranita; polje in njegova povezava se odstranita.",
+  "c3944f77efa4": "Vdelane slike v starejši obliki so prikazane po vrstnem redu v dokumentu in se ohranijo pri prenosu v obliki Word. Njihova postavitev se ne primerja; izvoz v PDF ni na voljo za postavitve s slikami v okvirjih za pozicioniranje."
 }

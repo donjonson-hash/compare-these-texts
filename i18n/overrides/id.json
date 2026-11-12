@@ -12,5 +12,10 @@
   "742b91c6231c": "{0}: A {1} → B {2}; B − A: {3}.{4}",
   "925348196ea8": "{0}: A {1} → B {2}; perubahan B − A: {3}{4}.",
   "6e9fe4a5d33b": "• A {0} = {1}; B {2} = {3} — {4} ({5}).",
-  "ddff1461e1c3": "• A {0} ↔ B {1} — {2}."
+  "ddff1461e1c3": "• A {0} ↔ B {1} — {2}.",
+  "c411521a56dc": "DOCX: Hanya bidang HYPERLINK dengan penanda awal dan akhir yang berpasangan serta hasil teks biasa dalam satu paragraf yang didukung. Ubah bidang lain menjadi teks biasa.",
+  "62acf48aa07d": "DOCX: Gambar berformat lama ini tidak didukung. Gunakan gambar PNG atau JPEG tertanam tanpa pemotongan, rotasi, atau efek gambar lainnya.",
+  "68296252c8f3": "Ekspor PDF tidak tersedia untuk gambar di dalam bingkai. Unduh Word (.docx) untuk mempertahankan posisinya.",
+  "a8c633859588": "Bidang hyperlink DOCX diubah menjadi teks yang terlihat saat mengunduh Word. Teks dan gayanya dipertahankan; bidang beserta tautannya dihapus.",
+  "c3944f77efa4": "Gambar tertanam berformat lama ditampilkan sesuai urutan dokumen dan dipertahankan dalam unduhan Word. Posisinya tidak dibandingkan; ekspor PDF tidak tersedia untuk tata letak dengan gambar di dalam bingkai."
 }
