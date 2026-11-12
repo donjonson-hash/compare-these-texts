@@ -98,6 +98,8 @@ body.home-mode{background:#f8faf9}
 .home-mode main{max-width:1440px}
 .home-mode .start-menu{max-width:none;padding:36px 0 0;text-align:left}
 .home-intro{margin:0 0 28px}.home-intro h1{font-family:system-ui,sans-serif;font-size:34px;line-height:1.2;font-weight:650;letter-spacing:-1px;margin:0 0 10px}.home-intro p{font-size:16px;margin:0;color:#65757c}
+/* The privacy promise is the first thing a visitor reads after the heading, before any file is chosen. */
+.home-intro .home-privacy{margin:10px 0 0;font-size:14px;font-weight:600;color:var(--green)}
 .home-sources{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
 .home-source{min-width:0;border:1px solid #dde4e6;border-radius:10px;background:#fff;overflow:hidden}
 .home-source.dragging{outline:3px solid #7bb79c;outline-offset:2px}
