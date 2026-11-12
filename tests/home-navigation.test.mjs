@@ -140,7 +140,10 @@ test('saved result and full document demo leave Home, while Help alone preserves
   p.$('home-help-close').click(); assert.equal(p.$('home-help').open, false);
   assert.equal(p.$('home-left-text').value, 'unsent text');
   p.$('results').hidden = false; await nextTurn();
-  assert.equal(p.$('start-menu').hidden, true, 'resuming a saved result reveals its editor');
+  assert.equal(p.$('start-menu').hidden, false, 'painting a result alone must not replace staged Home inputs');
+  p.document.dispatchEvent(new p.window.Event('ctt:comparison-operation-started'));
+  p.document.dispatchEvent(new p.window.Event('ctt:comparison-resumed'));
+  assert.equal(p.$('start-menu').hidden, true, 'explicitly resuming a saved result reveals its editor');
   p.$('workspace-home').click();
   assert.equal(p.$('start-menu').hidden, false);
   p.$('home-help-open').click(); p.$('demo').click();
@@ -198,4 +201,36 @@ test('Help examples require confirmation before replacing an open comparison', a
       await nextTurn();
     });
   }
+});
+
+test('returning through the back-forward cache retains Home result and notice observers', async t => {
+  const p = page(t);
+  p.window.dispatchEvent(new p.window.PageTransitionEvent('pagehide', {persisted:true}));
+  p.window.dispatchEvent(new p.window.PageTransitionEvent('pageshow', {persisted:true}));
+  p.$('results').hidden = false;
+  p.$('notice').textContent = 'Download your work before closing.';
+  p.$('notice').hidden = false;
+  await nextTurn();
+  assert.equal(p.$('start-compare').hidden, false, 'Continue tracks the live comparison after Back');
+  assert.equal(p.$('start-menu').hidden, false, 'an observer update does not navigate away from Home');
+  assert.equal(p.$('home-notice').textContent, 'Download your work before closing.');
+});
+
+
+test('a saved comparison completing after new Home input or navigation does not reopen old work', async t => {
+  const p = page(t);
+  p.document.dispatchEvent(new p.window.Event('ctt:comparison-operation-started'));
+  p.paste('left', 'New A'); p.paste('right', 'New B');
+  p.$('results').hidden = false;
+  p.document.dispatchEvent(new p.window.Event('ctt:comparison-resumed'));
+  await nextTurn();
+  assert.equal(p.$('start-menu').hidden, false);
+  assert.equal(p.$('home-left-text').value, 'New A');
+  p.document.dispatchEvent(new p.window.Event('ctt:comparison-operation-started'));
+  p.$('header-edit').click(); p.$('workspace-home').click();
+  p.document.dispatchEvent(new p.window.Event('ctt:comparison-resumed'));
+  assert.equal(p.$('start-menu').hidden, false, 'Home stays open after an intervening mode switch');
+  p.document.dispatchEvent(new p.window.Event('ctt:comparison-operation-started'));
+  p.document.dispatchEvent(new p.window.Event('ctt:comparison-resumed'));
+  assert.equal(p.$('start-menu').hidden, true, 'a resume without intervening input still opens the comparison');
 });

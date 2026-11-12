@@ -1,0 +1,29 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n-text="Compare Two Texts for Word — pilot">Compare Two Texts for Word — pilot</title>
+<meta name="description" content="Review and apply an edit to selected text inside Microsoft Word. Pilot add-in with explicit preview and stale-selection checks.">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://officeapis.public.onecdn.static.microsoft; style-src 'self'; img-src 'self' data:; connect-src https://officeapis.public.onecdn.static.microsoft; base-uri 'none'; form-action 'none'">
+<link rel="stylesheet" href="taskpane.css">
+<script src="../i18n.js" defer=""></script><script src="https://officeapis.public.onecdn.static.microsoft/1/office.js"></script>
+<script type="module" src="taskpane.mjs"></script>
+<link rel="stylesheet" href="../i18n.css"></head><body>
+<main><label class="ctt-language-control"><span data-i18n-text="Language">Language</span><select data-i18n-selector="" aria-label="Language" data-i18n-aria-label="Language"><option value="en" translate="no">English</option></select></label>
+<p class="eyebrow" data-i18n-text="WORD ADD-IN · PILOT 0.2.0">WORD ADD-IN · PILOT 0.2.0</p><h1 data-i18n-text="Edit selected text">Edit selected text</h1>
+<p data-i18n-text="Select one consistently formatted passage in an ordinary Word paragraph. Load it here, edit, preview, then apply.">Select one consistently formatted passage in an ordinary Word paragraph. Load it here, edit, preview, then apply.</p>
+<button id="load" type="button" disabled="" data-i18n-text="Load selected text">Load selected text</button>
+<p id="status" role="status" aria-live="polite"><span data-i18n-text="Connecting to Word. This panel works when installed as a Word add-in.">Connecting to Word. This panel works when installed as a Word add-in.</span></p>
+<section id="editor" hidden="">
+<details><summary data-i18n-text="Original selected text">Original selected text</summary><div id="original" class="text-box" translate="no" dir="auto"></div></details>
+<label for="edited" data-i18n-text="Your edit">Your edit</label><textarea id="edited" maxlength="4000" rows="8" spellcheck="true" aria-describedby="limit" translate="no" dir="auto"></textarea>
+<p id="limit" class="muted" data-i18n-text="One paragraph; up to 4,000 UTF-16 units (most letters use one; many emoji use two). No line breaks.">One paragraph; up to 4,000 UTF-16 units (most letters use one; many emoji use two). No line breaks.</p>
+<div class="actions"><button id="review" type="button" disabled="" data-i18n-text="Preview changes">Preview changes</button><button id="apply" type="button" class="primary" disabled="" data-i18n-text="Apply to Word">Apply to Word</button></div>
+<section id="changes" hidden=""><h2 data-i18n-text="Review the replacement">Review the replacement</h2><p class="muted" data-i18n-text="Removed text is crossed out; added text is underlined. This previews one replacement from the first to the last changed character.">Removed text is crossed out; added text is underlined. This previews one replacement from the first to the last changed character.</p><div id="preview" class="text-box" translate="no" dir="auto"></div></section>
+</section>
+<details class="limits"><summary data-i18n-text="How saving and privacy work">How saving and privacy work</summary><p data-i18n-text="Apply writes to your selected passage. Save and Undo work through Word. Keep the original passage selected until you apply. Avoid simultaneous edits by collaborators.">Apply writes to your selected passage. Save and Undo work through Word. Keep the original passage selected until you apply. Avoid simultaneous edits by collaborators.</p><p data-i18n-text="The panel loads from Compare Two Texts; Microsoft supplies Office.js. Our add-in code does not send document text to a server or AI service, and does not store drafts. Word’s own cloud saving and data handling still apply.">The panel loads from Compare Two Texts; Microsoft supplies Office.js. Our add-in code does not send document text to a server or AI service, and does not store drafts. Word’s own cloud saving and data handling still apply.</p><p data-i18n-text="Pilot: ordinary body text only. Tables, lists, links, fields, bookmarks, comments, content controls and Track Changes are unsupported. Mixed formatting within the selection is rejected. A change to the original text, formatting or selection requires loading it again.">Pilot: ordinary body text only. Tables, lists, links, fields, bookmarks, comments, content controls and Track Changes are unsupported. Mixed formatting within the selection is rejected. A change to the original text, formatting or selection requires loading it again.</p><p data-i18n-text="Native Word testing on your device is still required. Use a test copy for your first check.">Native Word testing on your device is still required. Use a test copy for your first check.</p></details>
+<p class="muted" data-i18n="<0>Setup and limitations</0>"><a href="https://comparetwotexts.pro/word-addin/" target="_blank" rel="noopener noreferrer" data-i18n-slot="0">Setup and limitations</a></p>
+</main>
+
+
+
+</body></html>

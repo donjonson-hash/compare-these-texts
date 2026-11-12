@@ -148,3 +148,11 @@ body.home-mode{background:#f8faf9}
 .topbar nav a.chrome-cta{display:inline-flex;padding:8px 14px;font-size:13px;text-decoration:none}
 .home-guides{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0 0;font-size:12px;color:#65757c}.home-guides a{color:var(--green)}
 @media(max-width:700px){.topbar nav a.chrome-cta{display:none}}
+
+/* Website-only explanation under the home tool, written for searchers. */
+.home-about{max-width:820px;margin:56px 0 8px;padding-top:32px;border-top:1px solid var(--line);color:#243b30}
+.home-about h2{font-size:26px;letter-spacing:-.4px;margin:0 0 14px}.home-about h3{font-size:19px;margin:30px 0 10px}
+.home-about p,.home-about li{font-size:15px;line-height:1.75}.home-about ol,.home-about ul{padding-left:24px}.home-about li+li{margin-top:6px}
+.home-about details{padding:12px 0;border-bottom:1px solid var(--line)}.home-about summary{font-size:15px;font-weight:600;cursor:pointer}.home-about details p{margin-top:8px}
+.home-about a{color:var(--green)}
+@media(max-width:700px){.home-about{margin-top:40px}.home-about h2{font-size:22px}}

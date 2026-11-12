@@ -1,3 +1,5 @@
+import {translateCommercialText} from './commercial-summary.mjs';
+import {uiTranslate as t} from './ui-text.mjs';
 /** Frozen, local XLSX evidence. Never evaluate formulas or round source decimals. */
 import {write, utils} from './xlsx-vendor.mjs';
 import {MAX_REPORT_BYTES} from './report.mjs';
@@ -10,7 +12,7 @@ const encoder = new TextEncoder();
 const text = value => value === null || value === undefined ? '' : String(value);
 // SheetJS escapes XML but does not protect literal SpreadsheetML escape syntax.
 const cellText = value => text(value).replace(/_x[0-9a-f]{4}_/gi, token => '_x005F_' + token.slice(1));
-const location = row => !row ? "Item missing" : `${row.sheet ? row.sheet + ': ' : ''}record ${row.record}${row.cells ? '; ' + Object.values(row.cells).join(', ') : ''}`;
+const location = row => !row ? t("Item missing") : t("{0}record {1}{2}", [row.sheet ? row.sheet + ': ' : '', row.record, row.cells ? '; ' + Object.values(row.cells).join(', ') : '']);
 
 function* sourceRows(report, side) {
   const rows = [];
@@ -21,46 +23,46 @@ function* sourceRows(report, side) {
 }
 
 function* summaryRows(report) {
-  yield ["Compare Two Texts — comparison results", "Value", 'A', 'B', "Change B − A", "Source A", "Source B"];
-  yield ["Comparison scope", "Selected fields are compared. Original values are on the Data A and Data B sheets."];
+  yield [t("Compare Two Texts — comparison results"), t("Value"), 'A', 'B', t("Change B − A"), t("Source A"), t("Source B")];
+  yield [t("Comparison scope"), t("Selected fields are compared. Original values are on the Data A and Data B sheets.")];
   for (const [side, label] of [['left', 'A'], ['right', 'B']]) {
-    yield [`File ${label}`, report.sources[side].name];
-    if (report.sources[side].sheet) yield [`Sheet ${label}`, report.sources[side].sheet, "Other sheets were not checked"];
+    yield [t("File {0}", [label]), report.sources[side].name];
+    if (report.sources[side].sheet) yield [t("Sheet {0}", [label]), report.sources[side].sheet, t("Other sheets were not checked")];
   }
-  for (const key of ['matched', 'changed', 'only_left', 'only_right']) yield [labels[key], report.summary[key]];
-  yield ["Data records A", report.summary.left_rows];
-  yield ["Data records B", report.summary.right_rows];
+  for (const key of ['matched', 'changed', 'only_left', 'only_right']) yield [t(labels[key]), report.summary[key]];
+  yield [t("Data records A"), report.summary.left_rows];
+  yield [t("Data records B"), report.summary.right_rows];
   const c = report.commercial;
-  if (!c) { yield ["Amount calculation", "Not performed"]; return; }
-  yield ["Amount calculation", statuses[c.status]];
-  yield ["Items calculated", c.coverage.included];
-  yield ["Total items", c.coverage.total];
-  yield ["Items excluded", c.coverage.excluded];
-  yield ["Quantity changes", c.counts.quantity_changed ?? "Not checked"];
-  yield ["Price changes", c.counts.price_changed ?? "Not checked"];
-  yield ["Amount calculation scope", c.scope];
-  yield ["Missing item", "A zero amount means no contribution to the list total, not a zero quantity or confirmation of delivery."];
-  yield ["Currencies", "Totals in different currencies are not added together or converted."];
-  for (const message of c.messages) yield ["Explanation", message];
-  for (const total of c.totals) yield ["Total for calculated items", total.currency, total.before, total.after, total.delta];
-  for (const item of c.items) yield [`Item: ${item.key}`, `${labels[item.category]}; ${item.currency}; ${item.unit}`, item.before, item.after, item.delta, location(item.left), location(item.right)];
-  for (const item of c.excluded) for (const reason of item.reasons) yield [`Excluded: ${item.key}`, reason];
+  if (!c) { yield [t("Amount calculation"), t("Not performed")]; return; }
+  yield [t("Amount calculation"), t(statuses[c.status])];
+  yield [t("Items calculated"), c.coverage.included];
+  yield [t("Total items"), c.coverage.total];
+  yield [t("Items excluded"), c.coverage.excluded];
+  yield [t("Quantity changes"), c.counts.quantity_changed ?? t("Not checked")];
+  yield [t("Price changes"), c.counts.price_changed ?? t("Not checked")];
+  yield [t("Amount calculation scope"), translateCommercialText(c.scope)];
+  yield [t("Missing item"), t("A zero amount means no contribution to the list total, not a zero quantity or confirmation of delivery.")];
+  yield [t("Currencies"), t("Totals in different currencies are not added together or converted.")];
+  for (const message of c.messages) yield [t("Explanation"), translateCommercialText(message)];
+  for (const total of c.totals) yield [t("Total for calculated items"), total.currency, total.before, total.after, total.delta];
+  for (const item of c.items) yield [t("Item: {0}", [item.key]), `${t(labels[item.category])}; ${item.currency}; ${item.unit}`, item.before, item.after, item.delta, location(item.left), location(item.right)];
+  for (const item of c.excluded) for (const reason of item.reasons) yield [t("Excluded: {0}", [item.key]), translateCommercialText(reason)];
 }
 
 function* differenceRows(report) {
-  yield ["Result", "Key", "Column A", "Column B", "Value A", "Value B", "Record A", "Sheet A", "Cell A", "Record B", "Sheet B", "Cell B"];
-  for (const item of report.changed) for (const change of item.changes) yield [labels.changed, item.key, change.left_column, change.right_column, change.before, change.after,
+  yield [t("Result"), t("Key"), t("Column A"), t("Column B"), t("Value A"), t("Value B"), t("Record A"), t("Sheet A"), t("Cell A"), t("Record B"), t("Sheet B"), t("Cell B")];
+  for (const item of report.changed) for (const change of item.changes) yield [t(labels.changed), item.key, change.left_column, change.right_column, change.before, change.after,
     item.left.record, item.left.sheet, item.left.cells?.[change.left_column], item.right.record, item.right.sheet, item.right.cells?.[change.right_column]];
   for (const side of ['left', 'right']) for (const item of report[`only_${side}`]) {
     const row = item.row;
-    yield [labels[`only_${side}`], item.key, '', '', side === 'left' ? "See the Data A sheet" : "Item missing", side === 'right' ? "See the Data B sheet" : "Item missing",
+    yield [t(labels[`only_${side}`]), item.key, '', '', side === 'left' ? t("See the Data A sheet") : t("Item missing"), side === 'right' ? t("See the Data B sheet") : t("Item missing"),
       side === 'left' ? row.record : '', side === 'left' ? row.sheet : '', '', side === 'right' ? row.record : '', side === 'right' ? row.sheet : '', ''];
   }
 }
 
 function* dataRows(report, side) {
   const headers = report.sources[side].headers;
-  yield ["Source record", "Source sheet", "Source cells (in column order)", ...headers];
+  yield [t("Source record"), t("Source sheet"), t("Source cells (in column order)"), ...headers];
   for (const row of sourceRows(report, side)) yield [row.record, row.sheet, row.cells ? headers.map(header => row.cells[header] || '').join(', ') : '', ...headers.map(header => row.values[header])];
 }
 
@@ -95,7 +97,7 @@ export function renderXlsx(report) {
     }
   }
   const book = utils.book_new();
-  book.Props = {Title: "Compare Two Texts — comparison results", Subject: "Saved values without formulas", Author: "Compare Two Texts"};
+  book.Props = {Title: t("Compare Two Texts — comparison results"), Subject: t("Saved values without formulas"), Author: "Compare Two Texts"};
   for (const [name, generate, widths, filter] of sheets) {
     const sheet = {}, colNames = widths.map((_, i) => utils.encode_col(i));
     let count = 0, columns = 0;

@@ -17,7 +17,7 @@ CİHAZINIZDA İŞLEME
 Belgeler cihazınızda işlenir. Uzantı çevrimdışı çalışır ve karşılaştırma ya da düzenleme için belgelerinizi bir sunucuya yüklemez. Web sitesindeki ve uzantıdaki taslaklar ayrı saklanır; otomatik olarak eşitlenmez. Tamamladığınız çalışmanın bir kopyasını indirin.
 
 BAŞLAMADAN ÖNCE
-- Düzenleyicinin arayüzü şu anda İngilizcedir. Çevrilmiş mağaza açıklamaları düzenleyicinin dilini değiştirmez.
+- Belgelerin içeriği çevrilmez.
 - Her giriş dosyası en fazla 2 MiB olabilir.
 - PDF'lerde metin katmanı bulunmalıdır: metin içermeyen taranmış görüntüler desteklenmez ve OCR yoktur. Basılı boşluklar, etkileşimli PDF form alanlarından farklıdır; etkileşimli alanlar ve PDF yorumları desteklenmez.
 - Görüntüler ve biçimlendirme karşılaştırılmaz. PDF düzeninin korunması belgeye bağlıdır; karmaşık düzenlerde yalnızca metin olarak dışa aktarma gerekebilir. Word düzeni, Microsoft Word'deki görünümden farklı olabilir.
@@ -25,3 +25,7 @@ BAŞLAMADAN ÖNCE
 - İki elektronik tablo dosyasını karşılaştırmak için tek bir başlık satırı, birleştirilmemiş hücreler ve formüller yerine değerler gerekir.
 
 Kendi dosyalarınızı açmadan önce iş akışını denemek için yerleşik belge veya CSV / Excel örneğiyle başlayın.
+
+Taslaklar yerel olarak AES-GCM-256 ile şifrelenir; anahtar tarayıcı profilinde kalır. Bu, parolayla korunan bir kasa değildir ve indirilen dosyalar şifrelenmez. Taslaklar yedi gün kullanılmadığında süreleri dolar.
+
+Word ve Google Docs için isteğe bağlı pilot eklentiler ayrı yüklenir ve ayrı gizlilik koşullarına sahiptir. Bu uzantı onları otomatik olarak yüklemez.

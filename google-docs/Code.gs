@@ -2,10 +2,28 @@
 // Bound Google Docs prototype. No URL fetch, LLM, or external document upload.
 const CTT_LIMIT = 4000;
 const CTT_TTL = 900;
+// Build replaces this marker with bundled menu translations; source stays usable in English.
+const CTT_MENU_TRANSLATIONS = /* CTT_MENU_I18N */ {};
+function cttMenuText_(source) {
+  let locale = 'en';
+  try { locale = String(Session.getActiveUserLocale() || 'en').replace(/-/g, '_'); } catch (_) {}
+  const codes = Object.keys(CTT_MENU_TRANSLATIONS);
+  const lower = locale.toLowerCase(), base = lower.split('_')[0];
+  let code = codes.find(function (key) { return key.toLowerCase() === lower; });
+  if (!code && base === 'zh') code = /(?:tw|hk|mo|hant)/.test(lower) ? 'zh_TW' : 'zh_CN';
+  if (!code && base === 'pt') code = /_(?:pt|ao|mz|cv|gw|st|tl)(?:_|$)/.test(lower) ? 'pt_PT' : 'pt_BR';
+  if (!code && base === 'es') code = /_(?:419|ar|bo|cl|co|cr|cu|do|ec|gt|hn|mx|ni|pa|pe|pr|py|sv|uy|ve)(?:_|$)/.test(lower) ? 'es_419' : 'es';
+  if (!code && base === 'tl') code = 'fil';
+  if (!code && base === 'in') code = 'id';
+  if (!code && (base === 'nb' || base === 'nn')) code = 'no';
+  if (!code && base === 'iw') code = 'he';
+  if (!code) code = base;
+  return (CTT_MENU_TRANSLATIONS[code] || {})[source] || source;
+}
 
 function onOpen() {
   DocumentApp.getUi().createMenu('Compare Two Texts')
-    .addItem('Edit selected text', 'showEditor').addToUi();
+    .addItem(cttMenuText_('Edit selected text'), 'showEditor').addToUi();
 }
 
 function showEditor() {

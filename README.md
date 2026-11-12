@@ -41,14 +41,43 @@ in Word or LibreOffice; changing the filename extension is not conversion.
 Supported text headers/footers and page numbers are included in the PDF. Complex
 page layouts remain restricted; PDF export does not silently discard those parts.
 
+OCR-generated DOCX files may contain markerless, empty note separator templates,
+embedded legacy VML pictures, and complex HYPERLINK fields. The bounded importer
+accepts these constructions: real footnotes/endnotes remain unsupported. It uses
+only embedded PNG/JPEG bytes and never fetches an external picture. A redundant
+VML image reference is accepted only when it resolves to the same embedded image.
+Pictures appear in document order in the editor and their original XML and media
+remain in DOCX downloads. Framed pictures retain their Word position on download;
+PDF export is disabled for that layout. Supported HYPERLINK fields become their
+visible, styled text on DOCX download; the field and its link are removed, so Word
+cannot replace an edit with a stale field result. Other field types, nested fields,
+cropping, rotation, and arbitrary VML shapes are rejected explicitly.
+
 ## Extension welcome and store kit
 
 The 0.37.4 candidate opens a local welcome page on first installation. Updates
 leave existing tabs alone. **Getting started** in the extension footer opens
 the guide separately; **Try an example** leaves an existing saved comparison
-available to resume. The editor and welcome page remain English.
+available to resume. The 0.37.9 release candidate adds offline interface localization across 51 locales. See `i18n/README.md` for the release scope and language checks.
 
-The Chrome package includes 22 localized metadata catalogs. Full store
+**Word & Google Docs add-ins** in Getting started, Help and the workspace footer
+opens an installation hub for editing selected text directly in those programs.
+The Google Docs prototype ZIP and English/Russian instructions are included in
+the extension and website downloads. Word uses a separately installed hosted
+task pane. These are manual-install prototypes, not published Office/Workspace
+store add-ins, and installing Chrome CTT does not install them automatically.
+The hub explains the separate network and data handling: Google Apps Script
+runs on Google infrastructure with a 15-minute plaintext paragraph cache; Word
+loads a hosted panel and Microsoft's Office.js while keeping selected text in
+panel memory. Neither add-in inherits the browser workspace's offline promise
+or encrypted draft storage. The separate LibreOffice Writer prototype remains
+available in the source tree.
+
+The installed package also includes the Word/Google Docs file comparison guide
+and related PDF, Excel and CSV guides offline. For this separate file workflow,
+download Google Docs versions as DOCX and compare the local copies.
+
+The Chrome package targets 51 localized metadata catalogs. Full store
 descriptions, five icon sizes, five actual screenshots, two promotional images
 and Russian submission instructions are assembled with `npm run package:store`
 after building and running `npm run store:assets`. The result is `artifacts/ctt-0.37.6-store-kit.zip`; unpack it

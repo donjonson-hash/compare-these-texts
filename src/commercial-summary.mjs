@@ -162,3 +162,22 @@ export function buildCommercialSummary(report) {
   if (result.totals.length > 1) result.messages.push("Totals in different currencies are shown separately and are not added together.");
   return result;
 }
+
+/** Translate only generated commercial explanations at the presentation boundary.
+ * Evidence, numeric strings, field names, currencies, and source values are unchanged.
+ */
+export function translateCommercialText(message) {
+  const i18n = globalThis.cttI18n;
+  if (!i18n) return message;
+  const localize = value => i18n.localizeError ? i18n.localizeError(value) : i18n.t(value);
+  const value = String(message);
+  const quantity = value.match(/^([AB]), (quantity|price): (.+)\.$/);
+  if (quantity) return i18n.t(quantity[2] === 'quantity' ? '{0}, quantity: {1}.' : '{0}, price: {1}.', [quantity[1], localize(quantity[3])]);
+  const ambiguous = value.match(/^Ambiguous columns: (units|currencies|VAT|VAT inclusion|price basis)\.$/);
+  if (ambiguous) return i18n.t('Ambiguous columns: {0}.', [i18n.t(ambiguous[1])]);
+  const selected = value.match(/^No unambiguous columns selected for «(quantity|price)» in numeric mode\.$/);
+  if (selected) return i18n.t('No unambiguous columns selected for «{0}» in numeric mode.', [i18n.t(selected[1])]);
+  const terms = value.match(/^(VAT|VAT inclusion|Price basis): terms differ between A and B or are missing on one side\.$/);
+  if (terms) return i18n.t('{0}: terms differ between A and B or are missing on one side.', [i18n.t(terms[1])]);
+  return localize(value);
+}

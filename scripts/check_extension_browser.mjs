@@ -133,6 +133,17 @@ try {
   checks.push('open-comparison');
 
   await navigate(async () => {
+    await page.goto(welcomeUrl); await page.locator('#open-single-editor').click(); await ready(page);
+  });
+  assert.equal(page.url(), editorUrl, 'direct editing consumes its one-time URL request');
+  assert.ok(await page.locator('#single-workspace').isVisible(), 'welcome editing action opens the existing single-document editor');
+  assert.ok(await page.locator('#start-menu').isHidden(), 'direct editing leaves the comparison home');
+  assert.equal(await page.locator('#single-editor-host').locator(':scope > *').count(), 0, 'direct editing does not load an example document');
+  await navigate(() => page.reload()); await ready(page);
+  assert.ok(await page.locator('#start-menu').isVisible(), 'reload does not repeat the consumed editing action');
+  checks.push('direct-edit-without-replacement');
+
+  await navigate(async () => {
     await page.goto(welcomeUrl); await page.locator('#try-example').click(); await visualReady(page); await saved(page);
   });
   assert.equal(new URL(page.url()).search, '', 'example launch is consumed once');

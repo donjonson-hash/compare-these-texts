@@ -1,3 +1,4 @@
+import './i18n.js';
 import {prepare, inspect, compare} from './engine.mjs';
 import {renderHtml, renderJson} from './report.mjs';
 import {prepareText, compareText} from './text-engine.mjs';
@@ -57,6 +58,7 @@ export async function handleRequest(path, payload) {
 if (typeof self !== 'undefined' && typeof self.postMessage === 'function') {
   self.onmessage = async ({data}) => {
     try {
+      await globalThis.cttI18n.setLocale(data.locale || 'en', {persist: false});
       const result = await handleRequest(data.path, data.payload);
       self.postMessage({ok: true, result}, result?.data instanceof Uint8Array ? [result.data.buffer] : []);
     }

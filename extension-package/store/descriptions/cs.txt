@@ -1,0 +1,21 @@
+Compare Two Texts porovnává dvě verze textu, smlouvy nebo dokumentu a ukazuje změny. Otevřete dva soubory, prohlédněte si rozdíly vedle sebe, upravte výsledek a stáhněte jej nebo vytiskněte. Vestavěné příklady umožňují vyzkoušení bez vlastních dokumentů.
+
+FUNKCE
+- TXT, Word DOCX, PDF s textovou vrstvou, CSV/TSV a Excel XLSX. Zvýraznění přidaného, odstraněného a změněného textu, přecházení mezi rozdíly a úpravy přímo v porovnání.
+- U tabulek vyberte list a sloupce, přiřaďte řádky podle identifikátoru, upravte hodnoty a zkopírujte chybějící řádek z A do B.
+- Kontrolujte změněné částky a procenta v textu, Wordu a podporovaných PDF.
+- Upravujte a exportujte i samostatný dokument. V podporovaných PDF vyplňujte vytištěná prázdná místa nebo přidávejte text.
+- Exportujte DOCX do PDF s náhledem, podporovanými záhlavími, zápatími a čísly stránek.
+
+SOUKROMÍ A JAZYKY
+Rozšíření funguje offline. Dokumenty se zpracovávají ve vašem zařízení a při porovnávání ani úpravách se nenahrávají na server. Koncepty jsou místní a šifrované pomocí AES-GCM-256; klíč zůstává v profilu prohlížeče. Nejde o trezor chráněný heslem a stažené soubory nejsou šifrované. Koncepty vyprší po sedmi dnech bez použití. Web a rozšíření ukládají koncepty odděleně.
+Obsah dokumentů se nepřekládá.
+Volitelné pilotní doplňky pro Word a Google Docs se instalují samostatně a mají vlastní podmínky ochrany soukromí. Toto rozšíření je neinstaluje automaticky.
+
+OMEZENÍ
+- Každý soubor nejvýše 2 MiB. PDF musí mít textovou vrstvu: naskenované obrázky, OCR, interaktivní formulářová pole ani komentáře PDF nejsou podporovány.
+- Obrázky a formátování se neporovnávají. Složité rozvržení se může exportovat jen jako text; rozvržení Wordu se může lišit od Microsoft Wordu.
+- Poznámky pod čarou, vysvětlivky a komentáře DOCX se neimportují. Nejprve je v kopii přesuňte do hlavního textu.
+- Porovnávání tabulek vyžaduje jeden řádek záhlaví, žádné sloučené buňky a hodnoty místo vzorců.
+
+Webová verze: comparetwotexts.pro. S dotazy použijte odkaz na podporu na této stránce.

@@ -1,3 +1,4 @@
+import {uiMessage, uiError, uiSetText, uiSetAttr, uiTranslate} from './ui-text.mjs';
 /** Local print view: only rendered pages from the final PDF enter the print job. */
 const aborted = () => new DOMException('Printing canceled.', 'AbortError');
 
@@ -6,16 +7,16 @@ export function preparePdfPrintWindow() {
   const target = window.open('', '_blank');
   if (!target) throw new Error('Allow the print window in your browser, then click Print again.');
   const doc = target.document;
-  doc.title = 'Preparing document…';
-  doc.documentElement.lang = 'en';
+  doc.title = uiTranslate('Preparing document…');
+  doc.documentElement.lang = globalThis.cttI18n?.getLocale().replace('_','-') || 'en';
   doc.head.replaceChildren();
   const charset = doc.createElement('meta'); charset.charset = 'utf-8';
   const link = doc.createElement('link'); link.rel = 'stylesheet';
   link.href = new URL('./pdf-print.css', import.meta.url).href;
   const bar = doc.createElement('header'), status = doc.createElement('p'), retry = doc.createElement('button'), download = doc.createElement('a');
-  bar.className = 'print-controls'; status.textContent = 'Preparing your document for printing…';
-  retry.type = 'button'; retry.textContent = 'Print'; retry.disabled = true;
-  download.textContent = 'Download PDF'; download.hidden = true;
+  bar.className = 'print-controls'; uiSetText(status, uiMessage("Preparing your document for printing…"));
+  retry.type = 'button'; uiSetText(retry, uiMessage("Print")); retry.disabled = true;
+  uiSetText(download, uiMessage("Download PDF")); download.hidden = true;
   bar.append(status, download, retry);
   const pages = doc.createElement('main'); pages.className = 'print-pages';
   doc.body.replaceChildren(bar, pages);
@@ -29,14 +30,14 @@ export function preparePdfPrintWindow() {
   target.addEventListener('unload', release, {once: true});
   const requestPrint = () => {
     if (target.closed || closed) return;
-    status.textContent = 'Ready. Click Download PDF to save the document to your computer, or Print to print it. Check paper size and turn off browser headers and footers in the print dialog.';
+    uiSetText(status, uiMessage("Ready. Click Download PDF to save the document to your computer, or Print to print it. Check paper size and turn off browser headers and footers in the print dialog."));
     try { target.focus(); target.print(); }
-    catch { status.textContent = 'The browser could not open its print dialog. Click Print to try again.'; }
+    catch { uiSetText(status, uiMessage("The browser could not open its print dialog. Click Print to try again.")); }
   };
   retry.addEventListener('click', requestPrint);
   return {
     close,
-    async print(data, {signal, title = 'Document'} = {}) {
+    async print(data, {signal, title = uiMessage("Document")} = {}) {
       if (started) throw new Error('This print window has already been prepared.');
       started = true;
       let viewer, timer;
@@ -61,7 +62,7 @@ export function preparePdfPrintWindow() {
         // Keep the final PDF bytes, not the rasterized print preview, available for a real user click.
         // Blob snapshots the bytes before PDF.js can transfer the input buffer.
         const pdfUrl = URL.createObjectURL(new Blob([data], {type: 'application/pdf'})); urls.add(pdfUrl);
-        const stem = String(title).replace(/\.pdf$/i, '').replace(/[\x00-\x1f\x7f/\\:*?"<>|]/g, '_').trim().slice(0, 180) || 'Document';
+        const stem = String(title).replace(/\.pdf$/i, '').replace(/[\x00-\x1f\x7f/\\:*?"<>|]/g, '_').trim().slice(0, 180) || uiMessage("Document");
         download.href = pdfUrl; download.download = `${stem}-filled.pdf`;
         const {openPdfVisual} = await import('./pdf-visual.mjs');
         check();
@@ -71,7 +72,7 @@ export function preparePdfPrintWindow() {
         if (styleError || !link.sheet) throw new Error('The print stylesheet could not be loaded. Try Print again.');
         let totalPixels = 0;
         for (let number = 1; number <= viewer.pageCount; number++) {
-          check(); status.textContent = `Preparing page ${number} of ${viewer.pageCount}…`;
+          check(); uiSetText(status, uiMessage("Preparing page {0} of {1}…", { 0: number, 1: viewer.pageCount }));
           const canvas = doc.createElement('canvas');
           try {
             const {width, height} = await viewer.renderPage(number, canvas, {scale: 2});

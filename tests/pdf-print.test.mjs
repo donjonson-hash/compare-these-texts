@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
 import {JSDOM} from 'jsdom';
 const code = await readFile(new URL('../src/pdf-print.mjs', import.meta.url), 'utf8');
+const uiCode = await readFile(new URL('../src/ui-text.mjs', import.meta.url), 'utf8');
 async function setup(t, {blocked = false, count = 2, renderError = false} = {}) {
   const dom = new JSDOM('<!doctype html><head></head><body></body>', {url:'https://example.test/'}), win = dom.window;
   let printed = 0, disposed = 0, closed = false, received, revoked = 0, renders = 0;
@@ -40,7 +41,9 @@ async function setup(t, {blocked = false, count = 2, renderError = false} = {}) 
   }, {context});
   await visual.link(() => {}); await visual.evaluate();
   const module = new vm.SourceTextModule(code, {context, initializeImportMeta(meta) {meta.url = 'https://example.test/pdf-print.mjs';}, importModuleDynamically:async () => visual});
-  await module.link(() => {}); await module.evaluate();
+  const ui = new vm.SourceTextModule(uiCode, {context});
+  await ui.link(() => {}); await ui.evaluate();
+  await module.link(specifier => { assert.equal(specifier, './ui-text.mjs'); return ui; }); await module.evaluate();
   t.after(() => dom.window.document.defaultView.close());
   return {prepare:module.namespace.preparePdfPrintWindow, win, rules, blobs, revokedUrls, state:() => ({printed,disposed,closed,received,revoked,renders})};
 }

@@ -17,7 +17,7 @@ LOKALE VERARBEITUNG
 Die Dokumente werden auf deinem Gerät verarbeitet. Die Erweiterung funktioniert offline und lädt deine Dokumente zum Vergleichen oder Bearbeiten nicht auf einen Server hoch. Entwürfe auf der Website und in der Erweiterung werden getrennt gespeichert und nicht automatisch synchronisiert. Lade eine Kopie deiner fertigen Arbeit herunter.
 
 BEVOR DU BEGINNST
-- Die Benutzeroberfläche des Editors ist derzeit auf Englisch. Übersetzte Beschreibungen im Store ändern die Sprache des Editors nicht.
+- Dokumentinhalte werden nicht übersetzt.
 - Eingabedateien dürfen jeweils bis zu 2 MiB groß sein.
 - PDFs benötigen eine Textebene: Gescannte Bilder ohne Text werden nicht unterstützt, eine Texterkennung (OCR) ist nicht enthalten. Gedruckte Leerstellen sind keine interaktiven PDF-Formularfelder. Interaktive Felder und PDF-Kommentare werden nicht unterstützt.
 - Bilder und Formatierungen werden nicht verglichen. Ob das PDF-Layout erhalten bleibt, hängt vom Dokument ab. Bei komplexen Layouts kann ein reiner Textexport nötig sein. Das Layout von Word-Dateien kann von der Darstellung in Microsoft Word abweichen.
@@ -25,3 +25,7 @@ BEVOR DU BEGINNST
 - Für den Vergleich zweier Tabellendateien brauchst du eine einzelne Kopfzeile, keine verbundenen Zellen und Werte statt Formeln.
 
 Probiere den Ablauf zunächst mit dem integrierten Dokument- oder CSV-/Excel-Beispiel aus, bevor du eigene Dateien öffnest.
+
+Entwürfe sind lokal mit AES-GCM-256 verschlüsselt; der Schlüssel bleibt im Browserprofil. Dies ist kein passwortgeschützter Tresor, und heruntergeladene Dateien sind nicht verschlüsselt. Entwürfe verfallen nach sieben Tagen ohne Nutzung.
+
+Die optionalen Pilot-Add-ins für Word und Google Docs werden separat installiert und haben eigene Datenschutzbedingungen. Diese Erweiterung installiert sie nicht automatisch.

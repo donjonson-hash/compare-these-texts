@@ -1,0 +1,21 @@
+Compare Two Texts compară două versiuni ale unui text, contract sau document și arată modificările. Deschide două fișiere, verifică diferențele alăturat, editează și descarcă sau tipărește rezultatul. Exemplele incluse permit testarea fără documente proprii.
+
+FUNCȚII
+- TXT, Word DOCX, PDF cu strat de text, CSV/TSV și Excel XLSX. Evidențierea textului adăugat, șters sau modificat, navigare între diferențe și editare direct în comparație.
+- Pentru tabele, alege foaia și coloanele, asociază rândurile după un identificator, editează valorile și copiază un rând lipsă din A în B.
+- Verifică sumele și procentele modificate în texte, Word și PDF compatibile.
+- Editează și exportă un singur document. Completează spații tipărite necompletate sau adaugă text în PDF compatibile.
+- Exportă DOCX în PDF cu previzualizare și cu anteturi, subsoluri și numere de pagină compatibile.
+
+CONFIDENȚIALITATE ȘI LIMBI
+Extensia funcționează offline. Documentele sunt procesate pe dispozitiv și nu sunt încărcate pe server pentru comparare sau editare. Ciornele sunt salvate local și criptate cu AES-GCM-256; cheia rămâne în profilul browserului. Nu este un seif protejat prin parolă, iar fișierele descărcate nu sunt criptate. Ciornele expiră după șapte zile fără utilizare. Site-ul și extensia păstrează ciornele separat.
+Conținutul documentelor nu este tradus.
+Suplimentele pilot opționale pentru Word și Google Docs se instalează separat și au condiții proprii de confidențialitate. Această extensie nu le instalează automat.
+
+LIMITĂRI
+- Maximum 2 MiB pentru fiecare fișier. PDF necesită un strat de text: imaginile scanate, OCR, câmpurile interactive de formular și comentariile PDF nu sunt acceptate.
+- Imaginile și formatarea nu sunt comparate. Machetele complexe pot fi exportate doar ca text; aspectul Word poate diferi de Microsoft Word.
+- Notele de subsol, notele de final și comentariile DOCX nu sunt importate. Mută-le mai întâi în textul principal al unei copii.
+- Compararea tabelelor necesită un singur rând de antet, fără celule îmbinate și cu valori în loc de formule.
+
+Versiune web: comparetwotexts.pro. Pentru întrebări, folosește linkul de asistență de pe această pagină.

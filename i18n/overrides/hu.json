@@ -1,0 +1,20 @@
+{
+  "2de40e2f92d8": "Különbség. Szerkesztés{0}: {1}",
+  "249f877f7b32": "Szerkesztés B",
+  "3c1f21250a61": "Szerkesztés{0}: {1}",
+  "ae1c349b541e": "Szerkesztés{0}: {1}{2}",
+  "b08c750907ff": "Igazítsa A-t B-hez",
+  "a24b3a810691": "PDF <0>·</0> Word DOCX <1>·</1> TXT <2>·</2> Excel XLSX <3>·</3> CSV / TSV",
+  "cf816c3fcce2": "A Google infrastruktúrájában fut. A felhasználói hatókörű CacheService ideiglenesen tárolja a kiválasztott szöveget és a teljes kiválasztott bekezdést titkosítatlan formában, valamint a formázási és kijelölési metaadatokat. A gyorsítótár kért élettartama: 15 perc; A Google korábban kilakoltathatja. Nincs LLM vagy harmadik féltől származó szerverhívás.",
+  "36874a6cd00c": "A mentett dokumentumneveket, az eredeti fájlokat, szerkesztéseket, a támogatott visszavonási előzményeket és a jelentéseket az <0>AES-GCM-256</0> titkosítja, mielőtt a böngésző tárhelyére írná őket. Minden mentett rekordhoz véletlenszerűen létrehozott kulcs és egyszer használatos titkosítási érték (nonce) tartozik. A kulcs nem bontható ki a Web Crypto API-n keresztül, és ugyanabban a böngészőprofilban van tárolva, így jelszó nélkül folytathatja. A tárolási verzió, a verzióazonosítók és a tevékenység/lejárati idők titkosítatlanok maradnak.",
+  "8effbd65c9ff": "Példák a támogatott parancsokra (angolul): {0}",
+  "087a259abc34": "A Google Docs prototípus a Google Apps Script-n keresztül fut a Google infrastruktúrájában, és engedélyt és internetkapcsolatot igényel. Beolvassa az aktív dokumentumlap törzsét, hogy ellenőrizze a változásokat. A Google felhasználói hatókörű CacheService-je ideiglenesen tárolja a kiválasztott szöveget, annak bekezdését, formázási és pozícióadatait titkosítatlan formában, a kért 15 perces élettartammal; A Google korábban kilakoltathatja. Az oldalsáv bezárása nem törli a gyorsítótár bejegyzését. Egyetlen LLM vagy fejlesztői szerver sem kapja meg a dokumentum szövegét. A böngészőbővítmény csak helyi feldolgozásra és titkosított piszkozatra vonatkozó utasításai nem írják le ezt a Google által hosztolt bővítményt. Olvassa el a telepítőcsomag adatkezelési szakaszát, mielőtt engedélyezné.",
+  "993153d8bb89": "Ez a verzió nem értékeli a szerződések, jelentések vagy könyvek tartalmát.",
+  "11da7c54a17a": "{0}: {1}sor {2}{3}",
+  "0f27b2200fa0": "{0}sor {1}{2}",
+  "c411521a56dc": "DOCX: csak a megfelelően lezárt HYPERLINK mezők támogatottak, amelyek eredménye egyetlen bekezdésben található egyszerű szöveg. A többi mezőt alakítsa egyszerű szöveggé.",
+  "62acf48aa07d": "DOCX: ez a régi formátumú kép nem támogatott. Használjon beágyazott PNG vagy JPEG képet vágás, forgatás vagy egyéb grafikai effektus nélkül.",
+  "68296252c8f3": "A pozicionáló keretben lévő kép PDF-exportja nem érhető el. A helyzet megőrzéséhez töltse le Word (.docx) formátumban.",
+  "a8c633859588": "Word formátumú letöltéskor a DOCX hiperhivatkozás-mezői a látható szövegükké alakulnak. A szöveg és annak formázása megmarad; a mező és a hivatkozás eltávolításra kerül.",
+  "c3944f77efa4": "A régi formátumú beágyazott képek a dokumentum sorrendjében jelennek meg, és a Word-letöltésekben megmaradnak. Elhelyezésüket nem hasonlítjuk össze; a pozicionáló keretekben képeket tartalmazó elrendezések PDF-exportja nem érhető el."
+}

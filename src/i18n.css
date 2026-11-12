@@ -1,0 +1,11 @@
+/* UI language controls do not change the direction or ordering of documents. */
+.ctt-language-control { display:inline-flex; align-items:center; gap:.45rem; max-inline-size:100%; font-size:.875rem; }
+.ctt-language-control select { inline-size:auto; max-inline-size:170px; min-block-size:36px; padding:.35rem .55rem; border:1px solid var(--border,#cbd5e1); border-radius:8px; background:var(--surface,#fff); color:inherit; font:inherit; }
+header.topbar { flex-wrap:wrap; }
+.ctt-language-control select:focus-visible { outline:2px solid var(--accent,#126b58); outline-offset:2px; }
+@media (max-width:540px) { .ctt-language-control { font-size:.8rem; } .ctt-language-control select { max-inline-size:145px; } }
+.ctt-language-status { max-inline-size:24rem; font-size:.8rem; }
+.ctt-language-status:empty { display:none; }
+/* A is always the original column; switching UI language cannot swap A and B. */
+.home-sources, section.sources, .document-heads, .document-pair, #office-excerpts, #document-scroll.documents, #result-rows { direction:ltr; }
+html[dir="rtl"] .home-sources > *, html[dir="rtl"] section.sources > *, html[dir="rtl"] .document-heads > *, html[dir="rtl"] #office-excerpts > * { direction:rtl; }

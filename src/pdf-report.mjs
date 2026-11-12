@@ -1,3 +1,6 @@
+import {translateCommercialText} from './commercial-summary.mjs';
+import {uiTranslate} from './ui-text.mjs';
+import {pdfReportLocale} from './pdf-report-language.mjs';
 /** Native offline PDF export. Source strings are drawn as text, never actions or links. */
 import {PDFDocument, fontkit, rgb} from './pdf-vendor.mjs';
 import fontBase64 from './pdf-font.mjs';
@@ -9,10 +12,12 @@ const LIMIT = "The PDF is too large. Split the documents or save the full HTML/J
 const labels = {changed: "Differences found", only_left: "Only in A", only_right: "Only in B", moved: "Moved without text changes", reflow: "Line breaks changed", matched: "Checked fields match"};
 const INK = rgb(.14, .22, .19), MUTED = rgb(.34, .39, .36);
 const COLORS = {left: rgb(1, .90, .86), right: rgb(.87, .95, .89), neutral: rgb(.94, .95, .93)};
-const money = value => value === null ? "not calculated" : String(value).replace('.', ',');
-const location = row => row ? `${row.sheet ? "sheet «" + row.sheet + '», ' : ''}row ${row.record}${row.cells ? ", cells " + Object.values(row.cells).join(', ') : ''}` : "item missing";
+const money = (value, t) => value === null ? t("not calculated") : String(value).replace('.', ',');
+const location = (row, t) => row ? t("{0}row {1}{2}", [row.sheet ? t("sheet «") + row.sheet + '», ' : '', row.record, row.cells ? t(", cells ") + Object.values(row.cells).join(', ') : '']) : t("item missing");
 
-function contents(report) {
+function contents(report, t, commercialText) {
+  const moneyText = value => money(value, t);
+  const rowLocation = row => location(row, t);
   const sections = []; let characters = 0, currentContext = '';
   function add(text, options = {}) {
     const segments = typeof text === 'string' ? [{text, changed: false}] : text;
@@ -21,48 +26,48 @@ function contents(report) {
     sections.push({segments, size: 10.5, gap: 4, context: currentContext, ...options});
   }
   const heading = text => { currentContext = text; add(text, {size: 14, heading: true, gap: 10}); };
-  add("Compare Two Texts · comparison report", {size: 21, gap: 13});
-  add(report.kind === 'text' ? "Text is compared; formatting and images are not checked." : "Selected fields are compared.", {muted: true});
-  add(`Changed: ${report.summary.changed}; only in A: ${report.summary.only_left}; only in B: ${report.summary.only_right}; matched: ${report.summary.matched}.`);
+  add(t("Compare Two Texts · comparison report"), {size: 21, gap: 13});
+  add(report.kind === 'text' ? t("Text is compared; formatting and images are not checked.") : t("Selected fields are compared."), {muted: true});
+  add(t("Changed: {0}; only in A: {1}; only in B: {2}; matched: {3}.", [report.summary.changed, report.summary.only_left, report.summary.only_right, report.summary.matched]));
   if (report.kind === 'text' && (report.moved?.length || report.reflow?.length)) {
-    add(`Separately: moved without text changes — ${report.moved?.length || 0}; groups with changed line breaks — ${report.reflow?.length || 0}.`);
+    add(t("Separately: moved without text changes — {0}; groups with changed line breaks — {1}.", [report.moved?.length || 0, report.reflow?.length || 0]));
   }
-  add("Only differences are shown.", {muted: true});
-  add("Red highlights show values from A; green highlights show values from B.", {muted: true});
-  add(`A: ${report.sources.left.name}`);
-  add(`B: ${report.sources.right.name}`);
-  for (const [side, label] of [['left', 'A'], ['right', 'B']]) if (report.sources[side].sheet) add(`${label}: checked only sheet «${report.sources[side].sheet}».`, {muted: true});
+  add(t("Only differences are shown."), {muted: true});
+  add(t("Red highlights show values from A; green highlights show values from B."), {muted: true});
+  add(t("A: {0}", [report.sources.left.name]));
+  add(t("B: {0}", [report.sources.right.name]));
+  for (const [side, label] of [['left', 'A'], ['right', 'B']]) if (report.sources[side].sheet) add(t("{0}: checked only sheet «{1}».", [label, report.sources[side].sheet]), {muted: true});
   if (report.commercial) {
     const summary = report.commercial;
-    heading("Quantity, price, and amount");
-    const status = {complete: "All items calculated", partial: "Partial calculation", unavailable: "Amount not calculated"}[summary.status];
-    add(`${status}: ${summary.coverage.included} of ${summary.coverage.total} items. Excluded: ${summary.coverage.excluded ?? summary.excluded.length}.`);
-    add(`Quantity changes: ${summary.counts.quantity_changed ?? "not checked"}; price changes: ${summary.counts.price_changed ?? "not checked"}.`);
-    add(summary.scope, {muted: true});
-    for (const total of summary.totals) add(`${total.currency}: A ${money(total.before)} → B ${money(total.after)}; B − A: ${money(total.delta)}.${summary.status === 'partial' ? " This is not the total for all items." : ''}`, {fill: 'neutral'});
-    for (const message of summary.messages) add(message, {muted: true});
+    heading(t("Quantity, price, and amount"));
+    const status = {complete: t("All items calculated"), partial: t("Partial calculation"), unavailable: t("Amount not calculated")}[summary.status];
+    add(t("{0}: {1} of {2} items. Excluded: {3}.", [status, summary.coverage.included, summary.coverage.total, summary.coverage.excluded ?? summary.excluded.length]));
+    add(t("Quantity changes: {0}; price changes: {1}.", [summary.counts.quantity_changed ?? t("not checked"), summary.counts.price_changed ?? t("not checked")]));
+    add(commercialText(summary.scope), {muted: true});
+    for (const total of summary.totals) add(t("{0}: A {1} → B {2}; B − A: {3}.{4}", [total.currency, moneyText(total.before), moneyText(total.after), moneyText(total.delta), summary.status === 'partial' ? t(" This is not the total for all items.") : '']), {fill: 'neutral'});
+    for (const message of summary.messages) add(commercialText(message), {muted: true});
   }
-  heading("Differences found");
+  heading(t("Differences found"));
   const categories = report.kind === 'text' ? ['changed', 'only_left', 'only_right', 'moved', 'reflow'] : ['changed', 'only_left', 'only_right'];
   const rows = categories.flatMap(category => (report[category] || []).map(item => ({item, category})));
   const record = ({item, category}, side) => item[side]?.record ?? (category === `only_${side}` ? item.row.record : Infinity);
   rows.sort(report.kind === 'text' ? (a, b) => Number(a.item.key.slice(5)) - Number(b.item.key.slice(5)) : (a, b) => record(a, 'left') - record(b, 'left') || record(a, 'right') - record(b, 'right'));
-  if (!rows.length) add("No differences found.");
+  if (!rows.length) add(t("No differences found."));
   for (const {item, category} of rows) {
-    const context = report.kind === 'text' ? labels[category] : `${item.key} · ${labels[category]}`;
+    const context = report.kind === 'text' ? t(labels[category]) : `${item.key} · ${t(labels[category])}`;
     add(context, {size: 12, heading: true, fill: 'neutral', context});
     const only = category === 'only_left' || category === 'only_right';
     if (report.kind === 'text') {
       if (category === 'moved') {
         if (item.left.text !== item.right.text) throw new TypeError("PDF: the text of a moved block differs. Run the comparison again.");
-        add(`A: ${item.left.location}`, {muted: true, context, keepNext: 2});
-        add(`B: ${item.right.location}`, {muted: true, context});
+        add(t("A: {0}", [item.left.location]), {muted: true, context, keepNext: 2});
+        add(t("B: {0}", [item.right.location]), {muted: true, context});
         add(item.left.text, {context});
         continue;
       }
       for (const [side, label] of [['left', 'A'], ['right', 'B']]) {
         const block = only ? (category === `only_${side}` ? item.row : null) : item[side];
-        if (!block) { add(`${label}: no matching block.`, {muted: true, context}); continue; }
+        if (!block) { add(t("{0}: no matching block.", [label]), {muted: true, context}); continue; }
         add(`${label}: ${block.location}`, {muted: true, context, keepNext: 1});
         let segments = [{text: block.text, changed: only}];
         if (category === 'changed') {
@@ -70,34 +75,37 @@ function contents(report) {
           if (!Array.isArray(segments) || segments.some(segment => typeof segment.text !== 'string' || typeof segment.changed !== 'boolean') || segments.map(segment => segment.text).join('') !== block.text) throw new TypeError("PDF: highlights do not match the source text. Run the comparison again.");
         }
         add(segments, {side, context});
-        if (block.text === '') add("(Empty text block)", {muted: true, context});
+        if (block.text === '') add(t("(Empty text block)"), {muted: true, context});
       }
     } else if (!only) {
-      add(`A: ${location(item.left)}; B: ${location(item.right)}.`, {muted: true, context});
+      add(t("A: {0}; B: {1}.", [rowLocation(item.left), rowLocation(item.right)]), {muted: true, context});
       for (const change of item.changes) {
-        add(`A «${change.left_column}» → B «${change.right_column}»`, {context, keepNext: 2});
-        add(`A: ${change.before === '' ? "(empty value)" : change.before}`, {fill: 'left', context});
-        add(`B: ${change.after === '' ? "(empty value)" : change.after}`, {fill: 'right', context});
+        add(t("A «{0}» → B «{1}»", [change.left_column, change.right_column]), {context, keepNext: 2});
+        add(t("A: {0}", [change.before === '' ? t("(empty value)") : change.before]), {fill: 'left', context});
+        add(t("B: {0}", [change.after === '' ? t("(empty value)") : change.after]), {fill: 'right', context});
       }
     } else {
       const side = category === 'only_left' ? 'left' : 'right', label = side === 'left' ? 'A' : 'B';
-      add(`${label}: ${location(item.row)}. No paired record.`, {muted: true, context});
-      for (const column of report.sources[side].headers) add(`${column}${item.row.cells?.[column] ? ' [' + item.row.cells[column] + ']' : ''}: ${item.row.values[column] === '' ? "(empty value)" : item.row.values[column]}`, {fill: side, context});
+      add(t("{0}: {1}. No paired record.", [label, rowLocation(item.row)]), {muted: true, context});
+      for (const column of report.sources[side].headers) add(`${column}${item.row.cells?.[column] ? ' [' + item.row.cells[column] + ']' : ''}: ${item.row.values[column] === '' ? t("(empty value)") : item.row.values[column]}`, {fill: side, context});
     }
   }
   if (report.commercial) {
     const summary = report.commercial;
-    heading("Item calculations");
+    heading(t("Item calculations"));
     for (const item of summary.items) {
-      add(`${item.key}: A ${money(item.before)} → B ${money(item.after)}; B − A: ${money(item.delta)} ${item.currency}.`, {context: "Item calculations"});
-      add(`A: ${location(item.left)}; B: ${location(item.right)}.`, {muted: true, context: "Item calculations"});
+      add(t("{0}: A {1} → B {2}; B − A: {3} {4}.", [item.key, moneyText(item.before), moneyText(item.after), moneyText(item.delta), item.currency]), {context: t("Item calculations")});
+      add(t("A: {0}; B: {1}.", [rowLocation(item.left), rowLocation(item.right)]), {muted: true, context: t("Item calculations")});
     }
-    for (const item of summary.excluded) add(`${item.key} — excluded: ${item.reasons.join(' ')}`, {context: "Excluded items"});
+    for (const item of summary.excluded) add(t("{0} — excluded: {1}", [item.key, item.reasons.map(translateCommercialText).join(' ')]), {context: t("Excluded items")});
   }
   return sections;
 }
 
 /** Complete report only; no network, browser printing, or source-derived PDF actions. */
+const formatLabel = (source, params = {}) => source.replace(/\{(\w+)\}/g, (match, key) => Object.hasOwn(params, key) ? String(params[key]) : match);
+let labelCharacterSet;
+
 export async function renderPdf(report) {
   if (!report || report.status !== 'complete') throw new TypeError("PDF is available after a completed comparison. Clarify the settings first.");
   // Same serialized evidence budget as existing HTML/JSON exports, before font work.
@@ -105,11 +113,31 @@ export async function renderPdf(report) {
     if (error instanceof RangeError) throw new RangeError(LIMIT);
     throw error;
   }
-  const sections = contents(report);
-  const pdf = await PDFDocument.create();
-  pdf.setTitle("Compare Two Texts — comparison report"); pdf.setProducer('Compare Two Texts');
-  pdf.registerFontkit(fontkit);
+  const locale = globalThis.cttI18n?.getLocale?.() || 'en';
+  const localized = pdfReportLocale(locale) !== 'en' || /^en(?:[-_]|$)/i.test(locale);
   const bytes = Uint8Array.from(atob(fontBase64), character => character.charCodeAt(0));
+  // Validate translation templates before interpolating any source data. A missing
+  // translated glyph falls back to its English label; user strings are never tested
+  // by this fallback and retain the existing PDF source-character handling.
+  labelCharacterSet ||= new Set(fontkit.create(bytes).characterSet);
+  const printableLabel = text => [...text].every(char => labelCharacterSet.has(char.codePointAt(0)) && !/[\p{Cc}\p{Cf}\p{Cs}]/u.test(char));
+  const t = (source, params = {}) => {
+    const candidate = localized ? uiTranslate(source) : source;
+    return formatLabel(printableLabel(candidate) ? candidate : source, params);
+  };
+  const commercialText = source => {
+    const candidate = localized ? translateCommercialText(source) : source;
+    return printableLabel(candidate) ? candidate : source;
+  };
+  // Capture every generated string before the first await. Changing the UI locale
+  // during font embedding must not create a report containing mixed languages.
+  const sections = contents(report, t, commercialText);
+  const titleText = t("Compare Two Texts — comparison report");
+  const headerText = t("CTT / DOCUMENT COMPARISON"), continuedText = t("Continued: ");
+  const footerTemplate = t("CTT · {0} / {1}");
+  const pdf = await PDFDocument.create();
+  pdf.setTitle(titleText); pdf.setProducer('Compare Two Texts');
+  pdf.registerFontkit(fontkit);
   const font = await pdf.embedFont(bytes, {subset: true, features: {liga: false}});
   const supported = new Set(font.getCharacterSet());
   let convertedCharacters = 0;
@@ -136,11 +164,11 @@ export async function renderPdf(report) {
   function newPage(context = '') {
     if (++pageNumber > MAX_PDF_PAGES) throw new RangeError(LIMIT);
     page = pdf.addPage([WIDTH, HEIGHT]); y = TOP;
-    page.drawText("CTT / DOCUMENT COMPARISON", {x: MARGIN, y: HEIGHT - 34, font, size: 9, color: MUTED});
+    page.drawText(headerText, {x: MARGIN, y: HEIGHT - 34, font, size: 9, color: MUTED});
     page.drawLine({start: {x: MARGIN, y: HEIGHT - 43}, end: {x: WIDTH - MARGIN, y: HEIGHT - 43}, thickness: .5, color: rgb(.80, .84, .81)});
     if (context) {
       // Context is a convenience label; full key remains in the report body.
-      let label = "Continued: " + printable(Array.from(context).slice(0, 140).join('')).replaceAll('\n', ' '), truncated = context.length > 140;
+      let label = continuedText + printable(Array.from(context).slice(0, 140).join('')).replaceAll('\n', ' '), truncated = context.length > 140;
       while (font.widthOfTextAtSize(label, 9) > lineWidth && label.length) { label = Array.from(label).slice(0, -1).join(''); truncated = true; }
       page.drawText(label + (truncated ? '…' : ''), {x: MARGIN, y, font, size: 9, color: MUTED}); y -= 19;
     }
@@ -229,7 +257,7 @@ export async function renderPdf(report) {
     y -= section.gap;
   }
   for (const [index, current] of pdf.getPages().entries()) {
-    current.drawText(`CTT · ${index + 1} / ${pageNumber}`, {x: MARGIN, y: 27, font, size: 9, color: MUTED});
+    current.drawText(formatLabel(footerTemplate, [index + 1, pageNumber]), {x: MARGIN, y: 27, font, size: 9, color: MUTED});
   }
   const result = await pdf.save();
   if (result.byteLength > MAX_REPORT_BYTES) throw new RangeError(LIMIT);

@@ -1,0 +1,21 @@
+Compare Two Texts primerja dve različici besedila, pogodbe ali dokumenta in pokaže spremembe. Odprite dve datoteki, preglejte razlike drugo ob drugi, uredite rezultat ter ga prenesite ali natisnite. Vgrajeni primeri omogočajo preizkus brez lastnih dokumentov.
+
+ZMOŽNOSTI
+- TXT, Word DOCX, PDF z besedilno plastjo, CSV/TSV in Excel XLSX. Označevanje dodanega, izbrisanega in spremenjenega besedila, premikanje med razlikami in urejanje v primerjalnem pogledu.
+- Pri preglednicah izberite list in stolpce, povežite vrstice po identifikatorju, uredite vrednosti in kopirajte manjkajočo vrstico iz A v B.
+- Preverite spremenjene zneske in odstotke v besedilu, Wordu in podprtih PDF-jih.
+- Uredite in izvozite tudi posamezen dokument. V podprtih PDF-jih izpolnite natisnjena prazna mesta ali dodajte besedilo.
+- Izvozite DOCX v PDF s predogledom, podprtimi glavami, nogami in številkami strani.
+
+ZASEBNOST IN JEZIKI
+Razširitev deluje brez povezave. Dokumenti se obdelujejo v vaši napravi in se za primerjavo ali urejanje ne nalagajo na strežnik. Osnutki so shranjeni lokalno in šifrirani z AES-GCM-256; ključ ostane v profilu brskalnika. To ni shramba, zaščitena z geslom, prenesene datoteke pa niso šifrirane. Osnutki potečejo po sedmih dneh brez uporabe. Spletno mesto in razširitev jih shranjujeta ločeno.
+Vsebina dokumentov se ne prevaja.
+Izbirni poskusni dodatki za Word in Google Docs se namestijo ločeno in imajo svoje pogoje zasebnosti. Ta razširitev jih ne namesti samodejno.
+
+OMEJITVE
+- Do 2 MiB na datoteko. PDF potrebuje besedilno plast: skenirane slike, OCR, interaktivna polja obrazcev in komentarji PDF niso podprti.
+- Slike in oblikovanje se ne primerjajo. Zahtevne postavitve se lahko izvozijo le kot besedilo; postavitev Worda se lahko razlikuje od Microsoft Worda.
+- Sprotne opombe, končne opombe in komentarji DOCX se ne uvozijo. Najprej jih v kopiji premaknite v glavno besedilo.
+- Primerjava preglednic zahteva eno naslovno vrstico, brez združenih celic in z vrednostmi namesto formul.
+
+Spletna različica: comparetwotexts.pro. Za vprašanja uporabite povezavo do podpore na tej strani.

@@ -17,7 +17,7 @@ XỬ LÝ TRÊN THIẾT BỊ
 Tài liệu được xử lý trên thiết bị của bạn. Tiện ích hoạt động ngoại tuyến và không tải tài liệu lên máy chủ để so sánh hoặc chỉnh sửa. Bản nháp trên trang web và trong tiện ích được lưu riêng, không tự động đồng bộ. Hãy tải xuống một bản sao khi hoàn thành công việc.
 
 TRƯỚC KHI BẮT ĐẦU
-- Giao diện trình chỉnh sửa hiện bằng tiếng Anh. Bản dịch mô tả trên cửa hàng không thay đổi ngôn ngữ của trình chỉnh sửa.
+- Nội dung tài liệu không được dịch.
 - Mỗi tệp đầu vào có thể có dung lượng tối đa 2 MiB.
 - PDF cần có lớp văn bản: không hỗ trợ ảnh quét không có văn bản và không có OCR. Chỗ trống in sẵn khác với trường biểu mẫu PDF tương tác; không hỗ trợ trường tương tác và chú thích trong PDF.
 - Không so sánh hình ảnh và định dạng. Khả năng giữ nguyên bố cục PDF phụ thuộc vào tài liệu; bố cục phức tạp có thể cần xuất dưới dạng chỉ có văn bản. Bố cục Word có thể khác với khi xem trong Microsoft Word.
@@ -25,3 +25,7 @@ TRƯỚC KHI BẮT ĐẦU
 - So sánh bảng tính từ hai tệp yêu cầu một hàng tiêu đề duy nhất, không có ô gộp và dùng giá trị thay cho công thức.
 
 Bắt đầu với ví dụ tài liệu hoặc CSV / Excel có sẵn để thử quy trình trước khi mở tệp của bạn.
+
+Bản nháp được mã hóa cục bộ bằng AES-GCM-256; khóa nằm trong hồ sơ trình duyệt. Đây không phải kho bảo mật bằng mật khẩu, và tệp đã tải xuống không được mã hóa. Bản nháp hết hạn sau bảy ngày không sử dụng.
+
+Các tiện ích bổ sung thử nghiệm tùy chọn cho Word và Google Docs được cài riêng và có điều khoản quyền riêng tư riêng. Tiện ích này không tự động cài đặt chúng.

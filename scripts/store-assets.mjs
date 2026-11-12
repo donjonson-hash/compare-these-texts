@@ -81,7 +81,19 @@ try {
   const welcome = await appPage();
   await welcome.goto(origin + '/welcome.html');
   await welcome.locator('h1').waitFor();
-  assert.ok(await welcome.evaluate(() => document.documentElement.scrollHeight <= innerHeight), 'Welcome content must fit the 1280×800 store screenshot');
+  await welcome.evaluate(() => document.fonts.ready);
+  // The welcome now has a scrollable PDF/privacy guide. Its store image shows
+  // the complete first-screen promise and all launch options, without shrinking
+  // the full guide into an unreadable 1280×800 thumbnail.
+  assert.ok(await welcome.evaluate(() => {
+    const inFrame = selector => {
+      const box = document.querySelector(selector)?.getBoundingClientRect();
+      return box && box.width > 0 && box.height > 0 && box.top >= 0 &&
+        box.left >= 0 && box.right <= innerWidth && box.bottom <= innerHeight;
+    };
+    return document.documentElement.scrollWidth <= innerWidth &&
+      ['.hero', '#welcome-title', '#try-example', '#open-editor', '#open-single-editor', '.reassurance'].every(inFrame);
+  }), 'Welcome headline, illustration and all launch options must fit the 1280×800 store screenshot');
   await screenshot(welcome, 'screenshot-welcome-1280x800.png');
 
   const icon = (await readFile(join(root, 'src/icon-64.png'))).toString('base64');

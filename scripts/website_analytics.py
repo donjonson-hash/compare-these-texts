@@ -70,6 +70,10 @@ def strip_website_analytics(text):
 
 def add_website_analytics(output):
     for page in sorted(output.rglob('*.html')):
+        # Office task panes run inside Word and may display selected document
+        # text. They are a separate product surface, never a marketing page.
+        if page.relative_to(output).parts[0] == 'word-addin':
+            continue
         text = page.read_text()
         if 'googletagmanager.com/gtag/js' in text:
             raise RuntimeError(f'Duplicate Google tag in {page}')

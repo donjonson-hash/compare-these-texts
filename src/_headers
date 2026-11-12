@@ -4,3 +4,17 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   Strict-Transport-Security: max-age=31536000
+
+# Word loads this one page in an Office task pane. All other routes keep the
+# global framing restriction. Detach before replacing a header (Pages syntax).
+/word-addin/taskpane.html
+  ! X-Frame-Options
+  ! Content-Security-Policy
+  Content-Security-Policy: frame-ancestors 'self' https://*.officeapps.live.com https://*.office.com https://*.microsoft365.com https://*.cloud.microsoft
+  X-Robots-Tag: noindex, nofollow
+
+/word-addin/taskpane
+  ! X-Frame-Options
+  ! Content-Security-Policy
+  Content-Security-Policy: frame-ancestors 'self' https://*.officeapps.live.com https://*.office.com https://*.microsoft365.com https://*.cloud.microsoft
+  X-Robots-Tag: noindex, nofollow

@@ -1,0 +1,21 @@
+Compare Two Texts palygina dvi teksto, sutarties ar dokumento versijas ir parodo pakeitimus. Atverkite du failus, peržiūrėkite skirtumus greta, pataisykite ir atsisiųskite arba išspausdinkite rezultatą. Įtaisytieji pavyzdžiai leidžia išbandyti neatsiverčiant savo dokumentų.
+
+GALIMYBĖS
+- TXT, Word DOCX, PDF su teksto sluoksniu, CSV/TSV ir Excel XLSX. Paryškinamas pridėtas, pašalintas ir pakeistas tekstas; pereikite nuo vieno skirtumo prie kito ir taisykite palyginimo lange.
+- Lentelėms pasirinkite lapą ir stulpelius, susiekite eilutes pagal identifikatorių, taisykite reikšmes ir nukopijuokite trūkstamą eilutę iš A į B.
+- Tikrinkite pakeistas sumas ir procentus tekste, Word ir palaikomuose PDF failuose.
+- Taisykite ir eksportuokite atskirą dokumentą. Palaikomuose PDF užpildykite spausdintus tuščius laukus arba pridėkite teksto.
+- Eksportuokite DOCX į PDF su peržiūra, palaikomomis antraštėmis, poraštėmis ir puslapių numeriais.
+
+PRIVATUMAS IR KALBOS
+Plėtinys veikia neprisijungus. Dokumentai apdorojami jūsų įrenginyje ir neįkeliami į serverį palyginti ar taisyti. Juodraščiai saugomi vietoje ir šifruojami AES-GCM-256; raktas lieka naršyklės profilyje. Tai nėra slaptažodžiu apsaugotas seifas, o atsisiųsti failai nešifruojami. Juodraščiai nustoja galioti po septynių nenaudojimo dienų. Svetainė ir plėtinys juos saugo atskirai.
+Dokumentų turinys neverčiamas.
+Pasirenkami bandomieji Word ir Google Docs priedai diegiami atskirai ir turi atskiras privatumo sąlygas. Šis plėtinys jų neįdiegia automatiškai.
+
+APRIBOJIMAI
+- Kiekvienas failas iki 2 MiB. PDF būtinas teksto sluoksnis: nuskenuoti vaizdai, OCR, interaktyvūs formų laukai ir PDF komentarai nepalaikomi.
+- Vaizdai ir formatavimas nelyginami. Sudėtingas maketas gali būti eksportuojamas tik kaip tekstas; Word maketas gali skirtis nuo Microsoft Word.
+- DOCX išnašos, galinės išnašos ir komentarai neimportuojami. Pirmiausia perkelkite juos į dokumento kopijos pagrindinį tekstą.
+- Lentelių palyginimui reikia vienos antraščių eilutės, nesujungtų langelių ir reikšmių vietoje formulių.
+
+Žiniatinklio versija: comparetwotexts.pro. Jei turite klausimų, naudokite šiame puslapyje pateiktą pagalbos nuorodą.

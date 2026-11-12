@@ -174,7 +174,9 @@ test('English UI: real demo Worker, suggested questions, TXT source preservation
  assert.equal(p.$('office-sidebar').hidden,true);
  assert.equal(p.$('office-open').disabled,true);
  p.$('demo-tables').click();await p.result();
- noRussian(p.dom.window.document.body.textContent);
+ const englishShell=p.dom.window.document.body.cloneNode(true);
+ englishShell.querySelectorAll('[data-i18n-selector]').forEach(select=>select.remove());
+ noRussian(englishShell.textContent);
  p.$('office-open').click();
  assert.equal(p.$('office-sidebar').hidden,false);
  assert.equal(p.$('office-open').getAttribute('aria-expanded'),'true');

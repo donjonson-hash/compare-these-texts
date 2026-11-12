@@ -1,5 +1,6 @@
 /** Local semantic DOCX presentation and lossless-package paragraph edits. */
-import {readTextSource, readDocxPackage, validateDocxDrawing, MAX_TEXT_CHARS, MAX_TEXT_BLOCKS, MAX_TEXT_SOURCE_BYTES} from './text-source.mjs';
+import {readTextSource, readDocxPackage, validateDocxDrawing, validateDocxVmlImage, MAX_TEXT_CHARS, MAX_TEXT_BLOCKS, MAX_TEXT_SOURCE_BYTES} from './text-source.mjs';
+import {isVmlPicture} from './docx-vml.mjs';
 import {renderDocxNumbering} from './docx-numbering.mjs';
 import {validateTableSequence, normalizeDocxRowPlan} from './docx-structure.mjs';
 const W = new Set(['http://schemas.openxmlformats.org/wordprocessingml/2006/main','http://purl.oclc.org/ooxml/wordprocessingml/main']);
@@ -109,14 +110,15 @@ export async function readDocxVisual(source) {
       if (is(node,'r')) style={...style,...formatting.run(node)};
       if (is(node,'fldSimple')) { const field=/^\s*(PAGE|NUMPAGES|SECTIONPAGES)\b/i.exec(attr(node,'instr')||'')?.[1]?.toUpperCase(); if(field){runs.push({field,text:'',style:{...style,...formatting.run(child(node,'r'))}});return;} }
       if (textual(node)) { runs.push({text:textOf(node),style,...(is(node,'br')&&attr(node,'type')==='page'?{pageBreak:true}:{})}); return; }
-      if (is(node,'drawing')) { const img=validateDocxDrawing(node,checked.entries,checked.docs); if(!imageSources.has(img.path))imageSources.set(img.path,`data:${img.mime};base64,${base64(img.bytes)}`); runs.push({image:{src:imageSources.get(img.path),width:img.width,height:img.height,alt:img.alt}}); return; }
+      if (is(node,'drawing')||isVmlPicture(node)) { const img=(isVmlPicture(node)?validateDocxVmlImage:validateDocxDrawing)(node,checked.entries,checked.docs); if(!imageSources.has(img.path))imageSources.set(img.path,`data:${img.mime};base64,${base64(img.bytes)}`); runs.push({image:{src:imageSources.get(img.path),width:img.width,height:img.height,alt:img.alt}}); return; }
       if(is(node,'pPr')||is(node,'rPr')) return;
       for(const c of elements(node)) visit(c,style);
     }
     visit(p);
-    const pictures=all(p).filter(n=>is(n,'pict')&&!all(n).some(c=>is(c,'txbxContent'))),horizontalRules=pictures.map(legacyRule);
+    const pictures=all(p).filter(n=>is(n,'pict')&&!isVmlPicture(n)&&!all(n).some(c=>is(c,'txbxContent'))),horizontalRules=pictures.map(legacyRule);
     if(pictures.length&&(horizontalRules.some(rule=>!rule)||runs.some(run=>run.image||run.field||run.text?.trim())))pdfUnsupported.push('PDF export is unavailable for this legacy horizontal rule layout. Download Word (.docx) to preserve it.');
-    return {record,text,horizontalRules:horizontalRules.filter(Boolean),...formatting.paragraph(p),runs,list,hasHorizontalRule:all(p).some(n=>is(n,'pict')),pageBreakBefore:!!enabled(child(child(p,'pPr'),'pageBreakBefore'))};
+    if(child(child(p,'pPr'),'framePr')&&runs.some(run=>run.image))pdfUnsupported.push('PDF export is unavailable for a framed image. Download Word (.docx) to preserve its position.');
+    return {record,text,horizontalRules:horizontalRules.filter(Boolean),...formatting.paragraph(p),runs,list,hasHorizontalRule:pictures.length>0,pageBreakBefore:!!enabled(child(child(p,'pPr'),'pageBreakBefore'))};
   }
   const blocks=checked.structure.paragraphs.map((p,i)=>visualParagraph(p,{record:i+1,text:checked.texts[i],list:lists[i]}));
   const section=child(body,'sectPr'),size=child(section,'pgSz'),margin=child(section,'pgMar');
@@ -150,7 +152,7 @@ export async function readDocxVisual(source) {
     }
   }
   if(all(body).filter(n=>is(n,'sectPr')).length>1||all(body).some(n=>is(n,'cols')&&Number(attr(n,'num')||1)>1||is(n,'br')&&attr(n,'type')==='column'))pdfUnsupported.push('This document uses multiple page layouts or text columns. Download DOCX to preserve them.');
-  return {format:'docx',headersFooters:checked.headersFooters,peripherals,peripheralTextboxes,blocks,page,content:checked.structure.content,hasTables:checked.structure.hasTables,listData:checked.listData,pdfUnsupported,notes:["Headings, tables, lists, text styles, and embedded photos are preserved. Page breaks in the browser may differ from Word."]};
+  return {format:'docx',hyperlinkFields:checked.hyperlinkFields,headersFooters:checked.headersFooters,peripherals,peripheralTextboxes,blocks,page,content:checked.structure.content,hasTables:checked.structure.hasTables,listData:checked.listData,pdfUnsupported,notes:["Headings, tables, lists, text styles, and embedded photos are preserved. Page breaks in the browser may differ from Word."]};
 }
 
 function validateText(text) {

@@ -1,0 +1,21 @@
+Compare Two Texts porównuje dwie wersje tekstu, umowy lub dokumentu i pokazuje zmiany. Otwórz dwa pliki, przejrzyj różnice obok siebie, edytuj wynik, a następnie pobierz go lub wydrukuj. Wbudowane przykłady pozwalają wypróbować narzędzie bez własnych dokumentów.
+
+FUNKCJE
+- TXT, Word DOCX, PDF z warstwą tekstową, CSV/TSV i Excel XLSX. Wyróżnianie dodanego, usuniętego i zmienionego tekstu, przechodzenie między różnicami oraz edycja w widoku porównania.
+- W tabelach wybierz arkusz i kolumny, dopasuj wiersze według identyfikatora, edytuj wartości i skopiuj brakujący wiersz z A do B.
+- Sprawdzaj zmienione kwoty i procenty w tekście, Wordzie i obsługiwanych plikach PDF.
+- Edytuj i eksportuj pojedynczy dokument. W obsługiwanych PDF wypełniaj wydrukowane puste miejsca lub dodawaj tekst.
+- Eksportuj DOCX do PDF z podglądem oraz obsługiwanymi nagłówkami, stopkami i numerami stron.
+
+PRYWATNOŚĆ I JĘZYKI
+Rozszerzenie działa offline. Dokumenty są przetwarzane na urządzeniu i nie są wysyłane na serwer do porównywania ani edycji. Wersje robocze są zapisywane lokalnie i szyfrowane AES-GCM-256; klucz pozostaje w profilu przeglądarki. Nie jest to sejf chroniony hasłem, a pobrane pliki nie są szyfrowane. Wersje robocze wygasają po siedmiu dniach bez użycia. Strona i rozszerzenie zapisują je oddzielnie.
+Treść dokumentów nie jest tłumaczona.
+Opcjonalne pilotażowe dodatki do Worda i Google Docs instaluje się osobno i mają one osobne zasady prywatności. To rozszerzenie nie instaluje ich automatycznie.
+
+OGRANICZENIA
+- Do 2 MiB na plik. PDF wymaga warstwy tekstowej: skany, OCR, interaktywne pola formularzy i komentarze PDF nie są obsługiwane.
+- Obrazy i formatowanie nie są porównywane. Złożony układ może zostać wyeksportowany tylko jako tekst; układ Worda może różnić się od Microsoft Worda.
+- Przypisy dolne, końcowe i komentarze DOCX nie są importowane. Najpierw przenieś je do tekstu głównego w kopii dokumentu.
+- Porównanie tabel wymaga jednego wiersza nagłówków, braku scalonych komórek i wartości zamiast formuł.
+
+Wersja internetowa: comparetwotexts.pro. Pytania kieruj przez łącze pomocy na tej stronie.

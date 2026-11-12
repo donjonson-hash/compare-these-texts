@@ -8,6 +8,7 @@ import subprocess
 import sys
 from website_analytics import add_website_analytics
 from website_meta import add_social_meta
+from build_i18n import collect, build as build_i18n
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src"
@@ -25,6 +26,8 @@ def build():
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     shutil.copytree(SOURCE, OUTPUT)
+    collect()
+    build_i18n(OUTPUT)
     # One authoritative license supplies the website and every downloadable copy.
     license_text = (ROOT / "LICENSE").read_text()
     shutil.copyfile(ROOT / "LICENSE", OUTPUT / "LICENSE.txt")
@@ -40,6 +43,15 @@ def build():
         paragraphs.append(f"<{tag}>{html.escape(text)}</{tag}>")
     terms_page.write_text(template.replace(marker, "\n".join(paragraphs)))
     (OUTPUT / "downloads").mkdir()
+    # This document-bound Apps Script package is installed separately in Google
+    # Docs. Ship the same verified sources and instructions on the site and in
+    # the browser package; never execute them inside the offline workspace.
+    google_archive = Path(subprocess.check_output(
+        [sys.executable, str(ROOT / "google-docs/build.py")], text=True).strip())
+    shutil.copyfile(google_archive, OUTPUT / "downloads" / google_archive.name)
+    for source, destination in [('README.md', 'google-docs-setup-en.md'),
+                                ('README-RU.md', 'google-docs-setup-ru.md')]:
+        shutil.copyfile(ROOT / "google-docs" / source, OUTPUT / "downloads" / destination)
     subprocess.run([sys.executable, str(ROOT / "scripts/package_extension.py")], check=True)
     # Keep remote scripts and website CSP permissions out of offline extensions.
     add_website_analytics(OUTPUT)
@@ -59,6 +71,7 @@ def build():
         "build_command": "npm ci --ignore-scripts && npm run build",
         "source_files_sha256": {str(p.relative_to(SOURCE)): sha256(p) for p in sorted(SOURCE.rglob("*")) if p.is_file()},
         "license_sha256": sha256(ROOT / "LICENSE"),
+        "localization_files_sha256": {str(p.relative_to(ROOT)): sha256(p) for p in sorted((ROOT / "i18n").rglob("*.json"))},
         "archives_sha256": {p.name: sha256(p) for p in sorted((OUTPUT / "downloads").glob("*.zip"))},
     }
     (OUTPUT / "release").mkdir()
