@@ -159,3 +159,19 @@ test('home page explains text comparison in English for search, outside the offl
   const leaked = execFileSync('python3', ['-c', inspect, fileURLToPath(new URL(`downloads/ctt-chrome-${release.version}.zip`, dist))], {encoding: 'utf8'}).trim();
   assert.equal(leaked, '0');
 });
+
+test('pricing page answers "is it free" for people and directories', () => {
+  const doc = load(new URL('pricing/index.html', dist));
+  assert.equal(doc.querySelector('link[rel=canonical]').href, 'https://comparetwotexts.pro/pricing/');
+  assert.match(doc.title.toLowerCase(), /free/);
+  assert.match(doc.querySelector('h1').textContent.toLowerCase(), /free/);
+  const page = doc.querySelector('#pricing');
+  assert.equal(page.getAttribute('lang'), 'en');
+  const text = page.textContent.replace(/\s+/g, ' ').toLowerCase();
+  for (const claim of ['no account', '2 mb per file', 'no document uploads']) assert.match(text, new RegExp(claim), claim);
+  assert.equal(page.querySelectorAll('[data-i18n], [data-i18n-text]').length, 0, 'English-only copy outside the catalogs');
+  for (const href of ['/privacy/', '/support/', '/terms/', '/extension/', '/']) assert.ok(page.querySelector(`a[href="${href}"]`), href);
+  assert.ok(load(new URL('index.html', dist)).querySelector('#home-about a[href="/pricing/"]'), 'linked from the home FAQ');
+  const sitemap = readFileSync(new URL('sitemap.xml', dist), 'utf8');
+  assert.ok(sitemap.includes('<loc>https://comparetwotexts.pro/pricing/</loc>'));
+});
