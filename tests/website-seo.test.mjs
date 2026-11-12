@@ -123,6 +123,21 @@ test('Word guide answers the how-to searches for Word and Google Docs', () => {
   assert.ok(headings.includes('which method should you use?'));
 });
 
+test('home first screen promises local processing before any file is chosen, in every language', () => {
+  const doc = load(new URL('index.html', dist));
+  const intro = doc.querySelector('.home-intro');
+  const line = intro.querySelector('.home-privacy');
+  assert.ok(line, 'privacy line under the heading');
+  assert.match(line.textContent, /on your device/);
+  assert.match(line.textContent, /No document uploads/);
+  const firstInput = doc.querySelector('#home-left-text');
+  assert.ok(line.compareDocumentPosition(firstInput) & doc.defaultView.Node.DOCUMENT_POSITION_FOLLOWING, 'shown before the inputs');
+  // Bound to a string every locale catalog already carries, so no language falls back to English.
+  assert.equal(line.getAttribute('data-i18n-text'), line.textContent);
+  const source = JSON.parse(readFileSync(new URL('../i18n/source.json', import.meta.url), 'utf8'));
+  assert.ok(Object.values(source).includes(line.textContent), 'string exists in i18n/source.json');
+});
+
 test('home page explains text comparison in English for search, outside the offline extension', () => {
   const doc = load(new URL('index.html', dist));
   const about = doc.querySelector('#home-about');
