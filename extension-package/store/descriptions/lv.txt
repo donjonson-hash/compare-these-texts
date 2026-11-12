@@ -1,21 +1,7 @@
-Compare Two Texts salīdzina divas teksta, līguma vai dokumenta versijas un parāda izmaiņas. Atveriet divus failus, pārskatiet atšķirības līdzās, rediģējiet un lejupielādējiet vai izdrukājiet rezultātu. Iebūvētie piemēri ļauj izmēģināt darbu bez saviem dokumentiem.
+Compare Two Texts palīdz pārskatīt divas dokumenta versijas un redzēt, kas ir mainījies. Versijas tiek rādītas blakus, izceļot pievienoto, dzēsto un mainīto tekstu. Izmantojiet paplašinājumu, pārbaudot pārskatītu līgumu vai labojumus melnrakstā.
 
-IESPĒJAS
-- TXT, Word DOCX, PDF ar teksta slāni, CSV/TSV un Excel XLSX. Pievienotā, dzēstā un mainītā teksta izcelšana, pārvietošanās starp atšķirībām un rediģēšana salīdzinājuma skatā.
-- Tabulām izvēlieties lapu un kolonnas, sasaistiet rindas pēc identifikatora, rediģējiet vērtības un kopējiet trūkstošu rindu no A uz B.
-- Pārbaudiet mainītas summas un procentus tekstā, Word un atbalstītos PDF failos.
-- Rediģējiet un eksportējiet arī atsevišķu dokumentu. Atbalstītos PDF aizpildiet drukātas tukšās vietas vai pievienojiet tekstu.
-- Eksportējiet DOCX uz PDF ar priekšskatījumu, atbalstītām galvenēm, kājenēm un lappušu numuriem.
+Atveriet divus atbalstītus failus vai ielīmējiet tekstu darbvietā. Pārskatiet atšķirības, veiciet labojumus un saglabājiet rezultātu, izmantojot pieejamās eksportēšanas iespējas. Iekļautais piemērs ļauj izmēģināt darbplūsmu pirms savu dokumentu atvēršanas.
 
-PRIVĀTUMS UN VALODAS
-Paplašinājums darbojas bezsaistē. Dokumenti tiek apstrādāti jūsu ierīcē un netiek augšupielādēti serverī salīdzināšanai vai rediģēšanai. Melnraksti tiek glabāti lokāli un šifrēti ar AES-GCM-256; atslēga paliek pārlūka profilā. Tā nav ar paroli aizsargāta glabātava, un lejupielādētie faili nav šifrēti. Melnraksti zaudē derīgumu pēc septiņām dienām bez lietošanas. Vietne un paplašinājums tos glabā atsevišķi.
-Dokumentu saturs netiek tulkots.
-Izvēles Word un Google Docs izmēģinājuma papildinājumi jāinstalē atsevišķi, un tiem ir atsevišķi privātuma noteikumi. Šis paplašinājums tos neinstalē automātiski.
+Salīdzināšana un rediģēšana notiek jūsu ierīcē. Šīm darbībām dokumenti netiek augšupielādēti serverī, un paplašinājums var darboties bez interneta savienojuma.
 
-IEROBEŽOJUMI
-- Katrs fails līdz 2 MiB. PDF nepieciešams teksta slānis: skenēti attēli, OCR, interaktīvi veidlapu lauki un PDF komentāri netiek atbalstīti.
-- Attēli un formatējums netiek salīdzināti. Sarežģīts izkārtojums var tikt eksportēts tikai kā teksts; Word izkārtojums var atšķirties no Microsoft Word.
-- DOCX zemsvītras piezīmes, beigu piezīmes un komentāri netiek importēti. Vispirms pārvietojiet tos kopijas pamattekstā.
-- Tabulu salīdzināšanai vajadzīga viena galvenes rinda, neapvienotas šūnas un vērtības formulu vietā.
-
-Tīmekļa versija: comparetwotexts.pro. Jautājumiem izmantojiet atbalsta saiti šajā lapā.
+Tiek salīdzināts teksts, nevis lapu izkārtojums vai attēli. PDF dokumentos jābūt atlasāmam tekstam; skenētas lapas netiek atbalstītas. Katra ievades faila lielums var būt līdz 2 MiB. Eksportētā faila formatējums var atšķirties no oriģināla.

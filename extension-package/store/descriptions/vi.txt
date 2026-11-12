@@ -1,31 +1,7 @@
-Compare Two Texts giúp bạn so sánh văn bản và tài liệu cạnh nhau, tìm điểm khác biệt và chỉnh sửa kết quả. Kiểm tra tài liệu đã chỉnh sửa, xem lại bảng tính của nhà cung cấp hoặc điền vào chỗ trống in sẵn trong PDF được hỗ trợ — sau đó tải xuống hoặc in thành quả của bạn.
+Compare Two Texts giúp bạn xem lại hai phiên bản của một tài liệu và nhận biết nội dung đã thay đổi. Hai phiên bản được hiển thị cạnh nhau, với phần văn bản được thêm, xóa hoặc sửa được đánh dấu. Bạn có thể dùng tiện ích khi kiểm tra hợp đồng đã chỉnh sửa hoặc xem lại các thay đổi trong bản nháp.
 
-SO SÁNH, CHỈNH SỬA, LƯU
-1. Mở tiện ích và chọn hai tệp để so sánh, hoặc dùng Edit & export cho một tệp.
-2. Xem các điểm khác biệt được tô nổi bật và thực hiện chỉnh sửa.
-3. Tải xuống hoặc in kết quả bằng các tùy chọn dành cho định dạng đó.
+Mở hai tệp được hỗ trợ hoặc dán văn bản vào vùng làm việc. Xem các điểm khác biệt, chỉnh sửa nội dung và lưu kết quả bằng các tùy chọn xuất có sẵn. Ví dụ tích hợp cho phép bạn thử các bước thao tác trước khi mở tài liệu của mình.
 
-BẠN CÓ THỂ LÀM GÌ?
-- So sánh văn bản TXT và Word DOCX, PDF có văn bản chọn được, cùng bảng CSV/TSV hoặc Excel XLSX.
-- Xem hai phiên bản cạnh nhau, chuyển qua các điểm khác biệt và chỉnh sửa văn bản ngay trong không gian so sánh.
-- Với bảng tính, chọn trang tính, ghép các hàng theo mã định danh và chọn những cột cần kiểm tra. Chỉnh sửa giá trị ô và sao chép hàng còn thiếu từ A sang B.
-- Xem những thay đổi về số tiền và tỷ lệ phần trăm khi so sánh văn bản, Word và PDF được hỗ trợ bằng Amounts & percentages.
-- Làm việc với một tài liệu trong Edit & export. Với PDF dạng văn bản được hỗ trợ, nhấp vào chỗ trống in sẵn đã được nhận diện để điền thông tin, hoặc dùng Add text để đặt nội dung vào vị trí mong muốn. Cỡ chữ tự điều chỉnh theo khoảng trống có sẵn; Format cung cấp các tùy chọn điều chỉnh thủ công.
-- Xuất tài liệu Word DOCX được hỗ trợ sang PDF với bản xem trước trước khi tải xuống. Các đầu trang, chân trang, số trang và đường ngang đơn giản được hỗ trợ sẽ được giữ lại; cách chia trang và phông chữ có thể khác với Word.
+Việc so sánh và chỉnh sửa diễn ra trên thiết bị của bạn. Tài liệu không được tải lên máy chủ để thực hiện các thao tác này, và tiện ích có thể hoạt động khi không có kết nối internet.
 
-XỬ LÝ TRÊN THIẾT BỊ
-Tài liệu được xử lý trên thiết bị của bạn. Tiện ích hoạt động ngoại tuyến và không tải tài liệu lên máy chủ để so sánh hoặc chỉnh sửa. Bản nháp trên trang web và trong tiện ích được lưu riêng, không tự động đồng bộ. Hãy tải xuống một bản sao khi hoàn thành công việc.
-
-TRƯỚC KHI BẮT ĐẦU
-- Nội dung tài liệu không được dịch.
-- Mỗi tệp đầu vào có thể có dung lượng tối đa 2 MiB.
-- PDF cần có lớp văn bản: không hỗ trợ ảnh quét không có văn bản và không có OCR. Chỗ trống in sẵn khác với trường biểu mẫu PDF tương tác; không hỗ trợ trường tương tác và chú thích trong PDF.
-- Không so sánh hình ảnh và định dạng. Khả năng giữ nguyên bố cục PDF phụ thuộc vào tài liệu; bố cục phức tạp có thể cần xuất dưới dạng chỉ có văn bản. Bố cục Word có thể khác với khi xem trong Microsoft Word.
-- Trước khi nhập DOCX, cần chuyển chú thích cuối trang, chú thích cuối tài liệu và bình luận vào các đoạn văn chính trong một bản sao của tài liệu.
-- So sánh bảng tính từ hai tệp yêu cầu một hàng tiêu đề duy nhất, không có ô gộp và dùng giá trị thay cho công thức.
-
-Bắt đầu với ví dụ tài liệu hoặc CSV / Excel có sẵn để thử quy trình trước khi mở tệp của bạn.
-
-Bản nháp được mã hóa cục bộ bằng AES-GCM-256; khóa nằm trong hồ sơ trình duyệt. Đây không phải kho bảo mật bằng mật khẩu, và tệp đã tải xuống không được mã hóa. Bản nháp hết hạn sau bảy ngày không sử dụng.
-
-Các tiện ích bổ sung thử nghiệm tùy chọn cho Word và Google Docs được cài riêng và có điều khoản quyền riêng tư riêng. Tiện ích này không tự động cài đặt chúng.
+Tiện ích so sánh văn bản, không so sánh bố cục trang hoặc hình ảnh. Tài liệu PDF phải có văn bản có thể chọn được; các trang quét không được hỗ trợ. Mỗi tệp đầu vào có thể có dung lượng tối đa 2 MiB. Định dạng sau khi xuất có thể khác với bản gốc.

@@ -1,3 +1,31 @@
+# Compare Two Texts 0.37.12 — English listing update
+
+- Update the English title, short and full descriptions to the owner-provided copy.
+- Preserve all 51 interface languages, the other 50 store translations and the
+  OCR-generated Word compatibility changes from 0.37.11.
+- No runtime, permissions, extension identity or saved-work changes.
+
+## Previous release notes
+
+# Compare Two Texts 0.37.11 — OCR-generated Word compatibility
+
+Prepared 12 November 2026. Submission candidate, not a store approval.
+
+- Open OCR-generated Word documents containing empty note separator templates,
+  supported embedded legacy pictures, and balanced hyperlink fields.
+- Preserve text, styling, and embedded pictures when editing and downloading Word.
+- Convert supported hyperlink fields to their visible styled text on download,
+  with a notice that their fields and links are removed.
+- Explain unsupported framed-picture PDF positioning before download; Word
+  download preserves the original picture and frame.
+- Retain 51 interface languages, with translated messages for these changes.
+- Preserve the rewritten 0.37.10 store names and descriptions. No extra permissions
+  or network requests are introduced. Existing saved-work storage keys are unchanged.
+
+This imports documents already produced by OCR software; it does not add OCR.
+
+## Previous release notes
+
 # Compare Two Texts 0.37.9 — localization candidate
 
 Prepared 8 November 2026. This is candidate documentation, not a statement of

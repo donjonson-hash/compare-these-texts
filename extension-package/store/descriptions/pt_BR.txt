@@ -1,31 +1,7 @@
-Compare Two Texts permite comparar textos e documentos lado a lado, encontrar diferenças e editar o resultado. Confira um documento revisado, analise a planilha de um fornecedor ou preencha um espaço destinado à escrita em um PDF compatível. Depois, baixe ou imprima seu trabalho.
+Compare Two Texts ajuda você a revisar duas versões de um documento e ver o que mudou. As versões aparecem lado a lado, com os trechos adicionados, removidos ou alterados em destaque. Use a extensão para conferir um contrato revisado ou examinar alterações em um rascunho.
 
-COMPARE, EDITE E SALVE
-1. Abra a extensão e escolha dois arquivos para comparar, ou use Edit & export para trabalhar com um único arquivo.
-2. Confira as diferenças destacadas e faça suas alterações.
-3. Baixe o resultado ou imprima com as opções disponíveis para esse formato.
+Abra dois arquivos compatíveis ou cole seu texto na área de trabalho. Revise as diferenças, faça correções e salve o resultado com as opções de exportação disponíveis. Um exemplo integrado permite testar o funcionamento antes de abrir seus próprios documentos.
 
-O QUE VOCÊ PODE FAZER
-- Comparar textos de arquivos TXT e Word DOCX, PDFs com texto selecionável e tabelas CSV/TSV ou Excel XLSX.
-- Ver duas versões lado a lado, navegar entre as diferenças e editar o texto na área de comparação.
-- Para planilhas, escolher uma aba, associar linhas por um identificador e selecionar as colunas que deseja conferir. Editar valores das células e copiar uma linha ausente de A para B.
-- Conferir alterações em valores monetários e porcentagens nas comparações de textos, arquivos Word e PDFs compatíveis com Amounts & percentages.
-- Trabalhar com um único documento em Edit & export. Nos PDFs compatíveis com camada de texto, clicar nos espaços para preenchimento detectados para inserir informações, ou usar Add text para posicionar uma entrada. O tamanho do texto se ajusta ao espaço disponível; Format oferece controles manuais.
-- Exporte documentos Word DOCX compatíveis para PDF com uma prévia antes de baixar. Cabeçalhos, rodapés, números de página e linhas horizontais simples compatíveis são incluídos; a paginação e as fontes podem diferir do Word.
+A comparação e a edição são feitas no seu dispositivo. Seus documentos não são enviados a um servidor para essas operações, e a extensão pode funcionar sem conexão com a Internet.
 
-PROCESSAMENTO LOCAL
-Os documentos são processados no seu dispositivo. A extensão funciona offline e não envia seus documentos a um servidor para comparar ou editar. Os rascunhos do site e da extensão são salvos separadamente, sem sincronização automática. Baixe uma cópia do trabalho concluído.
-
-ANTES DE COMEÇAR
-- O conteúdo dos documentos não é traduzido.
-- Cada arquivo de entrada pode ter até 2 MiB.
-- Os PDFs precisam de uma camada de texto: imagens digitalizadas sem texto não são compatíveis e não há reconhecimento óptico de caracteres (OCR). Espaços destinados ao preenchimento à mão são diferentes dos campos interativos de formulários PDF. Campos interativos e comentários em PDF não são compatíveis.
-- Imagens e formatação não são comparadas. A preservação do layout do PDF depende do documento; layouts complexos podem exigir uma exportação somente de texto. O layout de arquivos Word pode ser diferente do exibido no Microsoft Word.
-- Antes de importar um DOCX, mova as notas de rodapé, notas de fim e comentários para os parágrafos principais de uma cópia do documento.
-- A comparação de dois arquivos de planilha exige uma única linha de cabeçalho, nenhuma célula mesclada e valores no lugar de fórmulas.
-
-Comece pelo exemplo de documento ou de CSV / Excel incluído para experimentar o fluxo de trabalho antes de abrir seus próprios arquivos.
-
-Os rascunhos são criptografados localmente com AES-GCM-256; a chave fica no perfil do navegador. Não é um cofre protegido por senha, e os arquivos baixados não são criptografados. Os rascunhos expiram após sete dias sem uso.
-
-Os suplementos piloto opcionais para Word e Google Docs são instalados separadamente e têm condições de privacidade próprias. Esta extensão não os instala automaticamente.
+A comparação verifica o texto, não a disposição dos elementos na página nem as imagens. Os documentos PDF devem conter texto selecionável; páginas digitalizadas não são compatíveis. Cada arquivo de entrada pode ter até 2 MiB. A formatação exportada pode ser diferente da original.

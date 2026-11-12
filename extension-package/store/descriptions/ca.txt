@@ -1,21 +1,7 @@
-Compare Two Texts compara dues versions d'un text, contracte o document i mostra què ha canviat. Obre dos fitxers, revisa les diferències de costat, edita i descarrega o imprimeix el resultat. Els exemples integrats permeten provar-ho abans d'obrir documents propis.
+Compare Two Texts t’ajuda a revisar dues versions d’un document i veure què ha canviat. Les versions apareixen l’una al costat de l’altra, amb el text afegit, eliminat o modificat ressaltat. Fes-lo servir per comprovar un contracte revisat o examinar els canvis d’un esborrany.
 
-FUNCIONS
-- TXT, Word DOCX, PDF amb capa de text, CSV/TSV i Excel XLSX. Ressalta les addicions, supressions i modificacions; salta d'una diferència a l'altra i edita al mateix espai.
-- En taules: tria el full i les columnes, relaciona files per un identificador, edita valors i copia una fila que falti d'A a B.
-- Revisa canvis en imports i percentatges de textos, Word i PDF compatibles.
-- Edita i exporta un sol document. Emplena espais impresos en blanc o afegeix text en PDF compatibles.
-- Exporta DOCX a PDF amb vista prèvia, capçaleres, peus de pàgina i números de pàgina compatibles.
+Obre dos fitxers compatibles o enganxa el text a l’espai de treball. Revisa les diferències, fes correccions i desa el resultat amb les opcions d’exportació disponibles. Un exemple integrat et permet provar el funcionament abans d’obrir els teus documents.
 
-PRIVADESA I IDIOMES
-L'extensió funciona sense connexió. Els documents es processen al dispositiu i no es pugen a cap servidor per comparar-los o editar-los. Els esborranys es desen localment, xifrats amb AES-GCM-256; la clau queda al perfil del navegador. No és una caixa forta amb contrasenya i els fitxers descarregats no estan xifrats. Els esborranys caduquen després de set dies sense ús. El web i l'extensió els desen per separat.
-No tradueix el contingut dels documents.
-Els complements pilot opcionals per a Word i Google Docs s'instal·len per separat i tenen condicions de privadesa pròpies. Aquesta extensió no els instal·la automàticament.
+La comparació i l’edició es fan al teu dispositiu. Els documents no s’envien a cap servidor per fer aquestes operacions, i l’extensió pot funcionar sense connexió a Internet.
 
-LIMITACIONS
-- Fins a 2 MiB per fitxer. Els PDF necessiten capa de text: no s'admeten imatges escanejades ni OCR, camps de formulari interactius ni comentaris PDF.
-- Les imatges i el format no es comparen. Els dissenys complexos poden exportar-se només com a text; la disposició de Word pot diferir de Microsoft Word.
-- No s'importen notes al peu, notes finals ni comentaris DOCX. Mou-los abans al text principal d'una còpia.
-- Comparar taules requereix una sola fila de capçalera, cap cel·la combinada i valors en lloc de fórmules.
-
-Versió web: comparetwotexts.pro. Per a consultes, utilitza l'enllaç de suport d'aquesta pàgina.
+La comparació comprova el text, no la disposició de la pàgina ni les imatges. Els documents PDF han de contenir text seleccionable; les pàgines escanejades no són compatibles. Cada fitxer d’entrada pot tenir fins a 2 MiB. El format exportat pot diferir de l’original.

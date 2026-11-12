@@ -44,7 +44,8 @@ for target in ['chrome','firefox']:
   manifest['action']['default_title']='__MSG_actionTitle__'
  else:
   # AMO limits the add-on name to 45 characters; retain Chrome's localized title.
-  manifest['name']='Compare Two Texts — Diff Checker'
+  manifest['name']=release['short_name']
+  if len(manifest['name'])>45:raise RuntimeError('Firefox name exceeds 45 characters')
  # Preserve the Firefox ID and permission-free offline CSP.
  files={p.name:p.read_bytes() for p in dist.iterdir() if p.is_file() and p.name not in ('robots.txt','sitemap.xml','_headers')}
  if target=='firefox':split_color_emoji(files)
