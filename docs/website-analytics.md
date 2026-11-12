@@ -35,7 +35,9 @@ Parameter breakdowns in reports may require event-scoped custom dimensions.
 
 Every website link to the Chrome Web Store names its placement so the store's
 own Analytics property can split installs by source. Format:
-`?utm_source=comparetwotexts&utm_medium=website&utm_campaign=<placement>`.
+`?utm_source=comparetwotexts&utm_medium=referral&utm_campaign=<placement>`.
+GA4 files `referral` under its Referral channel; the earlier `website` value
+landed in Unassigned in the store property (October–November 2026).
 
 | Placement | `utm_campaign` |
 | --- | --- |
