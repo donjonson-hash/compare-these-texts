@@ -8,9 +8,12 @@ import {minify} from 'terser';
 
 const require = createRequire(import.meta.url);
 const terserVersion = require('terser/package.json').version;
+// Cover the local classic scripts and stylesheets used by the public pages.
+// Keep this after extension packaging: offline extension sources stay readable.
 export const WEBSITE_MINIFY_FILES = Object.freeze([
-  'compact-review.css', 'office.js', 'text-editor.js', 'transport.js',
-  'app.js', 'site.js', 'navigation.js',
+  'style.css', 'site.css', 'guides.css', 'office-addins.css', 'i18n.css',
+  'compact-review.css', 'i18n.js', 'office.js', 'text-editor.js', 'transport.js',
+  'document-demo.js', 'app.js', 'site.js', 'single-entry.js', 'navigation.js',
 ]);
 
 export async function minifyWebsite(directory) {
@@ -31,7 +34,7 @@ export async function minifyWebsite(directory) {
       // Only print compactly: no compression, renaming, bundling or module conversion.
       const result = await minify({[name]: source}, {
         ecma: 2022, compress: false, mangle: false, module: false, toplevel: false,
-        format: {comments: 'some', ascii_only: false, semicolons: true},
+        format: {comments: 'some', ascii_only: false, semicolons: true, keep_quoted_props: true},
       });
       code = result.code + '\n';
     }
