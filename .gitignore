@@ -4,3 +4,5 @@ artifacts/
 test-output/
 __pycache__/
 *.pyc
+# Local archive of dist/ prepared for manual site upload
+/ctt-site-dist.zip
