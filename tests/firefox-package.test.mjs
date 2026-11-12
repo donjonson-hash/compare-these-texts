@@ -9,7 +9,7 @@ import original from '../src/emoji-color-vendor.mjs';
 
 test('Firefox package preserves every emoji glyph and sequence through bounded static modules; Chrome retains original bytes', async t => {
   const root = fileURLToPath(new URL('../', import.meta.url));
-  const {version} = JSON.parse(await readFile(join(root, 'release.json'), 'utf8'));
+  const {version, short_name} = JSON.parse(await readFile(join(root, 'release.json'), 'utf8'));
   const folder = await mkdtemp(join(tmpdir(), 'ctt-firefox-package-'));
   t.after(() => rm(folder, {recursive:true, force:true}));
   execFileSync('python3', ['-c', `
@@ -26,7 +26,7 @@ with zipfile.ZipFile(pathlib.Path(root)/'dist/downloads'/f'ctt-chrome-{version}.
     assert not any(n.startswith('emoji-color-images-') for n in z.namelist())
 `, root, version, folder]);
   const manifest = JSON.parse(await readFile(join(folder, 'manifest.json'), 'utf8'));
-  assert.equal(manifest.name, 'Compare Two Texts — Diff Checker');
+  assert.equal(manifest.name, short_name);
   assert.ok(manifest.name.length <= 45);
   const modules = (await readdir(folder)).filter(name => name.endsWith('.mjs'));
   assert.ok(modules.filter(name => name.startsWith('emoji-color-images-')).length > 1);
