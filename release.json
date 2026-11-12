@@ -1,8 +1,8 @@
 {
-  "version": "0.37.11",
-  "name": "Compare Two Texts — Compare and edit",
-  "short_name": "Compare Two Texts — Compare and edit",
-  "description": "Review changes between two documents, edit the text and save the result. Processing takes place on your device.",
+  "version": "0.37.12",
+  "name": "Compare Two Texts — Diff Checker & Editor",
+  "short_name": "Compare Two Texts — Diff Checker & Editor",
+  "description": "Diff checker: see what changed between two versions of a text or document, edit and save. Your files stay on your device.",
   "homepage_url": "https://comparetwotexts.pro/",
   "privacy_url": "https://comparetwotexts.pro/privacy/",
   "support_url": "https://comparetwotexts.pro/support/"

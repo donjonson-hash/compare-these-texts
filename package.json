@@ -23,7 +23,7 @@
     "playwright-webkit-check": "npm:playwright@1.63.0",
     "terser": "5.44.1"
   },
-  "version": "0.37.11",
+  "version": "0.37.12",
   "engines": {
     "node": "^24.15.0 || >=26.0.0"
   },

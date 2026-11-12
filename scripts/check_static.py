@@ -177,7 +177,7 @@ for p in (root/'downloads').glob('*.zip'):
   assert manifest['homepage_url']==release['homepage_url']
   assert manifest['version']==re.search(r'-(\d+\.\d+\.\d+)\.zip$',p.name).group(1)
   if p.name.startswith('ctt-'):
-   assert manifest['name']==(release['name'] if is_chrome else 'Compare Two Texts — Diff Checker')
+   assert manifest['name']==(release['name'] if is_chrome else release['short_name'])
    assert '<html lang="en">' in z.read('index.html').decode()
    assert manifest['action']['default_title']=='CTT — Compare & Edit'
    for name in ['index.html','launcher.html','welcome.html']:
@@ -207,7 +207,7 @@ for p in (root/'downloads').glob('*.zip'):
      assert z.read(f.name)==expected_data,(p,f.name)
    parser=Parser();parser.feed(z.read('index.html').decode())
    assert manifest['content_security_policy']['extension_pages']==parser.csp
-   assert manifest['name']==(release['name'] if is_chrome else 'Compare Two Texts — Diff Checker')
+   assert manifest['name']==(release['name'] if is_chrome else release['short_name'])
    assert 'id="getting-started"' in z.read('index.html').decode()
    assert manifest['background']==({'service_worker':'background.js'} if is_chrome else {'scripts':['background.js']})
    for name in ('welcome.html','welcome.css','background.js','welcome-entry.mjs'):

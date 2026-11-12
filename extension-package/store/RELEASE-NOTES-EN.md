@@ -1,3 +1,12 @@
+# Compare Two Texts 0.37.12 — English listing update
+
+- Update the English title, short and full descriptions to the owner-provided copy.
+- Preserve all 51 interface languages, the other 50 store translations and the
+  OCR-generated Word compatibility changes from 0.37.11.
+- No runtime, permissions, extension identity or saved-work changes.
+
+## Previous release notes
+
 # Compare Two Texts 0.37.11 — OCR-generated Word compatibility
 
 Prepared 12 November 2026. Submission candidate, not a store approval.

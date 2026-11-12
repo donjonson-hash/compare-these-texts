@@ -36,8 +36,8 @@
     "description": "Δείτε αλλαγές μεταξύ δύο εγγράφων, επεξεργαστείτε το κείμενο και αποθηκεύστε το αποτέλεσμα. Η επεξεργασία γίνεται στη συσκευή σας."
   },
   "en": {
-    "name": "Compare Two Texts — Compare and edit",
-    "description": "Review changes between two documents, edit the text and save the result. Processing takes place on your device."
+    "name": "Compare Two Texts — Diff Checker & Editor",
+    "description": "Diff checker: see what changed between two versions of a text or document, edit and save. Your files stay on your device."
   },
   "es": {
     "name": "Compare Two Texts — Comparar textos y editar",

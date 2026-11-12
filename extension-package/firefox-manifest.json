@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Compare Two Texts — Diff Checker",
-  "version": "0.37.11",
+  "name": "Compare Two Texts — Diff Checker & Editor",
+  "version": "0.37.12",
   "homepage_url": "https://comparetwotexts.pro/",
-  "description": "Review changes between two documents, edit the text and save the result. Processing takes place on your device.",
+  "description": "Diff checker: see what changed between two versions of a text or document, edit and save. Your files stay on your device.",
   "icons": {
     "16": "icon-16.png",
     "32": "icon-32.png",

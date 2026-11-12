@@ -1,12 +1,13 @@
 # Compare Two Texts
 
-Current CTT website and offline Chrome/Firefox extension source: **0.37.11**.
+Current CTT website and offline Chrome/Firefox extension source: **0.37.12**.
 The same files in `src/` produce the website and both extension packages.
 Documents are processed locally; extension manifests request no permissions or
 host permissions. Website: https://comparetwotexts.pro/.
 
-The 0.37.11 packages include OCR-generated DOCX compatibility and all 51 existing
-interface locales. Store metadata preserves the concise 0.37.10 rewrite.
+The 0.37.12 packages include OCR-generated DOCX compatibility and all 51 existing
+interface locales. English store copy uses the owner-provided 0.37.12 descriptions;
+the other 50 store translations preserve the 0.37.10 rewrite.
 For the reproducible Firefox source submission, see
 [Firefox review sources](docs/FIREFOX-SOURCE.md).
 
