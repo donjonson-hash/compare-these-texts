@@ -6,3 +6,4 @@ __pycache__/
 *.pyc
 # Local archive of dist/ prepared for manual site upload
 /ctt-site-dist.zip
+/dist.zip
