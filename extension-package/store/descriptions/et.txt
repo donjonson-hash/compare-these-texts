@@ -1,21 +1,7 @@
-Compare Two Texts võrdleb teksti, lepingu või dokumendi kahte versiooni ja näitab muudatusi. Ava kaks faili, vaata erinevusi kõrvuti, muuda tulemust ning laadi see alla või prindi. Sisseehitatud näidetega saad töövoogu proovida oma dokumente avamata.
+Compare Two Texts aitab üle vaadata dokumendi kaks versiooni ja näha, mis on muutunud. Versioonid kuvatakse kõrvuti ning lisatud, eemaldatud ja muudetud tekst on esile tõstetud. Kasuta laiendust näiteks muudetud lepingu kontrollimiseks või mustandisse tehtud paranduste ülevaatamiseks.
 
-VÕIMALUSED
-- TXT, Word DOCX, tekstikihiga PDF, CSV/TSV ja Excel XLSX. Lisatud, kustutatud ja muudetud tekst tõstetakse esile; liigu erinevuste vahel ja muuda teksti võrdlusvaates.
-- Tabelites vali leht ja veerud, seo read tunnuse järgi, muuda väärtusi ning kopeeri puuduv rida A-st B-sse.
-- Kontrolli muutunud summasid ja protsente tekstis, Wordis ja toetatud PDF-failides.
-- Muuda ja ekspordi ka üksikut dokumenti. Täida toetatud PDF-failide trükitud lüngad või lisa teksti.
-- Ekspordi DOCX PDF-iks koos eelvaate, toetatud päiste, jaluste ja leheküljenumbritega.
+Ava kaks toetatud faili või kleebi oma tekst tööalale. Vaata erinevused üle, tee parandused ja salvesta tulemus olemasolevate ekspordivõimalustega. Kaasasoleva näite abil saad töövoogu proovida enne oma dokumentide avamist.
 
-PRIVAATSUS JA KEELED
-Laiendus töötab võrguühenduseta. Dokumente töödeldakse sinu seadmes ning neid ei laadita võrdlemiseks ega muutmiseks serverisse. Mustandid salvestatakse kohapeal AES-GCM-256 krüpteeringuga; võti jääb brauseriprofiili. See ei ole parooliga kaitstud seif ning allalaaditud failid pole krüpteeritud. Mustandid aeguvad pärast seitset kasutuseta päeva. Veebisait ja laiendus hoiavad mustandeid eraldi.
-Dokumentide sisu ei tõlgita.
-Valikulised Wordi ja Google Docsi proovilisandmoodulid paigaldatakse eraldi ning neile kehtivad eraldi privaatsustingimused. See laiendus ei paigalda neid automaatselt.
+Võrdlemine ja muutmine toimub sinu seadmes. Nendeks toiminguteks ei laadita sinu dokumente serverisse ning laiendus töötab ka ilma internetiühenduseta.
 
-PIIRANGUD
-- Iga fail kuni 2 MiB. PDF vajab tekstikihti: skannitud pilte, OCR-i, interaktiivseid vormivälju ega PDF-kommentaare ei toetata.
-- Pilte ja vormindust ei võrrelda. Keerulise küljendusega dokument võib eksportimisel jääda ainult tekstiks; Wordi küljendus võib Microsoft Wordi omast erineda.
-- DOCX-i allmärkusi, lõpumärkusi ja kommentaare ei impordita. Tõsta need esmalt dokumendi koopias põhiteksti.
-- Tabelivõrdlus vajab üht päiserida, ühendamata lahtreid ja valemeid asendavaid väärtusi.
-
-Veebiversioon: comparetwotexts.pro. Küsimuste korral kasuta selle lehe tugilinki.
+Võrreldakse teksti, mitte lehekülgede paigutust ega pilte. PDF-dokumendid peavad sisaldama valitavat teksti; skannitud lehekülgi ei toetata. Iga sisendfaili suurus võib olla kuni 2 MiB. Eksporditud faili vorming võib originaalist erineda.

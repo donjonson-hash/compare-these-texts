@@ -1,31 +1,7 @@
-Mit Compare Two Texts kannst du Texte vergleichen, Unterschiede erkennen und Dokumente direkt nebeneinander bearbeiten. Prüfe eine überarbeitete Fassung oder die Tabelle eines Lieferanten, oder fülle eine gedruckte Leerzeile in einer unterstützten PDF-Datei aus. Anschließend kannst du das Ergebnis herunterladen oder drucken.
+Compare Two Texts hilft dir, zwei Versionen eines Dokuments zu prüfen und Änderungen zu erkennen. Beide Versionen werden nebeneinander angezeigt. Hinzugefügte, entfernte und geänderte Textstellen sind hervorgehoben. So kannst du einen überarbeiteten Vertrag oder Änderungen an einem Entwurf prüfen.
 
-VERGLEICHEN, BEARBEITEN, SPEICHERN
-1. Öffne die Erweiterung und wähle zwei Dateien zum Vergleichen oder nutze Edit & export für eine einzelne Datei.
-2. Prüfe die markierten Unterschiede und nimm deine Änderungen vor.
-3. Lade das Ergebnis herunter oder drucke es mit den für das jeweilige Format verfügbaren Optionen.
+Öffne zwei unterstützte Dateien oder füge deinen Text in den Arbeitsbereich ein. Prüfe die Unterschiede, nimm Korrekturen vor und speichere das Ergebnis mit den verfügbaren Exportoptionen. Mit einem integrierten Beispiel kannst du den Ablauf ausprobieren, bevor du eigene Dokumente öffnest.
 
-FUNKTIONEN
-- Vergleiche Texte in TXT- und Word-DOCX-Dateien, PDFs mit auswählbarem Text sowie Tabellen in CSV, TSV oder Excel XLSX.
-- Sieh dir zwei Versionen nebeneinander an, springe zwischen Unterschieden und bearbeite den Text direkt im Vergleichsbereich.
-- Wähle bei Tabellen ein Tabellenblatt, ordne Zeilen anhand einer Kennung zu und lege fest, welche Spalten geprüft werden. Bearbeite Zellwerte und kopiere eine fehlende Zeile von A nach B.
-- Prüfe geänderte Geldbeträge und Prozentangaben beim Vergleich von Texten, Word-Dateien und unterstützten PDFs mit Amounts & percentages.
-- Bearbeite mit Edit & export ein einzelnes Dokument. Klicke in unterstützten PDFs mit Textebene auf erkannte gedruckte Leerstellen, um Angaben einzutragen, oder platziere einen Eintrag mit Add text. Die Schriftgröße passt sich dem verfügbaren Platz an; unter Format findest du manuelle Einstellungen.
-- Unterstützte Word-DOCX-Dokumente als PDF exportieren und vor dem Download prüfen. Unterstützte Kopf- und Fußzeilen, Seitenzahlen und einfache horizontale Linien bleiben enthalten; Seitenumbrüche und Schriftbild können von Word abweichen.
+Vergleich und Bearbeitung erfolgen auf deinem Gerät. Deine Dokumente werden dafür nicht auf einen Server hochgeladen. Die Erweiterung funktioniert auch ohne Internetverbindung.
 
-LOKALE VERARBEITUNG
-Die Dokumente werden auf deinem Gerät verarbeitet. Die Erweiterung funktioniert offline und lädt deine Dokumente zum Vergleichen oder Bearbeiten nicht auf einen Server hoch. Entwürfe auf der Website und in der Erweiterung werden getrennt gespeichert und nicht automatisch synchronisiert. Lade eine Kopie deiner fertigen Arbeit herunter.
-
-BEVOR DU BEGINNST
-- Dokumentinhalte werden nicht übersetzt.
-- Eingabedateien dürfen jeweils bis zu 2 MiB groß sein.
-- PDFs benötigen eine Textebene: Gescannte Bilder ohne Text werden nicht unterstützt, eine Texterkennung (OCR) ist nicht enthalten. Gedruckte Leerstellen sind keine interaktiven PDF-Formularfelder. Interaktive Felder und PDF-Kommentare werden nicht unterstützt.
-- Bilder und Formatierungen werden nicht verglichen. Ob das PDF-Layout erhalten bleibt, hängt vom Dokument ab. Bei komplexen Layouts kann ein reiner Textexport nötig sein. Das Layout von Word-Dateien kann von der Darstellung in Microsoft Word abweichen.
-- Fußnoten, Endnoten und Kommentare in DOCX-Dateien müssen vor dem Import in einer Kopie in die normalen Textabsätze verschoben werden.
-- Für den Vergleich zweier Tabellendateien brauchst du eine einzelne Kopfzeile, keine verbundenen Zellen und Werte statt Formeln.
-
-Probiere den Ablauf zunächst mit dem integrierten Dokument- oder CSV-/Excel-Beispiel aus, bevor du eigene Dateien öffnest.
-
-Entwürfe sind lokal mit AES-GCM-256 verschlüsselt; der Schlüssel bleibt im Browserprofil. Dies ist kein passwortgeschützter Tresor, und heruntergeladene Dateien sind nicht verschlüsselt. Entwürfe verfallen nach sieben Tagen ohne Nutzung.
-
-Die optionalen Pilot-Add-ins für Word und Google Docs werden separat installiert und haben eigene Datenschutzbedingungen. Diese Erweiterung installiert sie nicht automatisch.
+Verglichen wird der Text, nicht das Seitenlayout oder die Bilder. PDF-Dokumente müssen auswählbaren Text enthalten; gescannte Seiten werden nicht unterstützt. Jede Eingabedatei darf bis zu 2 MiB groß sein. Die Formatierung beim Export kann vom Original abweichen.

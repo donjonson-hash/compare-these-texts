@@ -1,31 +1,7 @@
-Compare Two Texts membantu Anda membandingkan teks dan dokumen berdampingan, menemukan perbedaan, dan mengedit hasilnya. Periksa revisi dokumen, tinjau spreadsheet dari pemasok, atau isi bagian kosong tercetak pada PDF yang didukung — lalu unduh atau cetak pekerjaan Anda.
+Compare Two Texts membantu Anda meninjau dua versi dokumen dan melihat apa yang berubah. Kedua versi ditampilkan berdampingan, dengan teks yang ditambahkan, dihapus, dan diubah ditandai. Gunakan saat memeriksa kontrak yang direvisi atau meninjau perubahan pada draf.
 
-BANDINGKAN, EDIT, SIMPAN
-1. Buka ekstensi dan pilih dua file untuk dibandingkan, atau gunakan Edit & export untuk satu file.
-2. Tinjau perbedaan yang disorot dan lakukan perubahan.
-3. Unduh hasilnya atau cetak dengan opsi yang tersedia untuk format tersebut.
+Buka dua file yang didukung atau tempelkan teks ke ruang kerja. Tinjau perbedaannya, lakukan koreksi, lalu simpan hasilnya menggunakan pilihan ekspor yang tersedia. Contoh bawaan memungkinkan Anda mencoba alur kerja sebelum membuka dokumen sendiri.
 
-YANG DAPAT ANDA LAKUKAN
-- Membandingkan teks TXT dan Word DOCX, PDF dengan teks yang dapat dipilih, serta tabel CSV/TSV atau Excel XLSX.
-- Melihat dua versi berdampingan, berpindah antarperbedaan, dan mengedit teks di ruang kerja perbandingan.
-- Untuk spreadsheet, pilih lembar, cocokkan baris berdasarkan pengenal, dan pilih kolom yang ingin diperiksa. Edit nilai sel dan salin baris yang belum ada dari A ke B.
-- Meninjau perubahan jumlah uang dan persentase dalam perbandingan teks, Word, dan PDF yang didukung melalui Amounts & percentages.
-- Mengerjakan satu dokumen di Edit & export. Pada PDF berbasis teks yang didukung, klik bagian kosong tercetak yang terdeteksi untuk memasukkan informasi, atau gunakan Add text untuk menempatkan isian. Ukuran teks menyesuaikan ruang yang tersedia; Format menyediakan kontrol manual.
-- Ekspor dokumen Word DOCX yang didukung ke PDF dengan pratinjau sebelum mengunduh. Header, footer, nomor halaman, dan garis horizontal sederhana yang didukung disertakan; pembagian halaman dan tampilan font dapat berbeda dari Word.
+Perbandingan dan penyuntingan dilakukan di perangkat Anda. Dokumen tidak diunggah ke server untuk menjalankan operasi ini, dan ekstensi dapat digunakan tanpa koneksi internet.
 
-PEMROSESAN LOKAL
-Dokumen diproses di perangkat Anda. Ekstensi bekerja secara offline dan tidak mengunggah dokumen Anda ke server untuk dibandingkan atau diedit. Draf di situs web dan ekstensi disimpan secara terpisah, tanpa sinkronisasi otomatis. Unduh salinan pekerjaan Anda setelah selesai.
-
-SEBELUM MEMULAI
-- Isi dokumen tidak diterjemahkan.
-- Ukuran setiap file masukan maksimal 2 MiB.
-- PDF harus memiliki lapisan teks: gambar hasil pemindaian tanpa teks tidak didukung dan OCR tidak tersedia. Bagian kosong tercetak berbeda dari kolom formulir PDF interaktif; kolom interaktif dan komentar PDF tidak didukung.
-- Gambar dan pemformatan tidak dibandingkan. Kemampuan mempertahankan tata letak PDF bergantung pada dokumennya; tata letak yang rumit mungkin memerlukan ekspor teks saja. Tata letak Word mungkin berbeda dari tampilan di Microsoft Word.
-- Sebelum impor, pindahkan catatan kaki, catatan akhir, dan komentar DOCX ke paragraf utama dalam salinan dokumen.
-- Perbandingan spreadsheet dari dua file memerlukan satu baris header, tanpa sel gabungan, dan nilai sebagai pengganti rumus.
-
-Mulailah dengan contoh dokumen atau CSV / Excel bawaan untuk mencoba alur kerja sebelum membuka file Anda sendiri.
-
-Draf dienkripsi secara lokal dengan AES-GCM-256; kunci tetap berada di profil browser. Ini bukan brankas yang dilindungi kata sandi dan file yang diunduh tidak dienkripsi. Draf kedaluwarsa setelah tujuh hari tanpa penggunaan.
-
-Add-in percontohan opsional untuk Word dan Google Docs dipasang secara terpisah dan memiliki ketentuan privasi sendiri. Ekstensi ini tidak memasangnya secara otomatis.
+Perbandingan memeriksa teks, bukan tata letak halaman atau gambar. Dokumen PDF harus berisi teks yang dapat dipilih; halaman hasil pemindaian tidak didukung. Setiap file masukan dapat berukuran hingga 2 MiB. Pemformatan hasil ekspor mungkin berbeda dari dokumen asli.

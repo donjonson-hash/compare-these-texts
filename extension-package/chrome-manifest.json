@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "__MSG_extensionName__",
-  "version": "0.37.9",
+  "name": "Compare Two Texts — Compare and edit",
+  "version": "0.37.11",
   "homepage_url": "https://comparetwotexts.pro/",
-  "description": "__MSG_extensionDescription__",
+  "description": "Review changes between two documents, edit the text and save the result. Processing takes place on your device.",
   "icons": {
     "16": "icon-16.png",
     "32": "icon-32.png",

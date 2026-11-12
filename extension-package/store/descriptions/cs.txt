@@ -1,21 +1,7 @@
-Compare Two Texts porovnává dvě verze textu, smlouvy nebo dokumentu a ukazuje změny. Otevřete dva soubory, prohlédněte si rozdíly vedle sebe, upravte výsledek a stáhněte jej nebo vytiskněte. Vestavěné příklady umožňují vyzkoušení bez vlastních dokumentů.
+Compare Two Texts pomáhá prohlédnout dvě verze dokumentu a zjistit, co se změnilo. Verze se zobrazují vedle sebe se zvýrazněným přidaným, odstraněným a změněným textem. Využijete jej při kontrole upravené smlouvy nebo změn v pracovním návrhu.
 
-FUNKCE
-- TXT, Word DOCX, PDF s textovou vrstvou, CSV/TSV a Excel XLSX. Zvýraznění přidaného, odstraněného a změněného textu, přecházení mezi rozdíly a úpravy přímo v porovnání.
-- U tabulek vyberte list a sloupce, přiřaďte řádky podle identifikátoru, upravte hodnoty a zkopírujte chybějící řádek z A do B.
-- Kontrolujte změněné částky a procenta v textu, Wordu a podporovaných PDF.
-- Upravujte a exportujte i samostatný dokument. V podporovaných PDF vyplňujte vytištěná prázdná místa nebo přidávejte text.
-- Exportujte DOCX do PDF s náhledem, podporovanými záhlavími, zápatími a čísly stránek.
+Otevřete dva podporované soubory nebo vložte text do pracovní plochy. Projděte rozdíly, proveďte opravy a uložte výsledek pomocí dostupných možností exportu. Vestavěný příklad umožňuje vyzkoušet postup ještě před otevřením vlastních dokumentů.
 
-SOUKROMÍ A JAZYKY
-Rozšíření funguje offline. Dokumenty se zpracovávají ve vašem zařízení a při porovnávání ani úpravách se nenahrávají na server. Koncepty jsou místní a šifrované pomocí AES-GCM-256; klíč zůstává v profilu prohlížeče. Nejde o trezor chráněný heslem a stažené soubory nejsou šifrované. Koncepty vyprší po sedmi dnech bez použití. Web a rozšíření ukládají koncepty odděleně.
-Obsah dokumentů se nepřekládá.
-Volitelné pilotní doplňky pro Word a Google Docs se instalují samostatně a mají vlastní podmínky ochrany soukromí. Toto rozšíření je neinstaluje automaticky.
+Porovnávání a úpravy probíhají ve vašem zařízení. Dokumenty se kvůli těmto operacím neodesílají na server a rozšíření může fungovat bez připojení k internetu.
 
-OMEZENÍ
-- Každý soubor nejvýše 2 MiB. PDF musí mít textovou vrstvu: naskenované obrázky, OCR, interaktivní formulářová pole ani komentáře PDF nejsou podporovány.
-- Obrázky a formátování se neporovnávají. Složité rozvržení se může exportovat jen jako text; rozvržení Wordu se může lišit od Microsoft Wordu.
-- Poznámky pod čarou, vysvětlivky a komentáře DOCX se neimportují. Nejprve je v kopii přesuňte do hlavního textu.
-- Porovnávání tabulek vyžaduje jeden řádek záhlaví, žádné sloučené buňky a hodnoty místo vzorců.
-
-Webová verze: comparetwotexts.pro. S dotazy použijte odkaz na podporu na této stránce.
+Porovnává se text, nikoli rozvržení stránek nebo obrázky. Dokumenty PDF musí obsahovat text, který lze označit. Naskenované stránky nejsou podporovány. Každý vstupní soubor může mít až 2 MiB. Formátování po exportu se může lišit od originálu.

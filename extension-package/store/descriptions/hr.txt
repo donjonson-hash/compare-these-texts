@@ -1,21 +1,7 @@
-Compare Two Texts uspoređuje dvije verzije teksta, ugovora ili dokumenta i pokazuje promjene. Otvorite dvije datoteke, pregledajte razlike jednu uz drugu, uredite rezultat te ga preuzmite ili ispišite. Ugrađeni primjeri omogućuju isprobavanje bez vlastitih dokumenata.
+Compare Two Texts pomaže vam pregledati dvije verzije dokumenta i vidjeti što se promijenilo. Verzije se prikazuju jedna uz drugu, uz istaknuti dodani, uklonjeni i promijenjeni tekst. Koristite ga za provjeru izmijenjenog ugovora ili pregled izmjena u nacrtu.
 
-MOGUĆNOSTI
-- TXT, Word DOCX, PDF s tekstualnim slojem, CSV/TSV i Excel XLSX. Isticanje dodanog, izbrisanog i promijenjenog teksta, prelazak između razlika i uređivanje u prikazu usporedbe.
-- Za tablice odaberite list i stupce, povežite retke prema identifikatoru, uredite vrijednosti i kopirajte nedostajući redak iz A u B.
-- Provjerite promjene iznosa i postotaka u tekstu, Wordu i podržanim PDF datotekama.
-- Uredite i izvezite pojedinačni dokument. U podržanim PDF datotekama popunite tiskane praznine ili dodajte tekst.
-- Izvezite DOCX u PDF uz pretpregled, podržana zaglavlja, podnožja i brojeve stranica.
+Otvorite dvije podržane datoteke ili zalijepite tekst u radni prostor. Pregledajte razlike, unesite ispravke i spremite rezultat pomoću dostupnih mogućnosti izvoza. Ugrađeni primjer omogućuje vam da isprobate postupak prije otvaranja vlastitih dokumenata.
 
-PRIVATNOST I JEZICI
-Proširenje radi izvan mreže. Dokumenti se obrađuju na uređaju i ne šalju se na poslužitelj za usporedbu ili uređivanje. Skice se spremaju lokalno i šifriraju s AES-GCM-256; ključ ostaje u profilu preglednika. To nije trezor zaštićen lozinkom, a preuzete datoteke nisu šifrirane. Skice istječu nakon sedam dana bez uporabe. Web i proširenje spremaju skice odvojeno.
-Sadržaj dokumenata ne prevodi se.
-Neobavezni probni dodaci za Word i Google Docs instaliraju se zasebno i imaju zasebne uvjete privatnosti. Ovo proširenje ne instalira ih automatski.
+Usporedba i uređivanje odvijaju se na vašem uređaju. Dokumenti se za te radnje ne šalju na poslužitelj, a proširenje može raditi bez internetske veze.
 
-OGRANIČENJA
-- Do 2 MiB po datoteci. PDF mora imati tekstualni sloj: skenirane slike, OCR, interaktivna polja obrazaca i PDF komentari nisu podržani.
-- Slike i oblikovanje ne uspoređuju se. Složeni rasporedi mogu se izvesti samo kao tekst; raspored Worda može se razlikovati od Microsoft Worda.
-- Fusnote, krajnje bilješke i komentari DOCX ne uvoze se. Prvo ih u kopiji premjestite u glavni tekst.
-- Usporedba tablica zahtijeva jedan redak zaglavlja, bez spojenih ćelija i s vrijednostima umjesto formula.
-
-Web-inačica: comparetwotexts.pro. Za pitanja upotrijebite poveznicu za podršku na ovoj stranici.
+Uspoređuje se tekst, a ne raspored stranica ili slike. Dokumenti PDF moraju sadržavati tekst koji se može označiti. Skenirane stranice nisu podržane. Svaka ulazna datoteka može biti velika do 2 MiB. Oblikovanje nakon izvoza može se razlikovati od izvornika.

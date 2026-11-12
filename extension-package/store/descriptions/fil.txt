@@ -1,31 +1,7 @@
-Sa Compare Two Texts, maaari mong paghambingin ang teksto at mga dokumento nang magkatabi, makita ang mga pagkakaiba, at i-edit ang resulta. Suriin ang binagong dokumento o spreadsheet ng supplier, o punan ang nakalimbag na puwang sa suportadong PDF — pagkatapos ay i-download o i-print ang iyong ginawa.
+Tinutulungan ka ng Compare Two Texts na suriin ang dalawang bersiyon ng isang dokumento at makita kung ano ang nagbago. Magkatabing ipinapakita ang mga bersiyon, at minamarkahan ang tekstong idinagdag, inalis o binago. Gamitin ito kapag sinusuri ang binagong kontrata o ang mga pag-edit sa isang burador.
 
-PAGHAMBINGIN, I-EDIT, I-SAVE
-1. Buksan ang extension at pumili ng dalawang file na paghahambingin, o gamitin ang Edit & export para sa isang file.
-2. Suriin ang mga pagkakaibang naka-highlight at gawin ang iyong mga pagbabago.
-3. I-download o i-print ang resulta gamit ang mga opsyong available para sa format na iyon.
+Magbukas ng dalawang suportadong file o mag-paste ng teksto sa lugar ng paggawa. Suriin ang mga pagkakaiba, itama ang teksto at i-save ang resulta gamit ang mga available na opsiyon sa pag-export. Maaari mong subukan ang proseso gamit ang kasamang halimbawa bago buksan ang sarili mong mga dokumento.
 
-MGA MAAARI MONG GAWIN
-- Paghambingin ang teksto sa TXT at Word DOCX, mga PDF na may tekstong puwedeng piliin, at mga talahanayan sa CSV/TSV o Excel XLSX.
-- Tingnan ang dalawang bersyon nang magkatabi, lumipat sa bawat pagkakaiba, at i-edit ang teksto sa workspace ng paghahambing.
-- Para sa mga spreadsheet, pumili ng sheet, itugma ang mga row gamit ang identifier, at piliin ang mga column na susuriin. I-edit ang mga value ng cell at kopyahin ang nawawalang row mula A papuntang B.
-- Suriin ang mga nabagong halaga ng pera at porsyento sa paghahambing ng teksto, Word, at suportadong PDF gamit ang Amounts & percentages.
-- Gumawa sa iisang dokumento gamit ang Edit & export. Sa suportadong PDF na may teksto, i-click ang mga natukoy na nakalimbag na puwang para maglagay ng impormasyon, o gamitin ang Add text para maglagay ng sagot sa napiling posisyon. Umaangkop ang laki ng teksto sa available na espasyo; may mga manwal na kontrol sa Format.
-- I-export ang mga suportadong Word DOCX na dokumento bilang PDF at tingnan muna ang preview bago i-download. Kasama ang mga suportadong header, footer, numero ng pahina at simpleng pahalang na linya; maaaring mag-iba ang paghahati ng mga pahina at hitsura ng font mula sa Word.
+Sa iyong device ginagawa ang paghahambing at pag-edit. Hindi ina-upload sa server ang mga dokumento para sa mga operasyong ito, at maaaring gamitin ang extension nang walang koneksiyon sa internet.
 
-PAGPROSESO SA IYONG DEVICE
-Sa iyong device pinoproseso ang mga dokumento. Gumagana ang extension nang offline at hindi nito ina-upload ang iyong mga dokumento sa server para paghambingin o i-edit. Magkahiwalay ang pag-save ng mga draft sa website at sa extension, at walang awtomatikong pag-sync. I-download ang kopya ng iyong natapos na gawa.
-
-BAGO MAGSIMULA
-- Hindi isinasalin ang nilalaman ng mga dokumento.
-- Hanggang 2 MiB ang laki ng bawat input file.
-- Kailangan ng PDF ng text layer: hindi suportado ang mga na-scan na larawan na walang teksto, at walang OCR. Iba ang mga nakalimbag na puwang sa mga interactive na field ng PDF form; hindi suportado ang mga interactive na field at komento sa PDF.
-- Hindi inihahambing ang mga larawan at formatting. Nakadepende sa dokumento kung mapapanatili ang layout ng PDF; maaaring kailanganin ang text-only na export para sa mga komplikadong layout. Maaaring mag-iba ang layout ng Word kumpara sa Microsoft Word.
-- Bago mag-import ng DOCX, ilipat ang mga footnote, endnote, at komento sa mga pangunahing talata ng isang kopya ng dokumento.
-- Para sa paghahambing ng spreadsheet mula sa dalawang file, kailangan ng iisang header row, walang merged cell, at mga value sa halip na formula.
-
-Magsimula sa kasamang halimbawa ng dokumento o CSV / Excel para subukan ang proseso bago buksan ang sarili mong mga file.
-
-Naka-encrypt nang lokal ang mga draft gamit ang AES-GCM-256; nananatili ang susi sa profile ng browser. Hindi ito vault na protektado ng password, at hindi naka-encrypt ang mga na-download na file. Nag-e-expire ang mga draft matapos ang pitong araw na hindi ginagamit.
-
-Magkahiwalay na ini-install ang mga opsyonal na pilot add-in para sa Word at Google Docs at may sarili silang mga tuntunin sa privacy. Hindi sila awtomatikong ini-install ng extension na ito.
+Teksto ang sinusuri sa paghahambing, hindi ang ayos ng pahina o mga larawan. Dapat may tekstong maaaring piliin ang mga dokumentong PDF; hindi suportado ang mga na-scan na pahina. Maaaring umabot sa 2 MiB ang bawat input file. Maaaring maiba sa orihinal ang pag-format ng na-export na dokumento.

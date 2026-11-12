@@ -1,21 +1,7 @@
-Compare Two Texts porównuje dwie wersje tekstu, umowy lub dokumentu i pokazuje zmiany. Otwórz dwa pliki, przejrzyj różnice obok siebie, edytuj wynik, a następnie pobierz go lub wydrukuj. Wbudowane przykłady pozwalają wypróbować narzędzie bez własnych dokumentów.
+Compare Two Texts pomaga przejrzeć dwie wersje dokumentu i sprawdzić, co się zmieniło. Wersje są wyświetlane obok siebie, a dodany, usunięty i zmieniony tekst jest wyróżniony. Możesz w ten sposób sprawdzić poprawioną umowę lub zmiany w wersji roboczej.
 
-FUNKCJE
-- TXT, Word DOCX, PDF z warstwą tekstową, CSV/TSV i Excel XLSX. Wyróżnianie dodanego, usuniętego i zmienionego tekstu, przechodzenie między różnicami oraz edycja w widoku porównania.
-- W tabelach wybierz arkusz i kolumny, dopasuj wiersze według identyfikatora, edytuj wartości i skopiuj brakujący wiersz z A do B.
-- Sprawdzaj zmienione kwoty i procenty w tekście, Wordzie i obsługiwanych plikach PDF.
-- Edytuj i eksportuj pojedynczy dokument. W obsługiwanych PDF wypełniaj wydrukowane puste miejsca lub dodawaj tekst.
-- Eksportuj DOCX do PDF z podglądem oraz obsługiwanymi nagłówkami, stopkami i numerami stron.
+Otwórz dwa obsługiwane pliki lub wklej tekst do obszaru roboczego. Przejrzyj różnice, wprowadź poprawki i zapisz wynik, korzystając z dostępnych opcji eksportu. Wbudowany przykład pozwala wypróbować te czynności przed otwarciem własnych dokumentów.
 
-PRYWATNOŚĆ I JĘZYKI
-Rozszerzenie działa offline. Dokumenty są przetwarzane na urządzeniu i nie są wysyłane na serwer do porównywania ani edycji. Wersje robocze są zapisywane lokalnie i szyfrowane AES-GCM-256; klucz pozostaje w profilu przeglądarki. Nie jest to sejf chroniony hasłem, a pobrane pliki nie są szyfrowane. Wersje robocze wygasają po siedmiu dniach bez użycia. Strona i rozszerzenie zapisują je oddzielnie.
-Treść dokumentów nie jest tłumaczona.
-Opcjonalne pilotażowe dodatki do Worda i Google Docs instaluje się osobno i mają one osobne zasady prywatności. To rozszerzenie nie instaluje ich automatycznie.
+Porównywanie i edycja odbywają się na Twoim urządzeniu. Dokumenty nie są przesyłane na serwer w celu wykonania tych operacji, a rozszerzenie może działać bez połączenia z internetem.
 
-OGRANICZENIA
-- Do 2 MiB na plik. PDF wymaga warstwy tekstowej: skany, OCR, interaktywne pola formularzy i komentarze PDF nie są obsługiwane.
-- Obrazy i formatowanie nie są porównywane. Złożony układ może zostać wyeksportowany tylko jako tekst; układ Worda może różnić się od Microsoft Worda.
-- Przypisy dolne, końcowe i komentarze DOCX nie są importowane. Najpierw przenieś je do tekstu głównego w kopii dokumentu.
-- Porównanie tabel wymaga jednego wiersza nagłówków, braku scalonych komórek i wartości zamiast formuł.
-
-Wersja internetowa: comparetwotexts.pro. Pytania kieruj przez łącze pomocy na tej stronie.
+Porównanie obejmuje tekst, a nie układ stron ani obrazy. Dokumenty PDF muszą zawierać tekst, który można zaznaczyć. Zeskanowane strony nie są obsługiwane. Każdy plik wejściowy może mieć do 2 MiB. Formatowanie po eksporcie może różnić się od oryginału.

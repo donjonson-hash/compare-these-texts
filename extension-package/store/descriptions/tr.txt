@@ -1,31 +1,7 @@
-Compare Two Texts ile metin karşılaştırma ve belge düzenleme işlemlerini yan yana görünümde yapın. Farkları bulun, düzenlenmiş bir belgeyi kontrol edin, tedarikçinizin elektronik tablosunu inceleyin veya desteklenen bir PDF'deki basılı boşluğu doldurun. Ardından çalışmanızı indirin ya da yazdırın.
+Compare Two Texts, bir belgenin iki sürümünü incelemenize ve nelerin değiştiğini görmenize yardımcı olur. Sürümler yan yana gösterilir; eklenen, silinen ve değiştirilen metin vurgulanır. Güncellenmiş bir sözleşmeyi kontrol ederken veya bir taslaktaki düzenlemeleri incelerken kullanabilirsiniz.
 
-KARŞILAŞTIRIN, DÜZENLEYİN, KAYDEDİN
-1. Uzantıyı açıp karşılaştırmak için iki dosya seçin veya tek bir dosya için Edit & export seçeneğini kullanın.
-2. Vurgulanan farkları inceleyip değişikliklerinizi yapın.
-3. İlgili biçim için sunulan seçeneklerle sonucu indirin veya yazdırın.
+Desteklenen iki dosyayı açın veya metninizi çalışma alanına yapıştırın. Farkları inceleyin, düzeltmeler yapın ve mevcut dışa aktarma seçenekleriyle sonucu kaydedin. Yerleşik örnek, kendi belgelerinizi açmadan önce iş akışını denemenizi sağlar.
 
-NELER YAPABİLİRSİNİZ?
-- TXT ve Word DOCX metinlerini, seçilebilir metin içeren PDF'leri, CSV/TSV veya Excel XLSX tablolarını karşılaştırın.
-- İki sürümü yan yana görüntüleyin, farklar arasında gezinin ve karşılaştırma alanında metni düzenleyin.
-- Elektronik tablolar için çalışma sayfasını seçin, satırları bir tanımlayıcıya göre eşleştirin ve kontrol edilecek sütunları belirleyin. Hücre değerlerini düzenleyin ve eksik bir satırı A'dan B'ye kopyalayın.
-- Metin, Word ve desteklenen PDF karşılaştırmalarında değişen para tutarlarını ve yüzdeleri Amounts & percentages ile inceleyin.
-- Edit & export ile tek bir belge üzerinde çalışın. Desteklenen metin tabanlı PDF'lerde algılanan basılı boşluklara tıklayarak bilgi girin veya Add text ile istediğiniz yere metin yerleştirin. Metin boyutu kullanılabilir alana göre ayarlanır; Format ile elle ayarlama yapabilirsiniz.
-- Desteklenen Word DOCX belgelerini indirmeden önce önizleyerek PDF olarak dışa aktarın. Desteklenen üstbilgiler, altbilgiler, sayfa numaraları ve basit yatay çizgiler dahil edilir; sayfalama ve yazı tiplerinin görünümü Word’den farklı olabilir.
+Karşılaştırma ve düzenleme cihazınızda yapılır. Bu işlemler için belgeleriniz bir sunucuya yüklenmez ve uzantı internet bağlantısı olmadan da çalışabilir.
 
-CİHAZINIZDA İŞLEME
-Belgeler cihazınızda işlenir. Uzantı çevrimdışı çalışır ve karşılaştırma ya da düzenleme için belgelerinizi bir sunucuya yüklemez. Web sitesindeki ve uzantıdaki taslaklar ayrı saklanır; otomatik olarak eşitlenmez. Tamamladığınız çalışmanın bir kopyasını indirin.
-
-BAŞLAMADAN ÖNCE
-- Belgelerin içeriği çevrilmez.
-- Her giriş dosyası en fazla 2 MiB olabilir.
-- PDF'lerde metin katmanı bulunmalıdır: metin içermeyen taranmış görüntüler desteklenmez ve OCR yoktur. Basılı boşluklar, etkileşimli PDF form alanlarından farklıdır; etkileşimli alanlar ve PDF yorumları desteklenmez.
-- Görüntüler ve biçimlendirme karşılaştırılmaz. PDF düzeninin korunması belgeye bağlıdır; karmaşık düzenlerde yalnızca metin olarak dışa aktarma gerekebilir. Word düzeni, Microsoft Word'deki görünümden farklı olabilir.
-- DOCX dipnotlarını, sonnotlarını ve yorumlarını içe aktarmadan önce belgenin bir kopyasında ana metindeki paragraflara taşıyın.
-- İki elektronik tablo dosyasını karşılaştırmak için tek bir başlık satırı, birleştirilmemiş hücreler ve formüller yerine değerler gerekir.
-
-Kendi dosyalarınızı açmadan önce iş akışını denemek için yerleşik belge veya CSV / Excel örneğiyle başlayın.
-
-Taslaklar yerel olarak AES-GCM-256 ile şifrelenir; anahtar tarayıcı profilinde kalır. Bu, parolayla korunan bir kasa değildir ve indirilen dosyalar şifrelenmez. Taslaklar yedi gün kullanılmadığında süreleri dolar.
-
-Word ve Google Docs için isteğe bağlı pilot eklentiler ayrı yüklenir ve ayrı gizlilik koşullarına sahiptir. Bu uzantı onları otomatik olarak yüklemez.
+Karşılaştırma, sayfa düzenini veya görselleri değil metni denetler. PDF belgelerinde seçilebilir metin bulunmalıdır; taranmış sayfalar desteklenmez. Her giriş dosyası en fazla 2 MiB olabilir. Dışa aktarılan dosyanın biçimlendirmesi orijinalinden farklı olabilir.
