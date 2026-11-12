@@ -39,6 +39,7 @@ test('home page links to every file comparison guide', () => {
 });
 
 test('store links on the website name their placement for store analytics', () => {
+  // GA4 files a medium of "referral" under the Referral channel; "website" landed in Unassigned (store property, Oct–Nov 2026).
   for (const [page, campaign] of [['index.html', 'home_header'], ['extension/index.html', 'extension_page'],
     ['compare-word-documents/index.html', 'guide_word'], ['compare-pdf-files/index.html', 'guide_pdf'],
     ['compare-excel-files/index.html', 'guide_excel'], ['compare-csv-files/index.html', 'guide_csv']]) {
@@ -47,7 +48,7 @@ test('store links on the website name their placement for store analytics', () =
     for (const link of links) {
       const url = new URL(link.href);
       assert.equal(url.origin + url.pathname, STORE, page);
-      assert.deepEqual(Object.fromEntries(url.searchParams), {utm_source: 'comparetwotexts', utm_medium: 'website', utm_campaign: campaign}, page);
+      assert.deepEqual(Object.fromEntries(url.searchParams), {utm_source: 'comparetwotexts', utm_medium: 'referral', utm_campaign: campaign}, page);
     }
   }
 });
