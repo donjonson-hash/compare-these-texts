@@ -68,5 +68,10 @@
   "c3ec1405a51e": "{0} —  kun i B.",
   "4751f6a4b5d9": "{0}–{1} av {2}",
   "2a1388ce5524": "• {0} — rad {1} i {2}.",
-  "44ab87c19036": "⇄ Bytt om på tekstene"
+  "44ab87c19036": "⇄ Bytt om på tekstene",
+  "c411521a56dc": "DOCX: Bare korrekt avsluttede HYPERLINK-felt med et resultat som ren tekst i ett avsnitt støttes. Konverter andre felt til ren tekst.",
+  "62acf48aa07d": "DOCX: Dette bildet i eldre format støttes ikke. Bruk et innebygd PNG- eller JPEG-bilde uten beskjæring, rotasjon eller andre grafiske effekter.",
+  "68296252c8f3": "Eksport til PDF er ikke tilgjengelig for et bilde i en posisjoneringsramme. Last ned Word (.docx) for å bevare plasseringen.",
+  "a8c633859588": "Når du laster ned i Word-format, konverteres DOCX-hyperlenkefelt til den synlige teksten. Teksten og tekstformateringen bevares; feltet og lenken fjernes.",
+  "c3944f77efa4": "Innebygde bilder i eldre format vises i dokumentrekkefølge og bevares ved nedlasting i Word-format. Plasseringen deres sammenlignes ikke; eksport til PDF er ikke tilgjengelig for oppsett med bilder i posisjoneringsrammer."
 }

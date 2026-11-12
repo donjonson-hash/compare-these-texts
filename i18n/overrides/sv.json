@@ -45,5 +45,10 @@
   "1ddb9bf30d5b": "Ångra senaste ändringen",
   "d99bcd78b586": "Ladda upp fil",
   "403e555cd16d": "Använd A",
-  "3807a668acb4": "Giltiga utkast från äldre versioner krypteras när de öppnas i den här versionen. Om krypteringen eller sparandet misslyckas visar appen ett fel och ersätter inte det gamla utkastet med en ny, okrypterad version. Det befintliga utkastet lämnas orört. När ett utkast raderas eller upphör att gälla tas det sparade innehållet och krypteringsnyckeln bort. Det garanterar inte säker radering från disken eller från säkerhetskopior."
+  "3807a668acb4": "Giltiga utkast från äldre versioner krypteras när de öppnas i den här versionen. Om krypteringen eller sparandet misslyckas visar appen ett fel och ersätter inte det gamla utkastet med en ny, okrypterad version. Det befintliga utkastet lämnas orört. När ett utkast raderas eller upphör att gälla tas det sparade innehållet och krypteringsnyckeln bort. Det garanterar inte säker radering från disken eller från säkerhetskopior.",
+  "c411521a56dc": "DOCX: Endast korrekt avslutade HYPERLINK-fält med ett resultat som vanlig text i ett stycke stöds. Konvertera andra fält till vanlig text.",
+  "62acf48aa07d": "DOCX: Den här bilden i äldre format stöds inte. Använd en inbäddad PNG- eller JPEG-bild utan beskärning, rotation eller andra grafiska effekter.",
+  "68296252c8f3": "PDF-export är inte tillgänglig för en bild i en positioneringsram. Ladda ned Word (.docx) för att bevara dess placering.",
+  "a8c633859588": "Vid nedladdning i Word-format konverteras DOCX-hyperlänkfält till sin synliga text. Texten och dess formatering bevaras; fältet och dess länk tas bort.",
+  "c3944f77efa4": "Inbäddade bilder i äldre format visas i dokumentordning och bevaras vid nedladdning i Word-format. Deras placering jämförs inte; PDF-export är inte tillgänglig för layouter med bilder i positioneringsramar."
 }

@@ -8,5 +8,10 @@
   "087a259abc34": "Google Docs prototips darbojas caur Google Apps Script Google infrastruktūrā, un tam ir nepieciešama autorizācija un interneta savienojums. Tas nolasa aktīvās dokumenta cilnes pamattekstu, lai pārbaudītu izmaiņas. Google lietotāja tvēruma kešatmiņas pakalpojums īslaicīgi saglabā atlasīto tekstu, tā rindkopu, formatējumu un pozīcijas datus nešifrētā veidā ar pieprasīto kalpošanas laiku 15 minūtes; Google var to izlikt agrāk. Aizverot sānjoslu, šis kešatmiņas ieraksts netiek izdzēsts. Neviens LLM vai izstrādātāja serveris nesaņem dokumenta tekstu. Pārlūka paplašinājuma tikai lokālā apstrāde un šifrētie uzmetuma paziņojumi neapraksta šo Google mitināto pievienojumprogrammu. Pirms instalācijas pakotnes iespējošanas izlasiet sadaļu par datu apstrādi.",
   "993153d8bb89": "Šī versija nevērtē līgumu, ziņojumu vai grāmatu saturu.",
   "11da7c54a17a": "{0}: {1}rinda {2}{3}",
-  "0f27b2200fa0": "{0}rinda {1}{2}"
+  "0f27b2200fa0": "{0}rinda {1}{2}",
+  "c411521a56dc": "DOCX: tiek atbalstīti tikai pareizi noslēgti HYPERLINK lauki ar vienkārša teksta rezultātu vienā rindkopā. Pārvērtiet pārējos laukus vienkāršā tekstā.",
+  "62acf48aa07d": "DOCX: šis vecā formāta attēls netiek atbalstīts. Izmantojiet iegultu PNG vai JPEG attēlu bez apgriešanas, pagriešanas vai citiem grafiskiem efektiem.",
+  "68296252c8f3": "Attēlam pozicionēšanas rāmī nav pieejama eksportēšana uz PDF. Lejupielādējiet Word (.docx), lai saglabātu tā novietojumu.",
+  "a8c633859588": "Lejupielādējot Word formātā, DOCX hipersaišu lauki tiek pārvērsti to redzamajā tekstā. Teksts un tā formatējums tiek saglabāts; lauks un tā saite tiek noņemti.",
+  "c3944f77efa4": "Iegultie vecā formāta attēli tiek rādīti dokumenta secībā un saglabāti Word lejupielādēs. To novietojums netiek salīdzināts; izkārtojumiem ar attēliem pozicionēšanas rāmjos eksportēšana uz PDF nav pieejama."
 }

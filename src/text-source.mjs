@@ -3,6 +3,8 @@ import {DOMParser} from './xml-vendor.mjs';
 import {unzipDocument} from './text-zip.mjs';
 import {parseDocxNumbering} from './docx-numbering.mjs';
 import {readDocxStructure} from './docx-structure.mjs';
+import {normalizeDocxHyperlinkFields} from './docx-fields.mjs';
+import {isVmlPicture, inspectVmlPicture, isRedundantVmlImageRelationship} from './docx-vml.mjs';
 export const MAX_TEXT_SOURCE_BYTES = 2 * 1024 * 1024;
 export const MAX_TEXT_CHARS = 500000;
 export const MAX_TEXT_BLOCKS = 2000;
@@ -81,7 +83,7 @@ function checkPackage(entries) {
         if (name !== 'word/_rels/document.xml.rels' || !/^media\/[^/]+\.(?:png|jpe?g)$/i.test(target) || !entries.has(`word/${target}`)) fail("DOCX: only embedded PNG and JPEG images are supported.");
       } else if (type === 'hyperlink') links = true;
       else if (!['styles', 'stylesWithEffects', 'settings', 'webSettings', 'fontTable', 'theme', 'extended-properties', 'core-properties', 'custom-properties', 'thumbnail'].includes(type)) fail(`DOCX: unsupported relationship ${type}.`);
-      if (rel.getAttribute('TargetMode') === 'External' && type !== 'hyperlink') fail("DOCX: external relationships other than hyperlink URLs are not supported.");
+      if (rel.getAttribute('TargetMode') === 'External' && type !== 'hyperlink' && !(type === 'image' && name === 'word/_rels/document.xml.rels' && isRedundantVmlImageRelationship(rel, docs))) fail("DOCX: external relationships other than hyperlink URLs are not supported.");
     }
   }
   if (!foundMain) fail("DOCX: the relationship to the main document is missing.");
@@ -112,16 +114,17 @@ function validateEmptyNotes(docs) {
     for (const note of elements(root)) {
       const type = wordAttribute(note,'type'), id = wordAttribute(note,'id');
       if (!w(note,kind.slice(0,-1)) || !['separator','continuationSeparator'].includes(type) || !/^-?\d+$/.test(id || '') || ids.has(id)) unsupported();
-      ids.add(id); let markers = 0;
+      ids.add(id);
       for (const node of walkElements(note).slice(1)) {
         if (!W.has(node.namespaceURI)) unsupported();
         const local = node.localName, parent = node.parentNode;
         if (local === 'p' && parent === note || local === 'r' && w(parent,'p') || local === 'pPr' && w(parent,'p') || local === 'rPr' && w(parent,'r')) continue;
         if (formatting.has(local) && (w(parent,'pPr') || w(parent,'rPr')) && !elements(node).length) continue;
-        if (local === type && w(parent,'r') && !elements(node).length) { markers++; continue; }
+        if (local === type && w(parent,'r') && !elements(node).length) continue;
         unsupported();
       }
-      if (!markers) unsupported();
+      // OCR exporters also emit typed, empty separator templates without a marker.
+      // The content and descendant checks above still reject real notes/objects.
     }
     safe.add(path);
   }
@@ -284,7 +287,7 @@ function docxBlocks(doc, entries, docs, structure) {
   while (inspect.length) {
     const node = inspect.pop();
     if (w(node, 'drawing')) { validateDocxDrawing(node, entries, docs); continue; }
-    if (w(node,'pict')) { validateHorizontalRule(node); continue; }
+    if (w(node,'pict')) { isVmlPicture(node) ? validateDocxVmlImage(node, entries, docs) : validateHorizontalRule(node); continue; }
     if (isLigatureFormatting(node)) continue;
     if (!W.has(node.namespaceURI)) reject(node);
     if (w(node, 'numPr') && (!w(node.parentNode, 'pPr') || !w(node.parentNode.parentNode, 'p'))) reject(node);
@@ -306,7 +309,7 @@ function docxBlocks(doc, entries, docs, structure) {
         if (!w(node, 'r') || elements(child).length) reject(child);
         parts.push(child.textContent);
       } else if (w(child, 'drawing') && w(node, 'r')) { validateDocxDrawing(child, entries, docs);
-      } else if (w(child,'pict') && w(node,'r')) { validateHorizontalRule(child);
+      } else if (w(child,'pict') && w(node,'r')) { isVmlPicture(child) ? validateDocxVmlImage(child, entries, docs) : validateHorizontalRule(child);
       } else if (['r', 'hyperlink'].includes(local)) inline(child, parts);
       else if (['tab', 'br', 'cr', 'noBreakHyphen', 'softHyphen'].includes(local)) {
         if (!w(node, 'r') || elements(child).length) reject(child);
@@ -356,6 +359,8 @@ export async function readTextSource(item) {
     if (checked.listData.paragraphs.some(Boolean)) notes.push("List numbers and bullets are preserved in the document; only the item text is compared, without automatic numbering.");
     if (checked.horizontalRules) notes.push("Legacy horizontal rules are preserved in DOCX downloads and supported PDF layouts; they are not displayed in the editor or compared.");
     if (checked.links) notes.push("Only the visible hyperlink text is compared; URLs are not opened or compared.");
+    if (checked.hyperlinkFields) notes.push("DOCX hyperlink fields are converted to their visible text when downloading Word. Text and text styling are preserved; the field and its link are removed.");
+    if (checked.legacyPictures) notes.push("Legacy embedded pictures are shown in document order and preserved in Word downloads. Their positioning is not compared; PDF export is unavailable for framed picture layouts.");
   }
   if (texts.length > MAX_TEXT_BLOCKS) fail("The document contains more than 2,000 text blocks. Split it into smaller files.");
   let chars = 0;
@@ -424,14 +429,22 @@ export function validateDocxDrawing(drawing, entries, docs) {
   return {path, bytes, mime, pixels, width, height, alt: (description?.getAttribute('descr') || description?.getAttribute('name') || '').slice(0,500)};
 }
 
+export function validateDocxVmlImage(picture, entries, docs) {
+  const image = inspectVmlPicture(picture, entries, docs);
+  return {...image, ...imageMime(image.bytes)};
+}
+
 export async function readDocxPackage(raw) {
   const checked = checkPackage(await unzipDocument(raw));
+  checked.hyperlinkFields = normalizeDocxHyperlinkFields(checked.doc);
+  if (checked.hyperlinkFields) checked.links = true;
   checked.structure = readDocxStructure(checked.doc, checked.docs);
   checked.texts = docxBlocks(checked.doc, checked.entries, checked.docs, checked.structure);
-  checked.horizontalRules = walkElements(checked.doc.documentElement).filter(node=>w(node,'pict')).length;
+  checked.horizontalRules = walkElements(checked.doc.documentElement).filter(node=>w(node,'pict') && !isVmlPicture(node)).length;
   checked.listData = parseDocxNumbering(checked.docs, checked.structure.paragraphs);
-  const pictures = walkElements(checked.doc.documentElement).filter(node => w(node,'drawing'));
-  if (pictures.length > 100 || pictures.reduce((sum,node) => sum + validateDocxDrawing(node,checked.entries,checked.docs).pixels,0) > 50000000) fail("DOCX: too many images to preview. Split the document into smaller files.");
+  const pictures = walkElements(checked.doc.documentElement).filter(node => w(node,'drawing') || w(node,'pict') && isVmlPicture(node));
+  checked.legacyPictures = pictures.filter(node=>w(node,'pict')).length;
+  if (pictures.length > 100 || pictures.reduce((sum,node) => sum + (w(node,'drawing') ? validateDocxDrawing : validateDocxVmlImage)(node,checked.entries,checked.docs).pixels,0) > 50000000) fail("DOCX: too many images to preview. Split the document into smaller files.");
   if (checked.texts.length > MAX_TEXT_BLOCKS || checked.texts.reduce((n,t) => n + [...t].length,0) > MAX_TEXT_CHARS) fail("The DOCX exceeds the text size limit.");
   return checked;
 }

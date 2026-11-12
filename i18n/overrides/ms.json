@@ -114,5 +114,10 @@
   "86bcbf307ff0": "{0} bahagian dalam A · {1} dalam B. Teks yang diekstrak dipaparkan tanpa susun atur asal.",
   "fb9e2b4d5d43": "{0}: nama mestilah rentetan tidak kosong dengan maksimum 255 aksara",
   "0674c5d0e565": "{0}: saiz sumber melebihi 2 MiB",
-  "44ab87c19036": "⇄ Tukar kedudukan teks"
+  "44ab87c19036": "⇄ Tukar kedudukan teks",
+  "c411521a56dc": "DOCX: Hanya medan HYPERLINK dengan penanda mula dan akhir yang sepadan serta hasil teks biasa dalam satu perenggan disokong. Tukar medan lain kepada teks biasa.",
+  "62acf48aa07d": "DOCX: Gambar berformat lama ini tidak disokong. Gunakan imej PNG atau JPEG terbenam tanpa pemangkasan, putaran atau kesan lukisan lain.",
+  "68296252c8f3": "Eksport PDF tidak tersedia untuk imej di dalam bingkai. Muat turun Word (.docx) untuk mengekalkan kedudukannya.",
+  "a8c633859588": "Medan hiperpautan DOCX ditukar kepada teks yang kelihatan apabila Word dimuat turun. Teks dan gayanya dikekalkan; medan dan pautannya dibuang.",
+  "c3944f77efa4": "Gambar terbenam berformat lama dipaparkan mengikut susunan dokumen dan dikekalkan dalam muat turun Word. Kedudukannya tidak dibandingkan; eksport PDF tidak tersedia untuk susun atur dengan gambar di dalam bingkai."
 }

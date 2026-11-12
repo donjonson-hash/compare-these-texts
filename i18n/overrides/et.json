@@ -7,5 +7,10 @@
   "087a259abc34": "Google Docs prototüüp töötab Google Apps Script kaudu Google infrastruktuuris ning nõuab autoriseerimist ja Interneti-ühendust. See loeb aktiivse dokumendi vahekaardi keha, et kontrollida muudatusi. Google kasutaja ulatusega CacheService salvestab ajutiselt valitud teksti, selle lõigu, vormingu ja asukoha andmed krüpteerimata kujul, nõutava elueaga 15 minutit; Google võib selle varem välja tõsta. Külgriba sulgemine seda vahemälu kirjet ei kustuta. Ükski LLM või arendaja server ei saa dokumendi teksti vastu. Brauseri laienduse lokaalne töötlemine ja krüptitud mustandi avaldused ei kirjelda seda Google hostitud lisandmoodulit. Enne installipaketi lubamist lugege läbi selle andmetöötluse jaotis.",
   "993153d8bb89": "See versioon ei hinda lepingute, aruannete ega raamatute sisu.",
   "11da7c54a17a": "{0}: {1}rida {2}{3}",
-  "0f27b2200fa0": "{0}rida {1}{2}"
+  "0f27b2200fa0": "{0}rida {1}{2}",
+  "c411521a56dc": "DOCX: toetatud on ainult korrektselt suletud HYPERLINK-väljad, mille lihttekstiline tulemus asub ühes lõigus. Teisendage muud väljad lihttekstiks.",
+  "62acf48aa07d": "DOCX: seda vanemas vormingus pilti ei toetata. Kasutage manustatud PNG- või JPEG-pilti ilma kärpimise, pööramise või muude graafiliste efektideta.",
+  "68296252c8f3": "Paigutusraamis oleva pildi PDF-eksport ei ole saadaval. Pildi asukoha säilitamiseks laadige alla Word (.docx).",
+  "a8c633859588": "Wordi vormingus allalaadimisel teisendatakse DOCX-i hüperlingiväljad nende nähtavaks tekstiks. Tekst ja selle vormindus säilivad; väli ja selle link eemaldatakse.",
+  "c3944f77efa4": "Vanemas vormingus manustatud pildid kuvatakse dokumendi järjekorras ja säilivad Wordi vormingus allalaadimisel. Nende paigutust ei võrrelda; paigutusraamides pilte sisaldavate küljenduste PDF-eksport ei ole saadaval."
 }

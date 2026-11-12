@@ -7,5 +7,10 @@
   "087a259abc34": "El prototip Google Docs passa per Google Apps Script a la infraestructura de Google i requereix autorització i connexió a Internet. Llegeix el cos de la pestanya del document actiu per comprovar si hi ha canvis. El servei de memòria cau d'abast de l'usuari de Google emmagatzema temporalment el text seleccionat, el seu paràgraf, les dades de format i posició en text no xifrat, amb una vida útil sol·licitada de 15 minuts; Google pot desallotjar-lo abans. Tancar la barra lateral no s'elimina l'entrada de la memòria cau. Cap servidor LLM o desenvolupador rep el text del document. El processament local i les declaracions d'esborrany xifrades de l'extensió del navegador no descriuen aquest complement allotjat per Google. Llegiu la secció de gestió de dades del paquet d'instal·lació abans d'activar-lo.",
   "993153d8bb89": "Aquesta versió no avalua el contingut de contractes, informes ni llibres.",
   "11da7c54a17a": "{0}: {1}fila {2}{3}",
-  "0f27b2200fa0": "{0}fila {1}{2}"
+  "0f27b2200fa0": "{0}fila {1}{2}",
+  "c411521a56dc": "DOCX: només s’admeten camps HYPERLINK amb inici i final correctament aparellats i un resultat de text pla en un sol paràgraf. Converteix els altres camps en text pla.",
+  "62acf48aa07d": "DOCX: aquesta imatge en format antic no és compatible. Utilitza una imatge PNG o JPEG incrustada, sense retalls, rotació ni altres efectes gràfics.",
+  "68296252c8f3": "L’exportació a PDF no està disponible per a una imatge dins d’un marc de posicionament. Descarrega Word (.docx) per conservar-ne la posició.",
+  "a8c633859588": "En descarregar en format Word, els camps d’hiperenllaç del DOCX es converteixen en el text visible. Es conserven el text i el seu format; s’eliminen el camp i l’enllaç.",
+  "c3944f77efa4": "Les imatges incrustades en format antic es mostren en l’ordre del document i es conserven en les descàrregues de Word. No se’n compara la posició; l’exportació a PDF no està disponible per a disposicions amb imatges dins de marcs de posicionament."
 }

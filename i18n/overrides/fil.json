@@ -27,5 +27,10 @@
   "11da7c54a17a": "{0}: {1}hilera {2}{3}",
   "0f27b2200fa0": "{0}hilera {1}{2}",
   "6e9fe4a5d33b": "• A {0} = {1}; B {2} = {3} — {4} ({5}).",
-  "ddff1461e1c3": "• A {0} ↔ B {1} — {2}."
+  "ddff1461e1c3": "• A {0} ↔ B {1} — {2}.",
+  "c411521a56dc": "DOCX: Tanging mga HYPERLINK field na may magkatugmang panimula at pangwakas, at simpleng tekstong resulta sa iisang talata, ang sinusuportahan. Gawing simpleng teksto ang ibang field.",
+  "62acf48aa07d": "DOCX: Hindi sinusuportahan ang larawang ito na nasa lumang format. Gumamit ng naka-embed na PNG o JPEG na walang pag-crop, pag-ikot o iba pang epekto sa pagguhit.",
+  "68296252c8f3": "Hindi magagamit ang pag-export sa PDF para sa larawang nasa frame. I-download ang Word (.docx) upang mapanatili ang posisyon nito.",
+  "a8c633859588": "Ginagawang nakikitang teksto ang mga hyperlink field ng DOCX kapag nagda-download ng Word. Pinapanatili ang teksto at estilo nito; inaalis ang field at ang link nito.",
+  "c3944f77efa4": "Ipinapakita ang mga naka-embed na larawan sa lumang format ayon sa pagkakasunod sa dokumento at pinapanatili sa mga na-download na Word file. Hindi inihahambing ang kanilang posisyon; hindi magagamit ang pag-export sa PDF para sa mga layout na may larawang nasa frame."
 }

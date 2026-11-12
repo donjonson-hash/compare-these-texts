@@ -298,5 +298,10 @@
   "1b234880a819": "{0} différences restent à vérifier.",
   "c95faf2ecd0b": "{0} différences à vérifier.",
   "925348196ea8": "{0} : A {1} → B {2} ; écart B − A : {3}{4}.",
-  "11da7c54a17a": "{0}: {1}ligne {2}{3}"
+  "11da7c54a17a": "{0}: {1}ligne {2}{3}",
+  "c411521a56dc": "DOCX : seuls les champs HYPERLINK dont les marqueurs de début et de fin sont correctement appariés, avec un résultat en texte brut dans un seul paragraphe, sont pris en charge. Convertissez les autres champs en texte brut.",
+  "62acf48aa07d": "DOCX : cette image au format ancien n’est pas prise en charge. Utilisez une image PNG ou JPEG incorporée, sans recadrage, rotation ni autre effet graphique.",
+  "68296252c8f3": "L’exportation PDF n’est pas disponible pour une image dans un cadre de positionnement. Téléchargez Word (.docx) pour conserver sa position.",
+  "a8c633859588": "Lors du téléchargement au format Word, les champs de lien hypertexte du DOCX sont convertis en leur texte visible. Le texte et sa mise en forme sont conservés ; le champ et son lien sont supprimés.",
+  "c3944f77efa4": "Les images incorporées au format ancien sont affichées dans l’ordre du document et conservées lors du téléchargement au format Word. Leur positionnement n’est pas comparé ; l’exportation PDF n’est pas disponible pour les mises en page avec des images dans des cadres de positionnement."
 }

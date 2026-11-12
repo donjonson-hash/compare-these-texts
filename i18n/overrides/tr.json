@@ -171,5 +171,10 @@
   "11da7c54a17a": "{0}: {1}satır {2}{3}",
   "4751f6a4b5d9": "{2} öğeden {0}–{1} arası",
   "c739d4d0e1d9": "{2} öğeden {0}–{1} arası {3}",
-  "44ab87c19036": "⇄ Metinlerin yerini değiştir"
+  "44ab87c19036": "⇄ Metinlerin yerini değiştir",
+  "c411521a56dc": "DOCX: Yalnızca başlangıç ve bitiş işaretleri eşleşen, tek paragrafta düz metin sonucu bulunan HYPERLINK alanları desteklenir. Diğer alanları düz metne dönüştürün.",
+  "62acf48aa07d": "DOCX: Eski biçimdeki bu resim desteklenmiyor. Kırpma, döndürme veya başka çizim efektleri olmayan gömülü bir PNG ya da JPEG resmi kullanın.",
+  "68296252c8f3": "Çerçeve içindeki bir resim PDF olarak dışa aktarılamaz. Konumunu korumak için Word (.docx) dosyasını indirin.",
+  "a8c633859588": "Word indirilirken DOCX köprü alanları görünen metinlerine dönüştürülür. Metin ve metin biçimi korunur; alan ve bağlantısı kaldırılır.",
+  "c3944f77efa4": "Eski biçimdeki gömülü resimler belge sırasına göre gösterilir ve indirilen Word dosyalarında korunur. Konumları karşılaştırılmaz; çerçeve içinde resim bulunan düzenler PDF olarak dışa aktarılamaz."
 }

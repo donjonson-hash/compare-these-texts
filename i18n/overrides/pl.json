@@ -23,5 +23,10 @@
   "2530c04512b7": "Wypróbuj przykład",
   "d99bcd78b586": "Prześlij plik",
   "403e555cd16d": "Użyj A",
-  "3807a668acb4": "Prawidłowe wersje robocze z wcześniejszych wersji programu są szyfrowane przy otwarciu w tej wersji. Jeśli szyfrowanie lub zapisywanie się nie powiedzie, aplikacja wyświetli błąd i nie zastąpi poprzedniej wersji roboczej nową, niezaszyfrowaną kopią. Istniejąca wersja robocza pozostanie nienaruszona. Usunięcie lub wygaśnięcie wersji roboczej powoduje usunięcie zapisanej treści i klucza szyfrowania. Nie stanowi to gwarancji bezpiecznego wymazania z dysku ani z kopii zapasowych."
+  "3807a668acb4": "Prawidłowe wersje robocze z wcześniejszych wersji programu są szyfrowane przy otwarciu w tej wersji. Jeśli szyfrowanie lub zapisywanie się nie powiedzie, aplikacja wyświetli błąd i nie zastąpi poprzedniej wersji roboczej nową, niezaszyfrowaną kopią. Istniejąca wersja robocza pozostanie nienaruszona. Usunięcie lub wygaśnięcie wersji roboczej powoduje usunięcie zapisanej treści i klucza szyfrowania. Nie stanowi to gwarancji bezpiecznego wymazania z dysku ani z kopii zapasowych.",
+  "c411521a56dc": "DOCX: obsługiwane są tylko poprawnie zamknięte pola HYPERLINK z wynikiem w postaci zwykłego tekstu w jednym akapicie. Zamień pozostałe pola na zwykły tekst.",
+  "62acf48aa07d": "DOCX: ten obraz w starszym formacie nie jest obsługiwany. Użyj osadzonego obrazu PNG lub JPEG bez przycinania, obracania ani innych efektów graficznych.",
+  "68296252c8f3": "Eksport do PDF jest niedostępny dla obrazu w ramce pozycjonującej. Pobierz Word (.docx), aby zachować jego położenie.",
+  "a8c633859588": "Podczas pobierania w formacie Word pola hiperłączy w DOCX są zamieniane na ich widoczny tekst. Tekst i jego formatowanie zostają zachowane; pole i jego łącze zostają usunięte.",
+  "c3944f77efa4": "Osadzone obrazy w starszym formacie są wyświetlane w kolejności dokumentu i zachowywane przy pobieraniu w formacie Word. Ich położenie nie jest porównywane; eksport do PDF jest niedostępny dla układów z obrazami w ramkach pozycjonujących."
 }

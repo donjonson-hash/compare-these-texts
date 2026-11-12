@@ -41,6 +41,18 @@ in Word or LibreOffice; changing the filename extension is not conversion.
 Supported text headers/footers and page numbers are included in the PDF. Complex
 page layouts remain restricted; PDF export does not silently discard those parts.
 
+OCR-generated DOCX files may contain markerless, empty note separator templates,
+embedded legacy VML pictures, and complex HYPERLINK fields. The bounded importer
+accepts these constructions: real footnotes/endnotes remain unsupported. It uses
+only embedded PNG/JPEG bytes and never fetches an external picture. A redundant
+VML image reference is accepted only when it resolves to the same embedded image.
+Pictures appear in document order in the editor and their original XML and media
+remain in DOCX downloads. Framed pictures retain their Word position on download;
+PDF export is disabled for that layout. Supported HYPERLINK fields become their
+visible, styled text on DOCX download; the field and its link are removed, so Word
+cannot replace an edit with a stale field result. Other field types, nested fields,
+cropping, rotation, and arbitrary VML shapes are rejected explicitly.
+
 ## Extension welcome and store kit
 
 The 0.37.4 candidate opens a local welcome page on first installation. Updates

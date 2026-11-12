@@ -11,5 +11,10 @@
   "087a259abc34": "A Google Docs prototípus a Google Apps Script-n keresztül fut a Google infrastruktúrájában, és engedélyt és internetkapcsolatot igényel. Beolvassa az aktív dokumentumlap törzsét, hogy ellenőrizze a változásokat. A Google felhasználói hatókörű CacheService-je ideiglenesen tárolja a kiválasztott szöveget, annak bekezdését, formázási és pozícióadatait titkosítatlan formában, a kért 15 perces élettartammal; A Google korábban kilakoltathatja. Az oldalsáv bezárása nem törli a gyorsítótár bejegyzését. Egyetlen LLM vagy fejlesztői szerver sem kapja meg a dokumentum szövegét. A böngészőbővítmény csak helyi feldolgozásra és titkosított piszkozatra vonatkozó utasításai nem írják le ezt a Google által hosztolt bővítményt. Olvassa el a telepítőcsomag adatkezelési szakaszát, mielőtt engedélyezné.",
   "993153d8bb89": "Ez a verzió nem értékeli a szerződések, jelentések vagy könyvek tartalmát.",
   "11da7c54a17a": "{0}: {1}sor {2}{3}",
-  "0f27b2200fa0": "{0}sor {1}{2}"
+  "0f27b2200fa0": "{0}sor {1}{2}",
+  "c411521a56dc": "DOCX: csak a megfelelően lezárt HYPERLINK mezők támogatottak, amelyek eredménye egyetlen bekezdésben található egyszerű szöveg. A többi mezőt alakítsa egyszerű szöveggé.",
+  "62acf48aa07d": "DOCX: ez a régi formátumú kép nem támogatott. Használjon beágyazott PNG vagy JPEG képet vágás, forgatás vagy egyéb grafikai effektus nélkül.",
+  "68296252c8f3": "A pozicionáló keretben lévő kép PDF-exportja nem érhető el. A helyzet megőrzéséhez töltse le Word (.docx) formátumban.",
+  "a8c633859588": "Word formátumú letöltéskor a DOCX hiperhivatkozás-mezői a látható szövegükké alakulnak. A szöveg és annak formázása megmarad; a mező és a hivatkozás eltávolításra kerül.",
+  "c3944f77efa4": "A régi formátumú beágyazott képek a dokumentum sorrendjében jelennek meg, és a Word-letöltésekben megmaradnak. Elhelyezésüket nem hasonlítjuk össze; a pozicionáló keretekben képeket tartalmazó elrendezések PDF-exportja nem érhető el."
 }

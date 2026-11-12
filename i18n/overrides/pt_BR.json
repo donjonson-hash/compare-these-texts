@@ -227,5 +227,10 @@
   "2a1388ce5524": "• {0} — linha {1} em {2}.",
   "dd92a5efb8a8": "←  Casa",
   "fe67c392f7d9": "←  Palavra & Google Docs Complementos",
-  "44ab87c19036": "⇄ Trocar textos"
+  "44ab87c19036": "⇄ Trocar textos",
+  "c411521a56dc": "DOCX: só são aceitos campos HYPERLINK com marcadores de início e fim corretamente pareados e resultado em texto simples em um único parágrafo. Converta os outros campos em texto simples.",
+  "62acf48aa07d": "DOCX: esta imagem em formato antigo não é compatível. Use uma imagem PNG ou JPEG incorporada, sem recorte, rotação ou outros efeitos gráficos.",
+  "68296252c8f3": "A exportação para PDF não está disponível para uma imagem em um quadro de posicionamento. Baixe Word (.docx) para preservar sua posição.",
+  "a8c633859588": "Ao baixar em formato Word, os campos de hiperlink do DOCX são convertidos em seu texto visível. O texto e sua formatação são preservados; o campo e seu link são removidos.",
+  "c3944f77efa4": "As imagens incorporadas em formato antigo são exibidas na ordem do documento e preservadas nos downloads em Word. Seu posicionamento não é comparado; a exportação para PDF não está disponível para layouts com imagens em quadros de posicionamento."
 }

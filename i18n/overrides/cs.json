@@ -8,5 +8,10 @@
   "087a259abc34": "Prototyp Google Docs běží přes Google Apps Script v infrastruktuře Google a vyžaduje autorizaci a připojení k internetu. Přečte tělo aktivní karty dokumentu a zkontroluje změny. CacheService Google v uživatelském rozsahu dočasně ukládá vybraný text, odstavec, ve kterém se nachází, formátování a údaje o poloze v nešifrované podobě s požadovanou životností 15 minut; Google jej může vypudit dříve. Zavřením postranního panelu se tato položka mezipaměti nesmaže. Žádný LLM nebo vývojářský server neobdrží text dokumentu. Pouze místní zpracování a šifrované koncepty rozšíření prohlížeče tento doplněk hostovaný Google nepopisují. Před povolením instalačního balíčku si přečtěte část o zpracování dat.",
   "993153d8bb89": "Tato verze neposuzuje obsah smluv, zpráv ani knih.",
   "11da7c54a17a": "{0}: {1}řádek {2}{3}",
-  "0f27b2200fa0": "{0}řádek {1}{2}"
+  "0f27b2200fa0": "{0}řádek {1}{2}",
+  "c411521a56dc": "DOCX: podporována jsou pouze správně uzavřená pole HYPERLINK s výsledkem ve formě prostého textu v jednom odstavci. Ostatní pole převeďte na prostý text.",
+  "62acf48aa07d": "DOCX: tento obrázek ve starším formátu není podporován. Použijte vložený obrázek PNG nebo JPEG bez ořezu, otočení či jiných grafických efektů.",
+  "68296252c8f3": "Export do PDF není dostupný pro obrázek v polohovacím rámečku. Stáhněte Word (.docx), abyste zachovali jeho umístění.",
+  "a8c633859588": "Při stažení ve formátu Word se pole hypertextových odkazů v DOCX převedou na svůj viditelný text. Text a jeho formátování zůstanou zachovány; pole a jeho odkaz se odstraní.",
+  "c3944f77efa4": "Vložené obrázky ve starším formátu se zobrazují v pořadí dokumentu a zachovají se při stažení ve formátu Word. Jejich umístění se neporovnává; export do PDF není dostupný pro rozvržení s obrázky v polohovacích rámečcích."
 }

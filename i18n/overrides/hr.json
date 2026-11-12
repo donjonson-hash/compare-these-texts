@@ -201,5 +201,10 @@
   "2fbc5d08ac9a": "broj ćelija ne odgovara mreži tablice.",
   "977de411ace5": "dokument sadrži više od 2.000 tekstualnih blokova. Podijelite ga na manje datoteke.",
   "11da7c54a17a": "{0}: {1}redak {2}{3}",
-  "0f27b2200fa0": "{0}redak {1}{2}"
+  "0f27b2200fa0": "{0}redak {1}{2}",
+  "c411521a56dc": "DOCX: podržana su samo pravilno zatvorena polja HYPERLINK s rezultatom u običnom tekstu unutar jednog odlomka. Ostala polja pretvorite u običan tekst.",
+  "62acf48aa07d": "DOCX: ova slika u starijem formatu nije podržana. Upotrijebite ugrađenu PNG ili JPEG sliku bez obrezivanja, zakretanja ili drugih grafičkih efekata.",
+  "68296252c8f3": "Izvoz u PDF nije dostupan za sliku u okviru za pozicioniranje. Preuzmite Word (.docx) kako biste sačuvali njezin položaj.",
+  "a8c633859588": "Pri preuzimanju u formatu Word polja hiperveza u DOCX-u pretvaraju se u svoj vidljivi tekst. Tekst i njegovo oblikovanje ostaju sačuvani; polje i njegova poveznica uklanjaju se.",
+  "c3944f77efa4": "Ugrađene slike u starijem formatu prikazuju se redoslijedom u dokumentu i čuvaju pri preuzimanju u formatu Word. Njihov se položaj ne uspoređuje; izvoz u PDF nije dostupan za rasporede sa slikama u okvirima za pozicioniranje."
 }
