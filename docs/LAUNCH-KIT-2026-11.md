@@ -34,7 +34,9 @@ website: the website uses Google Analytics; the extensions do not.
 
 On 30 October the Chrome Web Store listing showed 0.37.6 with the new name,
 long description and a link to comparetwotexts.pro, so store-bound launches are
-unblocked. Show HN is planned for Wednesday 4 November 2026.
+unblocked. Show HN was planned for Wednesday 4 November 2026 and did not happen
+(the owner was moving). It is rescheduled to Wednesday 18 November 2026; the run
+sheet below carries the new times.
 
 ## Links by placement
 
@@ -115,12 +117,18 @@ to open-source directories or awesome lists that require an OSI license.
 Post on Tuesday–Thursday, 8–10 a.m. US Eastern. Submit the URL; post the text
 below as the first comment immediately.
 
-### Run sheet for 4 November 2026 (8:00 ET = 16:00 Moscow)
+### Run sheet for 18 November 2026 (8:00 ET = 18:30 Colombo = 16:00 Moscow)
+
+Fallback if the day is lost again: Thursday 19 November, same time. Do not post
+on a Friday or at the weekend.
 
 Before the day:
 
 - Use an existing Hacker News account, or create one now and take part in a few
   discussions first. Brand-new accounts draw suspicion and may be restricted.
+- Check the Chrome Web Store page first: the English listing must carry the new
+  name and the rewritten description, not the "Compare and edit" copy that drew
+  the keyword-spam notice. HN readers open the store page and read it.
 - Walk the whole path once as a new user: site, Add to Chrome, install, Try an
   example, your own DOCX and PDF, download.
 - Keep the first comment and the answers below open in a text file.
@@ -166,6 +174,31 @@ Likely questions and honest answers:
 - *How is this different from Diffchecker?* Local processing, editing in place, DOCX/PDF export and ID-based spreadsheet matching. Do not disparage competitors.
 - *Why Google Analytics?* To see which pages lead to use and installs. It is configured without Google signals or ad personalisation and is absent from the extension.
 
+### Second HN angle: a diff of a public document
+
+Diffchecker's own Show HN in September 2020 reached 4 points. Its traffic on
+Hacker News came from diffs of documents people cared about: a Twitter Terms of
+Service diff in May 2022 (230 points, 145 comments,
+https://news.ycombinator.com/item?id=31351013) and a follow-up in January 2023
+(106 points, https://news.ycombinator.com/item?id=34448524). The product was the
+medium, not the subject.
+
+Plan for us, two to four weeks after the Show HN, or instead of it if a suitable
+document change happens first:
+
+1. Watch for a change in a document HN readers follow: the terms or privacy
+   policy of OpenAI, Google, Apple, GitHub, Mozilla or a major browser; a licence
+   change of a well-known open-source project.
+2. Fetch both public versions, compare them in Compare Two Texts and export the
+   report. Check that the diff is readable without the tool.
+3. Submit it as a plain link, not a Show HN, with a factual title such as
+   `OpenAI privacy policy changes, 12 Nov vs 1 Sep` and the report hosted on
+   comparetwotexts.pro. Mention the tool only if asked.
+4. The first comment summarises the three most important changes in plain
+   language, with quotes. No marketing.
+
+Speed matters: such posts work within hours of the change becoming public.
+
 ## 5. Product Hunt
 
 Launch at 12:01 a.m. Pacific, Tuesday–Thursday. Prepare the page as a draft a
@@ -194,6 +227,11 @@ Maker comment:
 Check each subreddit's self-promotion rules on the day you post. Use an account
 with a history of genuine participation. One subreddit at a time, several days
 apart.
+
+The owner's Reddit account was created on 12 November 2026. Before any post
+about the product, spend two or three weeks commenting in r/excel, r/word,
+r/legaltech or r/SideProject where you can genuinely help, without links. New
+accounts that start with a product post are removed by automoderators.
 
 ### r/SideProject
 
@@ -512,6 +550,36 @@ to add as negatives, and installs in the CWS dashboard for the same days. Stop
 early if store clicks stay at zero after $50. Expect roughly 150–250 clicks at
 Semrush's CPC estimates; that is an estimate, not a forecast of installs.
 
+## 13. AI-answer visibility baseline (12 November 2026)
+
+Measured with Shipfound's free baseline: 10 buyer questions, six engines
+(ChatGPT, Claude, Gemini, Perplexity, Google AI Mode, Google AI Overviews), four
+runs each. Compare Two Texts was named in 0 of 60 question/engine pairs. Named
+instead: Diffchecker (73 answers), Draftable (57), WinMerge (24). Re-check costs
+$1.90; do it about four weeks after the home page block, the store rename and the
+outreach below have had time to land.
+
+Pages the engines cite for these questions, none of which lists us. They are the
+priority outreach targets for section 7, ahead of the generic .edu search:
+
+| Page | Cited in answers | Engines |
+| --- | ---: | ---: |
+| https://zapier.com/blog/compare-two-word-documents | 18 | 4 |
+| https://clausul.com/blog/diffchecker-for-legal-documents | 16 | 5 |
+| https://atlasworkspace.ai/blog/compare-word-document | 15 | 4 |
+| https://adiralaw.com/journal/free-contract-comparison-and-diff-tools-compared | 14 | 2 |
+| https://rankite.com/blog/best-document-comparison-software | 14 | 2 |
+| https://vaquill.ai/blog/ai-tools-comparing-document-versions | 12 | 3 |
+| https://ones.com/blog/free-document-comparison-software-5-side-by-side-picks | 11 | 3 |
+
+Draftable, Diffchecker, Microsoft and Adobe pages are cited more often but will
+not list a competing free tool; skip them.
+
+Peer study notes (same run): ChangeChecks and DiffPaper state "files never leave
+your browser" on the first screen, ours does not; every peer, including free
+ones, has a `/pricing` page that directories link to; Diffchecker is on G2.
+Each is a small task in its own PR.
+
 ## Tracking
 
 | Date | Placement | URL of the post or listing | Status | Link type | Notes |
@@ -521,8 +589,8 @@ Semrush's CPC estimates; that is an estimate, not a forecast of installs.
 | 2026-10-30 | SaaSHub | https://www.saashub.com/compare-two-texts-edit-differences | Live, verified | Directory listing, Visit website → https://comparetwotexts.pro/ | Name change to "Compare Two Texts" requested |
 | | Microsoft Edge Add-ons | | Postponed by the owner on 2026-10-31; package and copy are ready | | |
 | 2026-11-01 | YouTube demo | https://youtu.be/BEHHf0I0kE8 | Published as a premiere | Video | Description links carry launch_2026_10 labels; chapters and tags still to add |
-| | Show HN | | | | |
-| | Product Hunt | | | | |
+| | Show HN | | Missed on 2026-11-04 (owner moving); rescheduled to 2026-11-18, 8:00 ET | | Run sheet in section 4 |
+| | Product Hunt | | One week after Show HN | | |
 | | Reddit r/SideProject | | | | |
 | | Reddit r/chrome_extensions | | | | |
 
