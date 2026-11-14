@@ -74,7 +74,9 @@ test('website structured data describes canonical pages without unsupported app 
     const data = JSON.parse(scripts[0].textContent);
     assert.equal(data['@context'], 'https://schema.org');
     const [site, page] = data['@graph'];
-    assert.deepEqual(data['@graph'].map(node => node['@type']), ['WebSite', 'WebPage']);
+    // The home FAQ is also published as FAQPage; scripts/check_static.py keeps it equal to the visible FAQ.
+    assert.deepEqual(data['@graph'].map(node => node['@type']),
+      path === 'index.html' ? ['WebSite', 'WebPage', 'FAQPage'] : ['WebSite', 'WebPage']);
     assert.equal(site.url, 'https://comparetwotexts.pro/');
     assert.equal(page.url, url);
     assert.equal(page.url, doc.querySelector('link[rel=canonical]').href);

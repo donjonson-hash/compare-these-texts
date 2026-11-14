@@ -1,7 +1,7 @@
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlparse,urljoin
-import io,json,zipfile,subprocess,re,uuid,importlib.util
+import io,json,zipfile,subprocess,re,uuid,importlib.util,html
 import xml.etree.ElementTree as ET
 from store_metadata import LOCALES, message_files
 from website_analytics import SCRIPT_HASH, TAG
@@ -101,6 +101,17 @@ sitemap=ET.parse(root/'sitemap.xml')
 sitemap_urls=[loc.text for loc in sitemap.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
 assert len(sitemap_urls)==len(set(sitemap_urls)) and set(sitemap_urls)==canonical_pages,'sitemap must list every canonical page exactly once'
 assert 'Sitemap: https://comparetwotexts.pro/sitemap.xml' in (root/'robots.txt').read_text()
+# Structured data must describe what visitors see: the FAQPage answers mirror the visible home FAQ.
+def plain_text(fragment):return re.sub(r'\s+',' ',html.unescape(re.sub(r'<[^>]+>','',fragment))).strip()
+home=(root/'index.html').read_text()
+graph={node['@type']:node for node in json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>',home,re.S).group(1))['@graph']}
+visible_faq=[(plain_text(q),plain_text(a)) for q,a in re.findall(r'<details><summary>(.*?)</summary><p>(.*?)</p></details>',re.search(r'<section id="home-about".*?</section>',home,re.S).group(0),re.S)]
+assert visible_faq and visible_faq==[(item['name'],item['acceptedAnswer']['text']) for item in graph['FAQPage']['mainEntity']],'FAQPage must match the visible home FAQ'
+# llms.txt is a website-only guide for AI agents; every site link must be a live canonical page.
+llms=(root/'llms.txt').read_text()
+assert llms.startswith('# Compare Two Texts\n'),'llms.txt title'
+llms_site_urls=set(re.findall(r'https://comparetwotexts\.pro/[^\s),]*',llms))
+assert llms_site_urls and llms_site_urls<=set(sitemap_urls),('llms.txt links outside the sitemap',llms_site_urls-set(sitemap_urls))
 for p in [*root.glob('*.js'), *root.glob('*.mjs'), *root.glob('word-addin/*.mjs')]:subprocess.run(['node','--check',str(p)],check=True)
 assert 'new Worker(' in (root/'transport.js').read_text()
 # The separately hosted Word pilot has its own Office permission contract. It

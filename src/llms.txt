@@ -1,25 +1,40 @@
 # Compare Two Texts
 
-> Compare and edit text and documents in the browser. Official website: https://comparetwotexts.pro/.
+> Compare Two Texts is a free diff checker for plain text, Word (.docx), text-based PDF, Excel (.xlsx) and CSV files. It shows the differences side by side, lets you edit the result and download it. Comparison runs in the browser: files are not uploaded to a server or sent to an AI service, and no account is needed.
 
-The website and browser extension are free to use. The pricing page describes current terms and limits. PDF comparison requires selectable text; scanned pages and image comparison are not supported. Word and Google Docs add-ins are separately installed prototypes with their own limits and data handling.
+Key facts:
 
-## Product
+- Free, with no account, no trial, no subscription and no limit on the number of comparisons. There is no paid plan.
+- Works on the website and as a Chrome extension (also installable in Microsoft Edge). The extension works offline once installed.
+- Supported files: DOCX, text-based PDF, TXT, XLSX, CSV and TSV, up to 2 MB per file and 5,000 spreadsheet rows per file.
+- PDF files need selectable text; scanned pages are not read (no OCR). Text and table content is compared, not images or layout.
+- Results can be edited in place and downloaded as DOCX, PDF or TXT. For Word documents you can keep the wording from either version, passage by passage.
+- Spreadsheets are compared by an ID or SKU column, showing changed cells and missing rows.
+- Interface available in 51 languages.
+- The website counts visits with Google Analytics, never the content of texts. The extension contains no analytics.
 
-- [Document workspace](https://comparetwotexts.pro/): Compare documents, review differences and download results.
-- [Pricing and limits](https://comparetwotexts.pro/pricing/): Current free offering, file limits and account requirements.
-- [Browser extension](https://comparetwotexts.pro/extension/): Installation options and offline workspace information.
-- [Word and Google Docs add-ins](https://comparetwotexts.pro/office-addins/): Prototype installation, supported selections and data handling.
+How to use: open https://comparetwotexts.pro/, paste the original text under A and the changed version under B, then select Compare texts.
+
+## Use it
+
+- [Compare two texts online](https://comparetwotexts.pro/): paste two texts or upload two files and see every difference
+- [Chrome extension](https://comparetwotexts.pro/extension/): the same tool in the browser toolbar, working offline
+- [Chrome Web Store listing](https://chromewebstore.google.com/detail/kclhfaiampafehfhhlejeeefhdhocfcg)
 
 ## File guides
 
-- [Word documents](https://comparetwotexts.pro/compare-word-documents/): Compare downloaded document versions.
-- [PDF files](https://comparetwotexts.pro/compare-pdf-files/): Compare text-based PDFs and review format limitations.
-- [Excel files](https://comparetwotexts.pro/compare-excel-files/): Compare spreadsheet rows and cells.
-- [CSV files](https://comparetwotexts.pro/compare-csv-files/): Compare delimited tables.
+- [Compare two Word documents](https://comparetwotexts.pro/compare-word-documents/): text and table differences in DOCX files, edit and download the result
+- [Compare two PDF files](https://comparetwotexts.pro/compare-pdf-files/): text differences in PDFs with selectable text
+- [Compare two Excel files](https://comparetwotexts.pro/compare-excel-files/): match rows by ID or SKU, find changed values and missing records
+- [Compare two CSV files](https://comparetwotexts.pro/compare-csv-files/): CSV diff by ID with delimiter choice and column mapping
 
-## Help and policies
+## Details
 
-- [Help and feedback](https://comparetwotexts.pro/support/): File guides, supported operations and limitations.
-- [Your files and privacy](https://comparetwotexts.pro/privacy/): Document processing, local drafts and website analytics.
-- [Terms of use](https://comparetwotexts.pro/terms/): Product licensing and third-party notices.
+- [Pricing](https://comparetwotexts.pro/pricing/): what is free and the current limits
+- [Privacy](https://comparetwotexts.pro/privacy/): how documents, encrypted local drafts and analytics are handled
+- [Help](https://comparetwotexts.pro/support/): supported files, editing, PDF export and troubleshooting
+
+## Optional
+
+- [Word and Google Docs add-ins](https://comparetwotexts.pro/office-addins/): manually installed prototypes for editing a selected passage inside Word or Google Docs
+- [Terms of use](https://comparetwotexts.pro/terms/)
