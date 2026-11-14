@@ -46,7 +46,7 @@ for target in ['chrome','firefox']:
   # AMO limits the add-on name to 45 characters; retain Chrome's localized title.
   manifest['name']='Compare Two Texts — Diff Checker'
  # Preserve the Firefox ID and permission-free offline CSP.
- files={p.name:p.read_bytes() for p in dist.iterdir() if p.is_file() and p.name not in ('robots.txt','sitemap.xml','_headers')}
+ files={p.name:p.read_bytes() for p in dist.iterdir() if p.is_file() and p.name not in ('robots.txt','sitemap.xml','llms.txt','_headers')}
  if target=='firefox':split_color_emoji(files)
  for name in files:
   if name.endswith('.html'):files[name]=strip_website_analytics(files[name].decode()).encode()
