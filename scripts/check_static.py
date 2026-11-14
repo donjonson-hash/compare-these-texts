@@ -188,7 +188,7 @@ for p in (root/'downloads').glob('*.zip'):
      assert not u.path.startswith('/'),(p,ref)
      assert u.path in z.namelist(),(p,ref)
   if p.name in (f"ctt-chrome-{release['version']}.zip",f"ctt-firefox-{release['version']}.zip"):
-   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','sitemap.xml','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
+   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','sitemap.xml','llms.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
    expected.update(page+'.html' for page in offline_guides)
    expected.update('downloads/'+name for name in office_downloads)
    if is_chrome:expected.update(localized_files)
@@ -201,7 +201,7 @@ for p in (root/'downloads').glob('*.zip'):
    check_google_archive(z.read('downloads/'+google_archive),str(p)+' nested Google Docs')
    assert not any(name.startswith('word-addin/') for name in z.namelist()),(p,'Word host code must remain outside the offline extension')
    for f in root.iterdir():
-    if f.is_file() and f.name not in ('index.html','robots.txt','sitemap.xml','_headers'):
+    if f.is_file() and f.name not in ('index.html','robots.txt','sitemap.xml','llms.txt','_headers'):
      expected_file=root.parent/'src'/f.name if f.name in minified_files else f
      expected_data=firefox_emoji[f.name] if not is_chrome and f.name in firefox_emoji else expected_file.read_bytes()
      assert z.read(f.name)==expected_data,(p,f.name)
