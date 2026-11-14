@@ -523,23 +523,34 @@ site code because GA4 already records `chrome_store_click`):
 
 - Type: Search only, Expert mode (not a Smart campaign); no Display or Search
   partners.
-- Budget: $7 per day for 14 days, Maximize clicks with a $0.60 bid limit.
+- Dates: Tuesday 1 December to Monday 14 December 2026. Not earlier: Show HN
+  (18 November) would mix with ad traffic, and the CWS dashboard does not split
+  installs by source; 26–30 November is Thanksgiving to Cyber Monday. Create the
+  campaign early with that start date so ad review finishes before it.
+- Ad schedule: Monday to Friday, 08:00–20:00 New York time (convert if the account
+  time zone differs). The product is a work tool installed on desktop.
+- Budget: $10 per day over the 10 weekdays ($100), Maximize clicks with a $0.60
+  bid limit.
 - Locations: United States, United Kingdom, Canada, Australia, Ireland. Language:
   English. Devices: desktop and tablet only (set mobile to -100%): extensions do not
   install on phones.
-- Conversion: import GA4 `chrome_store_click` as the primary conversion;
-  `comparison_complete` as secondary.
+- Conversion: GA4 `chrome_store_click`, imported into Ads as the primary action,
+  counted once per click. It was marked a key event on 13 November 2026; the website
+  property is linked to Ads customer 9266940431. No Ads tag on the site: the privacy
+  page promises no advertising trackers. `comparison_complete` is not a key event and
+  $100 is too little for bidding to learn from it, so it is not imported.
 - Ad group A, text (landing `/`): [compare two texts], [compare text online],
   "text comparison tool", [diff text], "compare texts online".
 - Ad group B, Word (landing `/compare-word-documents/`): [compare two word
   documents], "compare word documents online", [compare word docs].
 - Negative keywords: python, java, excel formula, git, github, code, plagiarism,
   similarity, ai detector, jobs, salary, download, crack, notepad++.
-- Do not use competitor trademarks in ad text or bid on them.
+- Do not use competitor trademarks in ad text or bid on them ("Diff Checker" reads as
+  Diffchecker, so it is not a headline).
 
 Responsive search ad, group A (headlines up to 30 characters, descriptions up to 90):
 
-- Headlines: `Compare Two Texts Online` / `Free Diff Checker` / `See Every Change Highlighted` / `Edit Differences in Place` / `No Upload, No Account` / `Word, PDF and Excel Too` / `Works Offline in Chrome`
+- Headlines: `Compare Two Texts Online` / `Free Text Diff Tool` / `See Every Change Highlighted` / `Edit Differences in Place` / `No Upload, No Account` / `Word, PDF and Excel Too` / `Works Offline in Chrome`
 - Descriptions: `Paste two texts and see every difference side by side. Fix them right in the results.` / `Files are processed in your browser, never uploaded. Free, with an offline extension.`
 
 Group B uses the same pattern with `Compare Two Word Documents`, `No Microsoft Word Needed`
