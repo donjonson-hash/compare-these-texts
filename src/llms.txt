@@ -1,0 +1,25 @@
+# Compare Two Texts
+
+> Compare and edit text and documents in the browser. Official website: https://comparetwotexts.pro/.
+
+The website and browser extension are free to use. The pricing page describes current terms and limits. PDF comparison requires selectable text; scanned pages and image comparison are not supported. Word and Google Docs add-ins are separately installed prototypes with their own limits and data handling.
+
+## Product
+
+- [Document workspace](https://comparetwotexts.pro/): Compare documents, review differences and download results.
+- [Pricing and limits](https://comparetwotexts.pro/pricing/): Current free offering, file limits and account requirements.
+- [Browser extension](https://comparetwotexts.pro/extension/): Installation options and offline workspace information.
+- [Word and Google Docs add-ins](https://comparetwotexts.pro/office-addins/): Prototype installation, supported selections and data handling.
+
+## File guides
+
+- [Word documents](https://comparetwotexts.pro/compare-word-documents/): Compare downloaded document versions.
+- [PDF files](https://comparetwotexts.pro/compare-pdf-files/): Compare text-based PDFs and review format limitations.
+- [Excel files](https://comparetwotexts.pro/compare-excel-files/): Compare spreadsheet rows and cells.
+- [CSV files](https://comparetwotexts.pro/compare-csv-files/): Compare delimited tables.
+
+## Help and policies
+
+- [Help and feedback](https://comparetwotexts.pro/support/): File guides, supported operations and limitations.
+- [Your files and privacy](https://comparetwotexts.pro/privacy/): Document processing, local drafts and website analytics.
+- [Terms of use](https://comparetwotexts.pro/terms/): Product licensing and third-party notices.

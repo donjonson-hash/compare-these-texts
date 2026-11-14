@@ -59,7 +59,12 @@ with zipfile.ZipFile(sys.argv[1]) as z:
       assert.match(doc.body.textContent, /15 minutes/);
       for (const element of doc.querySelectorAll('[href],[src]')) {
         const ref = element.getAttribute('href') ?? element.getAttribute('src');
-        if (/^https:/.test(ref)) { assert.equal(ref, 'https://comparetwotexts.pro/word-addin/'); continue; }
+        if (/^https:/.test(ref)) {
+          assert.ok(['https://comparetwotexts.pro/word-addin/', 'https://comparetwotexts.pro/pricing/'].includes(ref), ref);
+          assert.equal(element.getAttribute('target'), '_blank');
+          assert.ok(element.relList.contains('noopener'));
+          continue;
+        }
         if (ref.startsWith('#')) { assert.ok(doc.querySelector(ref)); continue; }
         assert.ok(!ref.startsWith('/'), ref);
         assert.ok(bundle.names.includes(ref), ref);
