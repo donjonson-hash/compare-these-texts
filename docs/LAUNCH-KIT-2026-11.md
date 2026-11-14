@@ -523,27 +523,57 @@ site code because GA4 already records `chrome_store_click`):
 
 - Type: Search only, Expert mode (not a Smart campaign); no Display or Search
   partners.
-- Budget: $7 per day for 14 days, Maximize clicks with a $0.60 bid limit.
+- Dates: Tuesday 1 December to Monday 14 December 2026. Not earlier: Show HN
+  (18 November) would mix with ad traffic, and the CWS dashboard does not split
+  installs by source; 26–30 November is Thanksgiving to Cyber Monday. Create the
+  campaign early with that start date so ad review finishes before it.
+- Ad schedule: the account time zone is GMT+05:30 and cannot change, so the
+  schedule runs Monday 13:30 to Saturday 09:30 account time: from Monday 08:00 in
+  London to Friday 20:00 in California. The product is a work tool used on desktop.
+- Budget: a $100 total campaign budget (a hard cap for the whole run, unlike a daily
+  budget that Google may exceed), Maximize clicks with a $0.60 bid limit.
 - Locations: United States, United Kingdom, Canada, Australia, Ireland. Language:
   English. Devices: desktop and tablet only (set mobile to -100%): extensions do not
   install on phones.
-- Conversion: import GA4 `chrome_store_click` as the primary conversion;
-  `comparison_complete` as secondary.
+- Conversion: GA4 `chrome_store_click`, imported into Ads as the primary action,
+  counted once per click. It was marked a key event on 13 November 2026; the website
+  property is linked to Ads customer 9266940431. No Ads tag on the site: the privacy
+  page promises no advertising trackers. `comparison_complete` is not a key event and
+  $100 is too little for bidding to learn from it, so it is not imported.
 - Ad group A, text (landing `/`): [compare two texts], [compare text online],
-  "text comparison tool", [diff text], "compare texts online".
+  "text comparison tool", [diff text], "compare texts online", plus seven phrase
+  matches picked from Google's suggestions: "text compare", "text diff online",
+  "text difference checker", "compare two texts online", "find differences between
+  two texts", "compare two texts and highlight differences", "compare texts for
+  differences". Do not accept the wizard's "Apply all": it adds 35 broad matches,
+  some about similarity and plagiarism, which is not what the product does.
 - Ad group B, Word (landing `/compare-word-documents/`): [compare two word
-  documents], "compare word documents online", [compare word docs].
-- Negative keywords: python, java, excel formula, git, github, code, plagiarism,
-  similarity, ai detector, jobs, salary, download, crack, notepad++.
-- Do not use competitor trademarks in ad text or bid on them.
+  documents], [compare word documents], "compare word documents online", [compare
+  word docs], "compare two word documents for differences".
+- Negative keywords (campaign level, broad): python, java, excel formula, git,
+  github, code, plagiarism, similarity, similarities, ai detector, jobs, salary,
+  download, crack, notepad++. Negatives do not match close variants, so plurals are
+  listed separately.
+- AI Max, text optimization, final URL expansion and automatically created assets
+  are off; broad match is off at campaign level.
+- Do not use competitor trademarks in ad text or bid on them ("Diff Checker" reads as
+  Diffchecker, so it is not a headline).
 
 Responsive search ad, group A (headlines up to 30 characters, descriptions up to 90):
 
-- Headlines: `Compare Two Texts Online` / `Free Diff Checker` / `See Every Change Highlighted` / `Edit Differences in Place` / `No Upload, No Account` / `Word, PDF and Excel Too` / `Works Offline in Chrome`
+- Headlines: `Compare Two Texts Online` / `Free Text Diff Tool` / `See Every Change Highlighted` / `Edit Differences in Place` / `No Upload, No Account` / `Word, PDF and Excel Too` / `Works Offline in Chrome` / `Compare Two Texts`
 - Descriptions: `Paste two texts and see every difference side by side. Fix them right in the results.` / `Files are processed in your browser, never uploaded. Free, with an offline extension.`
 
-Group B uses the same pattern with `Compare Two Word Documents`, `No Microsoft Word Needed`
-and `Download the Edited DOCX`.
+Group B, display path `/compare/word`: headlines `Compare Two Word Documents` /
+`No Microsoft Word Needed` / `Download the Edited DOCX` / `See Every Change Highlighted` /
+`No Upload, No Account` / `Free Word Compare Tool` / `Works Offline in Chrome` /
+`Compare Word Docs Online`; descriptions `Open two .docx files and see every change side
+by side. Edit and download the result.` and the privacy line from group A.
+
+Status on 14 November 2026: campaign "Search - test 2026-12" (ID 24459500622) is
+published and scheduled; both ads are under review. The account also holds a Google
+promotion (spend $400 by 12 January 2027, get $400 credit) that this $100 test does not
+reach; decide after the test.
 
 Read the results after 7 and 14 days: cost per store click by query, search terms
 to add as negatives, and installs in the CWS dashboard for the same days. Stop
