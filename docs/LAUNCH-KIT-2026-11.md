@@ -158,9 +158,9 @@ First comment:
 
 > Hi HN, I built Compare Two Texts, a side-by-side diff for documents rather than code: two DOCX, text-based PDF, TXT, XLSX or CSV files, or pasted text.
 >
-> What it does: highlights changes, lets you jump between them and edit either version in place, then download the edited DOCX, convert it to PDF, or export a report. Spreadsheets are matched by an identifier (SKU, ID) instead of row position, so reordered rows still compare correctly.
+> What it does: highlights changes side by side, lets you jump between them and edit either version in place, then download the edited DOCX, convert it to PDF, or export a report. For contracts and quotes, an "Amounts & percentages" check lists every changed currency figure and percentage across both drafts, and supported text-based PDFs allow filling printed blanks. Spreadsheets are matched by an identifier (SKU, ID) instead of row position, so reordered rows still compare correctly.
 >
-> How: everything runs client-side. PDFs are read with PDF.js, spreadsheets with SheetJS CE, DOCX is parsed directly from the OOXML. Comparison runs in a Web Worker. The Chrome extension is the same engine packaged with `connect-src 'none'`, so it works offline and cannot send anything anywhere. Saved drafts are encrypted with AES-GCM using a non-extractable WebCrypto key and expire after 7 days.
+> How: everything runs client-side across 51 UI languages. PDFs are read with PDF.js, spreadsheets with SheetJS CE, DOCX is parsed directly from the OOXML, and comparison runs in a Web Worker. The Chrome and Firefox extensions package the same engine with zero browser permissions (`"permissions": []`) and `connect-src 'none'`, so they work offline and cannot send anything anywhere. Saved drafts are encrypted locally with AES-GCM-256 using a non-extractable WebCrypto key and expire after 7 days.
 >
 > To be upfront: the website uses Google Analytics for visits and a few fixed events (comparison completed, download started, store click). No document text or file names are ever sent; the extension has no analytics at all. The source is on GitHub but the license is not open source.
 >
@@ -619,6 +619,9 @@ Each is a small task in its own PR.
 | 2026-10-30 | SaaSHub | https://www.saashub.com/compare-two-texts-edit-differences | Live, verified | Directory listing, Visit website → https://comparetwotexts.pro/ | Name change to "Compare Two Texts" requested |
 | | Microsoft Edge Add-ons | | Postponed by the owner on 2026-10-31; package and copy are ready | | |
 | 2026-11-01 | YouTube demo | https://youtu.be/BEHHf0I0kE8 | Published as a premiere | Video | Description links carry launch_2026_10 labels; chapters and tags still to add |
+| 2026-11-15 | Website 0.37.13 | https://comparetwotexts.pro/ | Live | Production deploy | llms.txt, /pricing/, FAQPage schema and referral store links live |
+| 2026-11-15 | Chrome Web Store 0.37.13 | https://chromewebstore.google.com/detail/kclhfaiampafehfhhlejeeefhdhocfcg | Under review | Store listing | Yellow Argon keyword-spam pattern cleaned across all 51 locales |
+| 2026-11-15 | Firefox AMO 0.37.13 | | Under review | Store listing | Submitted with reproducible source archive; 45-char name & 4 MB chunking fixed |
 | | Show HN | | Missed on 2026-11-04 (owner moving); rescheduled to 2026-11-18, 8:00 ET | | Run sheet in section 4 |
 | | Product Hunt | | One week after Show HN | | |
 | | Reddit r/SideProject | | | | |
