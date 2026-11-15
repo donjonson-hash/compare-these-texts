@@ -12,13 +12,13 @@ HOW IT WORKS
 3. Edit the result right in the comparison and download or print it.
 
 FEATURES
-- Text compare and document compare: TXT, Word DOCX, text-based PDF, CSV/TSV and Excel XLSX.
+- Compare plain text, Word documents, PDFs with selectable text, and spreadsheets in one workspace.
 - Side-by-side view with highlighted additions, deletions and changes.
 - Edit text in the comparison workspace instead of switching back to Word.
 - Excel compare by ID: pick a sheet, match rows by an identifier, choose the columns to check, edit cells and copy a missing row from A to B.
 - Amounts & percentages: catch changed prices, totals and percentages in text, Word and PDF comparisons.
 - Edit & export for a single document: fill printed blanks or add text on supported text-based PDFs.
-- Export Word DOCX to PDF with a preview, including headers, footers and page numbers.
+- Export supported DOCX documents to PDF with a preview, including headers, footers and page numbers.
 - Built-in examples so you can try the workflow before opening your own files.
 
 PRIVATE BY DESIGN

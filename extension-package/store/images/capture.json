@@ -1,28 +1,28 @@
 {
-  "version": "0.37.5",
-  "extension_sha256": "af9e5a81aae289424491787b477a30b2b554a02f378aef620d554df3f37c3be8",
-  "browser": "151.0.7922.34",
+  "version": "0.37.13",
+  "extension_sha256": "7a421a5decd77f4eded8f82ecfc4b3c5d2d76a0263b11f1388602e5581a00a7b",
+  "browser": "156.0.8078.4",
   "source": "packaged extension assets served locally; synthetic examples only",
   "images": [
     {
       "file": "screenshot-documents-1280x800.png",
-      "sha256": "687631921feb67251d7357a81b0735f16f569eaf380c55cf57f3dd5659ec7987"
+      "sha256": "8342d9684a39576610e302435175f1c22d3eee355ac9984e6999f634b2a5c219"
     },
     {
       "file": "screenshot-tables-1280x800.png",
-      "sha256": "ad5a82e8a49751dc97aa475352d269e96aba0294b1e54037857cf66e298a5a2b"
+      "sha256": "868a9b0f7d55c7f13050d0ec66db71dfbc3b16927b10e7cb70cad5e65024110b"
     },
     {
       "file": "screenshot-editor-1280x800.png",
-      "sha256": "d52c98d92b3025544bcdb791ab1b6ef2830d5c47ef2020b247538fd06b9f2172"
+      "sha256": "a7f896b915178aac750e9bb5c19c24625a89e9e56747a802e201da6fe943349b"
     },
     {
       "file": "screenshot-pdf-1280x800.png",
-      "sha256": "d491bf108d1b25196993b959fd5520f98bcb61d6bc2b276eb402ffb1c928c21b"
+      "sha256": "24f5b049d8577ed5f8787c32c5062d96bc6e58be535ad220d644596cc412b5c6"
     },
     {
       "file": "screenshot-welcome-1280x800.png",
-      "sha256": "9a352cbbc8761bd86cd08f740d8cb20dce506c801838bc6324a6dda06a3910bc"
+      "sha256": "56f39ca615ce8bee7c1aa0adc0adfe1d4a8cd5b6721dc49703a8da93266e5fd8"
     },
     {
       "file": "promo-440x280.png",
@@ -30,7 +30,7 @@
     },
     {
       "file": "promo-1400x560.png",
-      "sha256": "d653dcb2c9a4817093fb925e72324050a2b49d2923bf0b93fde08e377ed0e5e2"
+      "sha256": "bd8a851b65eb8d14b6fca9c92a7d86ac47f8cb9935262d4e678cc7f51d81b4b5"
     }
   ]
 }

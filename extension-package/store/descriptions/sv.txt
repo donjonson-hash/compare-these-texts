@@ -6,12 +6,12 @@ JÄMFÖR, REDIGERA, SPARA
 3. Ladda ned resultatet eller skriv ut det med de alternativ som finns för formatet.
 
 DET HÄR KAN DU GÖRA
-- Jämför text i TXT och Word DOCX, PDF-filer med markerbar text samt tabeller i CSV/TSV eller Excel XLSX.
+- Jämför vanlig text, DOCX-dokument, PDF-filer med markerbar text samt tabeller i Excel eller CSV.
 - Se två versioner bredvid varandra, gå mellan skillnaderna och redigera text i jämförelsevyn.
 - För kalkylblad kan du välja blad, matcha rader med hjälp av en identifierare och välja vilka kolumner som ska kontrolleras. Redigera cellvärden och kopiera en saknad rad från A till B.
 - Granska ändrade valutabelopp och procentsatser i jämförelser av text, Word och PDF-filer som stöds med Amounts & percentages.
 - Arbeta med ett enskilt dokument i Edit & export. I textbaserade PDF-filer som stöds kan du klicka på identifierade tryckta tomrader för att fylla i uppgifter, eller använda Add text för att placera text. Textstorleken anpassas till det tillgängliga utrymmet; i Format kan du justera den manuellt.
-- Exportera Word DOCX-dokument som stöds till PDF och förhandsgranska före nedladdning. Sidhuvuden, sidfötter, sidnummer och enkla vågräta linjer som stöds inkluderas; sidindelning och teckensnitt kan skilja sig från Word.
+- Exportera DOCX-dokument som stöds till PDF och förhandsgranska före nedladdning. Sidhuvuden, sidfötter, sidnummer och enkla vågräta linjer som stöds inkluderas; sidindelning och teckensnitt kan skilja sig från Word.
 
 LOKAL BEARBETNING
 Dokumenten bearbetas på din enhet. Tillägget fungerar offline och laddar inte upp dina dokument till en server för jämförelse eller redigering. Utkast på webbplatsen och i tillägget lagras separat, utan automatisk synkronisering. Ladda ned en kopia av ditt färdiga arbete.

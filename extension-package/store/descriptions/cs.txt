@@ -1,7 +1,7 @@
 Compare Two Texts porovnává dvě verze textu, smlouvy nebo dokumentu a ukazuje změny. Otevřete dva soubory, prohlédněte si rozdíly vedle sebe, upravte výsledek a stáhněte jej nebo vytiskněte. Vestavěné příklady umožňují vyzkoušení bez vlastních dokumentů.
 
 FUNKCE
-- TXT, Word DOCX, PDF s textovou vrstvou, CSV/TSV a Excel XLSX. Zvýraznění přidaného, odstraněného a změněného textu, přecházení mezi rozdíly a úpravy přímo v porovnání.
+- Zvýraznění přidaného, odstraněného a změněného textu, přecházení mezi rozdíly a úpravy přímo v porovnání.
 - U tabulek vyberte list a sloupce, přiřaďte řádky podle identifikátoru, upravte hodnoty a zkopírujte chybějící řádek z A do B.
 - Kontrolujte změněné částky a procenta v textu, Wordu a podporovaných PDF.
 - Upravujte a exportujte i samostatný dokument. V podporovaných PDF vyplňujte vytištěná prázdná místa nebo přidávejte text.

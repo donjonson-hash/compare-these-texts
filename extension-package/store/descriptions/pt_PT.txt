@@ -6,12 +6,12 @@ COMPARE, EDITE E GUARDE
 3. Descarregue o resultado ou imprima-o com as opções disponíveis para esse formato.
 
 O QUE PODE FAZER
-- Comparar textos de ficheiros TXT e Word DOCX, PDFs com texto selecionável e tabelas CSV/TSV ou Excel XLSX.
+- Comparar texto simples, documentos DOCX, PDFs com texto selecionável e tabelas Excel ou CSV.
 - Ver duas versões lado a lado, navegar entre as diferenças e editar o texto na área de comparação.
 - Para folhas de cálculo, escolher uma folha, associar linhas através de um identificador e selecionar as colunas a verificar. Editar valores das células e copiar uma linha em falta de A para B.
 - Verificar alterações em valores monetários e percentagens nas comparações de textos, ficheiros Word e PDFs compatíveis com Amounts & percentages.
 - Trabalhar com um único documento em Edit & export. Nos PDFs compatíveis com camada de texto, clicar nos espaços para preenchimento detetados para introduzir informações, ou utilizar Add text para posicionar uma entrada. O tamanho do texto ajusta-se ao espaço disponível; Format oferece controlos manuais.
-- Exporte documentos Word DOCX compatíveis para PDF com uma pré-visualização antes de transferir. Cabeçalhos, rodapés, números de página e linhas horizontais simples compatíveis são incluídos; a paginação e os tipos de letra podem diferir do Word.
+- Exporte documentos DOCX compatíveis para PDF com uma pré-visualização antes de transferir. Cabeçalhos, rodapés, números de página e linhas horizontais simples compatíveis são incluídos; a paginação e os tipos de letra podem diferir do Word.
 
 PROCESSAMENTO LOCAL
 Os documentos são processados no seu dispositivo. A extensão funciona offline e não envia os seus documentos para um servidor para os comparar ou editar. Os rascunhos do site e da extensão são guardados separadamente, sem sincronização automática. Descarregue uma cópia do trabalho concluído.

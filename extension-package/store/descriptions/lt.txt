@@ -1,7 +1,7 @@
 Compare Two Texts palygina dvi teksto, sutarties ar dokumento versijas ir parodo pakeitimus. Atverkite du failus, peržiūrėkite skirtumus greta, pataisykite ir atsisiųskite arba išspausdinkite rezultatą. Įtaisytieji pavyzdžiai leidžia išbandyti neatsiverčiant savo dokumentų.
 
 GALIMYBĖS
-- TXT, Word DOCX, PDF su teksto sluoksniu, CSV/TSV ir Excel XLSX. Paryškinamas pridėtas, pašalintas ir pakeistas tekstas; pereikite nuo vieno skirtumo prie kito ir taisykite palyginimo lange.
+- Paryškinamas pridėtas, pašalintas ir pakeistas tekstas; pereikite nuo vieno skirtumo prie kito ir taisykite palyginimo lange.
 - Lentelėms pasirinkite lapą ir stulpelius, susiekite eilutes pagal identifikatorių, taisykite reikšmes ir nukopijuokite trūkstamą eilutę iš A į B.
 - Tikrinkite pakeistas sumas ir procentus tekste, Word ir palaikomuose PDF failuose.
 - Taisykite ir eksportuokite atskirą dokumentą. Palaikomuose PDF užpildykite spausdintus tuščius laukus arba pridėkite teksto.

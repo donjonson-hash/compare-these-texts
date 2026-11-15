@@ -1,7 +1,7 @@
 {
   "en": {
-    "name": "Compare Two Texts — Diff Checker for Word, PDF & Excel",
-    "description": "Compare two texts, Word, PDF and Excel files side by side. Find differences, edit and export. Works offline, no file uploads."
+    "name": "Compare Two Texts — Diff Checker & Editor",
+    "description": "Side-by-side diff checker for text, DOCX, PDF, and Excel or CSV tables. Edit changes in place offline — files stay on your device."
   },
   "de": {
     "name": "Compare Two Texts — Texte vergleichen und bearbeiten",
@@ -52,8 +52,8 @@
     "description": "Bandingkan teks dan dokumen berdampingan, lihat perbedaan, lalu edit. Pemrosesan di perangkat Anda."
   },
   "ru": {
-    "name": "Compare Two Texts — Сравнение текстов и правка",
-    "description": "Сравнивайте тексты и документы рядом, находите отличия и вносите правки. Обработка на устройстве."
+    "name": "Compare Two Texts — Сравнение текстов, PDF и таблиц",
+    "description": "Сравнивайте тексты, документы DOCX, PDF и таблицы рядом, вносите правки и скачивайте результат. Локально и без интернета."
   },
   "pt_BR": {
     "name": "Compare Two Texts — Comparar textos e editar",

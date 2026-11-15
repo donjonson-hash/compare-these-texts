@@ -26,7 +26,7 @@ with zipfile.ZipFile(pathlib.Path(root)/'dist/downloads'/f'ctt-chrome-{version}.
     assert not any(n.startswith('emoji-color-images-') for n in z.namelist())
 `, root, version, folder]);
   const manifest = JSON.parse(await readFile(join(folder, 'manifest.json'), 'utf8'));
-  assert.equal(manifest.name, 'Compare Two Texts — Diff Checker');
+  assert.equal(manifest.name, JSON.parse(await readFile(join(root, 'release.json'), 'utf8')).short_name);
   assert.ok(manifest.name.length <= 45);
   const modules = (await readdir(folder)).filter(name => name.endsWith('.mjs'));
   assert.ok(modules.filter(name => name.startsWith('emoji-color-images-')).length > 1);

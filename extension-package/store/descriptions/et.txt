@@ -1,7 +1,7 @@
 Compare Two Texts võrdleb teksti, lepingu või dokumendi kahte versiooni ja näitab muudatusi. Ava kaks faili, vaata erinevusi kõrvuti, muuda tulemust ning laadi see alla või prindi. Sisseehitatud näidetega saad töövoogu proovida oma dokumente avamata.
 
 VÕIMALUSED
-- TXT, Word DOCX, tekstikihiga PDF, CSV/TSV ja Excel XLSX. Lisatud, kustutatud ja muudetud tekst tõstetakse esile; liigu erinevuste vahel ja muuda teksti võrdlusvaates.
+- Lisatud, kustutatud ja muudetud tekst tõstetakse esile; liigu erinevuste vahel ja muuda teksti võrdlusvaates.
 - Tabelites vali leht ja veerud, seo read tunnuse järgi, muuda väärtusi ning kopeeri puuduv rida A-st B-sse.
 - Kontrolli muutunud summasid ja protsente tekstis, Wordis ja toetatud PDF-failides.
 - Muuda ja ekspordi ka üksikut dokumenti. Täida toetatud PDF-failide trükitud lüngad või lisa teksti.

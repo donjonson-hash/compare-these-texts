@@ -6,12 +6,12 @@ VERTAA, MUOKKAA, TALLENNA
 3. Lataa lopputulos tai tulosta se tiedostomuodolle käytettävissä olevilla vaihtoehdoilla.
 
 MITÄ VOIT TEHDÄ
-- Vertaa TXT- ja Word DOCX -tekstejä, valittavaa tekstiä sisältäviä PDF-tiedostoja sekä CSV/TSV- tai Excel XLSX -taulukoita.
+- Vertaa tavallista tekstiä, DOCX-asiakirjoja, valittavaa tekstiä sisältäviä PDF-tiedostoja sekä Excel- tai CSV-taulukoita.
 - Tarkastele kahta versiota rinnakkain, siirry erosta toiseen ja muokkaa tekstiä vertailunäkymässä.
 - Valitse laskentataulukoista välilehti, kohdista rivit tunnisteen avulla ja valitse tarkistettavat sarakkeet. Muokkaa solujen arvoja ja kopioi puuttuva rivi A:sta B:hen.
 - Tarkista muuttuneet rahamäärät ja prosentit teksti-, Word- ja tuettujen PDF-tiedostojen vertailuissa Amounts & percentages -toiminnolla.
 - Käsittele yhtä asiakirjaa Edit & export -tilassa. Tuetuissa tekstipohjaisissa PDF-tiedostoissa voit napsauttaa tunnistettuja painettuja tyhjiä kohtia ja täyttää ne tai sijoittaa tekstiä Add text -toiminnolla. Tekstin koko mukautuu käytettävissä olevaan tilaan. Format tarjoaa manuaaliset säätömahdollisuudet.
-- Vie tuetut Word DOCX -asiakirjat PDF-muotoon ja esikatsele ennen lataamista. Tuetut ylä- ja alatunnisteet, sivunumerot ja yksinkertaiset vaakaviivat sisällytetään; sivutus ja kirjasinten ulkoasu voivat poiketa Wordista.
+- Vie tuetut DOCX -asiakirjat PDF-muotoon ja esikatsele ennen lataamista. Tuetut ylä- ja alatunnisteet, sivunumerot ja yksinkertaiset vaakaviivat sisällytetään; sivutus ja kirjasinten ulkoasu voivat poiketa Wordista.
 
 PAIKALLINEN KÄSITTELY
 Asiakirjat käsitellään omalla laitteellasi. Laajennus toimii ilman verkkoyhteyttä eikä lähetä asiakirjojasi palvelimelle vertailua tai muokkausta varten. Verkkosivuston ja laajennuksen luonnokset tallennetaan erikseen, eikä niitä synkronoida automaattisesti. Lataa kopio valmiista työstäsi.

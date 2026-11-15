@@ -1,7 +1,7 @@
 Compare Two Texts compara dues versions d'un text, contracte o document i mostra què ha canviat. Obre dos fitxers, revisa les diferències de costat, edita i descarrega o imprimeix el resultat. Els exemples integrats permeten provar-ho abans d'obrir documents propis.
 
 FUNCIONS
-- TXT, Word DOCX, PDF amb capa de text, CSV/TSV i Excel XLSX. Ressalta les addicions, supressions i modificacions; salta d'una diferència a l'altra i edita al mateix espai.
+- Ressalta les addicions, supressions i modificacions; salta d'una diferència a l'altra i edita al mateix espai.
 - En taules: tria el full i les columnes, relaciona files per un identificador, edita valors i copia una fila que falti d'A a B.
 - Revisa canvis en imports i percentatges de textos, Word i PDF compatibles.
 - Edita i exporta un sol document. Emplena espais impresos en blanc o afegeix text en PDF compatibles.

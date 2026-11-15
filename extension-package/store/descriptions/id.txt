@@ -6,12 +6,12 @@ BANDINGKAN, EDIT, SIMPAN
 3. Unduh hasilnya atau cetak dengan opsi yang tersedia untuk format tersebut.
 
 YANG DAPAT ANDA LAKUKAN
-- Membandingkan teks TXT dan Word DOCX, PDF dengan teks yang dapat dipilih, serta tabel CSV/TSV atau Excel XLSX.
+- Membandingkan teks biasa, dokumen DOCX, PDF dengan teks yang dapat dipilih, serta tabel Excel atau CSV.
 - Melihat dua versi berdampingan, berpindah antarperbedaan, dan mengedit teks di ruang kerja perbandingan.
 - Untuk spreadsheet, pilih lembar, cocokkan baris berdasarkan pengenal, dan pilih kolom yang ingin diperiksa. Edit nilai sel dan salin baris yang belum ada dari A ke B.
 - Meninjau perubahan jumlah uang dan persentase dalam perbandingan teks, Word, dan PDF yang didukung melalui Amounts & percentages.
 - Mengerjakan satu dokumen di Edit & export. Pada PDF berbasis teks yang didukung, klik bagian kosong tercetak yang terdeteksi untuk memasukkan informasi, atau gunakan Add text untuk menempatkan isian. Ukuran teks menyesuaikan ruang yang tersedia; Format menyediakan kontrol manual.
-- Ekspor dokumen Word DOCX yang didukung ke PDF dengan pratinjau sebelum mengunduh. Header, footer, nomor halaman, dan garis horizontal sederhana yang didukung disertakan; pembagian halaman dan tampilan font dapat berbeda dari Word.
+- Ekspor dokumen DOCX yang didukung ke PDF dengan pratinjau sebelum mengunduh. Header, footer, nomor halaman, dan garis horizontal sederhana yang didukung disertakan; pembagian halaman dan tampilan font dapat berbeda dari Word.
 
 PEMROSESAN LOKAL
 Dokumen diproses di perangkat Anda. Ekstensi bekerja secara offline dan tidak mengunggah dokumen Anda ke server untuk dibandingkan atau diedit. Draf di situs web dan ekstensi disimpan secara terpisah, tanpa sinkronisasi otomatis. Unduh salinan pekerjaan Anda setelah selesai.

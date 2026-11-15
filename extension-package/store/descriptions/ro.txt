@@ -1,7 +1,7 @@
 Compare Two Texts compară două versiuni ale unui text, contract sau document și arată modificările. Deschide două fișiere, verifică diferențele alăturat, editează și descarcă sau tipărește rezultatul. Exemplele incluse permit testarea fără documente proprii.
 
 FUNCȚII
-- TXT, Word DOCX, PDF cu strat de text, CSV/TSV și Excel XLSX. Evidențierea textului adăugat, șters sau modificat, navigare între diferențe și editare direct în comparație.
+- Evidențierea textului adăugat, șters sau modificat, navigare între diferențe și editare direct în comparație.
 - Pentru tabele, alege foaia și coloanele, asociază rândurile după un identificator, editează valorile și copiază un rând lipsă din A în B.
 - Verifică sumele și procentele modificate în texte, Word și PDF compatibile.
 - Editează și exportă un singur document. Completează spații tipărite necompletate sau adaugă text în PDF compatibile.

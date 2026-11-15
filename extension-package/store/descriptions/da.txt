@@ -6,12 +6,12 @@ SAMMENLIGN, REDIGER, GEM
 3. Download resultatet, eller udskriv det med de muligheder, der er tilgængelige for formatet.
 
 DET KAN DU GØRE
-- Sammenlign tekst i TXT og Word DOCX, PDF-filer med markerbar tekst samt tabeller i CSV/TSV eller Excel XLSX.
+- Sammenlign ren tekst, DOCX-dokumenter, PDF-filer med markerbar tekst samt tabeller i Excel eller CSV.
 - Se to versioner ved siden af hinanden, gå fra forskel til forskel, og rediger tekst i sammenligningsområdet.
 - I regneark kan du vælge ark, matche rækker ved hjælp af en identifikator og vælge de kolonner, der skal kontrolleres. Rediger celleværdier, og kopiér en manglende række fra A til B.
 - Gennemgå ændrede valutabeløb og procenter ved sammenligning af tekst, Word og understøttede PDF-filer med Amounts & percentages.
 - Arbejd med ét dokument i Edit & export. I understøttede tekstbaserede PDF-filer kan du klikke på registrerede trykte tomme linjer for at indtaste oplysninger eller bruge Add text til at placere tekst. Tekststørrelsen tilpasses den ledige plads; Format giver mulighed for manuel justering.
-- Eksportér understøttede Word DOCX-dokumenter til PDF med forhåndsvisning før download. Understøttede sidehoveder, sidefødder, sidetal og enkle vandrette linjer medtages; sideinddeling og skrifttyper kan afvige fra Word.
+- Eksportér understøttede DOCX-dokumenter til PDF med forhåndsvisning før download. Understøttede sidehoveder, sidefødder, sidetal og enkle vandrette linjer medtages; sideinddeling og skrifttyper kan afvige fra Word.
 
 LOKAL BEHANDLING
 Dokumenterne behandles på din enhed. Udvidelsen fungerer offline og uploader ikke dine dokumenter til en server for at sammenligne eller redigere dem. Kladder på hjemmesiden og i udvidelsen gemmes separat uden automatisk synkronisering. Download en kopi af dit færdige arbejde.

@@ -58,7 +58,7 @@ cropping, rotation, and arbitrary VML shapes are rejected explicitly.
 The 0.37.4 candidate opens a local welcome page on first installation. Updates
 leave existing tabs alone. **Getting started** in the extension footer opens
 the guide separately; **Try an example** leaves an existing saved comparison
-available to resume. The 0.37.9 release candidate adds offline interface localization across 51 locales. See `i18n/README.md` for the release scope and language checks.
+available to resume. The 0.37.13 release candidate adds offline interface localization across 51 locales. See `i18n/README.md` for the release scope and language checks.
 
 **Word & Google Docs add-ins** in Getting started, Help and the workspace footer
 opens an installation hub for editing selected text directly in those programs.

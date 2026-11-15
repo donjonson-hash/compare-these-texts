@@ -1,7 +1,7 @@
 Compare Two Texts membandingkan dua versi teks, kontrak atau dokumen dan menunjukkan perubahan. Buka dua fail, semak perbezaan sebelah menyebelah, sunting kemudian muat turun atau cetak hasilnya. Contoh terbina dalam membolehkan anda mencuba tanpa dokumen sendiri.
 
 CIRI
-- TXT, Word DOCX, PDF dengan lapisan teks, CSV/TSV dan Excel XLSX. Teks yang ditambah, dipadam dan diubah ditandakan; beralih antara perbezaan dan sunting terus dalam ruang perbandingan.
+- Teks yang ditambah, dipadam dan diubah ditandakan; beralih antara perbezaan dan sunting terus dalam ruang perbandingan.
 - Untuk hamparan, pilih helaian dan lajur, padankan baris mengikut pengecam, sunting nilai dan salin baris yang tiada dari A ke B.
 - Semak perubahan amaun dan peratusan dalam teks, Word dan PDF yang disokong.
 - Sunting dan eksport satu dokumen. Isi ruang kosong bercetak atau tambah teks dalam PDF yang disokong.

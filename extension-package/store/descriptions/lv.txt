@@ -1,7 +1,7 @@
 Compare Two Texts salīdzina divas teksta, līguma vai dokumenta versijas un parāda izmaiņas. Atveriet divus failus, pārskatiet atšķirības līdzās, rediģējiet un lejupielādējiet vai izdrukājiet rezultātu. Iebūvētie piemēri ļauj izmēģināt darbu bez saviem dokumentiem.
 
 IESPĒJAS
-- TXT, Word DOCX, PDF ar teksta slāni, CSV/TSV un Excel XLSX. Pievienotā, dzēstā un mainītā teksta izcelšana, pārvietošanās starp atšķirībām un rediģēšana salīdzinājuma skatā.
+- Pievienotā, dzēstā un mainītā teksta izcelšana, pārvietošanās starp atšķirībām un rediģēšana salīdzinājuma skatā.
 - Tabulām izvēlieties lapu un kolonnas, sasaistiet rindas pēc identifikatora, rediģējiet vērtības un kopējiet trūkstošu rindu no A uz B.
 - Pārbaudiet mainītas summas un procentus tekstā, Word un atbalstītos PDF failos.
 - Rediģējiet un eksportējiet arī atsevišķu dokumentu. Atbalstītos PDF aizpildiet drukātas tukšās vietas vai pievienojiet tekstu.
