@@ -10,9 +10,21 @@
 <div class="app">
   <header class="header"><a class="brand" href="/" aria-label="Compare Two Texts — начало"><span class="brand-icon">C<span>↔</span>T</span><span>Compare Two Texts<small>Точность в каждой правке</small></span></a><span class="pilot"><i></i> ChatGPT · пилот</span></header>
   <main>
-    <div class="intro"><div><p class="eyebrow">ДВА ТЕКСТА. ОДНО ЯСНОЕ РЕШЕНИЕ.</p><h1>Сравните. Выберите. Сохраните.</h1><p class="subtitle">Каждая правка — на своём месте. Итоговый текст — под вашим контролем.</p></div><button id="sample" class="secondary">Попробовать на примере <span aria-hidden="true">↗</span></button></div>
+    <div class="intro"><div><p class="eyebrow">ДВА ДОКУМЕНТА. ОДНА ЯСНАЯ КАРТИНА.</p><h1>Все изменения — перед вами.</h1><p class="subtitle">Откройте две версии, найдите отличия и разберите каждую правку.</p></div><button id="sample" class="secondary">Пример сравнения текста <span aria-hidden="true">↗</span></button></div>
+    <div class="mode-tabs" role="tablist" aria-label="Способ сравнения"><button id="mode-documents" role="tab" aria-selected="true">Документы DOCX / PDF</button><button id="mode-text" role="tab" aria-selected="false">Текст</button></div>
     <ol class="steps" aria-label="Этапы"><li class="active" id="step-input"><span>1</span> Два текста</li><li id="step-review"><span>2</span> Просмотр правок</li><li id="step-result"><span>3</span> Готовый результат</li></ol>
     <div id="status" role="status" aria-live="polite"></div>
+    <section id="document-mode" aria-label="Сравнение документов">
+      <section id="doc-inputs" aria-label="Выбор документов"><p class="doc-intro">Прикрепите два файла к сообщению ChatGPT и попросите сравнить их. Здесь можно выбрать файлы с компьютера.</p><div class="input-grid">
+        <label class="document-upload"><span class="letter">A</span><strong>Исходный документ</strong><span id="doc-name-original">Выбрать файл DOCX, PDF или TXT</span><small id="doc-size-original">До 2 МиБ</small><input type="file" id="doc-file-original" accept=".docx,.pdf,.txt" aria-label="Выбрать исходный документ"></label>
+        <label class="document-upload"><span class="letter revised-letter">B</span><strong>Новая версия</strong><span id="doc-name-revised">Выбрать файл DOCX, PDF или TXT</span><small id="doc-size-revised">До 2 МиБ</small><input type="file" id="doc-file-revised" accept=".docx,.pdf,.txt" aria-label="Выбрать новую версию документа"></label>
+      </div><div class="input-footer"><p>PDF с текстовым слоем · DOCX с основным текстом и таблицами<br>Файлы обрабатываются для сравнения без постоянного хранения.</p><button id="doc-compare" class="primary" disabled>Сравнить документы →</button></div></section>
+      <section id="doc-results" hidden aria-label="Результат сравнения документов"><div class="review-toolbar"><div class="review-heading"><h2 id="doc-total">Изменения</h2><span id="doc-summary" class="muted"></span></div><div class="toolbar-actions"><button id="doc-edit" class="text-button">Другие документы</button><button id="doc-fullscreen" class="secondary">Развернуть</button><div class="navigation"><button id="doc-previous" aria-label="Предыдущая правка документа">↑</button><span id="doc-position">0 / 0</span><button id="doc-next" aria-label="Следующая правка документа">↓</button></div></div></div>
+      <p class="doc-coverage" id="doc-coverage"></p><div class="doc-workspace"><aside class="changes-panel" aria-label="Правки документов"><div class="changes-controls">Изменения по порядку</div><div id="doc-change-list"></div></aside><div id="document-view" aria-label="Документы рядом"></div></div>
+      <section class="doc-evidence" id="doc-evidence" hidden aria-label="Пояснение выбранной правки"><div class="result-heading"><div><p class="eyebrow">ВЫБРАННАЯ ПРАВКА</p><h2 id="doc-fact-title"></h2></div><button id="doc-explain" class="primary">Объяснить в ChatGPT</button></div><p id="doc-fact"></p><div class="doc-quotes"><div><small id="doc-location-original"></small><pre id="doc-quote-original"></pre></div><div><small id="doc-location-revised"></small><pre id="doc-quote-revised"></pre></div></div><p class="result-note">Здесь показаны факты точного сравнения. Контекстное объяснение ChatGPT появится в чате после нажатия кнопки.</p></section>
+      <div id="doc-copy-context" hidden><label for="doc-context">Вопрос для ChatGPT с точными цитатами</label><textarea id="doc-context" readonly></textarea></div>
+      <details class="doc-scope"><summary>Что входит в сравнение</summary><ul id="doc-notes"></ul></details></section>
+    </section>
     <section id="inputs" aria-label="Исходные тексты">
       <div class="input-grid">
         <div class="input-card"><div class="pane-heading"><div><span class="letter">A</span><label for="original">Исходный текст</label></div><label class="file-label">Открыть TXT / MD<input id="file-original" type="file" accept=".txt,.md,text/plain,text/markdown" aria-label="Открыть исходный TXT или MD"></label></div><textarea id="original" spellcheck="false" placeholder="Вставьте исходную версию…" maxlength="30000"></textarea><div class="input-meta"><span id="name-original">original.txt</span><span id="count-original">0 / 30 000</span></div></div>
@@ -31,8 +43,8 @@
       <section class="result-panel" aria-label="Результат"><div class="result-heading"><div><p class="eyebrow">ВАШ ИТОГОВЫЙ ТЕКСТ</p><h2>Результат <span id="applied-count" class="result-count">0 правок</span></h2></div><div class="result-actions"><button id="undo" class="icon-button" aria-label="Отменить применение" title="Отменить">↶</button><button id="redo" class="icon-button" aria-label="Повторить применение" title="Повторить">↷</button><button id="copy" class="secondary">Копировать</button><button id="download" class="primary">Скачать TXT <span aria-hidden="true">↓</span></button></div></div><pre id="result-text" tabindex="0" aria-label="Итоговый текст"></pre><p class="result-note" id="result-note">Пока совпадает с исходным текстом A.</p></section>
     </section>
   </main>
-  <footer><span>Compare Two Texts <span class="dot">·</span> Движок точного сравнения</span><span>Документы не сохраняются на сервере приложения.</span></footer>
+  <footer><span>Compare Two Texts <span class="dot">·</span> Движок точного сравнения <span class="dot">·</span> <a href="/licenses" target="_blank" rel="noopener">Лицензии</a></span><span>Документы не сохраняются на сервере приложения.</span></footer>
 </div>
-<script>/* APP_SCRIPT */</script>
+<script type="module">/* APP_SCRIPT */</script>
 </body>
 </html>

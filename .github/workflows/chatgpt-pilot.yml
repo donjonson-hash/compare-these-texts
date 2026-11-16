@@ -3,13 +3,15 @@ on:
   pull_request:
     paths:
       - 'chatgpt/**'
-      - 'src/text-diff.mjs'
+      - 'src/**'
+      - 'tests/fixtures/**'
       - '.github/workflows/chatgpt-pilot.yml'
   push:
     branches: [main]
     paths:
       - 'chatgpt/**'
-      - 'src/text-diff.mjs'
+      - 'src/**'
+      - 'tests/fixtures/**'
       - '.github/workflows/chatgpt-pilot.yml'
 permissions:
   contents: read

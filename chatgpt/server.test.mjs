@@ -32,7 +32,7 @@ test('discovery, legacy initialization, notification and ping follow stateless M
 
 test('tools declare strict schemas, appropriate annotations, and the review resource', async () => {
   const tools = (await rpc('tools/list')).body.result.tools;
-  assert.deepEqual(tools.map(tool => tool.name), ['compare_texts', 'apply_text_changes', 'get_text_changes']);
+  assert.deepEqual(tools.map(tool => tool.name), ['compare_texts', 'apply_text_changes', 'get_text_changes','compare_documents','get_document_changes','compare_uploaded_documents']);
   for (const tool of tools) {
     assert.equal(tool.inputSchema.additionalProperties, false);
     assert.equal(tool.outputSchema.type, 'object');
@@ -122,8 +122,8 @@ test('malformed protocol envelopes, unknown methods, and invalid JSON are explic
 test('body size is enforced against actual streamed bytes, with no Content-Length', async () => {
   const tooLarge = await request('/mcp', {}, {body: ' '.repeat(MAX_BODY_BYTES + 1)});
   assert.equal(tooLarge.status, 413);
-  assert.match((await tooLarge.json()).error.message, /512 KiB/);
-  const utf8Large = await request('/api/compare', {}, {body: JSON.stringify({original: '中'.repeat(180000), revised: ''})});
+  assert.match((await tooLarge.json()).error.message, /6 MiB/);
+  const utf8Large = await request('/api/compare', {}, {body: JSON.stringify({original: '中'.repeat(Math.ceil(MAX_BODY_BYTES / 3)), revised: ''})});
   assert.equal(utf8Large.status, 413);
   const wrongType = await request('/api/compare', {}, {headers: {'Content-Type': 'text/plain'}});
   assert.equal(wrongType.status, 415);

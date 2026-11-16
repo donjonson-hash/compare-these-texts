@@ -1,12 +1,13 @@
 import {App} from '@modelcontextprotocol/ext-apps';
+import {createDocumentUI} from './document-ui.mjs';
 
 const $=id=>document.getElementById(id);
 const embedded=window.parent!==window;
 const state={comparison:null,selected:new Set(),applied:[],result:'',active:0,history:[[]],historyIndex:0,busy:false,original:'',revised:'',originalName:'original.txt',revisedName:'revised.txt'};
-let app,connected=false,requestEpoch=0,pendingHostResult=null;
+let app,connected=false,requestEpoch=0,pendingHostResult=null,documentsUI;
 const kinds={replace:'Замена',insert:'Добавление',delete:'Удаление'};
 function status(message='',error=false){$('status').textContent=message;$('status').classList.toggle('error',error);}
-function busy(value){state.busy=value;document.body.classList.toggle('busy',value);for(const id of ['compare','sample','apply','edit','undo','redo','download','copy'])$(id).disabled=value;for(const id of ['original','revised','file-original','file-revised'])$(id).disabled=value;renderControls();if(!value&&pendingHostResult){const result=pendingHostResult;pendingHostResult=null;receiveHostResult(result);}}
+function busy(value){state.busy=value;document.body.classList.toggle('busy',value);for(const id of ['compare','sample','apply','edit','undo','redo','download','copy'])$(id).disabled=value;for(const id of ['original','revised','file-original','file-revised'])$(id).disabled=value;documentsUI?.lock(value);renderControls();if(!value&&pendingHostResult){const result=pendingHostResult;pendingHostResult=null;receiveHostResult(result);}}
 async function run(action){if(state.busy)return;busy(true);status();try{await action();}catch(error){status(error.message||'Не удалось выполнить действие. Попробуйте ещё раз.',true);}finally{busy(false);}}
 function same(a,b){return a.length===b.length&&a.every(x=>b.includes(x));}
 function inputArgs(){return {original:state.original,revised:state.revised,originalName:state.originalName,revisedName:state.revisedName};}
@@ -15,13 +16,14 @@ async function tool(name,args){
     if(!connected)throw new Error('Подключение к ChatGPT ещё не готово. Дождитесь загрузки виджета.');
     const response=await app.callServerTool({name,arguments:args});
     if(response.isError)throw new Error(response.content?.find(x=>x.type==='text')?.text||'Не удалось обработать тексты.');
-    if(!response._meta?.comparison)throw new Error('Сервер не вернул данные сравнения. Повторите вызов инструмента.');
+    if(!response._meta?.comparison&&!response._meta?.documentComparison)throw new Error('Сервер не вернул данные сравнения. Повторите вызов инструмента.');
     return response._meta;
   }
-  const response=await fetch(name==='compare_texts'?'/api/compare':'/api/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(args)});
+  const response=await fetch(name==='compare_uploaded_documents'?'/api/documents':name==='compare_texts'?'/api/compare':'/api/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(args)});
   const data=await response.json();if(!response.ok)throw new Error(data.error||'Ошибка сервера.');return data;
 }
 function loadSnapshot(data,{history=true}={}){
+  textMode();
   const {comparison,review}=data;if(!comparison?.comparisonId)throw new Error('Некорректный результат сравнения.');
   const changed=state.comparison?.comparisonId!==comparison.comparisonId;
   state.comparison=comparison;state.original=comparison.original;state.revised=comparison.revised;state.originalName=comparison.originalName;state.revisedName=comparison.revisedName;
@@ -77,7 +79,7 @@ async function compare(){const epoch=++requestEpoch;const data=await tool('compa
 async function apply(ids,{history=true}={}){const data=await tool('apply_text_changes',{...inputArgs(),comparisonId:state.comparison.comparisonId,changeIds:ids});loadSnapshot(data,{history});status(`Результат обновлён. Применено правок: ${state.applied.length}.`);}
 for(const side of ['original','revised']){
   $(side).addEventListener('input',()=>{const normalized=state[side].includes('\r');state[side]=$(side).value;state[side+'Name']=side+'.txt';$('name-'+side).textContent=state[side+'Name'];$('count-'+side).textContent=state[side].length.toLocaleString('ru-RU')+' / 30 000';if(normalized)status('При ручном редактировании браузер заменил переносы строк CRLF / CR на LF. Для сохранения исходных переносов откройте файл заново.');});
-  $('file-'+side).onchange=()=>run(async()=>{const input=$('file-'+side),file=input.files?.[0];if(!file)return;try{if(!/\.(txt|md)$/iu.test(file.name))throw new Error('Откройте TXT или MD. Поддержка PDF и DOCX появится отдельно.');if(file.size>120000)throw new Error('Файл слишком большой: максимум 30 000 символов.');const text=new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(await file.arrayBuffer());if(text.length>30000)throw new Error('В файле больше 30 000 символов.');if(text.includes('\0'))throw new Error('Файл содержит нулевые байты. Выберите текстовый UTF-8 файл.');state[side]=text;state[side+'Name']=file.name;syncInputs();status('Открыт '+file.name+'.');}catch(error){if(error instanceof TypeError)throw new Error('Не удалось прочитать UTF-8. Сохраните файл в кодировке UTF-8.');throw error;}finally{input.value='';}});
+  $('file-'+side).onchange=()=>run(async()=>{const input=$('file-'+side),file=input.files?.[0];if(!file)return;try{if(!/\.(txt|md)$/iu.test(file.name))throw new Error('Откройте TXT или MD. Для PDF и DOCX перейдите во вкладку «Документы».');if(file.size>120000)throw new Error('Файл слишком большой: максимум 30 000 символов.');const text=new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(await file.arrayBuffer());if(text.length>30000)throw new Error('В файле больше 30 000 символов.');if(text.includes('\0'))throw new Error('Файл содержит нулевые байты. Выберите текстовый UTF-8 файл.');state[side]=text;state[side+'Name']=file.name;syncInputs();status('Открыт '+file.name+'.');}catch(error){if(error instanceof TypeError)throw new Error('Не удалось прочитать UTF-8. Сохраните файл в кодировке UTF-8.');throw error;}finally{input.value='';}});
 }
 $('compare').onclick=()=>run(compare);
 $('sample').onclick=()=>run(async()=>{state.originalName='Договор — исходная версия.txt';state.revisedName='Договор — изменения.txt';state.original='Договор на разработку сайта\n\nСтоимость проекта: 120 000 рублей.\nСрок выполнения: 30 рабочих дней.\nПредоплата составляет 50%.\n\nИсполнитель предоставляет гарантию на 6 месяцев.\nВсе изменения согласуются письменно.\n';state.revised='Договор на разработку сайта\n\nСтоимость проекта: 145 000 рублей.\nСрок выполнения: 20 рабочих дней.\nПредоплата составляет 30%.\n\nИсполнитель предоставляет гарантию на 12 месяцев.\nВсе изменения согласуются письменно.\nЗаказчик получает исходные файлы проекта.\n';syncInputs();await compare();status('Пример договора. Выберите правки или нажмите «Изменить тексты», чтобы добавить свои.');});
@@ -97,10 +99,17 @@ $('download').onclick=()=>run(async()=>{
   }
   const blob=new Blob([new TextEncoder().encode(state.result)],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='result.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);status('Файл result.txt подготовлен.');
 });
-function receiveHostResult(result){if(result.isError){status(result.content?.find(x=>x.type==='text')?.text||'Ошибка сравнения.',true);return;}if(result._meta?.comparison){try{loadSnapshot(result._meta);}catch(error){status(error.message,true);}}}
+function textMode(){documentsUI?.hide();$('step-result').hidden=false;$('mode-text').setAttribute('aria-selected','true');$('mode-documents').setAttribute('aria-selected','false');$('inputs').hidden=!!state.comparison;$('review').hidden=!state.comparison;$('step-input').lastChild.nodeValue=' Два текста';}
+documentsUI=createDocumentUI({tool,run,status,getApp:()=>connected?app:null,onActivate(){
+  $('step-result').hidden=true;$('inputs').hidden=true;$('review').hidden=true;$('mode-documents').setAttribute('aria-selected','true');$('mode-text').setAttribute('aria-selected','false');$('step-input').lastChild.nodeValue=' Два документа';
+}});
+$('mode-text').onclick=()=>{textMode();status();};$('mode-documents').onclick=()=>{documentsUI.show();status();};
+function receiveHostResult(result){if(result.isError){status(result.content?.find(x=>x.type==='text')?.text||'Ошибка сравнения.',true);return;}if(result._meta?.documentComparison){run(()=>documentsUI.receive(result._meta.documentComparison));return;}if(result._meta?.comparison){try{loadSnapshot(result._meta);}catch(error){status(error.message,true);}}}
 if(embedded){
-  document.body.classList.add('embedded');app=new App({name:'Compare Two Texts',version:'0.1.0'});
+  document.body.classList.add('embedded');app=new App({name:'Compare Two Texts',version:'0.2.0'},{availableDisplayModes:['inline','fullscreen']});
   app.ontoolresult=result=>{if(state.busy){pendingHostResult=result;return;}receiveHostResult(result);};
-  app.connect().then(()=>{connected=true;context();}).catch(()=>status('Не удалось подключиться к ChatGPT. Откройте плагин заново.',true));
+  app.connect().then(()=>{connected=true;context();documentsUI.hostReady();}).catch(()=>status('Не удалось подключиться к ChatGPT. Откройте плагин заново.',true));
+  document.querySelector('.brand').onclick=e=>{e.preventDefault();if(!state.busy){documentsUI.show();$('doc-edit').click();}};
 }
 syncInputs();
+documentsUI.show();
