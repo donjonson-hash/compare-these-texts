@@ -1,3 +1,5 @@
+import {documentReport} from './document-export.mjs';
+import {downloadReport} from './download.mjs';
 import {mountDocumentComparison} from './document-view.mjs';
 
 const $=id=>document.getElementById(id);
@@ -22,7 +24,7 @@ export function createDocumentUI({tool,run,status,getApp,onActivate}){
     pendingContext={app,evidence:value};void flushContext();
   }
   function show(){onActivate();$('document-mode').hidden=false;const change=snapshot?.changes.find(c=>c.id===activeId);if(change)context(evidence(change));}
-  function lock(value){locked=value;for(const id of ['doc-file-original','doc-file-revised','doc-compare','doc-edit','doc-explain','doc-fullscreen','mode-text','mode-documents'])$(id).disabled=value; if(!value){$('doc-compare').disabled=!sources.original||!sources.revised;$('doc-explain').disabled=!activeId;}}
+  function lock(value){locked=value;for(const id of ['doc-download','doc-file-original','doc-file-revised','doc-compare','doc-edit','doc-explain','doc-fullscreen','mode-text','mode-documents'])$(id).disabled=value; if(!value){$('doc-compare').disabled=!sources.original||!sources.revised;$('doc-explain').disabled=!activeId;}}
   function cleanup(){generation++;pendingContext=null;viewer?.destroy();viewer=null;}
   async function readFile(side){
     const field=$('doc-file-'+side),file=field.files?.[0];if(!file)return;
@@ -41,6 +43,7 @@ export function createDocumentUI({tool,run,status,getApp,onActivate}){
   $('doc-previous').onclick=()=>{const i=snapshot.changes.findIndex(c=>c.id===activeId);select(snapshot.changes[Math.max(0,i-1)]?.id);};
   $('doc-next').onclick=()=>{const i=snapshot.changes.findIndex(c=>c.id===activeId);select(snapshot.changes[Math.min(snapshot.changes.length-1,i+1)]?.id);};
   $('doc-fullscreen').onclick=()=>run(async()=>{const app=getApp();if(!app)throw new Error('Разворачивание доступно внутри ChatGPT. В браузере можно развернуть окно.');if(!app.getHostContext()?.availableDisplayModes?.includes('fullscreen'))throw new Error('В этом окне ChatGPT полноэкранный режим недоступен.');await app.requestDisplayMode({mode:'fullscreen'});});
+  $('doc-download').onclick=()=>run(async()=>{if(snapshot)await downloadReport(documentReport(snapshot),getApp());});
   $('doc-explain').onclick=()=>run(explain);
   function localLocation(value){return value?value.replace(/Page (\d+) · line (\d+)/g,'Стр. $1 · строка $2').replace(/Paragraph (\d+)/g,'Абзац $1').replace(/Line (\d+)/g,'Строка $1').replace(/Table (\d+), row (\d+), column (\d+), paragraph (\d+)/g,'Таблица $1, строка $2, столбец $3, абзац $4'):'Фрагмент отсутствует';}
   function select(id,focus=true){

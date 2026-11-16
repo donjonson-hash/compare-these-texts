@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import * as server from './server.mjs';
 import {docx} from '../tests/fixtures/text-fixture.mjs';
 
-const widget = '<!doctype html><html><body data-build="0.2.1">Current document and text viewer</body></html>';
+const widget = '<!doctype html><html><body data-build="0.2.2">Current document and text viewer</body></html>';
 const source = (name, paragraphs) => ({name, data: Buffer.from(docx(paragraphs)).toString('base64')});
 
 function client(options = {}) {
@@ -57,7 +57,7 @@ test('cached v1 resource URI serves the current viewer with the requested identi
 test('new descriptors use the current URI while a no-argument launcher opens the viewer', async () => {
   const c = client();
   const discovery = (await c.rpc('server/discover')).result;
-  assert.equal(discovery.serverInfo.version, '0.2.1');
+  assert.equal(discovery.serverInfo.version, '0.2.2');
   const {tools} = (await c.rpc('tools/list')).result;
   const launcher = tools.find(tool => tool.name === 'open_comparison');
   assert.ok(launcher);
@@ -78,7 +78,7 @@ test('new descriptors use the current URI while a no-argument launcher opens the
   assert.equal((await c.call('open_comparison', {original: 'Unexpected document text'})).isError, true);
   const listed = (await c.rpc('resources/list')).result.resources;
   assert.ok(listed.some(resource => resource.uri === server.WIDGET_URI));
-  assert.equal((await (await c.app.fetch(new Request('https://ctt.example/health'))).json()).version, '0.2.1');
+  assert.equal((await (await c.app.fetch(new Request('https://ctt.example/health'))).json()).version, '0.2.2');
 });
 
 test('diagnostics expose only allowlisted method, tool and resource labels', async () => {
@@ -103,7 +103,7 @@ test('diagnostics expose only allowlisted method, tool and resource labels', asy
   for (const event of events) {
     assert.ok(Object.keys(event).every(key => allowedKeys.has(key)));
     assert.equal(event.event, 'ctt_mcp');
-    assert.equal(event.version, '0.2.1');
+    assert.equal(event.version, '0.2.2');
     assert.ok(allowedMethods.has(event.method));
     if (event.tool !== undefined) assert.ok(knownTools.has(event.tool));
     if (event.resource !== undefined) assert.ok(['current', 'legacy', 'unknown'].includes(event.resource));

@@ -7,7 +7,7 @@ export const WIDGET_URI = 'ui://ctt/review-v2.html';
 export const LEGACY_WIDGET_URIS = ['ui://ctt/review-v1.html'];
 export const MAX_BODY_BYTES = 6 * 1024 * 1024;
 const PAGE_SIZE = 80;
-const VERSION = '0.2.1';
+const VERSION = '0.2.2';
 const MIME = 'text/html;profile=mcp-app';
 const HEADERS = {'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer'};
 const CSP = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'self'; font-src data: blob:; object-src 'none'; base-uri 'none'; form-action 'self'";
@@ -171,9 +171,9 @@ async function execute(name, args, options) {
   }
   if (name === 'apply_text_changes') {
     const review = await applyTextChanges(args);
-    return {structuredContent: review, _meta: {comparison, review}};
+    return {structuredContent: review, _meta: {snapshotId: crypto.randomUUID(), comparison, review}};
   }
-  return {structuredContent: page(comparison), _meta: {comparison, review: {appliedChangeIds: [], result: comparison.original}}};
+  return {structuredContent: page(comparison), _meta: {snapshotId: crypto.randomUUID(), comparison, review: {appliedChangeIds: [], result: comparison.original}}};
 }
 
 function rpcError(id, code, message, status = 200) { return json({jsonrpc: '2.0', id, error: {code, message}}, status); }
