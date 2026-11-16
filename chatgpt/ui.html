@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Compare Two Texts: точное сравнение, выбор правок и готовый текст. Приватный пилот для ChatGPT.">
+  <title>Compare Two Texts · ChatGPT</title>
+  <style>/* APP_STYLES */</style>
+</head>
+<body>
+<div class="app">
+  <header class="header"><a class="brand" href="/" aria-label="Compare Two Texts — начало"><span class="brand-icon">C<span>↔</span>T</span><span>Compare Two Texts<small>Точность в каждой правке</small></span></a><span class="pilot"><i></i> ChatGPT · пилот</span></header>
+  <main>
+    <div class="intro"><div><p class="eyebrow">ДВА ТЕКСТА. ОДНО ЯСНОЕ РЕШЕНИЕ.</p><h1>Сравните. Выберите. Сохраните.</h1><p class="subtitle">Каждая правка — на своём месте. Итоговый текст — под вашим контролем.</p></div><button id="sample" class="secondary">Попробовать на примере <span aria-hidden="true">↗</span></button></div>
+    <ol class="steps" aria-label="Этапы"><li class="active" id="step-input"><span>1</span> Два текста</li><li id="step-review"><span>2</span> Просмотр правок</li><li id="step-result"><span>3</span> Готовый результат</li></ol>
+    <div id="status" role="status" aria-live="polite"></div>
+    <section id="inputs" aria-label="Исходные тексты">
+      <div class="input-grid">
+        <div class="input-card"><div class="pane-heading"><div><span class="letter">A</span><label for="original">Исходный текст</label></div><label class="file-label">Открыть TXT / MD<input id="file-original" type="file" accept=".txt,.md,text/plain,text/markdown" aria-label="Открыть исходный TXT или MD"></label></div><textarea id="original" spellcheck="false" placeholder="Вставьте исходную версию…" maxlength="30000"></textarea><div class="input-meta"><span id="name-original">original.txt</span><span id="count-original">0 / 30 000</span></div></div>
+        <div class="input-card"><div class="pane-heading"><div><span class="letter revised-letter">B</span><label for="revised">Новая версия</label></div><label class="file-label">Открыть TXT / MD<input id="file-revised" type="file" accept=".txt,.md,text/plain,text/markdown" aria-label="Открыть новый TXT или MD"></label></div><textarea id="revised" spellcheck="false" placeholder="Вставьте изменённую версию…" maxlength="30000"></textarea><div class="input-meta"><span id="name-revised">revised.txt</span><span id="count-revised">0 / 30 000</span></div></div>
+      </div>
+      <div class="input-footer"><p>Точный текст · UTF-8 TXT / MD · до 30 000 символов на версию</p><button id="compare" class="primary">Сравнить тексты <span aria-hidden="true">→</span></button></div>
+    </section>
+    <section id="review" hidden aria-label="Просмотр изменений">
+      <div class="review-toolbar"><div class="review-heading"><h2 id="change-total">Изменения</h2><span id="summary" class="muted"></span></div><div class="toolbar-actions"><button id="edit" class="text-button">Изменить тексты</button><div class="navigation"><button id="previous" aria-label="Предыдущая правка">↑</button><span id="position">0 / 0</span><button id="next" aria-label="Следующая правка">↓</button></div></div></div>
+      <p id="coarse" class="notice" hidden>Для этой пары достигнут предел детальной подсветки. Показана одна общая замена; весь текст сохранён.</p>
+      <div class="workspace">
+        <aside class="changes-panel" aria-label="Список правок"><div class="changes-controls"><label><input id="select-all" type="checkbox"> Выбрать все</label><span id="selected-count"></span></div><div id="change-list" class="change-list"></div></aside>
+        <div class="documents"><article class="document"><div class="pane-heading"><div><span class="letter">A</span><h3>Исходный текст</h3></div><span class="legend old-legend">До</span></div><div id="original-doc" class="document-body" tabindex="0" aria-label="Исходный текст с подсветкой"></div></article><article class="document"><div class="pane-heading"><div><span class="letter revised-letter">B</span><h3>Новая версия</h3></div><span class="legend new-legend">После</span></div><div id="revised-doc" class="document-body" tabindex="0" aria-label="Новая версия с подсветкой"></div></article></div>
+      </div>
+      <div class="apply-bar"><p id="apply-hint">Выберите изменения, которые войдут в результат.</p><button id="apply" class="primary">Применить выбранные</button></div>
+      <section class="result-panel" aria-label="Результат"><div class="result-heading"><div><p class="eyebrow">ВАШ ИТОГОВЫЙ ТЕКСТ</p><h2>Результат <span id="applied-count" class="result-count">0 правок</span></h2></div><div class="result-actions"><button id="undo" class="icon-button" aria-label="Отменить применение" title="Отменить">↶</button><button id="redo" class="icon-button" aria-label="Повторить применение" title="Повторить">↷</button><button id="copy" class="secondary">Копировать</button><button id="download" class="primary">Скачать TXT <span aria-hidden="true">↓</span></button></div></div><pre id="result-text" tabindex="0" aria-label="Итоговый текст"></pre><p class="result-note" id="result-note">Пока совпадает с исходным текстом A.</p></section>
+    </section>
+  </main>
+  <footer><span>Compare Two Texts <span class="dot">·</span> Движок точного сравнения</span><span>Документы не сохраняются на сервере приложения.</span></footer>
+</div>
+<script>/* APP_SCRIPT */</script>
+</body>
+</html>

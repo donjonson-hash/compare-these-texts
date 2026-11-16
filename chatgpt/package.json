@@ -1,0 +1,13 @@
+{
+  "name": "ctt-chatgpt-pilot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test *.test.mjs",
+    "dev": "node dev.mjs"
+  },
+  "dependencies": { "@modelcontextprotocol/ext-apps": "2.0.4" },
+  "devDependencies": { "esbuild": "0.25.12" }
+}
