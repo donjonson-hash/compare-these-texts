@@ -7,12 +7,12 @@ host permissions. Website: https://comparetwotexts.pro/
 - Chrome Web Store: https://chromewebstore.google.com/detail/kclhfaiampafehfhhlejeeefhdhocfcg
 - Firefox Add-ons: https://addons.mozilla.org/firefox/addon/compare-two-texts-diff-checker/
 
-## PDF compatibility update in 0.37.13
+## Store & offline release 0.37.13
 
-This release ships the shared PDF placeholder-link fix in the offline extension.
-The published 0.37.5 store package was built before that fix. Existing permissions,
-offline processing and encrypted saved drafts are unchanged. Store packaging now
-requires the PDF regression checks to pass in the installed extension.
+Release 0.37.13 synchronizes the production web workspace and the published Chrome Web Store and Firefox Add-ons packages across 51 UI languages:
+- Zero browser permissions (`"permissions": []`) and strict offline CSP (`connect-src 'none'`).
+- Local AES-GCM-256 encrypted draft storage, Amounts & percentages contract audit, and printed PDF form filling.
+- Live store listings on Chrome Web Store and Mozilla Add-ons with reproducible build provenance.
 
 ## Encrypted saved drafts
 
