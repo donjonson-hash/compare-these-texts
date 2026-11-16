@@ -620,8 +620,8 @@ Each is a small task in its own PR.
 | | Microsoft Edge Add-ons | | Postponed by the owner on 2026-10-31; package and copy are ready | | |
 | 2026-11-01 | YouTube demo | https://youtu.be/BEHHf0I0kE8 | Published as a premiere | Video | Description links carry launch_2026_10 labels; chapters and tags still to add |
 | 2026-11-15 | Website 0.37.13 | https://comparetwotexts.pro/ | Live | Production deploy | llms.txt, /pricing/, FAQPage schema and referral store links live |
-| 2026-11-15 | Chrome Web Store 0.37.13 | https://chromewebstore.google.com/detail/kclhfaiampafehfhhlejeeefhdhocfcg | Under review | Store listing | Yellow Argon keyword-spam pattern cleaned across all 51 locales |
-| 2026-11-15 | Firefox AMO 0.37.13 | | Under review | Store listing | Submitted with reproducible source archive; 45-char name & 4 MB chunking fixed |
+| 2026-11-16 | Chrome Web Store 0.37.13 | https://chromewebstore.google.com/detail/kclhfaiampafehfhhlejeeefhdhocfcg | Live | Store listing | Yellow Argon keyword-spam pattern cleaned across all 51 locales |
+| 2026-11-15 | Firefox AMO 0.37.13 | https://addons.mozilla.org/firefox/addon/compare-two-texts-diff-checker/ | Live | Store listing | Submitted with reproducible source archive; 45-char name & 4 MB chunking fixed |
 | | Show HN | | Missed on 2026-11-04 (owner moving); rescheduled to 2026-11-18, 8:00 ET | | Run sheet in section 4 |
 | | Product Hunt | | One week after Show HN | | |
 | | Reddit r/SideProject | | | | |
