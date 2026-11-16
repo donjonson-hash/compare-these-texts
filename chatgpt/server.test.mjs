@@ -32,7 +32,7 @@ test('discovery, legacy initialization, notification and ping follow stateless M
 
 test('tools declare strict schemas, appropriate annotations, and the review resource', async () => {
   const tools = (await rpc('tools/list')).body.result.tools;
-  assert.deepEqual(tools.map(tool => tool.name), ['compare_texts', 'apply_text_changes', 'get_text_changes','compare_documents','get_document_changes','compare_uploaded_documents']);
+  assert.deepEqual(tools.map(tool => tool.name), ['compare_texts', 'apply_text_changes', 'get_text_changes','compare_documents','get_document_changes','compare_uploaded_documents','open_comparison']);
   for (const tool of tools) {
     assert.equal(tool.inputSchema.additionalProperties, false);
     assert.equal(tool.outputSchema.type, 'object');

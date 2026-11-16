@@ -104,9 +104,9 @@ documentsUI=createDocumentUI({tool,run,status,getApp:()=>connected?app:null,onAc
   $('step-result').hidden=true;$('inputs').hidden=true;$('review').hidden=true;$('mode-documents').setAttribute('aria-selected','true');$('mode-text').setAttribute('aria-selected','false');$('step-input').lastChild.nodeValue=' Два документа';
 }});
 $('mode-text').onclick=()=>{textMode();status();};$('mode-documents').onclick=()=>{documentsUI.show();status();};
-function receiveHostResult(result){if(result.isError){status(result.content?.find(x=>x.type==='text')?.text||'Ошибка сравнения.',true);return;}if(result._meta?.documentComparison){run(()=>documentsUI.receive(result._meta.documentComparison));return;}if(result._meta?.comparison){try{loadSnapshot(result._meta);}catch(error){status(error.message,true);}}}
+function receiveHostResult(result){if(result._meta?.viewer){documentsUI.show();$('doc-edit').click();return;}if(result.isError){status(result.content?.find(x=>x.type==='text')?.text||'Ошибка сравнения.',true);return;}if(result._meta?.documentComparison){run(()=>documentsUI.receive(result._meta.documentComparison));return;}if(result._meta?.comparison){try{loadSnapshot(result._meta);}catch(error){status(error.message,true);}}}
 if(embedded){
-  document.body.classList.add('embedded');app=new App({name:'Compare Two Texts',version:'0.2.0'},{availableDisplayModes:['inline','fullscreen']});
+  document.body.classList.add('embedded');app=new App({name:'Compare Two Texts',version:'0.2.1'},{availableDisplayModes:['inline','fullscreen']});
   app.ontoolresult=result=>{if(state.busy){pendingHostResult=result;return;}receiveHostResult(result);};
   app.connect().then(()=>{connected=true;context();documentsUI.hostReady();}).catch(()=>status('Не удалось подключиться к ChatGPT. Откройте плагин заново.',true));
   document.querySelector('.brand').onclick=e=>{e.preventDefault();if(!state.busy){documentsUI.show();$('doc-edit').click();}};
