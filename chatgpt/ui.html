@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Compare Two Texts: точное сравнение, выбор правок и готовый текст. Приватный пилот для ChatGPT.">
+  <title>Compare Two Texts · ChatGPT</title>
+  <style>/* APP_STYLES */</style>
+</head>
+<body>
+<div class="app">
+  <header class="header"><a class="brand" href="/" aria-label="Compare Two Texts — начало"><span class="brand-icon">C<span>↔</span>T</span><span>Compare Two Texts</span></a></header>
+  <main>
+    <button id="sample" hidden>Пример</button>
+    <div class="mode-tabs" role="tablist" aria-label="Способ сравнения"><button id="mode-documents" role="tab" aria-selected="true">Документы</button><button id="mode-text" role="tab" aria-selected="false">Текст</button></div>
+    <ol hidden class="steps" aria-label="Этапы"><li class="active" id="step-input"><span>1</span> Два текста</li><li id="step-review"><span>2</span> Просмотр правок</li><li id="step-result"><span>3</span> Готовый результат</li></ol>
+    <div id="status" role="status" aria-live="polite"></div>
+    <section id="document-mode" aria-label="Сравнение документов">
+      <section id="doc-inputs" aria-label="Выбор документов"><div class="input-grid">
+        <label class="document-upload"><span class="letter">A</span><strong>Исходный документ</strong><span id="doc-name-original">Выбрать файл</span><small id="doc-size-original">DOCX · PDF · TXT</small><input type="file" id="doc-file-original" accept=".docx,.pdf,.txt" aria-label="Выбрать исходный документ"></label>
+        <label class="document-upload"><span class="letter revised-letter">B</span><strong>Новая версия</strong><span id="doc-name-revised">Выбрать файл</span><small id="doc-size-revised">DOCX · PDF · TXT</small><input type="file" id="doc-file-revised" accept=".docx,.pdf,.txt" aria-label="Выбрать новую версию документа"></label>
+      </div><div class="input-footer"><button id="doc-compare" class="primary" disabled>Сравнить</button></div></section>
+      <section id="doc-results" hidden aria-label="Результат сравнения документов"><div class="review-toolbar"><div class="review-heading"><h2 id="doc-total">Изменения</h2><span hidden id="doc-summary" class="muted"></span></div><div class="toolbar-actions"><button id="doc-download" class="primary" title="Скачать текстовый отчёт с изменениями (HTML)">Отчёт HTML ↓</button><button id="doc-edit" class="text-button">Другие документы</button><button id="doc-fullscreen" class="secondary">Развернуть</button><div class="navigation"><button id="doc-previous" aria-label="Предыдущая правка документа">↑</button><span id="doc-position">0 / 0</span><button id="doc-next" aria-label="Следующая правка документа">↓</button></div></div></div>
+      <p class="document-edit-note">В этом режиме доступно сравнение. Применение правок и экспорт изменённого PDF / DOCX пока не поддерживаются.</p><div class="doc-workspace"><aside hidden class="changes-panel" aria-label="Правки документов"><div class="changes-controls">Изменения по порядку</div><div id="doc-change-list"></div></aside><div id="document-view" aria-label="Документы рядом"></div></div>
+      <section class="doc-evidence" id="doc-evidence" hidden aria-label="Пояснение выбранной правки"><div class="result-heading"><div><p class="eyebrow">ВЫБРАННАЯ ПРАВКА</p><h2 id="doc-fact-title"></h2></div><button id="doc-explain" class="primary">Объяснить в ChatGPT</button></div><p id="doc-fact"></p><div class="doc-quotes"><div><small id="doc-location-original"></small><pre id="doc-quote-original"></pre></div><div><small id="doc-location-revised"></small><pre id="doc-quote-revised"></pre></div></div><p class="result-note">Здесь показаны факты точного сравнения. Контекстное объяснение ChatGPT появится в чате после нажатия кнопки.</p></section>
+      <div id="doc-copy-context" hidden><label for="doc-context">Вопрос для ChatGPT с точными цитатами</label><textarea id="doc-context" readonly></textarea></div>
+      <details class="doc-scope"><summary>О сравнении</summary><p class="doc-coverage" id="doc-coverage"></p><ul id="doc-notes"></ul></details></section>
+    </section>
+    <section id="inputs" aria-label="Исходные тексты">
+      <div class="input-grid">
+        <div class="input-card"><div class="pane-heading"><div><span class="letter">A</span><label for="original">Исходный текст</label></div><label class="file-label">Открыть TXT / MD<input id="file-original" type="file" accept=".txt,.md,text/plain,text/markdown" aria-label="Открыть исходный TXT или MD"></label></div><textarea id="original" spellcheck="false" placeholder="Вставьте исходную версию…" maxlength="30000"></textarea><div class="input-meta"><span id="name-original">original.txt</span><span id="count-original">0 / 30 000</span></div></div>
+        <div class="input-card"><div class="pane-heading"><div><span class="letter revised-letter">B</span><label for="revised">Новая версия</label></div><label class="file-label">Открыть TXT / MD<input id="file-revised" type="file" accept=".txt,.md,text/plain,text/markdown" aria-label="Открыть новый TXT или MD"></label></div><textarea id="revised" spellcheck="false" placeholder="Вставьте изменённую версию…" maxlength="30000"></textarea><div class="input-meta"><span id="name-revised">revised.txt</span><span id="count-revised">0 / 30 000</span></div></div>
+      </div>
+      <div class="input-footer"><button id="compare" class="primary">Сравнить</button></div>
+    </section>
+    <section id="review" hidden aria-label="Просмотр изменений">
+      <div class="review-toolbar"><div class="review-heading"><h2 id="change-total">Изменения</h2><span hidden id="summary" class="muted"></span></div><div class="toolbar-actions"><button id="download" class="primary">Скачать итог TXT ↓</button><button id="text-report" class="text-button" title="Отчёт об исходных различиях A и B">Отчёт HTML</button><button id="edit" class="text-button">Изменить тексты</button><div class="navigation"><button id="previous" aria-label="Предыдущая правка">↑</button><span id="position">0 / 0</span><button id="next" aria-label="Следующая правка">↓</button></div></div></div>
+      <p id="coarse" class="notice" hidden>Для этой пары достигнут предел детальной подсветки. Показана одна общая замена; весь текст сохранён.</p>
+      <section class="change-decision" aria-label="Применение текущей правки">
+        <div class="decision-copy"><strong id="active-change-title">Выберите правку</strong><div class="decision-snippets"><span id="active-before" class="snippet before"></span><span aria-hidden="true">→</span><span id="active-after" class="snippet after"></span></div></div>
+        <div class="decision-actions"><button id="keep-change" class="secondary">Оставить A</button><button id="accept-change" class="primary">Взять B</button></div>
+        <p id="active-choice" aria-live="polite"></p>
+      </section>
+      <div class="result-tools"><p id="result-note" class="result-note">Пока совпадает с исходным текстом A.</p><div class="result-actions"><span id="applied-count" class="result-count"></span><button id="undo" class="icon-button" aria-label="Отменить применение" title="Отменить">↶</button><button id="redo" class="icon-button" aria-label="Повторить применение" title="Повторить">↷</button><button id="copy" class="text-button">Копировать итог</button></div></div>
+      <div class="workspace">
+        <aside class="changes-panel" aria-label="Список правок"><div class="changes-controls"><label><input id="select-all" type="checkbox"> Взять все правки из B</label><span id="selected-count"></span></div><div id="change-list" class="change-list"></div></aside>
+        <div class="documents"><article class="document"><div class="pane-heading"><div><span class="letter">A</span><h3>Исходный текст</h3></div><span class="legend old-legend">До</span></div><div id="original-doc" class="document-body" tabindex="0" aria-label="Исходный текст с подсветкой"></div></article><article class="document"><div class="pane-heading"><div class="result-tabs" role="tablist" aria-label="Правая колонка"><button id="show-revised" role="tab" aria-selected="true" aria-controls="revised-doc">Версия B</button><button id="show-result" role="tab" aria-selected="false" aria-controls="result-text">Итог</button></div></div><div id="revised-doc" class="document-body" role="tabpanel" tabindex="0" aria-label="Новая версия с подсветкой"></div><pre id="result-text" class="document-body" role="tabpanel" tabindex="0" aria-label="Итоговый текст" hidden></pre></article></div>
+      </div>
+      <details class="text-options"><summary>Все правки — выбор применяется сразу</summary><div id="selection-options"></div></details>
+    </section>
+  </main>
+  <footer><a href="/licenses" target="_blank" rel="noopener">Лицензии</a></footer>
+</div>
+<script type="module">/* APP_SCRIPT */</script>
+</body>
+</html>
