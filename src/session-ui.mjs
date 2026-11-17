@@ -12,7 +12,7 @@ export async function mountSessionUI(root, {onResume, onFinish, onOperating = ()
   const button = (text, action, className = 'button secondary') => {
     const item = node('button', text, className); item.type = 'button'; item.addEventListener('click', action); return item;
   };
-  root.className = 'session-panel'; root.hidden = true;
+  root.className = 'session-panel'; root.hidden = true; if (root.setAttribute) root.setAttribute('data-nosnippet', '');
   const info = node('div', '', 'session-info'), title = node('strong'), names = node('p', '', 'session-names');
   const status = node('p', '', 'session-status'); status.setAttribute('role', 'status');
   const retention = node('p', uiMessage("Encrypted on this device. Saved for 7 days after opening or saving. Download files you want to keep."), 'hint');
