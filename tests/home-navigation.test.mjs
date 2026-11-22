@@ -273,3 +273,65 @@ test('the Word guide opens its editable sample once and exports the negotiated t
   assert.equal(p.window.location.search, '');
   assert.equal(page(t, undefined, p.window.location.href).commands.length, 0, 'refresh must not launch another demo');
 });
+
+test('one uploaded workbook offers distinct populated sheets and keeps pasted sources available', async t => {
+  const {createInventoryExample} = await import('../src/workbook-example.mjs');
+  const {handleRequest} = await import('../src/worker.mjs');
+  const {file} = createInventoryExample();
+  const p = page(t, ({window}) => { window.KristinaTransport = {request: handleRequest}; }, 'https://example.invalid/?excel=sheets');
+  assert.ok(p.$('home-workbook').open);
+  p.upload('left', file);
+  assert.equal(p.$('start-new-compare').disabled, false);
+  const available = new Promise(resolve => {
+    const observer = new p.window.MutationObserver(() => {
+      if (!p.$('workbook-choices').hidden) { observer.disconnect(); resolve(); }
+    });
+    observer.observe(p.$('workbook-choices'), {attributes:true});
+  });
+  p.$('start-new-compare').click();
+  await available;
+  assert.deepEqual(Array.from(p.$('workbook-left').options, option => option.value), ['October', 'November']);
+  p.$('workbook-left').value = 'November';
+  p.$('workbook-left').dispatchEvent(new p.window.Event('change'));
+  assert.equal(p.$('workbook-right').value, 'October');
+  p.$('workbook-compare').click();
+  const command = p.commands[0];
+  assert.equal(command.files.left, command.files.right);
+  assert.equal(command.files.right, file);
+  assert.equal(command.sheets.left, 'November');
+  assert.equal(command.sheets.right, 'October');
+  command.complete({ok:true}); await nextTurn();
+  p.$('workspace-home').click();
+  assert.equal(p.$('home-left-name').textContent, file.name);
+  assert.equal(p.$('home-right-text').value, '');
+});
+
+test('inventory example uses the real selected worksheets and exports an independently edited sheet', async t => {
+  const {handleRequest} = await import('../src/worker.mjs');
+  const {openSheetDocument} = await import('../src/sheet-document.mjs');
+  const {read} = await import('../src/xlsx-vendor.mjs');
+  let capture;
+  const opened = new Promise(resolve => { capture = resolve; });
+  const p = page(t, ({document}) => document.addEventListener('ctt:new-comparison', e => capture(e.detail)), 'https://example.invalid/?excel=example');
+  const {files, example, sheets, complete} = await opened;
+  assert.equal(example, 'workbook');
+  const data = Buffer.from(await files.left.arrayBuffer()).toString('base64');
+  const left = {name:files.left.name, data, sheet:sheets.left};
+  const right = {...left, sheet:sheets.right};
+  const metadata = await handleRequest('/api/prepare', {left, right, delimiter:'auto'});
+  assert.equal(metadata.ready, true);
+  const {report} = await handleRequest('/api/compare', {left, right, ...metadata.rules, delimiter:metadata.delimiter});
+  assert.equal(report.changed.length, 2);
+  assert.equal(report.only_left.length, 1);
+  assert.equal(report.only_right.length, 1);
+  const lamp = report.changed.find(row => row.key === 'LAMP-01');
+  assert.equal(lamp.right.values.Quantity, '10');
+  const edited = await openSheetDocument(right, metadata.right);
+  edited.edit(lamp.right.cells.Quantity, '11', 'number');
+  const exported = read(edited.export(), {type:'array'});
+  assert.equal(exported.Sheets.November[lamp.right.cells.Quantity].v, 11);
+  assert.equal(exported.Sheets.October[lamp.left.cells.Quantity].v, 12);
+  complete({ok:true}); await nextTurn();
+  assert.ok(p.$('start-menu').hidden);
+  assert.equal(p.window.location.search, '');
+});

@@ -28,6 +28,42 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   const files = {left:null, right:null};
   const sides = ['left', 'right'];
   const help = $('home-help');
+  const workbookPanel = $('home-workbook');
+  let selectedWorkbook = null;
+  function stagedWorkbook() {
+    const side = sides.find(side => !hasInput(side));
+    if (!side) return null;
+    const file = files[side === 'left' ? 'right' : 'left'];
+    return file && /\.xlsx?$/i.test(file.name) ? file : null;
+  }
+  async function chooseWorkbook(file) {
+    if (!file || pending) return;
+    workbookPanel.open = true;
+    selectedWorkbook = null;
+    $('workbook-choices').hidden = true;
+    const message = $('workbook-notice');
+    message.hidden = false;
+    message.classList.remove('error');
+    uiSetText(message, uiMessage("Reading workbook sheets…"));
+    pending = true; controls(); notice();
+    try {
+      if (!window.KristinaTransport) throw new Error("The spreadsheet engine could not load. Reload this page and try again.");
+      const {sheets} = await window.KristinaTransport.request('/api/workbook-sheets', {file});
+      if (sheets.length < 2) throw new Error("Choose a workbook with at least two non-empty sheets.");
+      for (const side of sides) {
+        const select = $('workbook-' + side);
+        select.replaceChildren(...sheets.map(({name, hidden}) => uiOption(hidden ? uiMessage("{0} (hidden)", {0:name}) : name, name)));
+        select.selectedIndex = side === 'left' ? 0 : 1;
+      }
+      selectedWorkbook = file; message.hidden = true;
+      uiSetText($('workbook-filename'), file.name);
+      $('workbook-choices').hidden = false;
+    } catch (error) {
+      uiSetText(message, uiError(error.message));
+      message.classList.add('error');
+    } finally { pending = false; controls(); }
+    if (selectedWorkbook) $('workbook-left').focus();
+  }
   let pending = false, navigationRevision = 0, resumeNavigation = null;
   function notice(text = '', error = false) {
     const node = $('home-notice'); uiSetText(node, error && !text?.__cttUiMessage && !text?.__cttUiError ? uiError(text) : text); node.hidden = !text;
@@ -35,8 +71,10 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   }
   function hasInput(side) { return !!files[side] || $('home-' + side + '-text').value.length > 0; }
   function controls() {
-    start.disabled = pending || !sides.every(hasInput);
-    uiSetText(start, pending ? uiMessage("Opening documents…") : sides.some(side => files[side]) ? uiMessage("Compare documents →") : uiMessage("Compare texts →"));
+    const workbook = stagedWorkbook();
+    start.disabled = pending || (!workbook && !sides.every(hasInput));
+    for (const id of ['workbook-file','workbook-left','workbook-right','workbook-compare','workbook-example']) $(id).disabled = pending;
+    uiSetText(start, pending ? uiMessage("Opening documents…") : workbook ? uiMessage("Compare sheets in this workbook") : sides.some(side => files[side]) ? uiMessage("Compare documents →") : uiMessage("Compare texts →"));
     compare.disabled = edit.disabled = home.disabled = $('header-edit').disabled = $('home-example').disabled = $('home-swap').disabled = pending;
     for (const side of sides) {
       const file = files[side], field = $('home-' + side + '-text');
@@ -53,7 +91,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     if (!file || pending) return;
     let error = '';
     if (/\.doc$/i.test(file.name)) error = 'Old Word files (.doc) are not supported. Save the file as .docx in Word or LibreOffice, then try again. Renaming the file is not enough.';
-    else if (!/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.test(file.name)) error = 'Choose a DOCX, PDF, TXT, XLSX, CSV or TSV file.';
+    else if (!/\.(docx|pdf|txt|xlsx?|csv|tsv)$/i.test(file.name)) error = 'Choose a DOCX, PDF, TXT, XLS, XLSX, CSV or TSV file.';
     else if (file.size > window.cttFileLimits.MAX_FILE_BYTES) error = 'Choose a file up to 25 MB.';
     if (error) notice(uiError(error), true);
     else { navigationRevision++; files[side] = file; notice(); }
@@ -79,26 +117,50 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     else modes.find(button => button.dataset.workMode === mode)?.focus({preventScroll:true});
     home.scrollIntoView({block:'start'});
   }
-  async function compareFromHome(example) {
-    if (pending || (!example && !sides.every(hasInput))) return;
+  async function compareFromHome(example, workbook = null) {
+    if (pending || (!example && !workbook && !sides.every(hasInput))) return;
     pending = true; controls(); notice(uiMessage("Checking your documents…"));
     try {
-      let next;
-      if (example === 'contract') {
+      let next, sheets;
+      if (example === 'workbook') {
+        const {createInventoryExample} = await import('./workbook-example.mjs');
+        workbook = createInventoryExample();
+      }
+      if (workbook) {
+        sheets = workbook.sheets;
+        next = {left:workbook.file, right:workbook.file};
+      } else if (example === 'contract') {
         const {createContractExample} = await import('./contract-example.mjs');
         next = await createContractExample();
       } else {
         next = {};
         for (const side of sides) next[side] = files[side] || new File([$('home-' + side + '-text').value], side === 'left' ? 'original-text.txt' : 'changed-text.txt', {type:'text/plain'});
       }
-      const result = await new Promise(resolve => document.dispatchEvent(new CustomEvent('ctt:new-comparison', {detail:{files:next, example, complete:resolve}})));
+      const result = await new Promise(resolve => document.dispatchEvent(new CustomEvent('ctt:new-comparison', {detail:{files:next, sheets, example, complete:resolve}})));
       if (!result.ok) { notice((result.message || ''), !!result.message); return; }
       // Keep the staged sources for convenient corrections on a later Home visit.
       notice(); open('compare');
     } catch (error) { notice((error.message || uiMessage("Could not open these documents. Your previous work is still open.")), true); }
     finally { pending = false; controls(); updateResume(); }
   }
-  start.addEventListener('click', () => compareFromHome());
+  start.addEventListener('click', () => {
+    const file = stagedWorkbook();
+    if (file) { $('workbook-file').value = ''; void chooseWorkbook(file); }
+    else void compareFromHome();
+  });
+  $('workbook-file').addEventListener('change', event => chooseWorkbook(event.target.files[0]));
+  $('workbook-example').addEventListener('click', () => compareFromHome('workbook'));
+  for (const side of sides) $('workbook-' + side).addEventListener('change', event => {
+    const other = $('workbook-' + (side === 'left' ? 'right' : 'left'));
+    if (other.value === event.target.value) {
+      other.selectedIndex = Array.from(other.options).findIndex(option => option.value !== event.target.value);
+    }
+  });
+  $('workbook-compare').addEventListener('click', () => {
+    if (!selectedWorkbook) return;
+    const sheets = {left:$('workbook-left').value, right:$('workbook-right').value};
+    if (sheets.left !== sheets.right) void compareFromHome(null, {file:selectedWorkbook, sheets});
+  });
   for (const side of sides) {
     const input = $('home-' + side + '-file'), zone = $('home-' + side + '-drop'), field = $('home-' + side + '-text');
     input.addEventListener('change', () => { choose(side, input.files[0]); input.value = ''; });
@@ -166,7 +228,15 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   });
   controls(); updateResume();
   const entry = new URL(window.location.href);
-  if (entry.searchParams.get('demo') === 'contract') {
+  const excel = entry.searchParams.get('excel');
+  if (excel === 'sheets' || excel === 'example') {
+    workbookPanel.open = true;
+    if (excel === 'example') {
+      entry.searchParams.delete('excel');
+      window.history.replaceState(window.history.state, '', entry.href);
+      void compareFromHome('workbook');
+    } else $('workbook-file').focus();
+  } else if (entry.searchParams.get('demo') === 'contract') {
     entry.searchParams.delete('demo');
     window.history.replaceState(window.history.state, '', entry.href);
     void compareFromHome('contract');

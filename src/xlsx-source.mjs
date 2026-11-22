@@ -1,5 +1,5 @@
-/** Bounded XLSX input. No formulas are evaluated and no links are followed. */
-import {read, utils, SSF} from './xlsx-vendor.mjs';
+/** Bounded Excel input. No formulas are evaluated and no links are followed. */
+import {read, write, parse_xlscfb, CFB, utils, SSF} from './xlsx-vendor.mjs';
 
 const MAX_EXPANDED_BYTES = 64 * 1024 * 1024;
 const MAX_XML_BYTES = 16 * 1024 * 1024;
@@ -110,11 +110,45 @@ function valueOf(cell, location, date1904, identifier = false) {
   return value;
 }
 
-export async function readWorkbook(raw, {name, sha256, sheet}) {
-  await validateZip(raw);
+// Accept the binary Excel 97–2003 workbook stream. SheetJS also guesses HTML,
+// text and unrelated compound file formats, which are not valid XLS uploads.
+function readLegacy(raw, name, options) {
+  const invalid = () => fail(`${name}: expected an Excel 97–2003 XLS workbook. Open the file in Excel or LibreOffice and save it as XLSX.`);
+  const magic = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1];
+  if (raw.length < 512 || !magic.every((byte, index) => raw[index] === byte)) invalid();
+  let archive;
+  try { archive = CFB.read(raw, {type: 'array'}); } catch { invalid(); }
+  const entry = CFB.find(archive, '/Workbook');
+  if (!entry?.content || entry.content.length < 12) invalid();
+  const bytes = entry.content;
+  const word = offset => bytes[offset] | bytes[offset + 1] << 8;
+  if (word(0) !== 0x0809 || word(4) !== 0x0600 || word(6) !== 0x0005) invalid();
+  if (archive.FullPaths.some(path => /\/(?:_VBA_PROJECT_CUR|VBA)(?:\/|$)/i.test(path))) fail('Workbooks with macros or external links are not supported. Save a separate XLSX copy containing values only.');
+  for (let offset = 0; offset < bytes.length;) {
+    if (offset + 4 > bytes.length) invalid();
+    const id = word(offset), size = word(offset + 2), data = offset + 4;
+    if (data + size > bytes.length) invalid();
+    if (id === 0x002f) fail(`${name}: password-protected XLS workbooks cannot be compared.`);
+    if ((id === 0x0085 && bytes[data + 5] === 1) || (id === 0x01ae && word(data + 2) !== 0x0401)) {
+      fail('Workbooks with macros or external links are not supported. Save a separate XLSX copy containing values only.');
+    }
+    // Macro sheets, passwords and external workbook references are declared in globals.
+    if (id === 0x000a) break;
+    offset = data + size;
+  }
+  try { return parse_xlscfb(archive, options); } catch { invalid(); }
+}
+
+export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, listOnly = false}) {
+  const legacy = /\.xls$/i.test(name);
+  const options = {type: 'array', cellFormula: true, sheetStubs: true, cellNF: true, cellText: false, cellDates: false, dense: false};
   let workbook;
-  try { workbook = read(raw, {type: 'array', cellFormula: true, sheetStubs: true, cellNF: true, cellText: false, cellDates: false, dense: false}); }
-  catch { fail(`${name}: could not read the XLSX. Save the workbook again.`); }
+  if (legacy) workbook = readLegacy(raw, name, options);
+  else {
+    await validateZip(raw);
+    try { workbook = read(raw, options); }
+    catch { fail(`${name}: could not read the XLSX. Save the workbook again.`); }
+  }
   if (workbook.SheetNames.length > 100) fail(`${name}: more than 100 sheets. Split the workbook into smaller files.`);
   let count = 0;
   const populated = workbook.SheetNames.map((name, i) => {
@@ -126,6 +160,7 @@ export async function readWorkbook(raw, {name, sha256, sheet}) {
   }).filter(s => s.addresses.length);
   if (!populated.length) fail(`${name}: the workbook has no filled sheets.`);
   const sheets = populated.map(({name, hidden}) => ({name, hidden}));
+  if (listOnly) return {sheets};
   if (sheet !== undefined && (typeof sheet !== 'string' || !populated.some(s => s.name === sheet))) fail(`${name}: the selected sheet was not found or is empty.`);
   if (sheet === undefined && populated.length > 1) return {sheets, selected: null, parsed: null};
   const selected = populated.find(s => s.name === sheet) || populated[0];
@@ -155,7 +190,20 @@ export async function readWorkbook(raw, {name, sha256, sheet}) {
     });
     return {record: r + 1, values, cells, sheet: selected.name};
   });
-  return {sheets, selected: selected.name, parsed: {meta: {name, sha256, format: 'xlsx', sheet: selected.name, sheets, headers, header_cells: headerCells, row_count: rows.length,
+  if (asXlsx && legacy) {
+    // A values-only working copy deliberately omits links, macros, names and embedded objects.
+    // Keep original addresses, value types, number formats and the Excel date system.
+    const grid = {'!ref': utils.encode_range({s:{r:minRow,c:minCol}, e:{r:maxRow,c:maxCol}})};
+    for (const address of addresses) {
+      const {t, v, z} = ws[address];
+      grid[address] = {t, v, z};
+    }
+    const copy = utils.book_new();
+    copy.Workbook = {WBProps:{date1904}};
+    utils.book_append_sheet(copy, grid, selected.name);
+    return new Uint8Array(write(copy, {bookType:'xlsx', type:'array', compression:true}));
+  }
+  return {sheets, selected: selected.name, parsed: {meta: {name, sha256, format: legacy ? 'xls' : 'xlsx', sheet: selected.name, sheets, headers, header_cells: headerCells, row_count: rows.length,
     notes: ["Only the selected sheet is compared, including hidden rows and columns. Empty rows are skipped. The first filled row contains the headers.", "Numbers are compared by value; a simple 000… format preserves leading zeros. Dates are converted to ISO format. Formatting, comments, images, and formulas are not compared."]}, rows}};
 }
 

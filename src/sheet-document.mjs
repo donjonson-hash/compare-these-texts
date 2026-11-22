@@ -3,7 +3,7 @@ import {decodeBase64Bytes} from './file-limits.mjs';
 import {createSheetCalculator} from './sheet-formulas.mjs';
 import {sheetMerges} from './sheet-merges.mjs';
 import {read, utils, CFB, SSF} from './xlsx-vendor.mjs';
-import {validateZip} from './xlsx-source.mjs';
+import {validateZip, readWorkbook} from './xlsx-source.mjs';
 import {DOMParser} from './xml-vendor.mjs';
 import {insertWorkbookRows} from './sheet-row-insert.mjs';
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -56,7 +56,9 @@ export function parseCsv(text, delimiter, sampleRows = Infinity) {
  return rows;
 }
 export async function openSheetDocument(source, meta, delimiter=',') {
- const raw=decodeBase64Bytes(source.data),xlsx=meta.format==='xlsx';
+ let raw=decodeBase64Bytes(source.data);
+ const legacy=meta.format==='xls',xlsx=legacy||meta.format==='xlsx';
+ if(legacy)raw=await readWorkbook(raw,{name:source.name,sheet:meta.sheet,asXlsx:true});
  const sheetPaths=new Map();let workbook,grid,archive,sheetPath,xml,range,newline='\n',bom=false,ending=true;
  if(xlsx){await validateZip(raw);workbook=read(raw,{type:'array',cellStyles:true,cellNF:true,cellFormula:true,cellText:true});grid=workbook.Sheets[meta.sheet];if(!grid)fail('Selected sheet is missing.');range=utils.decode_range(grid['!ref']||'A1');archive=CFB.read(raw,{type:'array'});
   const part=name=>{const file=CFB.find(archive,'/'+name);if(!file)fail('Workbook part is missing.');return file.content;};

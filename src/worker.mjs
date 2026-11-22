@@ -1,4 +1,6 @@
 import './i18n.js';
+import {MAX_FILE_BYTES} from './file-limits.mjs';
+import {readWorkbook} from './xlsx-source.mjs';
 import {prepare, inspect, compare} from './engine.mjs';
 import {renderHtml, renderJson} from './report.mjs';
 import {prepareText, compareText} from './text-engine.mjs';
@@ -6,6 +8,12 @@ import {renderTextHtml} from './text-report.mjs';
 import {buildCommercialSummary} from './commercial-summary.mjs';
 
 export async function handleRequest(path, payload) {
+  if (path === '/api/workbook-sheets') {
+    const file = payload?.file;
+    if (!(file instanceof Blob) || typeof file.name !== 'string' || !/\.xlsx?$/i.test(file.name)) throw new Error("Choose an XLS or XLSX workbook.");
+    if (file.size > MAX_FILE_BYTES) throw new Error("This file exceeds 25 MiB. Choose a smaller file.");
+    return readWorkbook(new Uint8Array(await file.arrayBuffer()), {name:file.name, listOnly:true});
+  }
   if (path === '/api/export') {
     const format = payload?.format, report = payload?.report;
     if (!['xlsx', 'pdf'].includes(format)) throw new Error("Select XLSX or PDF export.");
