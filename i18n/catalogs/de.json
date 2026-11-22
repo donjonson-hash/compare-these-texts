@@ -2170,5 +2170,11 @@
   "97c0a7ed2af5": "{0}: Kennwortgeschützte XLS-Arbeitsmappen können nicht verglichen werden.",
   "0541847f12bc": "Dokumentvergleich öffnen",
   "71327f623703": "Texte und Dateien vergleichen",
-  "0d811c4f2835": "Texte und Dokumente"
+  "0d811c4f2835": "Texte und Dokumente",
+  "d06238d70267": "Die Zeilen wurden nach ihrer Position verglichen.",
+  "d6861831f3c7": "Eintrag / Zeile",
+  "3fdc9a587693": "Spalte",
+  "4aefb0ef967d": "Einfacher Vergleich",
+  "3273999e1eac": "Formelergebnisse werden so angezeigt, wie sie in der Arbeitsmappe gespeichert sind.",
+  "8a99a9882005": "Wenn kein Ergebnis gespeichert ist, wird die Formel selbst angezeigt."
 }

@@ -108,7 +108,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     controls();
   }
   function updateResume() {
-    compare.hidden = $('results').hidden;
+    compare.hidden = $('results').hidden && $('simple-sheet-result').hidden;
     edit.hidden = !$('single-editor-host').childElementCount;
     uiSetText(edit, uiMessage("Continue editing"));
   }
@@ -122,7 +122,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   function leaveHome() { help?.close(); document.body.classList.remove('home-mode'); menu.hidden = true; }
   function open(mode) {
     leaveHome(); modes.find(button => button.dataset.workMode === mode)?.click();
-    const target = mode === 'single' ? $('single-current') : document.querySelector('[data-workspace-tools-open]') || $('result-heading');
+    const target = mode === 'single' ? $('single-current') : (!$('simple-sheet-result').hidden ? $('simple-sheet-heading') : document.querySelector('[data-workspace-tools-open]') || $('result-heading'));
     if (target && !target.hidden && target.textContent && target.getClientRects().length) target.focus({preventScroll:true});
     else modes.find(button => button.dataset.workMode === mode)?.focus({preventScroll:true});
     home.scrollIntoView({block:'start'});
@@ -252,6 +252,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   });
   const observer = new MutationObserver(updateResume);
   observer.observe($('results'), {attributes:true, attributeFilter:['hidden']});
+  observer.observe($('simple-sheet-result'), {attributes:true, attributeFilter:['hidden']});
   // The packaged welcome guard reports through the existing workspace notice.
   // Surface that warning on Home as well, where the comparison is still hidden.
   const workspaceNotice = $('notice');

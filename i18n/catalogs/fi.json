@@ -2170,5 +2170,11 @@
   "97c0a7ed2af5": "{0}: salasanalla suojattuja XLS-työkirjoja ei voi verrata.",
   "0541847f12bc": "Avaa asiakirjavertailu",
   "71327f623703": "Vertaa tekstejä ja tiedostoja",
-  "0d811c4f2835": "Tekstit ja asiakirjat"
+  "0d811c4f2835": "Tekstit ja asiakirjat",
+  "d06238d70267": "Rivejä verrattiin niiden järjestyksen perusteella.",
+  "d6861831f3c7": "Kohde / rivi",
+  "3fdc9a587693": "Sarake",
+  "4aefb0ef967d": "Yksinkertainen vertailu",
+  "3273999e1eac": "Kaavojen tulokset näytetään sellaisina kuin ne on tallennettu työkirjaan.",
+  "8a99a9882005": "Jos tulosta ei ole tallennettu, näytetään itse kaava."
 }

@@ -248,6 +248,9 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   }
   function clearResult() {
     restoreWorkspaceTools();
+    simplePage = null; previousOffsets = [];
+    $('simple-sheet-result').hidden = true; $('simple-sheet-rows').replaceChildren();
+    document.body.classList.remove('simple-sheet-mode');
     $('source-picker').open = true;
     sessionUI?.deactivate();
     visualController?.abort(); visualController = null; visualReview?.dispose(); visualReview = null;
@@ -340,22 +343,115 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     for (const name of state.metadata.right.headers) if (!used.has(name)) omitted.push('B: ' + name);
     uiSetText($('unmapped-fields'), omitted.length ? uiMessage("Fields that won't be checked: {0}. Match these fields or explicitly apply these settings.", { 0: omitted.join('; ') }) : uiMessage("All fields are matched. The identifier pairs the rows; the other fields are checked within each pair."));
   }
-  async function prepare() {
+  let advancedSheets = false, simplePage = null, previousOffsets = [];
+  function isExcelPair(sources = state.sources) {
+    return ['left', 'right'].every(side => /\.xlsx?$/i.test(sources[side]?.name || ''));
+  }
+  function labelSheetSources(metadata) {
+    for (const side of ['left', 'right']) {
+      const source = metadata[side];
+      showSheets(side, source.sheets, source.sheet ?? null);
+      uiSetText($(side + '-meta'), uiMessage("{0}{1} rows · {2} columns · replace file", {
+        0: source.sheet ? uiMessage("Sheet «{0}» · ", {0:source.sheet}) : '', 1:source.row_count, 2:source.headers.length,
+      }));
+    }
+  }
+  function putSimpleValue(cell, value) {
+    if (value === null) {
+      cell.append(element('span', '—'));
+    } else {
+      cell.append(element('span', value === '' ? uiMessage("(empty value)") : value));
+    }
+  }
+  function showSimplePage(page) {
+    simplePage = page;
+    const {items, contexts, summary} = page;
+    uiSetText($('simple-sheet-heading'), page.total ? uiMessage("Differences: {0}", {0:page.total}) : uiMessage("No differences found."));
+    uiSetText($('simple-sheet-method'), page.key ? uiMessage("Key matching: A {0} ↔ B {1}.", {0:page.key[0], 1:page.key[1]}) : uiMessage("Rows compared by position."));
+    uiSetText($('simple-sheet-a'), page.left.name);
+    uiSetText($('simple-sheet-b'), page.right.name);
+    const counts = $('simple-sheet-summary');
+    counts.replaceChildren();
+    for (const [count, caption] of [[summary.removedRows, uiMessage("Only in A")], [summary.addedRows, uiMessage("Only in B")]]) {
+      if (count) counts.append(element('span', uiMessage("{0}: {1}", {0:caption, 1:count})));
+    }
+    counts.hidden = !counts.childElementCount;
+    const formulas = $('simple-sheet-formulas');
+    formulas.replaceChildren();
+    if (page.left.formulas?.cached || page.right.formulas?.cached) formulas.append(element('span', uiMessage("Formula results are shown as saved in the workbook.")));
+    if (page.left.formulas?.uncached || page.right.formulas?.uncached) formulas.append(element('span', uiMessage("Formulas without a saved result are shown as expressions.")));
+    formulas.hidden = !formulas.childElementCount;
+    const rows = document.createDocumentFragment(), expandedRows = new Set();
+    for (const item of items) {
+      const row = element('tr'), id = element('th'); id.scope = 'row';
+      const record = item.leftRow ?? item.rightRow, side = item.leftRow == null ? 'right' : 'left';
+      const rowName = item.label || (record == null ? uiMessage("Column") : uiMessage("Record {0}", {0:record}));
+      const context = contexts?.[side]?.[record];
+      const contextKey = side + ':' + record;
+      if (context?.length && !expandedRows.has(contextKey)) {
+        expandedRows.add(contextKey);
+        const details = element('details'), fields = element('dl');
+        for (const [name, value] of context) fields.append(element('dt', name), element('dd', value));
+        details.append(element('summary', rowName), fields); id.append(details);
+      } else id.append(element('span', rowName));
+      if (page.mode === 'position' && record != null && item.label) id.append(element('small', uiMessage("Record {0}", {0:record})));
+      const field = element('td', item.column), before = element('td'), after = element('td');
+      if (item.kind.endsWith('-added')) field.append(element('small', uiMessage("Only in B")));
+      if (item.kind.endsWith('-removed')) field.append(element('small', uiMessage("Only in A")));
+      putSimpleValue(before, item.before); putSimpleValue(after, item.after);
+      row.append(id, field, before, after); rows.append(row);
+    }
+    $('simple-sheet-rows').replaceChildren(rows);
+    $('simple-sheet-scroll').hidden = !items.length;
+    $('simple-sheet-pager').hidden = !previousOffsets.length && page.nextOffset == null;
+    $('simple-sheet-prev').disabled = !previousOffsets.length;
+    $('simple-sheet-next').disabled = page.nextOffset == null;
+    uiSetText($('simple-sheet-range'), items.length ? (page.offset + 1) + '–' + (page.offset + items.length) + ' / ' + page.total : '');
+    $('simple-sheet-result').hidden = false;
+    document.body.classList.add('simple-sheet-mode');
+  }
+  async function turnSimplePage(forward) {
+    if (state.busy || !simplePage) return;
+    const offset = forward ? simplePage.nextOffset : previousOffsets.at(-1);
+    if (offset == null) return;
+    const revision = state.revision;
+    busy(true);
+    try {
+      const next = await api('/api/simple-sheet', {...state.sources, offset});
+      if (revision !== state.revision) return;
+      if (forward) previousOffsets.push(simplePage.offset); else previousOffsets.pop();
+      showSimplePage(next);
+      notice(); $('simple-sheet-heading').focus();
+    } catch (error) {
+      if (revision === state.revision && error.name !== 'AbortError') notice(uiError(error.message), true);
+    } finally { if (revision === state.revision) busy(false); }
+  }
+  async function prepare(prefetched = null) {
     clearResult(); state.metadata = null; state.suggested = [];
     $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
     $('rules').hidden = true; $('rules').disabled = true; $('rules-empty').hidden = false;
     uiSetText($('rules-summary'), uiMessage("Detect automatically"));
-    $('settings').hidden = textSourcesSelected();
+    const excel = isExcelPair(), simple = excel && !advancedSheets;
+    $('settings').hidden = simple || textSourcesSelected();
+    $('simple-sheet-back').hidden = !excel || !advancedSheets;
     if (!state.sources.left || !state.sources.right) { notice(uiMessage("Add the second file to start comparing automatically.")); officeReset(uiMessage("The first file is ready. Add the second, and I'll match the items and explain the results.")); return; }
     busy(true); notice(uiMessage("Reading files and finding matches…"));
     const revision = state.revision; let ready = false;
     try {
-      const metadata = await api('/api/prepare', {...state.sources, delimiter: delimiter()});
+      const metadata = prefetched || await api(simple ? '/api/simple-sheet' : '/api/prepare', {...state.sources, delimiter: delimiter()});
       if (revision !== state.revision) return;
       if (metadata.needs_sheet) {
         for (const side of ['left', 'right']) showSheets(side, metadata.sheets[side], metadata.selected[side]);
         notice(uiMessage("Choose a sheet in each Excel file that has multiple sheets with data. I'll compare only the selected sheets."));
         officeReset(uiMessage("This workbook has multiple sheets with data. Choose a sheet next to the file to continue."));
+        return;
+      }
+      if (simple) {
+        labelSheetSources(metadata);
+        $('source-picker').open = false;
+        showSimplePage(metadata);
+        notice();
+        recordProductEvent('comparison_complete', {comparison_type:'table'});
         return;
       }
       state.metadata = metadata;
@@ -369,9 +465,8 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       } else {
         $('settings').hidden = false;
         state.suggested = metadata.rules.fields; state.delimiter = metadata.delimiter;
+        labelSheetSources(metadata);
         for (const side of ['left', 'right']) {
-          showSheets(side, metadata[side].sheets, metadata[side].sheet ?? null);
-          uiSetText($(side + '-meta'), uiMessage("{0}{1} rows · {2} columns · replace file", { 0: metadata[side].sheet ? uiMessage("Sheet «{0}» · ", { 0: metadata[side].sheet }) : '', 1: metadata[side].row_count, 2: metadata[side].headers.length }));
           options($(side + '-key'), metadata[side].headers, uiMessage("Choose an identifier"));
         }
         if (metadata.rules.key) { chooseColumn($('left-key'), metadata.rules.key[0]); chooseColumn($('right-key'), metadata.rules.key[1]); }
@@ -382,6 +477,10 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
         $('strip').checked = false; $('mapping-panel').hidden = $('membership').checked;
         mapping(false); $('rules').hidden = false; $('rules-empty').hidden = true;
         ready = metadata.ready;
+        if (excel && advancedSheets) {
+          $('settings').open = true; notice();
+          return;
+        }
         if (!ready) {
           uiSetText($('question-text'), metadata.question);
           $('setup-question').hidden = false;
@@ -401,6 +500,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   async function loadFile(side, file) {
     if (!file || state.busy) return;
     if (/\.doc$/i.test(file.name)) { visualReview?.closeWorkspaceTools?.(); notice(uiMessage("Old Word files (.doc) are not supported. Open the file in Word or LibreOffice and save it as .docx, then try again."), true); $('notice').scrollIntoView({block: 'nearest'}); return; }
+    advancedSheets = false; $('simple-sheet-back').hidden = true;
     const version = ++loads[side]; clearResult(); state.sources[side] = null; state.metadata = null;
     showSheets(side); $('settings').hidden = textSourcesSelected();
     $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
@@ -592,6 +692,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       const renderSaved = saved.report.kind === 'text' ? (await import(textReportModuleURL.href)).renderTextHtml : (await import(tableReportModuleURL.href)).renderHtml;
       if (revision !== state.revision) return;
       state.sources = saved.sources; state.report = saved.report;
+      advancedSheets = isExcelPair(); $('simple-sheet-back').hidden = !advancedSheets;
       state.html = renderSaved(saved.report); state.metadata = saved.report.kind === 'text' ? {kind:'text'} : null;
       for (const side of ['left', 'right']) {
         loads[side]++; $(side + '-file').value = ''; sourceLabel(side, state.sources[side]); showSheets(side);
@@ -618,6 +719,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     } finally { busy(false); }
   }
   function finishSession() {
+    advancedSheets = false; $('simple-sheet-back').hidden = true;
     clearResult(); state.metadata = null; state.sources = {left: null, right: null};
     state.suggested = [];
     for (const side of ['left', 'right']) {
@@ -954,7 +1056,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
         }
         // Parse both files before replacing anything. An invalid new document
         // must not destroy the previous comparison, its saved draft or Undo.
-        await window.KristinaTransport.request('/api/prepare', {...next, delimiter:'auto'});
+        const prefetched = await window.KristinaTransport.request(isExcelPair(next) ? '/api/simple-sheet' : '/api/prepare', {...next, delimiter:'auto'});
         if ((state.report || state.sources.left || state.sources.right) && !window.confirm(String(uiMessage("Replace the previous comparison and its saved draft? Download your edited files first if you want to keep them.")))) return {ok:false};
         if (example === 'contract' || example === 'workbook') {
           exampleSources.set(next.left, example);
@@ -963,10 +1065,10 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
           uploadedSources.add(next.left);
           uploadedSources.add(next.right);
         }
-        loads.left++; loads.right++; clearResult(); state.sources = next;
+        loads.left++; loads.right++; clearResult(); state.sources = next; advancedSheets = false;
         for (const side of ['left', 'right']) { showSheets(side); $(side + '-file').value = ''; sourceLabel(side, next[side]); }
         $('delimiter').value = 'auto'; $('settings').open = false;
-        busy(false); await prepare();
+        busy(false); await prepare(prefetched);
         return {ok:true};
       } catch (error) { return {ok:false, message:error.message || 'Could not open the new files. Your previous work is still open.'}; }
       finally { busy(false); }
@@ -1047,7 +1149,20 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     for (const side of ['left', 'right']) { const [name, text] = examples[side]; state.sources[side] = {name, data: encode(new TextEncoder().encode(text))}; $(side + '-file').value = ''; sourceLabel(side, {name}); }
     await prepare();
   });
-  $('delimiter').addEventListener('change', prepare);
+  $('simple-sheet-prev').addEventListener('click', () => turnSimplePage(false));
+  $('simple-sheet-next').addEventListener('click', () => turnSimplePage(true));
+  $('simple-sheet-advanced').addEventListener('click', async () => {
+    if (state.busy) return;
+    advancedSheets = true;
+    await prepare();
+    if (!$('settings').hidden) $('settings').querySelector('summary').focus();
+  });
+  $('simple-sheet-back').addEventListener('click', async () => {
+    if (state.busy) return;
+    advancedSheets = false; $('settings').open = false;
+    await prepare(); if (simplePage) $('simple-sheet-heading').focus();
+  });
+  $('delimiter').addEventListener('change', () => prepare());
   $('membership').addEventListener('change', () => { dirty(); $('mapping-panel').hidden = $('membership').checked; });
   $('strip').addEventListener('change', dirty); $('compare').addEventListener('click', compare); $('answer').addEventListener('click', compare);
   $('search').addEventListener('input', () => { state.page = 0; state.active = -1; changePage = 0; renderRows(); });

@@ -16286,6 +16286,11 @@ return function parse_ws_xml_data(sdata/*:string*/, s, opts, guess/*:Range*/, th
 							p.F = arrayf[i][1];
 			}
 
+			// CTT: retain whether the file supplied a result before SheetJS fills a missing numeric cache with zero.
+			if(opts.cttFormulaCache && (p.f != null || p.F != null)) {
+				p.cttCached = p.v !== undefined || (tag.t === "str" && /<(?:\w+:)?v\b[^<>]*>/.test(d));
+				if(!p.cttCached) tag.t = "z";
+			}
 			if(tag.t == null && p.v === undefined) {
 				if(p.f || p.F) {
 					p.v = 0; p.t = "n";

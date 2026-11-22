@@ -2132,5 +2132,11 @@
   "97c0a7ed2af5": "{0}: não é possível comparar livros XLS protegidos por palavra-passe.",
   "0541847f12bc": "Comparação de documento aberto",
   "71327f623703": "Comparar textos e ficheiros",
-  "0d811c4f2835": "Textos e documentos"
+  "0d811c4f2835": "Textos e documentos",
+  "d06238d70267": "As linhas foram comparadas pela ordem em que aparecem.",
+  "d6861831f3c7": "Elemento / linha",
+  "3fdc9a587693": "Coluna",
+  "4aefb0ef967d": "Comparação simples",
+  "3273999e1eac": "Os resultados das fórmulas são apresentados tal como foram guardados no livro.",
+  "8a99a9882005": "Se não houver um resultado guardado, é apresentada a própria fórmula."
 }

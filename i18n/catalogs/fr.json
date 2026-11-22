@@ -2170,5 +2170,11 @@
   "97c0a7ed2af5": "{0} : la comparaison des classeurs XLS protégés par mot de passe est impossible.",
   "0541847f12bc": "Ouvrir la comparaison de documents",
   "71327f623703": "Comparer des textes et des fichiers",
-  "0d811c4f2835": "Textes et documents"
+  "0d811c4f2835": "Textes et documents",
+  "d06238d70267": "Les lignes ont été comparées selon leur position.",
+  "d6861831f3c7": "Élément / ligne",
+  "3fdc9a587693": "Colonne",
+  "4aefb0ef967d": "Comparaison simple",
+  "3273999e1eac": "Les résultats des formules sont affichés tels qu’ils ont été enregistrés dans le classeur.",
+  "8a99a9882005": "Si aucun résultat n’a été enregistré, la formule elle-même est affichée."
 }
