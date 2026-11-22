@@ -5,15 +5,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {File} from 'node:buffer';
+import {Script} from 'node:vm';
+import {compareText} from '../src/text-engine.mjs';
+import {writeDocxVisual} from '../src/docx-visual.mjs';
+import {readTextSource} from '../src/text-source.mjs';
 import {setImmediate as nextTurn} from 'node:timers/promises';
 import {JSDOM, VirtualConsole} from 'jsdom';
 
-function page(t, beforeNavigation = () => {}) {
+function page(t, beforeNavigation = () => {}, url = 'https://example.invalid/') {
   const errors = [];
   const console = new VirtualConsole();
   console.on('jsdomError', error => errors.push(error.message));
   const dom = new JSDOM(readFileSync(new URL('../src/index.html', import.meta.url), 'utf8'), {
-    url:'https://example.invalid/', runScripts:'outside-only', virtualConsole:console,
+    url, runScripts:'outside-only', virtualConsole:console,
   });
   const {window} = dom, document = window.document, $ = id => document.getElementById(id);
   window.File = File;
@@ -24,7 +28,11 @@ function page(t, beforeNavigation = () => {}) {
   const commands = [];
   document.addEventListener('ctt:new-comparison', event => commands.push(event.detail));
   beforeNavigation({window, document, $});
-  window.eval(readFileSync(new URL('../src/navigation.js', import.meta.url), 'utf8'));
+  const navigation = new URL('../src/navigation.js', import.meta.url);
+  const script = new Script(readFileSync(navigation, 'utf8'), {
+    importModuleDynamically: path => import(new URL(path, navigation)),
+  });
+  script.runInContext(dom.getInternalVMContext());
   t.after(() => { window.dispatchEvent(new window.Event('pagehide')); dom.window.close(); assert.deepEqual(errors, []); });
   function paste(side, value) {
     const field = $('home-' + side + '-text');
@@ -233,4 +241,34 @@ test('a saved comparison completing after new Home input or navigation does not 
   p.document.dispatchEvent(new p.window.Event('ctt:comparison-operation-started'));
   p.document.dispatchEvent(new p.window.Event('ctt:comparison-resumed'));
   assert.equal(p.$('start-menu').hidden, true, 'a resume without intervening input still opens the comparison');
+});
+
+test('the Word guide opens its editable sample once and exports the negotiated terms', async t => {
+  const guide = new JSDOM(readFileSync(new URL('../src/compare-word-documents/index.html', import.meta.url), 'utf8'), {
+    url: 'https://example.invalid/compare-word-documents/',
+  });
+  const href = guide.window.document.querySelector('a[href="/?demo=contract"]').href;
+  guide.window.close();
+  let resolve;
+  const opened = new Promise(done => { resolve = done; });
+  const p = page(t, ({document}) => document.addEventListener('ctt:new-comparison', e => resolve(e.detail)), href);
+  const {files, example, complete} = await opened;
+  assert.equal(example, 'contract');
+  const sources = {};
+  for (const [side, file] of Object.entries(files)) sources[side] = {name: file.name, data: Buffer.from(await file.arrayBuffer()).toString('base64')};
+  const report = await compareText(sources);
+  assert.equal(report.changed.length, 3);
+  assert.equal(report.only_left.length + report.only_right.length, 0);
+  assert.ok(report.changed.some(({left, right}) => left.text.includes('12,000') && right.text.includes('13,200')));
+  assert.ok(report.changed.some(({left, right}) => left.text.includes('included') && !right.text.includes('included')));
+  const payment = report.changed.find(({left, right}) => left.text.includes('30 days') && right.text.includes('14 days'));
+  assert.ok(payment, 'payment terms must be independently reviewable');
+  const agreed = payment.right.text.replace('14 days', '21 days');
+  const bytes = await writeDocxVisual(sources.right, [{record: payment.right.record, text: agreed}]);
+  const exported = await readTextSource({name: 'agreed.docx', data: Buffer.from(bytes).toString('base64')});
+  assert.ok(exported.blocks.some(p => p.text === agreed));
+  complete({ok:true}); await nextTurn();
+  assert.ok(p.$('start-menu').hidden);
+  assert.equal(p.window.location.search, '');
+  assert.equal(page(t, undefined, p.window.location.href).commands.length, 0, 'refresh must not launch another demo');
 });

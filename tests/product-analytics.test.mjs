@@ -33,6 +33,16 @@ test('analytics accepts only defined actions and fixed dimensions, never documen
   assert.equal(JSON.stringify(events()).includes('secret'),false);
 });
 
+test('Word funnel accepts three named actions without forwarding document details', t => {
+  const {window, events} = setup(t);
+  for (const name of ['contract_demo_view', 'word_pair_compare', 'word_pair_download']) {
+    window.cttProductEvent(name, {file_name:'test-private.docx', text:'private content'});
+  }
+  assert.deepEqual(events(), ['contract_demo_view', 'word_pair_compare', 'word_pair_download'].map(
+    name => ['event', name, {send_to:'G-J33QPHR8L3'}]
+  ));
+});
+
 test('campaign attribution preserves launch labels but removes unrelated query and fragment', t => {
   const {window} = setup(t, 'https://comparetwotexts.pro/?document=private.docx&utm_source=youtube&utm_medium=video&utm_campaign=launch_2026_10&utm_content=description&email=private%40example.com#secret');
   const config = window.dataLayer.find(x => x[0] === 'config')[2];

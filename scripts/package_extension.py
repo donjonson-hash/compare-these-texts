@@ -18,7 +18,7 @@ def offline_page(content):
  # Shared help and file guides must stay inside the installed package, including
  # links which the website writes as absolute canonical URLs.
  content=strip_website_analytics(content)
- routes={'/':'index.html','/style.css':'style.css','/site.css':'site.css',
+ routes={'/':'index.html','/?demo=contract':'index.html?demo=contract','/style.css':'style.css','/site.css':'site.css',
          '/guides.css':'guides.css','/favicon.svg':'favicon.svg',
          '/i18n.css':'i18n.css',
          '/privacy/':'privacy.html','/support/':'support.html','/terms/':'terms.html',

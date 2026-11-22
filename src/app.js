@@ -24,6 +24,12 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   function recordProductEvent(name, parameters) {
     try { window.cttProductEvent?.(name, parameters); } catch (_) {}
   }
+  // Object identity distinguishes uploads from built-in examples and restored drafts
+  // without putting analytics labels, filenames or identifiers into saved work.
+  const uploadedSources = new WeakSet();
+  function isUploadedWordPair(report, sources) {
+    return ['left', 'right'].every(side => report.sources[side]?.format === 'docx' && uploadedSources.has(sources[side]));
+  }
   const $ = (id) => document.getElementById(id);
   const visualModuleURL = new URL('visual-review.mjs', document.currentScript.src);
   const sheetModuleURL = new URL('sheet-review.mjs', document.currentScript.src);
@@ -65,6 +71,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   const MAX_FILE_BYTES = 2 * 1024 * 1024, PAGE_SIZE = 25;
   const state = {sources: {left: null, right: null}, metadata: null, suggested: [], delimiter: ',',
     report: null, html: null, records: [], editor: null, busy: false, revision: 0, filter: 'all', page: 0, active: -1};
+  const contractExampleSources = new WeakSet();
   const loads = {left: 0, right: 0}, selectColumns = new WeakMap();
   let controller = null, exportController = null, changePage = 0;
   function reviewMode(enabled, textMode = false) {
@@ -394,7 +401,9 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     try {
       const bytes = new Uint8Array(await file.arrayBuffer());
       if (version !== loads[side]) return;
-      state.sources[side] = {name: file.name, data: encode(bytes)}; sourceLabel(side, file); await prepare();
+      state.sources[side] = {name: file.name, data: encode(bytes)};
+      uploadedSources.add(state.sources[side]);
+      sourceLabel(side, file); await prepare();
     } catch (error) { if (version === loads[side]) { clearResult(); state.metadata = null; notice(uiMessage("Couldn't open the file. {0}", { 0: uiError(error.message) }), true); } }
   }
   function selectedRules() {
@@ -424,6 +433,10 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       await renderResult(); officeDescribe(); notice();
       if (revision === state.revision && state.report === result.report && result.report.status === 'complete') {
         recordProductEvent('comparison_complete', {comparison_type: result.report.kind === 'text' ? 'text' : 'table'});
+        if (visualReview && isUploadedWordPair(result.report, state.sources)) recordProductEvent('word_pair_compare', {});
+        else if (visualReview && ['left', 'right'].every(side => contractExampleSources.has(state.sources[side]))) {
+          recordProductEvent('contract_demo_view', {});
+        }
       }
     } catch (error) { if (error.name !== 'AbortError' && revision === state.revision) { clearResult(); notice(uiMessage("Comparison failed. {0}", { 0: uiError(error.message) }), true); officeReset(uiMessage("Comparison failed. Correct the data or settings described in the error message.")); busy(false); } }
     finally { if (revision === state.revision) busy(false); }
@@ -523,9 +536,10 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       if (abort.signal.aborted || state.report !== report) return;
       document.body.classList.add('visual-mode'); $('visual-review').hidden = false;
       uiSetText($('result-context'), uiMessage("Both documents are ready. Click any text to edit it."));
-      uiSetText($('source-privacy'), uiMessage("Documents and edits are saved in this browser. You can download your edited documents."));
       const sources = {...state.sources};
-      const review = await mount($('visual-review'), {report, sources, restoredState, signal: abort.signal,
+      const isExample = contractExampleSources.has(sources.left) || contractExampleSources.has(sources.right);
+      uiSetText($('source-privacy'), isExample ? uiMessage("Your documents stay on this device. Download a copy when you are ready.") : uiMessage("Documents and edits are saved in this browser. You can download your edited documents."));
+      const review = await mount($('visual-review'), {report, sources, restoredState, signal: abort.signal, uploadedWordPair: isUploadedWordPair(report, sources),
         onSelectionChange: context => { if (!abort.signal.aborted) officeUpdateContext(context); },
         onExplain: () => { if (!abort.signal.aborted) officeToggle(true); },
         onStateChange: () => { if (!abort.signal.aborted) sessionUI?.changed(); }, onRevision: changed => {
@@ -540,7 +554,8 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
         $('source-picker').open = false;
         await sessionReady;
         if (!abort.signal.aborted) {
-          sessionUI?.activate(() => ({version: 1, sources, report, review: review.snapshot()}));
+          // A guide link must never overwrite a visitor's existing saved documents.
+          if (!isExample) sessionUI?.activate(() => ({version: 1, sources, report, review: review.snapshot()}));
           if (!document.body.classList.contains('single-mode')) mountWorkspaceTools(review);
         }
       }
@@ -904,7 +919,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   });
   document.addEventListener('ctt:home', () => restoreWorkspaceTools());
   document.addEventListener('ctt:new-comparison', event => {
-    const {files, complete} = event.detail || {};
+    const {files, complete, example} = event.detail || {};
     if (typeof complete !== 'function') return;
     void (async () => {
       if (state.busy) return {ok:false, message:'Wait for the current operation to finish, then try again.'};
@@ -922,6 +937,13 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
         // must not destroy the previous comparison, its saved draft or Undo.
         await window.KristinaTransport.request('/api/prepare', {...next, delimiter:'auto'});
         if ((state.report || state.sources.left || state.sources.right) && !window.confirm(String(uiMessage("Replace the previous comparison and its saved draft? Download your edited files first if you want to keep them.")))) return {ok:false};
+        if (example === 'contract') {
+          contractExampleSources.add(next.left);
+          contractExampleSources.add(next.right);
+        } else if (!example) {
+          uploadedSources.add(next.left);
+          uploadedSources.add(next.right);
+        }
         loads.left++; loads.right++; clearResult(); state.sources = next;
         for (const side of ['left', 'right']) { showSheets(side); $(side + '-file').value = ''; sourceLabel(side, next[side]); }
         $('delimiter').value = 'auto'; $('settings').open = false;

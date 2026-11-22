@@ -233,7 +233,7 @@ const encoder=new TextEncoder();
 const crcTable=Uint32Array.from({length:256},(_,n)=>{for(let i=0;i<8;i++)n=n&1?0xedb88320^(n>>>1):n>>>1;return n>>>0;});
 const crc32=bytes=>{let crc=0xffffffff;for(const byte of bytes)crc=crcTable[(crc^byte)&255]^(crc>>>8);return (crc^0xffffffff)>>>0;};
 const concat=arrays=>{const out=new Uint8Array(arrays.reduce((n,a)=>n+a.length,0));let offset=0;for(const a of arrays){out.set(a,offset);offset+=a.length;}return out;};
-async function zip(entries) {
+export async function packDocx(entries) {
   const files=[],directory=[];let offset=0,total=0;
   for(const [name,bytes] of entries) {
     total+=bytes.length;if(total>16*1024*1024)throw new Error("The edited DOCX exceeds 16 MiB.");
@@ -273,7 +273,7 @@ export async function writeDocxVisual(source,edits=[],options={}) {
     const section=child(body,'sectPr');for(const {node} of output)body.insertBefore(node,section||null);
   }
   checked.entries.set('word/document.xml',encoder.encode(checked.doc.toString()));
-  return zip(checked.entries);
+  return packDocx(checked.entries);
 }
 
 async function writeTableRows(checked, edits, {sequence, rowPlan}) {
@@ -329,5 +329,5 @@ async function writeTableRows(checked, edits, {sequence, rowPlan}) {
   }
   for (const [record, text] of texts) editParagraph(paragraphNodes.get(record), text);
   checked.entries.set('word/document.xml', encoder.encode(checked.doc.toString()));
-  return zip(checked.entries);
+  return packDocx(checked.entries);
 }

@@ -79,19 +79,26 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     else modes.find(button => button.dataset.workMode === mode)?.focus({preventScroll:true});
     home.scrollIntoView({block:'start'});
   }
-  start.addEventListener('click', async () => {
-    if (pending || !sides.every(hasInput)) return;
+  async function compareFromHome(example) {
+    if (pending || (!example && !sides.every(hasInput))) return;
     pending = true; controls(); notice(uiMessage("Checking your documents…"));
     try {
-      const next = {};
-      for (const side of sides) next[side] = files[side] || new File([$('home-' + side + '-text').value], side === 'left' ? 'original-text.txt' : 'changed-text.txt', {type:'text/plain'});
-      const result = await new Promise(resolve => document.dispatchEvent(new CustomEvent('ctt:new-comparison', {detail:{files:next, complete:resolve}})));
+      let next;
+      if (example === 'contract') {
+        const {createContractExample} = await import('./contract-example.mjs');
+        next = await createContractExample();
+      } else {
+        next = {};
+        for (const side of sides) next[side] = files[side] || new File([$('home-' + side + '-text').value], side === 'left' ? 'original-text.txt' : 'changed-text.txt', {type:'text/plain'});
+      }
+      const result = await new Promise(resolve => document.dispatchEvent(new CustomEvent('ctt:new-comparison', {detail:{files:next, example, complete:resolve}})));
       if (!result.ok) { notice((result.message || ''), !!result.message); return; }
       // Keep the staged sources for convenient corrections on a later Home visit.
       notice(); open('compare');
     } catch (error) { notice((error.message || uiMessage("Could not open these documents. Your previous work is still open.")), true); }
     finally { pending = false; controls(); updateResume(); }
-  });
+  }
+  start.addEventListener('click', () => compareFromHome());
   for (const side of sides) {
     const input = $('home-' + side + '-file'), zone = $('home-' + side + '-drop'), field = $('home-' + side + '-text');
     input.addEventListener('change', () => { choose(side, input.files[0]); input.value = ''; });
@@ -158,6 +165,12 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     if (!event.persisted) { observer.disconnect(); noticeObserver.disconnect(); }
   });
   controls(); updateResume();
+  const entry = new URL(window.location.href);
+  if (entry.searchParams.get('demo') === 'contract') {
+    entry.searchParams.delete('demo');
+    window.history.replaceState(window.history.state, '', entry.href);
+    void compareFromHome('contract');
+  }
 })();
 
 })();

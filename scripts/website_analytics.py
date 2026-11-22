@@ -19,7 +19,7 @@ BOOTSTRAP = """
             !['comparison', 'editor'].includes(p.workspace)) return;
         data.file_format = p.file_format;
         data.workspace = p.workspace;
-      } else if (name !== 'chrome_store_click') return;
+      } else if (!['chrome_store_click', 'contract_demo_view', 'word_pair_compare', 'word_pair_download'].includes(name)) return;
       gtag('event', name, data);
     } catch (_) { /* Measurement failures must not interrupt the workspace. */ }
   };

@@ -38,7 +38,7 @@ function pdfIssue(message = uiMessage("")) {
   if (/too large|too many pages/i.test(message)) return [uiMessage("The updated document is too large to prepare with its images."), uiMessage("Undo the change or reduce the added text, then preview again.")];
   return [uiMessage("We could not prepare this PDF with its images."), uiMessage("Try Preview PDF again, or undo the last change.")];
 }
-export async function mountVisualReview(root, {report, sources, single = false, signal, onRevision = () => {}, restoredState, onStateChange = () => {}, onSelectionChange = () => {}, onExplain = () => {}}) {
+export async function mountVisualReview(root, {report, sources, single = false, uploadedWordPair = false, signal, onRevision = () => {}, restoredState, onStateChange = () => {}, onSelectionChange = () => {}, onExplain = () => {}}) {
   const originalGroups = categories.flatMap(category => (report[category] || []).map(item => ({...item, category})));
   originalGroups.sort((a, b) => Number(a.key.slice(5)) - Number(b.key.slice(5)));
   let groups = [...originalGroups];
@@ -73,7 +73,10 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   }
   function download(data,name,mime) {
     const fileFormat = mime === 'application/pdf' ? 'pdf' : mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? 'docx' : 'txt';
-    const recordDownload = () => recordProductEvent('document_download', {file_format:fileFormat, workspace:single?'editor':'comparison'});
+    const recordDownload = () => {
+      recordProductEvent('document_download', {file_format:fileFormat, workspace:single?'editor':'comparison'});
+      if (uploadedWordPair && !single && fileFormat === 'docx') recordProductEvent('word_pair_download', {});
+    };
     if(!single||report.sources.left.format!=='pdf'||mime!=='application/pdf'){
       triggerDownload(data,name,mime);recordDownload();return;
     }
