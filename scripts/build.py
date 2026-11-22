@@ -3,6 +3,7 @@ from pathlib import Path
 import hashlib
 import html
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -17,6 +18,23 @@ OUTPUT = ROOT / "dist"
 
 def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def fingerprint_navigation_assets():
+    # Keep the files at the site root so relative module imports still resolve.
+    assets = {}
+    for name in ("navigation.js", "site.css"):
+        source = OUTPUT / name
+        fingerprinted = f"{source.stem}.{sha256(source)[:16]}{source.suffix}"
+        shutil.copyfile(source, OUTPUT / fingerprinted)
+        assets[name] = fingerprinted
+    references = re.compile(r'(\b(?:src|href)=")(/?)(navigation\.js|site\.css)(")')
+    for page in OUTPUT.rglob("*.html"):
+        html_source = page.read_text()
+        updated = references.sub(lambda m: m[1] + m[2] + assets[m[3]] + m[4], html_source)
+        if html_source != updated:
+            page.write_text(updated)
+    return assets
 
 
 def build():
@@ -64,6 +82,7 @@ def build():
     dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "--", "."], cwd=ROOT, text=True).strip())
     record = {
         "website_minification": minification,
+        "website_navigation_assets": fingerprint_navigation_assets(),
         "product": "Compare Two Texts",
         "version": release["version"],
         "source_commit": revision,

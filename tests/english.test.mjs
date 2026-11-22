@@ -81,7 +81,8 @@ async function page(t, target, browserCompatibility = false, realModules = false
   }
   const virtualConsole = new VirtualConsole();
   virtualConsole.on('jsdomError', error => errors.push(error.message));
-  const dom = new JSDOM(readFileSync(path.join(directory, 'index.html'), 'utf8').replace('href="/site.css"', 'href="site.css"').replace('href="/favicon.svg"', 'href="favicon.svg"'), {url: pathToFileURL(path.join(directory, 'index.html')).href,
+  const pageHtml = readFileSync(path.join(directory, 'index.html'), 'utf8').replace(/href="\/(site(?:\.[0-9a-f]{16})?\.css|favicon\.svg)"/g, 'href="$1"');
+  const dom = new JSDOM(pageHtml, {url: pathToFileURL(path.join(directory, 'index.html')).href,
     resources: localResources, runScripts: realModules ? 'outside-only' : 'dangerously', virtualConsole,
     beforeParse(window) {
       window.Worker = WebWorker;

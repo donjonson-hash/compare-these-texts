@@ -1,7 +1,7 @@
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlparse,urljoin
-import io,json,zipfile,subprocess,re,uuid,importlib.util,html
+import hashlib,io,json,zipfile,subprocess,re,uuid,importlib.util,html
 import xml.etree.ElementTree as ET
 from store_metadata import LOCALES, message_files
 from website_analytics import SCRIPT_HASH, TAG
@@ -20,6 +20,16 @@ word_pages={'word-addin/index.html','word-addin/taskpane.html'}
 firefox_emoji={'emoji-color-vendor.mjs':(root.parent/'src/emoji-color-vendor.mjs').read_bytes()}
 split_color_emoji(firefox_emoji)
 minified_files={entry['file'] for entry in json.loads((root/'release/provenance.json').read_text())['website_minification']['files']}
+# Only the published HTML uses fingerprinted navigation assets. The offline
+# archives and existing clients retain their original local paths.
+navigation_assets = {}
+for name in ('navigation.js', 'site.css'):
+ asset = root / name
+ digest = hashlib.sha256(asset.read_bytes()).hexdigest()[:16]
+ target = f'{asset.stem}.{digest}{asset.suffix}'
+ assert (root / target).read_bytes() == asset.read_bytes(), (name, 'fingerprinted asset mismatch')
+ navigation_assets[name] = target
+website_only_files = {'robots.txt', 'sitemap.xml', 'llms.txt', '_headers', *navigation_assets.values()}
 assert release['homepage_url']=='https://comparetwotexts.pro/'
 assert release['privacy_url']==release['homepage_url']+'privacy/'
 assert release['support_url']==release['homepage_url']+'support/'
@@ -57,6 +67,9 @@ canonical_pages=set(); descriptions=set()
 for p in root.rglob('*.html'):
  content=p.read_text();parser=Parser();parser.feed(content);assert len(parser.ids)==len(set(parser.ids)),p
  relative=p.relative_to(root).as_posix()
+ asset_names={Path(urlparse(ref).path).name for ref in parser.resources}
+ assert not asset_names.intersection(navigation_assets),(p,'stale navigation asset reference')
+ if relative=='index.html':assert set(navigation_assets.values())<=asset_names,(p,'missing fingerprinted navigation assets')
  route=relative.removesuffix('index.html')
  canonical='https://comparetwotexts.pro/'+route
  assert parser.h1_count==1,(p,'expected one main heading')
@@ -199,7 +212,7 @@ for p in (root/'downloads').glob('*.zip'):
      assert not u.path.startswith('/'),(p,ref)
      assert u.path in z.namelist(),(p,ref)
   if p.name in (f"ctt-chrome-{release['version']}.zip",f"ctt-firefox-{release['version']}.zip"):
-   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','sitemap.xml','llms.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
+   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in website_only_files} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
    expected.update(page+'.html' for page in offline_guides)
    expected.update('downloads/'+name for name in office_downloads)
    if is_chrome:expected.update(localized_files)
@@ -212,7 +225,7 @@ for p in (root/'downloads').glob('*.zip'):
    check_google_archive(z.read('downloads/'+google_archive),str(p)+' nested Google Docs')
    assert not any(name.startswith('word-addin/') for name in z.namelist()),(p,'Word host code must remain outside the offline extension')
    for f in root.iterdir():
-    if f.is_file() and f.name not in ('index.html','robots.txt','sitemap.xml','llms.txt','_headers'):
+    if f.is_file() and f.name!='index.html' and f.name not in website_only_files:
      expected_file=root.parent/'src'/f.name if f.name in minified_files else f
      expected_data=firefox_emoji[f.name] if not is_chrome and f.name in firefox_emoji else expected_file.read_bytes()
      assert z.read(f.name)==expected_data,(p,f.name)
