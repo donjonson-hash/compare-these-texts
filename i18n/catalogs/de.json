@@ -2168,5 +2168,7 @@
   "f01711bf73bd": "{0}: CSV, TSV und XLS/XLSX werden unterstützt. Speichern Sie die Arbeitsmappe unter dem Namen XLSX.",
   "7208e54b5a60": "{0}: Eine XLS-Arbeitsmappe im Format Excel 97–2003 wird erwartet. Öffnen Sie die Datei in Excel oder LibreOffice und speichern Sie sie als XLSX.",
   "97c0a7ed2af5": "{0}: Kennwortgeschützte XLS-Arbeitsmappen können nicht verglichen werden.",
-  "0541847f12bc": "Dokumentvergleich öffnen"
+  "0541847f12bc": "Dokumentvergleich öffnen",
+  "71327f623703": "Texte und Dateien vergleichen",
+  "0d811c4f2835": "Texte und Dokumente"
 }

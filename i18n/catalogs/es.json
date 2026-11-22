@@ -2168,5 +2168,7 @@
   "f01711bf73bd": "{0}: Se admiten CSV, TSV y XLS/XLSX. Guarde el libro de trabajo como XLSX.",
   "7208e54b5a60": "{0}: se esperaba un libro XLS de Excel 97–2003. Abre el archivo en Excel o LibreOffice y guárdalo como XLSX.",
   "97c0a7ed2af5": "{0}: no se pueden comparar libros XLS protegidos con contraseña.",
-  "0541847f12bc": "Abrir comparación de documentos"
+  "0541847f12bc": "Abrir comparación de documentos",
+  "71327f623703": "Comparar textos y archivos",
+  "0d811c4f2835": "Textos y documentos"
 }

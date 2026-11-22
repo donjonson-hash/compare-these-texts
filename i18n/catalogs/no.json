@@ -2163,5 +2163,7 @@
   "f01711bf73bd": "{0}: CSV, TSV og XLS/XLSX er støttet. Lagre arbeidsboken som XLSX.",
   "7208e54b5a60": "{0}: forventet en XLS-arbeidsbok fra Excel 97–2003. Åpne filen i Excel eller LibreOffice og lagre den som XLSX.",
   "97c0a7ed2af5": "{0}: passordbeskyttede XLS-arbeidsbøker kan ikke sammenlignes.",
-  "0541847f12bc": "Åpne dokumentsammenligning"
+  "0541847f12bc": "Åpne dokumentsammenligning",
+  "71327f623703": "Sammenlign tekster og filer",
+  "0d811c4f2835": "Tekster og dokumenter"
 }

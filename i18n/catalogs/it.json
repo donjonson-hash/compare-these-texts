@@ -2168,5 +2168,7 @@
   "f01711bf73bd": "{0}: sono supportati CSV, TSV e XLS/XLSX. Salva la cartella di lavoro come XLSX.",
   "7208e54b5a60": "{0}: è richiesta una cartella di lavoro XLS di Excel 97–2003. Apri il file in Excel o LibreOffice e salvalo in formato XLSX.",
   "97c0a7ed2af5": "{0}: impossibile confrontare cartelle di lavoro XLS protette da password.",
-  "0541847f12bc": "Confronto documenti aperto"
+  "0541847f12bc": "Confronto documenti aperto",
+  "71327f623703": "Confronta testi e file",
+  "0d811c4f2835": "Testi e documenti"
 }

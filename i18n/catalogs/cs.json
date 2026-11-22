@@ -2168,5 +2168,7 @@
   "f01711bf73bd": "{0}: podporovány jsou formáty CSV, TSV, XLS a XLSX. Uložte sešit ve formátu XLSX.",
   "7208e54b5a60": "{0}: očekává se sešit Excelu 97–2003 ve formátu XLS. Otevřete soubor v Excelu nebo LibreOffice a uložte ho ve formátu XLSX.",
   "97c0a7ed2af5": "{0}: sešity XLS chráněné heslem nelze porovnat.",
-  "0541847f12bc": "Otevřít porovnání dokumentů"
+  "0541847f12bc": "Otevřít porovnání dokumentů",
+  "71327f623703": "Porovnat texty a soubory",
+  "0d811c4f2835": "Texty a dokumenty"
 }

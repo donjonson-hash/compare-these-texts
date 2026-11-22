@@ -2168,5 +2168,7 @@
   "f01711bf73bd": "{0}: podržani su CSV, TSV, XLS i XLSX. Spremite radnu knjigu u formatu XLSX.",
   "7208e54b5a60": "{0}: očekuje se radna knjiga programa Excel 97–2003 u formatu XLS. Otvorite datoteku u Excelu ili LibreOfficeu i spremite je u formatu XLSX.",
   "97c0a7ed2af5": "{0}: radne knjige XLS zaštićene lozinkom nije moguće usporediti.",
-  "0541847f12bc": "Otvori usporedbu dokumenata"
+  "0541847f12bc": "Otvori usporedbu dokumenata",
+  "71327f623703": "Usporedite tekstove i datoteke",
+  "0d811c4f2835": "Tekstovi i dokumenti"
 }

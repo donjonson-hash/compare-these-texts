@@ -2168,5 +2168,7 @@
   "f01711bf73bd": "{0} : CSV, TSV et XLS/XLSX sont pris en charge. Enregistrez le classeur sous le nom XLSX.",
   "7208e54b5a60": "{0} : un classeur XLS au format Excel 97–2003 est attendu. Ouvrez le fichier dans Excel ou LibreOffice et enregistrez-le au format XLSX.",
   "97c0a7ed2af5": "{0} : la comparaison des classeurs XLS protégés par mot de passe est impossible.",
-  "0541847f12bc": "Ouvrir la comparaison de documents"
+  "0541847f12bc": "Ouvrir la comparaison de documents",
+  "71327f623703": "Comparer des textes et des fichiers",
+  "0d811c4f2835": "Textes et documents"
 }

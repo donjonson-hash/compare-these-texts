@@ -2130,5 +2130,7 @@
   "f01711bf73bd": "{0}: CSV, TSV, e XLS/XLSX são suportados. Salve a pasta de trabalho como XLSX.",
   "7208e54b5a60": "{0}: o formato esperado é XLS do Excel 97–2003. Abra o arquivo no Excel ou no LibreOffice e salve-o como XLSX.",
   "97c0a7ed2af5": "{0}: não é possível comparar pastas de trabalho XLS protegidas por senha.",
-  "0541847f12bc": "Comparação de documentos abertos"
+  "0541847f12bc": "Comparação de documentos abertos",
+  "71327f623703": "Comparar textos e arquivos",
+  "0d811c4f2835": "Textos e documentos"
 }

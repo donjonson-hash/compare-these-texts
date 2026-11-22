@@ -2168,5 +2168,7 @@
   "f01711bf73bd": "{0}: palaikomi CSV, TSV ir XLS/XLSX. Išsaugokite darbaknygę kaip XLSX.",
   "7208e54b5a60": "{0}: tikėtasi „Excel 97–2003“ XLS darbaknygės. Atverkite failą naudodami „Excel“ arba „LibreOffice“ ir išsaugokite XLSX formatu.",
   "97c0a7ed2af5": "{0}: slaptažodžiu apsaugotų XLS darbaknygių palyginti negalima.",
-  "0541847f12bc": "Atidaryti dokumentų palyginimą"
+  "0541847f12bc": "Atidaryti dokumentų palyginimą",
+  "71327f623703": "Palyginti tekstus ir failus",
+  "0d811c4f2835": "Tekstai ir dokumentai"
 }

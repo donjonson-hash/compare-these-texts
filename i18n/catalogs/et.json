@@ -2168,5 +2168,7 @@
   "f01711bf73bd": "{0}: toetatakse CSV, TSV ja XLS/XLSX. Salvestage töövihik nimega XLSX.",
   "7208e54b5a60": "{0}: oodati Exceli 97–2003 XLS-töövihikut. Avage fail Excelis või LibreOffice’is ja salvestage see XLSX-vormingus.",
   "97c0a7ed2af5": "{0}: parooliga kaitstud XLS-töövihikuid ei saa võrrelda.",
-  "0541847f12bc": "Ava dokumentide võrdlus"
+  "0541847f12bc": "Ava dokumentide võrdlus",
+  "71327f623703": "Võrdle tekste ja faile",
+  "0d811c4f2835": "Tekstid ja dokumendid"
 }

@@ -2168,5 +2168,7 @@
   "f01711bf73bd": "{0}: CSV, TSV, at XLS/XLSX ay suportado. I-save ang workbook bilang XLSX.",
   "7208e54b5a60": "{0}: kailangan ng XLS workbook na nasa format ng Excel 97–2003. Buksan ang file sa Excel o LibreOffice at i-save bilang XLSX.",
   "97c0a7ed2af5": "{0}: hindi maihahambing ang mga XLS workbook na may password.",
-  "0541847f12bc": "Buksan ang paghahambing ng dokumento"
+  "0541847f12bc": "Buksan ang paghahambing ng dokumento",
+  "71327f623703": "Ihambing ang mga teksto at file",
+  "0d811c4f2835": "Mga teksto at dokumento"
 }

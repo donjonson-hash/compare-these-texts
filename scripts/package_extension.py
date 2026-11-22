@@ -19,7 +19,7 @@ def offline_page(content):
  # links which the website writes as absolute canonical URLs.
  content=strip_website_analytics(content)
  routes={'/':'index.html','/?demo=contract':'index.html?demo=contract','/style.css':'style.css','/site.css':'site.css',
-         '/?excel=sheets':'index.html?excel=sheets', '/?excel=example':'index.html?excel=example',
+         '/?excel=files':'index.html?excel=files', '/?excel=sheets':'index.html?excel=sheets', '/?excel=example':'index.html?excel=example',
          '/excel-columns.css':'excel-columns.css', '/guides.css':'guides.css','/favicon.svg':'favicon.svg',
          '/i18n.css':'i18n.css',
          '/privacy/':'privacy.html','/support/':'support.html','/terms/':'terms.html',
