@@ -54,7 +54,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     let error = '';
     if (/\.doc$/i.test(file.name)) error = 'Old Word files (.doc) are not supported. Save the file as .docx in Word or LibreOffice, then try again. Renaming the file is not enough.';
     else if (!/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.test(file.name)) error = 'Choose a DOCX, PDF, TXT, XLSX, CSV or TSV file.';
-    else if (file.size > 2 * 1024 * 1024) error = 'Choose a file up to 2 MB.';
+    else if (file.size > window.cttFileLimits.MAX_FILE_BYTES) error = 'Choose a file up to 25 MB.';
     if (error) notice(uiError(error), true);
     else { navigationRevision++; files[side] = file; notice(); }
     controls();

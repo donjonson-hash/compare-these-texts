@@ -102,7 +102,7 @@ on load, and failures do not silently fall back to plaintext persistence.
 
 ## Scope and expected limitations
 
-- Input files: up to 2 MiB each. Legacy `.doc` is not supported; save a `.docx`
+- Input files: up to 25 MiB each. Legacy `.doc` is not supported; save a `.docx`
   copy in Word or LibreOffice first. Renaming a file is not conversion.
 - PDFs need a selectable text layer. No OCR, scanned-image comparison,
   interactive PDF widgets or PDF comments.

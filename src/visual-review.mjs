@@ -1,3 +1,4 @@
+import {decodeBase64Bytes} from './file-limits.mjs';
 import {uiMessage, uiError, uiSetText, uiSetAttr, uiTranslate, uiAppendText} from './ui-text.mjs';
 import {preparePdfPrintWindow} from './pdf-print.mjs';
 import {validateStyleKept} from './repetition-scan.mjs';
@@ -1051,7 +1052,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       download:data=>download(data,filename(side,'pdf'),'application/pdf'),onClose:()=>{documentPdfDialog=null;}});
   }
   async function fillBase() {
-    if (!drafts.left.changed) return {data:Uint8Array.from(atob(sources.left.data), c=>c.charCodeAt(0)), name:sources.left.name};
+    if (!drafts.left.changed) return {data:decodeBase64Bytes(sources.left.data), name:sources.left.name};
     const entries = drafts.left.entries(), blocks = sourceBlocks('left');
     const {renderPdfRevision} = await import('./pdf-visual.mjs');
     let data;
@@ -1135,7 +1136,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       let pdf = null;
       if(format === 'pdf' && (edited||textOnly)){pdf={entries:drafts[side].entries(),blocks:sourceBlocks(side),edits:null,data:pdfPreviews[side]?.revision===revision?pdfPreviews[side].data:null,reflow:textOnly||!!pdfErrors[side]};try{pdf.edits=pdfEdits(side);}catch{pdf.reflow=true;}}
       if (format === 'pdf') {
-        if (!edited&&!textOnly) download(Uint8Array.from(atob(sources[side].data), c => c.charCodeAt(0)), filename(side, 'pdf'), 'application/pdf');
+        if (!edited&&!textOnly) download(decodeBase64Bytes(sources[side].data), filename(side, 'pdf'), 'application/pdf');
         else {
           const {renderPdfRevision,renderReflowedPdf} = await import('./pdf-visual.mjs');
           if (!alive()) return;

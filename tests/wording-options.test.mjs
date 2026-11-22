@@ -14,8 +14,9 @@ import editor from '../dist/text-editor.js';
 import {docx} from './fixtures/text-fixture.mjs';
 const source=(name,bytes)=>({name,data:Buffer.from(bytes).toString('base64')});
 const until=async fn=>{for(let i=0;i<150;i++){if(fn())return;await delay(10);}assert.fail('UI did not settle');};
+const fileLimitsScript = await readFile(new URL('../dist/file-limits.js', import.meta.url), 'utf8');
 function setup(t,html='<main></main>'){
- const dom=new JSDOM(html,{url:'https://ctt.example/',pretendToBeVisual:true,runScripts:'outside-only'});Object.assign(globalThis,{window:dom.window,document:dom.window.document});window.KristinaTextEditor=editor;window.Element.prototype.scrollIntoView=()=>{};window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};window.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new window.Event('close'));};
+ const dom=new JSDOM(html,{url:'https://ctt.example/',pretendToBeVisual:true,runScripts:'outside-only'});dom.window.eval(fileLimitsScript);Object.assign(globalThis,{window:dom.window,document:dom.window.document});window.KristinaTextEditor=editor;window.Element.prototype.scrollIntoView=()=>{};window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};window.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new window.Event('close'));};
  const downloads=[],oldCreate=URL.createObjectURL,oldRevoke=URL.revokeObjectURL;URL.createObjectURL=b=>{downloads.push(b);return 'blob:wording';};URL.revokeObjectURL=()=>{};window.HTMLAnchorElement.prototype.click=()=>{};
  t.after(()=>{dom.window.close();URL.createObjectURL=oldCreate;URL.revokeObjectURL=oldRevoke;delete globalThis.window;delete globalThis.document;});return {dom,downloads};
 }

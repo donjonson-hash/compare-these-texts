@@ -1,7 +1,8 @@
 /** Bounded XLSX input. No formulas are evaluated and no links are followed. */
 import {read, utils, SSF} from './xlsx-vendor.mjs';
 
-const LIMIT = 16 * 1024 * 1024;
+const MAX_EXPANDED_BYTES = 64 * 1024 * 1024;
+const MAX_XML_BYTES = 16 * 1024 * 1024;
 const fail = message => { throw new Error(message); };
 const decoder = new TextDecoder('utf-8', {fatal: true});
 const crcTable = Uint32Array.from({length: 256}, (_, n) => {
@@ -36,7 +37,8 @@ export async function validateZip(raw) {
     if (!name || names.has(name) || name.includes('..') || name.includes('\\') || name.startsWith('/') || name.includes('\0')) bad();
     names.add(name);
     if (/vbaProject|externalLinks\//i.test(name)) fail("Workbooks with macros or external links are not supported. Save a separate XLSX copy containing values only.");
-    if (size > LIMIT || total + size > LIMIT) fail("The uncompressed XLSX exceeds 16 MiB. Split the workbook into smaller files.");
+    if (total + size > MAX_EXPANDED_BYTES) fail("The uncompressed XLSX exceeds 64 MiB. Split the workbook into smaller files.");
+    if (/\.(?:xml|rels)$/i.test(name) && size > MAX_XML_BYTES) fail("An XML part of the XLSX exceeds 16 MiB. Split the workbook into smaller files.");
     if (local + 30 > start || u32(local) !== 0x04034b50 || u16(local + 6) !== flags || u16(local + 8) !== method || u16(local + 26) !== nameLength) bad();
     const dataStart = local + 30 + nameLength + u16(local + 28), dataEnd = dataStart + compressed;
     if (dataEnd > start || decoder.decode(raw.subarray(local + 30, local + 30 + nameLength)) !== name) bad();
@@ -59,7 +61,7 @@ export async function validateZip(raw) {
           const {done, value} = await reader.read();
           if (done) break;
           actual += value.length;
-          if (actual > size || total + actual > LIMIT) { await reader.cancel(); bad(); }
+          if (actual > size || total + actual > MAX_EXPANDED_BYTES) { await reader.cancel(); bad(); }
           crc = crcUpdate(crc, value);
         }
       } catch { bad(); } finally { reader.releaseLock(); }

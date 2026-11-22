@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {crc32, deflateRawSync} from 'node:zlib';
+import {createHash} from 'node:crypto';
+import {writeDocxVisual} from '../src/docx-visual.mjs';
 import {unzipDocument} from '../src/text-zip.mjs';
 import {validateZip} from '../src/xlsx-source.mjs';
 import {readDocxPackage} from '../src/text-source.mjs';
@@ -57,11 +59,12 @@ for (const [format, parse] of parsers) {
 }
 const W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
 const doc = content => `<w:document xmlns:w="${W}"><w:body>${content}</w:body></w:document>`;
-function word(xml) {
+function word(xml, extraParts = []) {
   return zip([
     ['[Content_Types].xml', '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'],
     ['_rels/.rels', '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="r1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],
     ['word/document.xml', xml],
+    ...extraParts,
   ]).bytes;
 }
 test('DOCX XML rejects DTD, external/custom entities, malformed XML and excessive nesting', async () => {
@@ -76,4 +79,24 @@ test('DOCX XML rejects DTD, external/custom entities, malformed XML and excessiv
 test('DOCX rejects invalid merged table structure instead of silently hiding text', async () => {
   const table = '<w:tbl><w:tblGrid><w:gridCol w:w="1000"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:vMerge/></w:tcPr><w:p/></w:tc></w:tr></w:tbl>';
   await assert.rejects(readDocxPackage(word(doc(table))), /vertical cell merge is invalid/);
+});
+
+
+test('DOCX can edit, recompress and reopen a package with more than 16 MiB of media', async () => {
+  // Opaque, unreferenced media is preserved byte-for-byte by Word export.
+  const picture = Buffer.alloc(17 * 1024 * 1024);
+  let seed = 7421;
+  for (let i = 0; i < 3 * 1024 * 1024; i++) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    picture[i] = seed >>> 24;
+  }
+  const path = 'word/media/image1.jpg';
+  const sourceBytes = word(doc('<w:p><w:r><w:t>30 days</w:t></w:r></w:p>'), [[path, picture]]);
+  const source = {name: 'terms.docx', data: sourceBytes.toString('base64')};
+  const output = await writeDocxVisual(source, [{record: 1, text: '14 days'}]);
+  assert.ok(output.length > 2 * 1024 * 1024 && output.length < sourceBytes.length);
+  const reopened = await readDocxPackage(output);
+  assert.deepEqual(reopened.texts, ['14 days']);
+  const digest = data => createHash('sha256').update(data).digest('hex');
+  assert.equal(digest(reopened.entries.get(path)), digest(picture));
 });

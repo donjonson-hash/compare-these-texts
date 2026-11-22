@@ -27,6 +27,7 @@ function page(t, beforeNavigation = () => {}, url = 'https://example.invalid/') 
   window.HTMLDialogElement.prototype.close = function () { this.open = false; };
   const commands = [];
   document.addEventListener('ctt:new-comparison', event => commands.push(event.detail));
+  window.eval(readFileSync(new URL('../src/file-limits.js', import.meta.url), 'utf8'));
   beforeNavigation({window, document, $});
   const navigation = new URL('../src/navigation.js', import.meta.url);
   const script = new Script(readFileSync(navigation, 'utf8'), {
@@ -118,8 +119,8 @@ test('file rejection, failed preparation and cancellation keep current editor ob
   p.upload('left', new File(['legacy'], 'old.doc'));
   assert.match(p.$('home-notice').textContent, /\.doc.*not supported/);
   assert.equal(p.$('home-left-name').textContent, 'a.txt', 'a rejected file must not replace the previously staged valid source');
-  p.upload('left', {name:'large.txt', size:2 * 1024 * 1024 + 1});
-  assert.match(p.$('home-notice').textContent, /up to 2 MB/);
+  p.upload('left', {name:'large.txt', size:25 * 1024 * 1024 + 1});
+  assert.match(p.$('home-notice').textContent, /up to 25 MB/);
   p.$('start-new-compare').click();
   assert.equal(p.commands[0].files.left, valid);
   p.commands[0].complete({ok:false, message:'Invalid document archive'}); await nextTurn();

@@ -1,4 +1,5 @@
 /** Conservative suggestions for printed blanks; all coordinates are scale-1 viewport points. */
+import {MAX_FILE_BYTES, decodeBase64Bytes, maxEncodedLength} from './file-limits.mjs';
 import {getDocument} from './pdf-reader.mjs';
 import {PDFDocument, fontkit} from './pdf-vendor.mjs';
 import fontBase64 from './pdf-font.mjs';
@@ -51,10 +52,10 @@ export async function detectPdfFillAreas(source, {page = 1, signal, generated = 
   abort(signal);
   let raw;
   if(generated) raw=source?.data;
-  else if(typeof source?.data==='string' && source.data.length<=Math.ceil(2*1024*1024/3)*4){
-    try{raw=Uint8Array.from(atob(source.data),c=>c.charCodeAt(0));}catch{}
+  else if(typeof source?.data==='string' && source.data.length<=maxEncodedLength()){
+    try{raw=decodeBase64Bytes(source.data);}catch{}
   }
-  if(!(raw instanceof Uint8Array)||!raw.length||raw.length>(generated?64:2)*1024*1024)throw new Error('PDF: Invalid source for finding blank lines.');
+  if(!(raw instanceof Uint8Array)||!raw.length||raw.length>(generated ? 64 * 1024 * 1024 : MAX_FILE_BYTES))throw new Error('PDF: Invalid source for finding blank lines.');
   const loading=getDocument({data:raw.slice(),stopAtErrors:true,isEvalSupported:false,disableFontFace:true,useSystemFonts:false,useWorkerFetch:false,isOffscreenCanvasSupported:false,isImageDecoderSupported:false,useWasm:false,enableXfa:false,disableAutoFetch:true,disableStream:true,disableRange:true,verbosity:0,BinaryDataFactory:NoExternalData});
   const cancel=()=>{void loading.destroy().catch(()=>{});};signal?.addEventListener('abort',cancel,{once:true});
   try{

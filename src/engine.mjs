@@ -1,6 +1,7 @@
 /** Deterministic, offline tabular engine. No network, storage, or model access. */
 import {readWorkbook} from './xlsx-source.mjs';
-export const MAX_SOURCE_BYTES = 2 * 1024 * 1024;
+import {MAX_FILE_BYTES, maxEncodedLength, decodeBase64Bytes} from './file-limits.mjs';
+export const MAX_SOURCE_BYTES = MAX_FILE_BYTES;
 export const MAX_REPORT_BYTES = 16 * 1024 * 1024;
 const MAX_RECORDS = 5000, MAX_COLUMNS = 200, MAX_FIELD_CHARS = 131072, MAX_ISSUES = 100;
 const DELIMITERS = [',', ';', '\t'];
@@ -65,12 +66,11 @@ async function inputs(payload, auto = false) {
     if (typeof name !== 'string' || !strip(name) || [...name].length > 255 || name.includes('\0')) fail(`${side}: name must be a nonblank string of at most 255 characters`);
     if (/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(name)) fail(`${side}: name must contain valid Unicode characters`);
     if (typeof data !== 'string') fail(`${side}: data must be base64 text`);
-    if (data.length > 4 * Math.ceil(MAX_SOURCE_BYTES / 3)) fail(`${side}: source exceeds 2 MiB`);
+    if (data.length > maxEncodedLength()) fail(`${side}: source exceeds 25 MiB`);
     if (/[^A-Za-z0-9+/=]/.test(data) || data.length % 4 || !/^[A-Za-z0-9+/]*={0,2}$/.test(data)) fail(`${side}: invalid base64 data`);
-    let binary;
-    try { binary = atob(data); } catch { fail(`${side}: invalid base64 data`); }
-    const raw = Uint8Array.from(binary, ch => ch.charCodeAt(0));
-    if (raw.length > MAX_SOURCE_BYTES) fail(`${side}: source exceeds 2 MiB`);
+    let raw;
+    try { raw = decodeBase64Bytes(data); } catch { fail(`${side}: invalid base64 data`); }
+    if (raw.length > MAX_SOURCE_BYTES) fail(`${side}: source exceeds 25 MiB`);
     const sha256 = [...new Uint8Array(await crypto.subtle.digest('SHA-256', raw))].map(n => n.toString(16).padStart(2, '0')).join('');
     if (/\.xlsx$/i.test(name)) {
       sources[side] = {name, sha256, workbook: await readWorkbook(raw, {name, sha256, sheet: item.sheet})};
@@ -98,13 +98,15 @@ function source(input, delimiter) {
     chars.push(ch);
     if (chars.length > MAX_FIELD_CHARS) fail(`${name}: invalid CSV: field larger than field limit (${MAX_FIELD_CHARS})`);
   }
-  function field() { cells.push(chars.join('')); chars = []; state = 'start'; }
+  function field() {
+    if (cells.length >= MAX_COLUMNS) fail(`${name}: more than ${MAX_COLUMNS} columns`);
+    cells.push(chars.join('')); chars = []; state = 'start';
+  }
   function record() {
     if (touched || cells.length || chars.length) field();
     if (headers === undefined) {
       headers = cells;
       if (!headers.length || headers.some(h => !strip(h))) fail(`${name}: headers must be nonblank`);
-      if (headers.length > MAX_COLUMNS) fail(`${name}: more than ${MAX_COLUMNS} columns`);
       if (new Set(headers).size !== headers.length) fail(`${name}: duplicate headers`);
     } else {
       if (rows.length >= MAX_RECORDS) fail(`${name}: more than ${MAX_RECORDS} data records`);

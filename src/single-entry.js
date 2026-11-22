@@ -81,9 +81,9 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   if(file&&/\.doc$/i.test(file.name)){note(uiMessage("Old Word files (.doc) are not supported. Open the file in Word or LibreOffice and save it as .docx, then try again."),true);return;}
   if(!file||busy||operating)return;const ticket=++generation;candidate=null;$('single-options').hidden=true;setBusy(true);
   try{
-   if(file.size>2097152)throw Error('Choose a file up to 2 MB.');note(uiMessage("Reading your file…"));
-   const bytes=new Uint8Array(await file.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
-   const source={name:file.name,data:btoa(binary)},{inspectSingleSource}=await import(moduleURL.href),info=await inspectSingleSource(source);if(ticket!==generation)return;candidate=source;
+   if(file.size>window.cttFileLimits.MAX_FILE_BYTES)throw Error('Choose a file up to 25 MB.');note(uiMessage("Reading your file…"));
+   const bytes=new Uint8Array(await file.arrayBuffer());
+   const source={name:file.name,data:window.cttFileLimits.encodeBase64Bytes(bytes)},{inspectSingleSource}=await import(moduleURL.href),info=await inspectSingleSource(source);if(ticket!==generation)return;candidate=source;
    $('single-sheet-label').hidden=info.format!=='xlsx';$('single-delimiter-label').hidden=!['csv','tsv'].includes(info.format);
    $('single-sheet').replaceChildren();for(const name of info.sheets||[]){const option=document.createElement('option');option.value=uiSetText(option, name);$('single-sheet').append(option);}
    $('single-delimiter').value=info.delimiter||',';note('');setBusy(false);

@@ -1,4 +1,5 @@
 /** Editable source cells. XLSX exports patch worksheet XML, retaining all other parts. */
+import {decodeBase64Bytes} from './file-limits.mjs';
 import {createSheetCalculator} from './sheet-formulas.mjs';
 import {sheetMerges} from './sheet-merges.mjs';
 import {read, utils, CFB, SSF} from './xlsx-vendor.mjs';
@@ -12,13 +13,50 @@ const fail = message => { throw new Error(message); };
 const children = (node,name) => Array.from(node.childNodes || []).filter(n=>n.nodeType===1 && (!name || n.localName===name));
 const descendants = (node,name) => Array.from(node.getElementsByTagName('*')).filter(n=>n.localName===name);
 const parseXML = bytes => {const text=decode(bytes);if(/<!DOCTYPE|<!ENTITY/i.test(text))fail('Unsupported workbook XML.');return new DOMParser({onError:()=>fail('Invalid workbook XML.')}).parseFromString(text,'application/xml');};
-export function parseCsv(text, delimiter) {
- const rows=[];let row=[],value='',quoted=false;
- for(let i=0;i<text.length;i++) {const ch=text[i];if(quoted){if(ch==='"'&&text[i+1]==='"'){value+='"';i++;}else if(ch==='"')quoted=false;else value+=ch;}else if(ch==='"'&&!value)quoted=true;else if(ch===delimiter){row.push(value);value='';}else if(ch==='\r'||ch==='\n'){row.push(value);rows.push(row);row=[];value='';if(ch==='\r'&&text[i+1]==='\n')i++;}else value+=ch;}
- if(quoted)fail('Unclosed CSV quote.');if(value||row.length||!rows.length){row.push(value);rows.push(row);}return rows;
+export function parseCsv(text, delimiter, sampleRows = Infinity) {
+ const rows = [];
+ let row = [], value = '', start = 0;
+ function finishCell(end) {
+  if (row.length >= 200) fail('Open a table with up to 5,000 rows, 200 columns and 200,000 cells.');
+  row.push(value + text.slice(start, end));
+  value = '';
+ }
+ function finishRow(end) {
+  // Comparison allows a header plus 5,000 data rows.
+  if (rows.length >= 5001) fail('Open a table with up to 5,000 rows.');
+  finishCell(end);
+  rows.push(row);
+  row = [];
+ }
+ for (let i = 0; i < text.length; i++) {
+  const ch = text[i];
+  if (ch === '"' && start === i && !value) {
+   const quotedStart = i + 1;
+   let end = text.indexOf('"', quotedStart), escaped = false;
+   while (end !== -1 && text[end + 1] === '"') {
+    escaped = true;
+    end = text.indexOf('"', end + 2);
+   }
+   if (end === -1) fail('Unclosed CSV quote.');
+   const content = text.slice(quotedStart, end);
+   value = escaped ? content.replaceAll('""', '"') : content;
+   i = end;
+   start = i + 1;
+  } else if (ch === delimiter) {
+   finishCell(i);
+   start = i + 1;
+  } else if (ch === '\r' || ch === '\n') {
+   finishRow(i);
+   if (rows.length >= sampleRows) return rows;
+   if (ch === '\r' && text[i + 1] === '\n') i++;
+   start = i + 1;
+  }
+ }
+ if (value || start < text.length || row.length || !rows.length) finishRow(text.length);
+ return rows;
 }
 export async function openSheetDocument(source, meta, delimiter=',') {
- const raw=Uint8Array.from(atob(source.data),c=>c.charCodeAt(0)),xlsx=meta.format==='xlsx';
+ const raw=decodeBase64Bytes(source.data),xlsx=meta.format==='xlsx';
  const sheetPaths=new Map();let workbook,grid,archive,sheetPath,xml,range,newline='\n',bom=false,ending=true;
  if(xlsx){await validateZip(raw);workbook=read(raw,{type:'array',cellStyles:true,cellNF:true,cellFormula:true,cellText:true});grid=workbook.Sheets[meta.sheet];if(!grid)fail('Selected sheet is missing.');range=utils.decode_range(grid['!ref']||'A1');archive=CFB.read(raw,{type:'array'});
   const part=name=>{const file=CFB.find(archive,'/'+name);if(!file)fail('Workbook part is missing.');return file.content;};

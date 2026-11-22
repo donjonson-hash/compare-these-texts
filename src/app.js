@@ -68,7 +68,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       restoreWorkspaceTools = () => {};
     };
   }
-  const MAX_FILE_BYTES = 2 * 1024 * 1024, PAGE_SIZE = 25;
+  const PAGE_SIZE = 25;
   const state = {sources: {left: null, right: null}, metadata: null, suggested: [], delimiter: ',',
     report: null, html: null, records: [], editor: null, busy: false, revision: 0, filter: 'all', page: 0, active: -1};
   const contractExampleSources = new WeakSet();
@@ -269,9 +269,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   function textSourcesSelected() { return Object.values(state.sources).some(source => source && /\.(txt|docx|pdf)$/i.test(source.name)); }
   function delimiter() { return $('delimiter').value === 'tab' ? '\t' : $('delimiter').value; }
   function encode(bytes) {
-    let text = '';
-    for (let offset = 0; offset < bytes.length; offset += 8192) text += String.fromCharCode(...bytes.subarray(offset, offset + 8192));
-    return btoa(text);
+    return window.cttFileLimits.encodeBase64Bytes(bytes);
   }
   async function api(path, payload) {
     controller = new AbortController();
@@ -281,7 +279,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   function sourceLabel(side, file) {
     $(side + '-filename').dataset.sourceLoaded = String(!!file);
     uiSetText($(side + '-filename'), file ? file.name : uiMessage("Choose a file or drop it here"));
-    uiSetText($(side + '-meta'), file ? uiMessage("File selected · click to replace") : window.KristinaTransport ? uiMessage("XLSX, CSV, TXT, DOCX, PDF · up to 2 MiB") : uiMessage("CSV · UTF-8 · up to 2 MiB"));
+    uiSetText($(side + '-meta'), file ? uiMessage("File selected · click to replace") : window.KristinaTransport ? uiMessage("XLSX, CSV, TXT, DOCX, PDF · up to 25 MiB") : uiMessage("CSV · UTF-8 · up to 25 MiB"));
   }
   function showSheets(side, sheets = [], selected = null) {
     const select = $(side + '-sheet');
@@ -395,7 +393,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     showSheets(side); $('settings').hidden = textSourcesSelected();
     $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
     $('rules').hidden = true; $('rules').disabled = true; $('rules-empty').hidden = false; sourceLabel(side, null);
-    if (file.size > MAX_FILE_BYTES) { notice(uiMessage("This file exceeds 2 MiB. Choose a smaller file."), true); return; }
+    if (file.size > window.cttFileLimits.MAX_FILE_BYTES) { notice(uiMessage("This file exceeds 25 MiB. Choose a smaller file."), true); return; }
     if (/\.(txt|docx|pdf)$/i.test(file.name) && !window.KristinaTransport) { notice(uiMessage("The document engine could not load. Reload this page and try again."), true); return; }
     if (/\.(xlsx|xls|xlsm|xlsb|ods)$/i.test(file.name) && !window.KristinaTransport) { notice(uiMessage("The spreadsheet engine could not load. Reload this page and try again."), true); return; }
     try {
@@ -611,7 +609,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
     $('rules').hidden = true; $('rules').disabled = true; $('rules-empty').hidden = false;
     uiSetText($('rules-summary'), uiMessage("Detect automatically"));
-    uiSetText($('source-privacy'), uiMessage("Comparison starts automatically. Files are processed in your browser. Up to 2 MiB per file."));
+    uiSetText($('source-privacy'), uiMessage("Comparison starts automatically. Files are processed in your browser. Up to 25 MiB per file."));
     officeReset(); notice(uiMessage("Session ended. Saved documents and edits have been deleted from this browser."));
   }
   // A bounded, linear prefix/suffix highlight. Preserve every original character.
@@ -930,7 +928,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
         for (const side of ['left', 'right']) {
           const file = files?.[side];
           if (!file || !/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.test(file.name)) throw new Error('Choose two supported files. Old .doc files must first be saved as .docx in Word or LibreOffice.');
-          if (file.size > MAX_FILE_BYTES) throw new Error('Choose files up to 2 MB each.');
+          if (file.size > window.cttFileLimits.MAX_FILE_BYTES) throw new Error('Choose files up to 25 MB each.');
           next[side] = {name:file.name, data:encode(new Uint8Array(await file.arrayBuffer()))};
         }
         // Parse both files before replacing anything. An invalid new document
@@ -973,7 +971,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   })() : Promise.resolve();
   if (window.KristinaTransport) {
     uiSetText($('supported-formats'), uiMessage("CSV/Excel tables, TXT/DOCX text, and PDFs with a text layer, including those with logos and images. Images are not compared; scans without text, forms, and comments are not supported."));
-    uiSetText($('source-privacy'), uiMessage("Comparison starts automatically. Files are processed locally, without sending them to an LLM. Up to 2 MiB per file."));
+    uiSetText($('source-privacy'), uiMessage("Comparison starts automatically. Files are processed locally, without sending them to an LLM. Up to 25 MiB per file."));
   }
   for (const side of ['left', 'right']) {
     if (window.KristinaTransport) {

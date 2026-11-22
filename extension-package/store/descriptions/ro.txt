@@ -13,7 +13,7 @@ Conținutul documentelor nu este tradus.
 Suplimentele pilot opționale pentru Word și Google Docs se instalează separat și au condiții proprii de confidențialitate. Această extensie nu le instalează automat.
 
 LIMITĂRI
-- Maximum 2 MiB pentru fiecare fișier. PDF necesită un strat de text: imaginile scanate, OCR, câmpurile interactive de formular și comentariile PDF nu sunt acceptate.
+- Maximum 25 MiB pentru fiecare fișier. PDF necesită un strat de text: imaginile scanate, OCR, câmpurile interactive de formular și comentariile PDF nu sunt acceptate.
 - Imaginile și formatarea nu sunt comparate. Machetele complexe pot fi exportate doar ca text; aspectul Word poate diferi de Microsoft Word.
 - Notele de subsol, notele de final și comentariile DOCX nu sunt importate. Mută-le mai întâi în textul principal al unei copii.
 - Compararea tabelelor necesită un singur rând de antet, fără celule îmbinate și cu valori în loc de formule.

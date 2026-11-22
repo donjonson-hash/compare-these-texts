@@ -18,7 +18,7 @@ Los documentos se procesan en tu dispositivo. La extensión funciona sin conexi�
 
 ANTES DE EMPEZAR
 - El contenido de los documentos no se traduce.
-- Cada archivo de entrada puede tener un tamaño máximo de 2 MiB.
+- Cada archivo de entrada puede tener un tamaño máximo de 25 MiB.
 - Los PDF necesitan una capa de texto: las imágenes escaneadas sin texto no son compatibles y no hay reconocimiento óptico de caracteres (OCR). Los espacios previstos para escribir a mano no son campos interactivos de formulario PDF. No se admiten campos interactivos ni comentarios PDF.
 - No se comparan imágenes ni formatos. La conservación de la maquetación del PDF depende del documento; las maquetaciones complejas pueden requerir una exportación de solo texto. La presentación de los archivos Word puede diferir de la de Microsoft Word.
 - Antes de importar un DOCX, mueve las notas al pie, las notas al final y los comentarios a los párrafos principales de una copia del documento.

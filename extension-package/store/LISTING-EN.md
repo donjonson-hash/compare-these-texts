@@ -48,7 +48,7 @@ PRIVATE BY DESIGN
 - Drafts expire after seven days without use. Website and extension drafts are stored separately.
 
 GOOD TO KNOW
-- Files up to 2 MiB each. Document contents are not translated.
+- Files up to 25 MiB each. Document contents are not translated.
 - PDFs need a text layer: scanned images and OCR are not supported. Interactive PDF form fields and comments are not supported.
 - Images and formatting are not compared. Complex PDF or Word layouts may export as text only, and Word layout may differ from Microsoft Word.
 - DOCX footnotes, endnotes and comments are not imported; move them into the main text of a copy first.

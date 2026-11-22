@@ -18,7 +18,7 @@ Asiakirjat käsitellään omalla laitteellasi. Laajennus toimii ilman verkkoyhte
 
 ENNEN KUIN ALOITAT
 - Asiakirjojen sisältöä ei käännetä.
-- Kukin avattava tiedosto saa olla enintään 2 MiB.
+- Kukin avattava tiedosto saa olla enintään 25 MiB.
 - PDF-tiedostoissa on oltava tekstikerros: skannattuja kuvia ilman tekstiä ei tueta, eikä OCR-tekstintunnistusta ole. Painetut tyhjät kohdat ovat eri asia kuin interaktiiviset PDF-lomakekentät. Interaktiivisia kenttiä ja PDF-kommentteja ei tueta.
 - Kuvia ja muotoiluja ei verrata. PDF-asettelun säilyminen riippuu asiakirjasta; monimutkainen asettelu voi vaatia viennin pelkkänä tekstinä. Word-asettelu voi poiketa Microsoft Wordin asettelusta.
 - DOCX-tiedoston alaviitteet, loppuviitteet ja kommentit on siirrettävä asiakirjan kopiossa leipätekstin kappaleisiin ennen tuontia.

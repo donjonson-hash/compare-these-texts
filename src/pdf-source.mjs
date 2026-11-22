@@ -1,7 +1,7 @@
 /** Strict, bounded PDF text-layer import. No rendering, OCR or external resources. */
+import {MAX_FILE_BYTES} from './file-limits.mjs';
 import {getDocument} from './pdf-reader.mjs';
 
-const MAX_BYTES = 2 * 1024 * 1024;
 const MAX_PAGES = 100, MAX_BLOCKS = 2000, MAX_CHARS = 500000, MAX_ITEMS = 100000;
 const MAX_MS = 15000;
 const fail = message => { throw new Error(`PDF: ${message}`); };
@@ -100,7 +100,7 @@ const NOTES = [
 ];
 
 export async function readPdfBytes(raw) {
-  if (!(raw instanceof Uint8Array) || !raw.length || raw.length > MAX_BYTES) fail("a nonempty file of no more than 2 MiB is required.");
+  if (!(raw instanceof Uint8Array) || !raw.length || raw.length > MAX_FILE_BYTES) fail("a nonempty file of no more than 25 MiB is required.");
   if (!new TextDecoder('latin1').decode(raw.subarray(0, 1024)).includes('%PDF-')) fail("the document signature was not found.");
   const started = Date.now();
   const checkTime = () => { if (Date.now() - started > MAX_MS) fail("reading took too long. Split the document into smaller files."); };

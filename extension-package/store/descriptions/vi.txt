@@ -18,7 +18,7 @@ Tài liệu được xử lý trên thiết bị của bạn. Tiện ích hoạt
 
 TRƯỚC KHI BẮT ĐẦU
 - Nội dung tài liệu không được dịch.
-- Mỗi tệp đầu vào có thể có dung lượng tối đa 2 MiB.
+- Mỗi tệp đầu vào có thể có dung lượng tối đa 25 MiB.
 - PDF cần có lớp văn bản: không hỗ trợ ảnh quét không có văn bản và không có OCR. Chỗ trống in sẵn khác với trường biểu mẫu PDF tương tác; không hỗ trợ trường tương tác và chú thích trong PDF.
 - Không so sánh hình ảnh và định dạng. Khả năng giữ nguyên bố cục PDF phụ thuộc vào tài liệu; bố cục phức tạp có thể cần xuất dưới dạng chỉ có văn bản. Bố cục Word có thể khác với khi xem trong Microsoft Word.
 - Trước khi nhập DOCX, cần chuyển chú thích cuối trang, chú thích cuối tài liệu và bình luận vào các đoạn văn chính trong một bản sao của tài liệu.

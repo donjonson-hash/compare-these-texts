@@ -98,3 +98,10 @@ test('styled XLSX uses full-cell contrast and original column widths without cha
  q('.visual-inspector [data-sheet-undo]').click();assert.equal(cell('B2').textContent,'');assert.equal(cell('B2').parentElement.style.backgroundColor,'rgb(0, 0, 0)');
  assert.equal(sheetColumnWidth({wpx:Infinity,wch:20}),145);assert.equal(sheetColumnWidth({wpx:-1}),160);assert.equal(sheetColumnWidth({wpx:9000}),800);assert.equal(sheetCellColors({patternType:'none',fgColor:{rgb:'000000'}}),null);assert.equal(sheetCellColors({patternType:'solid',fgColor:{rgb:'FF000000'}}).foreground,'#ffffff');
 });
+
+test('CSV samples complete quoted records and stops before oversized rows', () => {
+ const first = 'sku,note\r\n1,"a\nb ""quoted"""\r\n';
+ const text = first + ','.repeat(250000);
+ assert.deepEqual(parseCsv(text, ',', 2), [['sku','note'],['1','a\nb "quoted"']]);
+ assert.throws(() => parseCsv(text, ','), /200 columns/);
+});
