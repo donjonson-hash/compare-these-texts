@@ -16,6 +16,8 @@ const crcUpdate = (crc, bytes) => {
 
 // Validate the actual expanded ZIP bytes before handing the archive to SheetJS.
 // Central-directory declarations alone do not protect against forged ZIP sizes.
+// Return the original bytes for ordinary XLSX archives and a reader-compatible
+// copy when a streaming writer used ZIP64 data descriptors for bounded parts.
 export async function validateZip(raw) {
   const v = new DataView(raw.buffer, raw.byteOffset, raw.byteLength);
   const u16 = i => v.getUint16(i, true), u32 = i => v.getUint32(i, true);
@@ -26,7 +28,7 @@ export async function validateZip(raw) {
   if (end < Math.max(0, raw.length - 65557) || end + 22 + u16(end + 20) !== raw.length) bad();
   const count = u16(end + 10), start = u32(end + 16);
   if (u16(end + 4) || u16(end + 6) || count !== u16(end + 8) || !count || count > 1024 || start + u32(end + 12) !== end) bad();
-  let cursor = start, total = 0;
+  let cursor = start, total = 0, readerView;
   const names = new Set(), ranges = [];
   for (let n = 0; n < count; n++) {
     if (cursor + 46 > end || u32(cursor) !== 0x02014b50) bad();
@@ -47,8 +49,25 @@ export async function validateZip(raw) {
     if (flags & 8) {
       let descriptor = dataEnd;
       if (descriptor + 4 <= start && u32(descriptor) === 0x08074b50) descriptor += 4;
-      if (descriptor + 12 > start || u32(descriptor) !== checksum || u32(descriptor + 4) !== compressed || u32(descriptor + 8) !== size) bad();
-      rangeEnd = descriptor + 12;
+      if (descriptor + 12 > start || u32(descriptor) !== checksum || u32(descriptor + 4) !== compressed) bad();
+      // Bounded parts fit in 32 bits even when the writer streams both sizes
+      // as 64-bit fields. The central directory may still be ordinary ZIP32.
+      const wide = u16(local + 4) >= 45 && descriptor + 20 <= start &&
+        u32(descriptor + 8) === 0 && u32(descriptor + 12) === size && u32(descriptor + 16) === 0;
+      if (wide) {
+        // SheetJS expects a classic descriptor. Expose the validated sizes in
+        // its local header instead. All offsets and compressed bytes stay put.
+        readerView ??= new DataView(new Uint8Array(raw).buffer);
+        readerView.setUint16(local + 6, flags & ~8, true);
+        readerView.setUint16(cursor + 8, flags & ~8, true);
+        readerView.setUint32(local + 14, checksum, true);
+        readerView.setUint32(local + 18, compressed, true);
+        readerView.setUint32(local + 22, size, true);
+        rangeEnd = descriptor + 20;
+      } else {
+        if (u32(descriptor + 8) !== size) bad();
+        rangeEnd = descriptor + 12;
+      }
     }
     ranges.push([local, rangeEnd]);
     let actual = 0, crc = 0xffffffff;
@@ -72,6 +91,7 @@ export async function validateZip(raw) {
   }
   ranges.sort((a, b) => a[0] - b[0]);
   if (cursor !== end || ranges.some((range, i) => i && range[0] < ranges[i - 1][1]) || !names.has('[Content_Types].xml') || !names.has('xl/workbook.xml')) bad();
+  return readerView ? new Uint8Array(readerView.buffer) : raw;
 }
 
 function decimal(value) {
@@ -145,8 +165,8 @@ export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, li
   let workbook;
   if (legacy) workbook = readLegacy(raw, name, options);
   else {
-    await validateZip(raw);
-    try { workbook = read(raw, options); }
+    const checked = await validateZip(raw);
+    try { workbook = read(checked, options); }
     catch { fail(`${name}: could not read the XLSX. Save the workbook again.`); }
   }
   if (workbook.SheetNames.length > 100) fail(`${name}: more than 100 sheets. Split the workbook into smaller files.`);
