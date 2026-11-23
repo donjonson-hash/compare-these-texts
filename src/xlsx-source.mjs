@@ -196,8 +196,10 @@ export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, li
   const date1904 = !!workbook.Workbook?.WBProps?.date1904;
   const headerCells = {}, headers = [];
   for (let c = minCol; c <= maxCol; c++) {
-    const addr = utils.encode_cell({r: minRow, c}), value = valueOf(ws[addr], prefix(addr), date1904);
-    if (!value.trim() || headers.includes(value)) fail(`${prefix(addr)}: headers must be nonempty and unique.`);
+    const addr = utils.encode_cell({r: minRow, c}), raw = valueOf(ws[addr], prefix(addr), date1904).trim();
+    const base = raw || `Column ${addr.replace(/\d+$/, "")}`;
+    let value = base, suffix = 2;
+    while (headers.includes(value)) value = `${base} (${suffix++})`;
     headers.push(value); Object.defineProperty(headerCells, value, {value: addr, enumerable: true});
   }
   const rows = rowNumbers.slice(1).map(r => {
