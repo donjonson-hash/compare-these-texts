@@ -83,7 +83,13 @@ async function page(t, target, browserCompatibility = false, realModules = false
     terminate() { this.terminated = true; return this.worker.terminate(); }
   }
   const virtualConsole = new VirtualConsole();
-  virtualConsole.on('jsdomError', error => errors.push(error.message));
+  virtualConsole.on('jsdomError', error => {
+    // jsdom 31 loads <img> via @napi-rs/canvas, which cannot rasterize the SVG
+    // favicon; that decorative decode failure is not a UI error, so skip only
+    // image-load noise and keep every real JS/script error in `errors`.
+    if (/^Could not load img:/.test(error.message)) return;
+    errors.push(error.message);
+  });
   const pageHtml = readFileSync(path.join(directory, 'index.html'), 'utf8').replace(/href="\/(site(?:\.[0-9a-f]{16})?\.css|favicon\.svg)"/g, 'href="$1"');
   const dom = new JSDOM(pageHtml, {url: pathToFileURL(path.join(directory, 'index.html')).href,
     resources: localResources, runScripts: realModules ? 'outside-only' : 'dangerously', virtualConsole,
