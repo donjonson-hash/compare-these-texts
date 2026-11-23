@@ -1,21 +1,22 @@
 /** Full, local PDF page rendering and bounded edits of existing text areas. */
+import {MAX_FILE_BYTES, decodeBase64Bytes, maxEncodedLength} from './file-limits.mjs';
 import {getDocument} from './pdf-reader.mjs';
 import {PDFDocument, fontkit, rgb} from './pdf-vendor.mjs';
 import fontBase64 from './pdf-font.mjs';
 import {refineRasterBounds} from './pdf-raster-bounds.mjs';
 import {createPdfEditFonts} from './pdf-edit-fonts.mjs';
 
-const MAX_BYTES = 2 * 1024 * 1024, MAX_PIXELS = 16_000_000;
+const MAX_PIXELS = 16_000_000;
 const fail = message => { throw new Error(`PDF: ${message}`); };
 const abort = signal => { if (signal?.aborted) throw new DOMException("Canceled", 'AbortError'); };
 class NoExternalData {
   async fetch() { fail("this page requires external fonts or data. Save the PDF with embedded fonts."); }
 }
 function bytes(source) {
-  if (typeof source?.data !== 'string' || source.data.length > Math.ceil(MAX_BYTES / 3) * 4) fail("files up to 2 MiB are supported.");
+  if (typeof source?.data !== 'string' || source.data.length > maxEncodedLength()) fail("files up to 25 MiB are supported.");
   let raw;
-  try { raw = Uint8Array.from(atob(source.data), value => value.charCodeAt(0)); } catch { fail("couldn't read the file."); }
-  if (!raw.length || raw.length > MAX_BYTES) fail("a nonempty file up to 2 MiB is required.");
+  try { raw = decodeBase64Bytes(source.data); } catch { fail("couldn't read the file."); }
+  if (!raw.length || raw.length > MAX_FILE_BYTES) fail("a nonempty file up to 25 MiB is required.");
   return raw;
 }
 export function pdfBlockRects(block) {

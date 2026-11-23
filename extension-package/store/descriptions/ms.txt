@@ -13,7 +13,7 @@ Kandungan dokumen tidak diterjemahkan.
 Tambahan perintis pilihan untuk Word dan Google Docs dipasang secara berasingan dan mempunyai syarat privasi tersendiri. Sambungan ini tidak memasangnya secara automatik.
 
 BATASAN
-- Sehingga 2 MiB setiap fail. PDF memerlukan lapisan teks: imej imbasan, OCR, medan borang interaktif dan komen PDF tidak disokong.
+- Sehingga 25 MiB setiap fail. PDF memerlukan lapisan teks: imej imbasan, OCR, medan borang interaktif dan komen PDF tidak disokong.
 - Imej dan pemformatan tidak dibandingkan. Susun atur rumit mungkin dieksport sebagai teks sahaja; susun atur Word mungkin berbeza daripada Microsoft Word.
 - Nota kaki, nota hujung dan komen DOCX tidak diimport. Pindahkannya dahulu ke teks utama dalam salinan dokumen.
 - Perbandingan hamparan memerlukan satu baris pengepala, tiada sel digabungkan dan nilai menggantikan formula.

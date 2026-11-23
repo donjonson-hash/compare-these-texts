@@ -1,11 +1,12 @@
 /** Bounded TXT, plain-paragraph DOCX and PDF text-layer extraction, offline. */
+import {MAX_FILE_BYTES, maxEncodedLength, decodeBase64Bytes} from './file-limits.mjs';
 import {DOMParser} from './xml-vendor.mjs';
 import {unzipDocument} from './text-zip.mjs';
 import {parseDocxNumbering} from './docx-numbering.mjs';
 import {readDocxStructure} from './docx-structure.mjs';
 import {normalizeDocxHyperlinkFields} from './docx-fields.mjs';
 import {isVmlPicture, inspectVmlPicture, isRedundantVmlImageRelationship} from './docx-vml.mjs';
-export const MAX_TEXT_SOURCE_BYTES = 2 * 1024 * 1024;
+export const MAX_TEXT_SOURCE_BYTES = MAX_FILE_BYTES;
 export const MAX_TEXT_CHARS = 500000;
 export const MAX_TEXT_BLOCKS = 2000;
 const W = new Set(['http://schemas.openxmlformats.org/wordprocessingml/2006/main', 'http://purl.oclc.org/ooxml/wordprocessingml/main']);
@@ -325,16 +326,21 @@ function docxBlocks(doc, entries, docs, structure) {
   return output;
 }
 
-export async function readTextSource(item) {
+export function decodeTextSource(item) {
   if (!item || typeof item.name !== 'string' || !item.name.trim() || [...item.name].length > 255 || item.name.includes('\0')) fail("Provide a text filename of up to 255 characters.");
   const format = /\.(txt|docx|pdf)$/i.exec(item.name)?.[1].toLowerCase();
   if (!format) fail("For text comparison, upload TXT, DOCX, or PDF files with a text layer.");
   const data = item.data;
-  if (typeof data !== 'string' || data.length > 4 * Math.ceil(MAX_TEXT_SOURCE_BYTES / 3)) fail("The text file exceeds 2 MiB or has an invalid format.");
+  if (typeof data !== 'string' || data.length > maxEncodedLength()) fail("The text file exceeds 25 MiB or has an invalid format.");
   if (/[^A-Za-z0-9+/=]/.test(data) || data.length % 4 || !/^[A-Za-z0-9+/]*={0,2}$/.test(data)) fail("Invalid base64 data.");
   let raw;
-  try { raw = Uint8Array.from(atob(data), c => c.charCodeAt(0)); } catch { fail("Invalid base64 data."); }
-  if (raw.length > MAX_TEXT_SOURCE_BYTES) fail("The text file exceeds 2 MiB.");
+  try { raw = decodeBase64Bytes(data); } catch { fail("Invalid base64 data."); }
+  if (raw.length > MAX_TEXT_SOURCE_BYTES) fail("The text file exceeds 25 MiB.");
+  return {format, raw};
+}
+
+export async function readTextSource(item) {
+  const {format, raw} = decodeTextSource(item);
   const sha256 = [...new Uint8Array(await crypto.subtle.digest('SHA-256', raw))].map(n => n.toString(16).padStart(2, '0')).join('');
   if (format === 'pdf') {
     const {readPdfBytes} = await import('./pdf-source.mjs');
@@ -343,10 +349,12 @@ export async function readTextSource(item) {
   }
   let texts, locations, headerFooterCount = 0, notes = [...standardNotes];
   if (format === 'txt') {
+    // Even four-byte code points, CRLF separators and a BOM must fit this budget.
+    if (raw.length > MAX_TEXT_CHARS * 4 + MAX_TEXT_BLOCKS * 2 + 3) fail("The extracted text exceeds 500,000 characters. Split the document into smaller files.");
     let text;
     try { text = normalizeLines(decode(raw)); } catch { fail(`${item.name}: save the TXT file as UTF-8.`); }
     if (text.includes('\0')) fail(`${item.name}: NUL characters are not allowed.`);
-    texts = text === '' ? [] : text.split('\n');
+    texts = text === '' ? [] : text.split('\n', MAX_TEXT_BLOCKS + 2);
     if (text.endsWith('\n')) texts.pop();
     notes.push("Each TXT line is a separate block, including empty lines. One final newline marks the end of the last line and does not create an extra block.");
   } else {
@@ -364,7 +372,11 @@ export async function readTextSource(item) {
   }
   if (texts.length > MAX_TEXT_BLOCKS) fail("The document contains more than 2,000 text blocks. Split it into smaller files.");
   let chars = 0;
-  for (const text of texts) { chars += [...text].length; if (chars > MAX_TEXT_CHARS) fail("The extracted text exceeds 500,000 characters. Split the document into smaller files."); }
+  for (const text of texts) {
+    for (const _ of text) {
+      if (++chars > MAX_TEXT_CHARS) fail("The extracted text exceeds 500,000 characters. Split the document into smaller files.");
+    }
+  }
   return {meta: {name: item.name, sha256, format, block_count: texts.length, notes, ...(headerFooterCount ? {header_footer_count:headerFooterCount,coverage:'main_body_only'} : {})}, blocks: texts.map((text, i) => ({record: i + 1, text, ...(locations?.[i] ? {table: locations[i]} : {}), location: locations?.[i] ? `Table ${locations[i].table}, row ${locations[i].row}, column ${locations[i].column}, paragraph ${locations[i].paragraph}` : `${format === 'txt' ? "Line" : "Paragraph"} ${i + 1}`}))};
 }
 

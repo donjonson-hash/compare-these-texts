@@ -18,7 +18,7 @@ Dokumenten bearbetas på din enhet. Tillägget fungerar offline och laddar inte 
 
 INNAN DU BÖRJAR
 - Dokumentens innehåll översätts inte.
-- Varje indatafil får vara högst 2 MiB.
+- Varje indatafil får vara högst 25 MiB.
 - PDF-filer måste ha ett textlager: skannade bilder utan text stöds inte, och OCR saknas. Tryckta tomrader är inte samma sak som interaktiva PDF-formulärfält; interaktiva fält och PDF-kommentarer stöds inte.
 - Bilder och formatering jämförs inte. Om PDF-layouten kan bevaras beror på dokumentet; komplexa layouter kan kräva export som enbart text. Word-layouten kan skilja sig från Microsoft Word.
 - Fotnoter, slutnoter och kommentarer i DOCX måste flyttas till huvudtextens stycken i en kopia före import.

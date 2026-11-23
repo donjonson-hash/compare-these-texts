@@ -11,8 +11,9 @@ import editor from '../dist/text-editor.js';
 const source=(name,data)=>({name,data:Buffer.from(data).toString('base64')});
 const until=async fn=>{for(let i=0;i<500;i++){if(fn())return;await delay(10);}assert.fail('Timed out');};
 function memoryStore(){let row={token:null,payload:null},serial=0;return {read:async()=>structuredClone(row),async write(payload,token){if(token!==row.token)throw Object.assign(Error('conflict'),{code:'conflict'});row={token:String(++serial),payload:validateSinglePayload(payload)};return structuredClone(row);},async clear(token){if(token!==row.token)throw Object.assign(Error('conflict'),{code:'conflict'});row={token:String(++serial),payload:null};return structuredClone(row);},close(){}};}
+const fileLimitsScript = await readFile(new URL('../dist/file-limits.js', import.meta.url), 'utf8');
 function setup(t,html='<main></main>'){
- const dom=new JSDOM(html,{url:'https://ctt.example/',pretendToBeVisual:true,runScripts:'outside-only'});Object.assign(globalThis,{document:dom.window.document,window:dom.window});window.KristinaTextEditor=editor;window.Element.prototype.scrollIntoView=()=>{};window.confirm=()=>true;
+ const dom=new JSDOM(html,{url:'https://ctt.example/',pretendToBeVisual:true,runScripts:'outside-only'});dom.window.eval(fileLimitsScript);Object.assign(globalThis,{document:dom.window.document,window:dom.window});window.KristinaTextEditor=editor;window.Element.prototype.scrollIntoView=()=>{};window.confirm=()=>true;
  t.after(()=>{dom.window.close();delete globalThis.window;delete globalThis.document;});return dom;
 }
 async function entry(t,store){

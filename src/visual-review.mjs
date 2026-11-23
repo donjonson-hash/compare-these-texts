@@ -1,3 +1,4 @@
+import {decodeBase64Bytes} from './file-limits.mjs';
 import {uiMessage, uiError, uiSetText, uiSetAttr, uiTranslate, uiAppendText} from './ui-text.mjs';
 import {preparePdfPrintWindow} from './pdf-print.mjs';
 import {validateStyleKept} from './repetition-scan.mjs';
@@ -38,7 +39,7 @@ function pdfIssue(message = uiMessage("")) {
   if (/too large|too many pages/i.test(message)) return [uiMessage("The updated document is too large to prepare with its images."), uiMessage("Undo the change or reduce the added text, then preview again.")];
   return [uiMessage("We could not prepare this PDF with its images."), uiMessage("Try Preview PDF again, or undo the last change.")];
 }
-export async function mountVisualReview(root, {report, sources, single = false, signal, onRevision = () => {}, restoredState, onStateChange = () => {}, onSelectionChange = () => {}, onExplain = () => {}}) {
+export async function mountVisualReview(root, {report, sources, single = false, uploadedWordPair = false, signal, onRevision = () => {}, restoredState, onStateChange = () => {}, onSelectionChange = () => {}, onExplain = () => {}}) {
   const originalGroups = categories.flatMap(category => (report[category] || []).map(item => ({...item, category})));
   originalGroups.sort((a, b) => Number(a.key.slice(5)) - Number(b.key.slice(5)));
   let groups = [...originalGroups];
@@ -73,7 +74,10 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   }
   function download(data,name,mime) {
     const fileFormat = mime === 'application/pdf' ? 'pdf' : mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? 'docx' : 'txt';
-    const recordDownload = () => recordProductEvent('document_download', {file_format:fileFormat, workspace:single?'editor':'comparison'});
+    const recordDownload = () => {
+      recordProductEvent('document_download', {file_format:fileFormat, workspace:single?'editor':'comparison'});
+      if (uploadedWordPair && !single && fileFormat === 'docx') recordProductEvent('word_pair_download', {});
+    };
     if(!single||report.sources.left.format!=='pdf'||mime!=='application/pdf'){
       triggerDownload(data,name,mime);recordDownload();return;
     }
@@ -1048,7 +1052,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       download:data=>download(data,filename(side,'pdf'),'application/pdf'),onClose:()=>{documentPdfDialog=null;}});
   }
   async function fillBase() {
-    if (!drafts.left.changed) return {data:Uint8Array.from(atob(sources.left.data), c=>c.charCodeAt(0)), name:sources.left.name};
+    if (!drafts.left.changed) return {data:decodeBase64Bytes(sources.left.data), name:sources.left.name};
     const entries = drafts.left.entries(), blocks = sourceBlocks('left');
     const {renderPdfRevision} = await import('./pdf-visual.mjs');
     let data;
@@ -1132,7 +1136,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       let pdf = null;
       if(format === 'pdf' && (edited||textOnly)){pdf={entries:drafts[side].entries(),blocks:sourceBlocks(side),edits:null,data:pdfPreviews[side]?.revision===revision?pdfPreviews[side].data:null,reflow:textOnly||!!pdfErrors[side]};try{pdf.edits=pdfEdits(side);}catch{pdf.reflow=true;}}
       if (format === 'pdf') {
-        if (!edited&&!textOnly) download(Uint8Array.from(atob(sources[side].data), c => c.charCodeAt(0)), filename(side, 'pdf'), 'application/pdf');
+        if (!edited&&!textOnly) download(decodeBase64Bytes(sources[side].data), filename(side, 'pdf'), 'application/pdf');
         else {
           const {renderPdfRevision,renderReflowedPdf} = await import('./pdf-visual.mjs');
           if (!alive()) return;

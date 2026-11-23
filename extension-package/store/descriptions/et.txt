@@ -13,7 +13,7 @@ Dokumentide sisu ei tõlgita.
 Valikulised Wordi ja Google Docsi proovilisandmoodulid paigaldatakse eraldi ning neile kehtivad eraldi privaatsustingimused. See laiendus ei paigalda neid automaatselt.
 
 PIIRANGUD
-- Iga fail kuni 2 MiB. PDF vajab tekstikihti: skannitud pilte, OCR-i, interaktiivseid vormivälju ega PDF-kommentaare ei toetata.
+- Iga fail kuni 25 MiB. PDF vajab tekstikihti: skannitud pilte, OCR-i, interaktiivseid vormivälju ega PDF-kommentaare ei toetata.
 - Pilte ja vormindust ei võrrelda. Keerulise küljendusega dokument võib eksportimisel jääda ainult tekstiks; Wordi küljendus võib Microsoft Wordi omast erineda.
 - DOCX-i allmärkusi, lõpumärkusi ja kommentaare ei impordita. Tõsta need esmalt dokumendi koopias põhiteksti.
 - Tabelivõrdlus vajab üht päiserida, ühendamata lahtreid ja valemeid asendavaid väärtusi.

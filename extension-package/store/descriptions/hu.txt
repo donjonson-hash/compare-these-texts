@@ -13,7 +13,7 @@ A dokumentumok tartalmát nem fordítja le.
 A választható Word- és Google Docs-próbabővítmények külön telepítendők, és külön adatvédelmi feltételeik vannak. Ez a bővítmény nem telepíti őket automatikusan.
 
 KORLÁTOZÁSOK
-- Fájlonként legfeljebb 2 MiB. A PDF-hez szövegréteg szükséges: a beolvasott képek, az OCR, az interaktív űrlapmezők és a PDF-megjegyzések nem támogatottak.
+- Fájlonként legfeljebb 25 MiB. A PDF-hez szövegréteg szükséges: a beolvasott képek, az OCR, az interaktív űrlapmezők és a PDF-megjegyzések nem támogatottak.
 - Képeket és formázást nem hasonlít össze. Az összetett elrendezés exportáláskor egyszerű szöveggé válhat; a Word-elrendezés eltérhet a Microsoft Wordben látottól.
 - A DOCX lábjegyzetei, végjegyzetei és megjegyzései nem importálhatók. Előbb helyezze őket egy másolat főszövegébe.
 - Táblázatok összehasonlításához egy fejlécsor, egyesítetlen cellák és képletek helyett értékek szükségesek.

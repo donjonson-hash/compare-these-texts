@@ -70,8 +70,8 @@
       "sha256": "2ca3623ba52b707b1f257254ba8164fc758e7f7bd5584b54bb763ef234576634"
     },
     "src/xlsx-vendor.mjs": {
-      "bytes": 1008396,
-      "sha256": "af7252a481b500eafd61da653362b96f6bb5c84441c1d651bdc40903d9f8bf96"
+      "bytes": 1008698,
+      "sha256": "af784b1cdf5b403ffaf5f7499537e2d069b9818e56f1a73b2abeab2d3521d8ed"
     },
     "src/xml-vendor.mjs": {
       "bytes": 93711,

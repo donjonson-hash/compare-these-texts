@@ -18,8 +18,9 @@ def offline_page(content):
  # Shared help and file guides must stay inside the installed package, including
  # links which the website writes as absolute canonical URLs.
  content=strip_website_analytics(content)
- routes={'/':'index.html','/style.css':'style.css','/site.css':'site.css',
-         '/guides.css':'guides.css','/favicon.svg':'favicon.svg',
+ routes={'/':'index.html','/?demo=contract':'index.html?demo=contract','/style.css':'style.css','/site.css':'site.css',
+         '/?excel=files':'index.html?excel=files', '/?excel=sheets':'index.html?excel=sheets', '/?excel=example':'index.html?excel=example',
+         '/excel-columns.css':'excel-columns.css', '/guides.css':'guides.css','/favicon.svg':'favicon.svg',
          '/i18n.css':'i18n.css',
          '/privacy/':'privacy.html','/support/':'support.html','/terms/':'terms.html',
          '/LICENSE.txt':'LICENSE.txt','/extension/':'welcome.html',
@@ -29,6 +30,7 @@ def offline_page(content):
  for before,after in routes.items():
   content=content.replace('href="'+before+'"','href="'+after+'"')
   if before!='/':content=content.replace('href="'+website.rstrip('/')+before+'"','href="'+after+'"')
+ content=content.replace('src="/excel-columns.mjs"','src="excel-columns.mjs"')
  content=content.replace('src="/favicon.svg"','src="favicon.svg"').replace('src="/i18n.js"','src="i18n.js"')
  content=content.replace('>Extension</a>','>Getting started</a>').replace('>Get the extension</a>','>Getting started</a>').replace('data-i18n-text="Extension"','data-i18n-text="Getting started"').replace('data-i18n-text="Get the extension"','data-i18n-text="Getting started"')
  content=re.sub(r'<a\b[^>]*href="https://chromewebstore\.google\.com/[^\"]*"[^>]*>.*?</a>','',content,flags=re.S)
@@ -55,6 +57,7 @@ for target in ['chrome','firefox']:
  # Remove the website-only home promotion; local guide entry points are added below.
  html=re.sub(re.escape(WEBSITE_ONLY[0])+'.*?'+re.escape(WEBSITE_ONLY[1]),'',files['index.html'].decode(),flags=re.S)
  html=html.replace('href="/"','href="index.html"').replace('href="/site.css"','href="site.css"').replace('href="/favicon.svg"','href="favicon.svg"').replace('src="/favicon.svg"','src="favicon.svg"')
+ html=html.replace('href="/compare-excel-files/#compare-columns"','href="compare-excel-files.html#compare-columns"')
  html=html.replace('href="/extension/"',f'href="{extension_url}"').replace('href="/privacy/"','href="privacy.html"').replace('href="/support/"','href="support.html"').replace('href="/terms/"','href="terms.html"')
  html=html.replace('>Extension</a>','>Website</a>').replace('>Get the extension</a>','>Website</a>').replace('data-i18n-text="Get the extension"','data-i18n-text="Website"').replace('data-i18n-text="Extension"','data-i18n-text="Website"').replace(f'href="{extension_url}"',f'href="{website}"')
  html=re.sub(r'<a href="(https://[^"]+)"',r'<a href="\1" target="_blank" rel="noopener noreferrer"',html)

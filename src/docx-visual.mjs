@@ -1,5 +1,7 @@
 /** Local semantic DOCX presentation and lossless-package paragraph edits. */
-import {readTextSource, readDocxPackage, validateDocxDrawing, validateDocxVmlImage, MAX_TEXT_CHARS, MAX_TEXT_BLOCKS, MAX_TEXT_SOURCE_BYTES} from './text-source.mjs';
+import {accountDocxPart} from './text-zip.mjs';
+import {MAX_FILE_BYTES, encodeBase64Bytes} from './file-limits.mjs';
+import {decodeTextSource, readDocxPackage, validateDocxDrawing, validateDocxVmlImage, MAX_TEXT_CHARS, MAX_TEXT_BLOCKS} from './text-source.mjs';
 import {isVmlPicture} from './docx-vml.mjs';
 import {renderDocxNumbering} from './docx-numbering.mjs';
 import {validateTableSequence, normalizeDocxRowPlan} from './docx-structure.mjs';
@@ -52,10 +54,8 @@ function stylesFor(checked) {
 }
 async function load(source) {
   if(!/\.docx$/i.test(source?.name||'')) throw new Error("A DOCX document is required.");
-  await readTextSource(source);
-  return readDocxPackage(Uint8Array.from(atob(source.data),c=>c.charCodeAt(0)));
+  return readDocxPackage(decodeTextSource(source).raw);
 }
-function base64(bytes) { let result=''; for(let i=0;i<bytes.length;i+=32768) result+=String.fromCharCode(...bytes.subarray(i,i+32768)); return btoa(result); }
 // Coordinates in these bounded legacy-shape models are PDF points (page remains CSS px).
 const SHAPE_NS={mc:'http://schemas.openxmlformats.org/markup-compatibility/2006',wp:'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing',a:'http://schemas.openxmlformats.org/drawingml/2006/main',wps:'http://schemas.microsoft.com/office/word/2010/wordprocessingShape',v:'urn:schemas-microsoft-com:vml',o:'urn:schemas-microsoft-com:office:office'};
 const shapeIs=(node,ns,name)=>node?.namespaceURI===SHAPE_NS[ns]&&node.localName===name;
@@ -110,7 +110,7 @@ export async function readDocxVisual(source) {
       if (is(node,'r')) style={...style,...formatting.run(node)};
       if (is(node,'fldSimple')) { const field=/^\s*(PAGE|NUMPAGES|SECTIONPAGES)\b/i.exec(attr(node,'instr')||'')?.[1]?.toUpperCase(); if(field){runs.push({field,text:'',style:{...style,...formatting.run(child(node,'r'))}});return;} }
       if (textual(node)) { runs.push({text:textOf(node),style,...(is(node,'br')&&attr(node,'type')==='page'?{pageBreak:true}:{})}); return; }
-      if (is(node,'drawing')||isVmlPicture(node)) { const img=(isVmlPicture(node)?validateDocxVmlImage:validateDocxDrawing)(node,checked.entries,checked.docs); if(!imageSources.has(img.path))imageSources.set(img.path,`data:${img.mime};base64,${base64(img.bytes)}`); runs.push({image:{src:imageSources.get(img.path),width:img.width,height:img.height,alt:img.alt}}); return; }
+      if (is(node,'drawing')||isVmlPicture(node)) { const img=(isVmlPicture(node)?validateDocxVmlImage:validateDocxDrawing)(node,checked.entries,checked.docs); if(!imageSources.has(img.path))imageSources.set(img.path,`data:${img.mime};base64,${encodeBase64Bytes(img.bytes)}`); runs.push({image:{src:imageSources.get(img.path),width:img.width,height:img.height,alt:img.alt}}); return; }
       if(is(node,'pPr')||is(node,'rPr')) return;
       for(const c of elements(node)) visit(c,style);
     }
@@ -233,16 +233,17 @@ const encoder=new TextEncoder();
 const crcTable=Uint32Array.from({length:256},(_,n)=>{for(let i=0;i<8;i++)n=n&1?0xedb88320^(n>>>1):n>>>1;return n>>>0;});
 const crc32=bytes=>{let crc=0xffffffff;for(const byte of bytes)crc=crcTable[(crc^byte)&255]^(crc>>>8);return (crc^0xffffffff)>>>0;};
 const concat=arrays=>{const out=new Uint8Array(arrays.reduce((n,a)=>n+a.length,0));let offset=0;for(const a of arrays){out.set(a,offset);offset+=a.length;}return out;};
-async function zip(entries) {
-  const files=[],directory=[];let offset=0,total=0;
+export async function packDocx(entries) {
+  const files=[],directory=[],budget={total:0,structure:0};let offset=0;
   for(const [name,bytes] of entries) {
-    total+=bytes.length;if(total>16*1024*1024)throw new Error("The edited DOCX exceeds 16 MiB.");
+    accountDocxPart(budget, name, bytes.length);
     const path=encoder.encode(name),packed=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()),crc=crc32(bytes);
     const local=new Uint8Array(30+path.length),l=new DataView(local.buffer);l.setUint32(0,0x04034b50,true);l.setUint16(4,20,true);l.setUint16(6,0x800,true);l.setUint16(8,8,true);l.setUint32(14,crc,true);l.setUint32(18,packed.length,true);l.setUint32(22,bytes.length,true);l.setUint16(26,path.length,true);local.set(path,30);
     const central=new Uint8Array(46+path.length),c=new DataView(central.buffer);c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x800,true);c.setUint16(10,8,true);c.setUint32(16,crc,true);c.setUint32(20,packed.length,true);c.setUint32(24,bytes.length,true);c.setUint16(28,path.length,true);c.setUint32(42,offset,true);central.set(path,46);files.push(local,packed);directory.push(central);offset+=local.length+packed.length;
   }
   const central=concat(directory),end=new Uint8Array(22),e=new DataView(end.buffer);e.setUint32(0,0x06054b50,true);e.setUint16(8,directory.length,true);e.setUint16(10,directory.length,true);e.setUint32(12,central.length,true);e.setUint32(16,offset,true);
-  const result=concat([...files,central,end]);if(result.length>MAX_TEXT_SOURCE_BYTES)throw new Error("The edited DOCX exceeds 2 MiB. Shorten the text.");return result;
+  if(offset+central.length+end.length>MAX_FILE_BYTES)throw new Error("The edited DOCX exceeds 25 MiB. Shorten the text.");
+  return concat([...files,central,end]);
 }
 
 /** edits changes existing records. Optional sequence replaces paragraph order, permits insertion/deletion. */
@@ -273,7 +274,7 @@ export async function writeDocxVisual(source,edits=[],options={}) {
     const section=child(body,'sectPr');for(const {node} of output)body.insertBefore(node,section||null);
   }
   checked.entries.set('word/document.xml',encoder.encode(checked.doc.toString()));
-  return zip(checked.entries);
+  return packDocx(checked.entries);
 }
 
 async function writeTableRows(checked, edits, {sequence, rowPlan}) {
@@ -329,5 +330,5 @@ async function writeTableRows(checked, edits, {sequence, rowPlan}) {
   }
   for (const [record, text] of texts) editParagraph(paragraphNodes.get(record), text);
   checked.entries.set('word/document.xml', encoder.encode(checked.doc.toString()));
-  return zip(checked.entries);
+  return packDocx(checked.entries);
 }

@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {webcrypto} from 'node:crypto';
 import {openSessionStore, validateSessionPayload} from '../src/session-store.mjs';
-import {openSingleSessionStore} from '../src/single-session.mjs';
+import {MAX_FILE_BYTES} from '../src/file-limits.mjs';
+import {openSingleSessionStore, validateSinglePayload} from '../src/single-session.mjs';
 const WEEK = 7 * 24 * 60 * 60 * 1000;
 const SECRET = 'PRIVATE-CUSTOMER-ALPHA-49382';
 const source = {name: SECRET + '.txt', data: Buffer.from(SECRET).toString('base64')};
@@ -220,5 +221,18 @@ test('schema validation detaches snapshots and refuses incompatible, cyclic, and
   const original = payload(), detached = validateSessionPayload(original); original.review.selected = 'later'; assert.equal(detached.review.selected, undefined);
   assert.throws(() => validateSessionPayload({...payload(), version: 2}), {code: 'incompatible'});
   const cyclic = payload(); cyclic.review.self = cyclic; assert.throws(() => validateSessionPayload(cyclic), {code: 'invalid'});
-  const huge = payload(); huge.sources.left.data = Buffer.alloc(2 * 1024 * 1024 + 1).toString('base64'); assert.throws(() => validateSessionPayload(huge), {code: 'invalid'});
+  const huge = payload(); huge.sources.left.data = 'A'.repeat(Math.ceil((MAX_FILE_BYTES + 1) / 3) * 4);
+  assert.throws(() => validateSessionPayload(huge), {code: 'invalid'});
+  const single = {version: 1, kind: 'single-editor', source: huge.sources.left, delimiter: ',', sheet: null, review: {version: 1}};
+  assert.throws(() => validateSinglePayload(single), {code: 'invalid'});
+});
+
+test('drafts accept two larger sources whose combined base64 exceeds the former snapshot limit', () => {
+  const original = payload();
+  const data = Buffer.alloc(12 * 1024 * 1024 + 1).toString('base64');
+  original.sources = {left: {name: 'a.pdf', data}, right: {name: 'b.pdf', data}};
+  original.report.sources = {left: {format: 'pdf'}, right: {format: 'pdf'}};
+  assert.equal(validateSessionPayload(original).sources.right.data.length, data.length);
+  const single = {version: 1, kind: 'single-editor', source: original.sources.left, sheet: null, delimiter: ',', review: {version: 1}};
+  assert.equal(validateSinglePayload(single).source.data.length, data.length);
 });

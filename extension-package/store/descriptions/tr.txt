@@ -18,7 +18,7 @@ Belgeler cihazınızda işlenir. Uzantı çevrimdışı çalışır ve karşıla
 
 BAŞLAMADAN ÖNCE
 - Belgelerin içeriği çevrilmez.
-- Her giriş dosyası en fazla 2 MiB olabilir.
+- Her giriş dosyası en fazla 25 MiB olabilir.
 - PDF'lerde metin katmanı bulunmalıdır: metin içermeyen taranmış görüntüler desteklenmez ve OCR yoktur. Basılı boşluklar, etkileşimli PDF form alanlarından farklıdır; etkileşimli alanlar ve PDF yorumları desteklenmez.
 - Görüntüler ve biçimlendirme karşılaştırılmaz. PDF düzeninin korunması belgeye bağlıdır; karmaşık düzenlerde yalnızca metin olarak dışa aktarma gerekebilir. Word düzeni, Microsoft Word'deki görünümden farklı olabilir.
 - DOCX dipnotlarını, sonnotlarını ve yorumlarını içe aktarmadan önce belgenin bir kopyasında ana metindeki paragraflara taşıyın.

@@ -1,11 +1,25 @@
 /* One local review, with transaction-level ownership across extension tabs. */
+import {isValidEncodedSource} from './file-limits.mjs';
 const DB_NAME = 'kristina-review-session', STORE = 'session', KEY = 'current';
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-const MAX_SOURCE_BYTES = 2 * 1024 * 1024, MAX_PAYLOAD_BYTES = 32 * 1024 * 1024;
+// Two 25 MiB inputs occupy almost 67 MiB when encoded as base64.
+const MAX_PAYLOAD_BYTES = 96 * 1024 * 1024;
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const failure = (code, message, details = {}) => Object.assign(new Error(message), {code, ...details});
 const tokenOf = row => typeof row?.token === 'string' ? row.token : null;
 const empty = () => ({token: null, payload: null, updatedAt: null});
+
+// JSON is the persisted format. Detach from live edits before writing and apply
+// the same UTF-8 byte budget to comparison, single-editor and encrypted drafts.
+export function detachSessionPayload(payload, invalid) {
+  let serialized;
+  try { serialized = JSON.stringify(payload); } catch { invalid(); }
+  if (serialized.length > MAX_PAYLOAD_BYTES ||
+      (serialized.length * 3 > MAX_PAYLOAD_BYTES && new Blob([serialized]).size > MAX_PAYLOAD_BYTES)) {
+    throw failure('invalid', "This work is too large to save.");
+  }
+  return JSON.parse(serialized);
+}
 
 /** Validate and detach the snapshot before an asynchronous write can start. */
 export function validateSessionPayload(payload) {
@@ -16,10 +30,7 @@ export function validateSessionPayload(payload) {
   for (const side of ['left', 'right']) {
     const source = payload.sources[side];
     if (!object(source) || typeof source.name !== 'string' || !source.name.length || source.name.length > 4096 || typeof source.data !== 'string') invalid();
-    const data = source.data;
-    if (data.length > Math.ceil(MAX_SOURCE_BYTES / 3) * 4 || data.length % 4 || !/^[A-Za-z0-9+/]*={0,2}$/.test(data)) invalid();
-    const bytes = data.length / 4 * 3 - (data.endsWith('==') ? 2 : data.endsWith('=') ? 1 : 0);
-    if (bytes > MAX_SOURCE_BYTES) invalid();
+    if (!isValidEncodedSource(source.data)) invalid();
   }
   const report = payload.report;
   if (report.kind === 'text') {
@@ -44,9 +55,12 @@ export function validateSessionPayload(payload) {
   } else {
     if (report.kind !== undefined || report.status !== 'complete' || !object(report.sources) || !object(report.rules) || payload.review.kind !== 'sheet') invalid();
     if (!Array.isArray(report.rules.key) || report.rules.key.length !== 2 || !Array.isArray(report.rules.fields) || report.rules.fields.length > 200 || ![',',';','\t'].includes(report.rules.delimiter)) invalid();
-    for (const side of ['left','right']) {
+    const secondKey = report.rules.second_key;
+    if (secondKey !== undefined && (!Array.isArray(secondKey) || secondKey.length !== 2)) invalid();
+    for (const [index, side] of ['left','right'].entries()) {
       const meta=report.sources[side];
-      if (!object(meta) || ![undefined,'csv','xlsx'].includes(meta.format) || !Array.isArray(meta.headers) || !meta.headers.length || meta.headers.length > 200 || meta.headers.some(h=>typeof h!=='string') || new Set(meta.headers).size!==meta.headers.length) invalid();
+      if (!object(meta) || ![undefined,'csv','xls','xlsx'].includes(meta.format) || !Array.isArray(meta.headers) || !meta.headers.length || meta.headers.length > 200 || meta.headers.some(h=>typeof h!=='string') || new Set(meta.headers).size!==meta.headers.length) invalid();
+      if (secondKey && (!meta.headers.includes(secondKey[index]) || secondKey[index] === report.rules.key[index])) invalid();
     }
     let count=0; const keys=new Set();
     for (const category of ['matched','changed','only_left','only_right']) {
@@ -58,10 +72,7 @@ export function validateSessionPayload(payload) {
       }
     }
   }
-  let serialized;
-  try { serialized = JSON.stringify(payload); } catch { invalid(); }
-  if (serialized.length > MAX_PAYLOAD_BYTES || new TextEncoder().encode(serialized).byteLength > MAX_PAYLOAD_BYTES) throw failure('invalid', "This work is too large to save.");
-  return JSON.parse(serialized);
+  return detachSessionPayload(payload, invalid);
 }
 
 // The key is local to this browser profile. Non-extractability prevents raw-key

@@ -1,10 +1,10 @@
 /** Add user text above unchanged PDF artwork. Coordinates use PDF.js scale-1 viewports. */
+import {MAX_FILE_BYTES, decodeBase64Bytes, maxEncodedLength} from './file-limits.mjs';
 import {PDFDocument, PDFName, fontkit, rgb} from './pdf-vendor.mjs';
 import {getDocument} from './pdf-reader.mjs';
 import fontBase64 from './pdf-font.mjs';
 import {readPdfBytes} from './pdf-source.mjs';
 
-const MAX_BYTES = 2 * 1024 * 1024;
 const fail = message => { throw new Error(`PDF: ${message}`); };
 const abort = signal => { if (signal?.aborted) throw new DOMException('Canceled', 'AbortError'); };
 class NoExternalData { async fetch() { fail('external resources are not supported.'); } }
@@ -49,9 +49,9 @@ export async function renderFilledPdf(source, fields, {signal, generated = false
     if (!(source?.data instanceof Uint8Array) || !source.data.length || source.data.length > 64 * 1024 * 1024) fail('The generated PDF is too large.');
     raw = source.data;
   } else {
-    if (typeof source?.data !== 'string' || source.data.length > Math.ceil(MAX_BYTES / 3) * 4) fail('A PDF up to 2 MiB is required.');
-    try { raw = Uint8Array.from(atob(source.data), char => char.charCodeAt(0)); } catch { fail('Could not read the source PDF.'); }
-    if (!raw.length || raw.length > MAX_BYTES) fail('A nonempty PDF up to 2 MiB is required.');
+    if (typeof source?.data !== 'string' || source.data.length > maxEncodedLength()) fail('A PDF up to 25 MiB is required.');
+    try { raw = decodeBase64Bytes(source.data); } catch { fail('Could not read the source PDF.'); }
+    if (!raw.length || raw.length > MAX_FILE_BYTES) fail('A nonempty PDF up to 25 MiB is required.');
   }
   if (!Array.isArray(fields) || fields.length > 100) fail('Use up to 100 text areas.');
   // Original uploads follow the editor importer. Generated input is only for

@@ -46,6 +46,7 @@ async function setup(t, intercept = null) {
     const module=new SyntheticModule(Object.keys(exports),function(){for(const [key,value]of Object.entries(exports))this.setExport(key,value);},{context,identifier:url});
     await module.link(()=>{});await module.evaluate();moduleCache.set(url,module);return module;
   }
+  window.eval(readFileSync(new URL('../src/file-limits.js',import.meta.url),'utf8'));
   window.eval(readFileSync(new URL('../src/office.js',import.meta.url),'utf8'));
   new Script(readFileSync(new URL('../src/app.js',import.meta.url),'utf8'),{importModuleDynamically:load}).runInContext(context);
   for(let i=0;!sessionOptions&&i<100;i++)await delay(1);
@@ -54,8 +55,9 @@ async function setup(t, intercept = null) {
   const files=kind=>kind==='table' ? {
     left:new File(['sku,quantity\nA,1\n'],'private-a.csv'),right:new File(['sku,quantity\nA,2\n'],'private-b.csv'),
   } : {left:new File(['Old private sentence.'],'private-a.txt'),right:new File(['New private sentence.'],'private-b.txt')};
-  const start=(kind='text')=>new Promise(resolve=>document.dispatchEvent(new window.CustomEvent('ctt:new-comparison',{detail:{files:files(kind),complete:resolve}})));
-  return {window,document,events,results,start,restore:()=>sessionOptions.onResume(saved)};
+  const submit=(files, example)=>new Promise(resolve=>document.dispatchEvent(new window.CustomEvent('ctt:new-comparison',{detail:{files,example,complete:resolve}})));
+  const start=(kind='text')=>submit(files(kind));
+  return {window,document,events,results,start,submit,restore:()=>sessionOptions.onResume(saved)};
 }
 
 for(const kind of ['text','table'])test(`completed ${kind} comparison emits once; rendering and restoring do not count again`,async t=>{
@@ -104,4 +106,20 @@ test('late result from invalidated comparison is not counted',async t=>{
   release();await pending;
   assert.deepEqual(p.events,[]);
   assert.equal(p.document.getElementById('results').hidden,true);
+});
+
+
+test('the same Word bytes count as demo or upload only according to their entry point', async t => {
+  const p = await setup(t);
+  p.window.eval(readFileSync(new URL('../src/document-demo.js',import.meta.url),'utf8'));
+  const files = {};
+  for (const side of ['left', 'right']) {
+    const sample = p.window.CTTDemoDocuments[side];
+    files[side] = new File([Buffer.from(sample.data, 'base64')], sample.name);
+  }
+  assert.equal((await p.submit(files, 'contract')).ok, true);
+  assert.deepEqual(p.events, [['comparison_complete', {comparison_type:'text'}], ['contract_demo_view', {}]]);
+  p.events.length = 0;
+  assert.equal((await p.submit(files)).ok, true);
+  assert.deepEqual(p.events, [['comparison_complete', {comparison_type:'text'}], ['word_pair_compare', {}]]);
 });

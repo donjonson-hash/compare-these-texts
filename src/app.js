@@ -24,6 +24,12 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   function recordProductEvent(name, parameters) {
     try { window.cttProductEvent?.(name, parameters); } catch (_) {}
   }
+  // Object identity distinguishes uploads from built-in examples and restored drafts
+  // without putting analytics labels, filenames or identifiers into saved work.
+  const uploadedSources = new WeakSet();
+  function isUploadedWordPair(report, sources) {
+    return ['left', 'right'].every(side => report.sources[side]?.format === 'docx' && uploadedSources.has(sources[side]));
+  }
   const $ = (id) => document.getElementById(id);
   const visualModuleURL = new URL('visual-review.mjs', document.currentScript.src);
   const sheetModuleURL = new URL('sheet-review.mjs', document.currentScript.src);
@@ -62,9 +68,10 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       restoreWorkspaceTools = () => {};
     };
   }
-  const MAX_FILE_BYTES = 2 * 1024 * 1024, PAGE_SIZE = 25;
+  const PAGE_SIZE = 25;
   const state = {sources: {left: null, right: null}, metadata: null, suggested: [], delimiter: ',',
     report: null, html: null, records: [], editor: null, busy: false, revision: 0, filter: 'all', page: 0, active: -1};
+  const exampleSources = new WeakMap();
   const loads = {left: 0, right: 0}, selectColumns = new WeakMap();
   let controller = null, exportController = null, changePage = 0;
   function reviewMode(enabled, textMode = false) {
@@ -233,7 +240,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     sessionUI?.setBusy(value);
     if (value) officeReset(uiMessage("Reading the documents and checking the data. I'll answer questions about the new comparison when it's ready."));
     officeEnable(); exportEnable();
-    for (const id of ['demo', 'demo-tables', 'visual-retry', 'left-file', 'right-file', 'delimiter', 'left-key', 'right-key', 'answer']) $(id).disabled = value;
+    for (const id of ['demo', 'demo-tables', 'visual-retry', 'left-file', 'right-file', 'delimiter', 'left-key', 'right-key', 'composite-key', 'left-key2', 'right-key2', 'answer']) $(id).disabled = value;
     for (const side of ['left', 'right']) if ($(side + '-sheet')) $(side + '-sheet').disabled = value;
     $('rules').disabled = value || !state.metadata || state.metadata.kind === 'text';
     $('compare').disabled = value;
@@ -241,6 +248,9 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   }
   function clearResult() {
     restoreWorkspaceTools();
+    simplePage = null; previousOffsets = [];
+    $('simple-sheet-result').hidden = true; $('simple-sheet-rows').replaceChildren();
+    document.body.classList.remove('simple-sheet-mode');
     $('source-picker').open = true;
     sessionUI?.deactivate();
     visualController?.abort(); visualController = null; visualReview?.dispose(); visualReview = null;
@@ -262,9 +272,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   function textSourcesSelected() { return Object.values(state.sources).some(source => source && /\.(txt|docx|pdf)$/i.test(source.name)); }
   function delimiter() { return $('delimiter').value === 'tab' ? '\t' : $('delimiter').value; }
   function encode(bytes) {
-    let text = '';
-    for (let offset = 0; offset < bytes.length; offset += 8192) text += String.fromCharCode(...bytes.subarray(offset, offset + 8192));
-    return btoa(text);
+    return window.cttFileLimits.encodeBase64Bytes(bytes);
   }
   async function api(path, payload) {
     controller = new AbortController();
@@ -274,7 +282,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   function sourceLabel(side, file) {
     $(side + '-filename').dataset.sourceLoaded = String(!!file);
     uiSetText($(side + '-filename'), file ? file.name : uiMessage("Choose a file or drop it here"));
-    uiSetText($(side + '-meta'), file ? uiMessage("File selected · click to replace") : window.KristinaTransport ? uiMessage("XLSX, CSV, TXT, DOCX, PDF · up to 2 MiB") : uiMessage("CSV · UTF-8 · up to 2 MiB"));
+    uiSetText($(side + '-meta'), file ? uiMessage("File selected · click to replace") : window.KristinaTransport ? uiMessage("XLS, XLSX, CSV, TXT, DOCX, PDF · up to 25 MiB") : uiMessage("CSV · UTF-8 · up to 25 MiB"));
   }
   function showSheets(side, sheets = [], selected = null) {
     const select = $(side + '-sheet');
@@ -292,19 +300,28 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   function chooseColumn(select, name) {
     const index = selectColumns.get(select).indexOf(name); select.value = index < 0 ? '' : String(index);
   }
+  function selectedIdentifiers(side) {
+    const primary = selectedColumn($(side + '-key'));
+    return $('composite-key').checked ? [primary, selectedColumn($(side + '-key2'))] : [primary];
+  }
+  function fillSecondIdentifier(side, value) {
+    const primary = selectedColumn($(side + '-key')), select = $(side + '-key2');
+    options(select, state.metadata[side].headers.filter(name => name !== primary), uiMessage("Choose an identifier"));
+    chooseColumn(select, value);
+  }
   function mapping(preserve = true) {
     if (!state.metadata || state.metadata.kind === 'text') return;
     const body = $('field-mapping'), previous = new Map();
     if (preserve) for (const row of body.children) previous.set(row.dataset.left, [selectedColumn(row.querySelector('.field-target')), row.querySelector('.field-mode').value]);
     const suggestions = new Map(state.suggested.map(([left, right, mode]) => [left, [right, mode]]));
     body.replaceChildren();
-    const leftKey = selectedColumn($('left-key')), rightKey = selectedColumn($('right-key'));
-    for (const name of state.metadata.left.headers.filter(n => n !== leftKey)) {
+    const leftKeys = selectedIdentifiers('left'), rightKeys = selectedIdentifiers('right');
+    for (const name of state.metadata.left.headers.filter(n => !leftKeys.includes(n))) {
       const row = element('div', undefined, 'field-rule'); row.dataset.left = name;
       row.append(element('span', name));
       const targetLabel = element('label', uiMessage("Matching field in B")), target = element('select', undefined, 'field-target');
       uiSetAttr(target, 'aria-label', uiMessage("Column B for {0}", { 0: name }));
-      options(target, state.metadata.right.headers.filter(n => n !== rightKey), uiMessage("Don't check"));
+      options(target, state.metadata.right.headers.filter(n => !rightKeys.includes(n)), uiMessage("Don't check"));
       const [right, rule] = previous.get(name) || suggestions.get(name) || [name, 'text'];
       chooseColumn(target, right); targetLabel.append(target);
       const modeLabel = element('label', uiMessage("Compare as")), mode = element('select', undefined, 'field-mode');
@@ -318,7 +335,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   }
   function updateUnmapped() {
     if (!state.metadata || state.metadata.kind === 'text') return;
-    const used = new Set([selectedColumn($('right-key'))]), omitted = [];
+    const used = new Set(selectedIdentifiers('right')), omitted = [];
     for (const row of $('field-mapping').children) {
       const target = selectedColumn(row.querySelector('.field-target'));
       if (target) used.add(target); else omitted.push('A: ' + row.dataset.left);
@@ -326,22 +343,115 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     for (const name of state.metadata.right.headers) if (!used.has(name)) omitted.push('B: ' + name);
     uiSetText($('unmapped-fields'), omitted.length ? uiMessage("Fields that won't be checked: {0}. Match these fields or explicitly apply these settings.", { 0: omitted.join('; ') }) : uiMessage("All fields are matched. The identifier pairs the rows; the other fields are checked within each pair."));
   }
-  async function prepare() {
+  let advancedSheets = false, simplePage = null, previousOffsets = [];
+  function isExcelPair(sources = state.sources) {
+    return ['left', 'right'].every(side => /\.xlsx?$/i.test(sources[side]?.name || ''));
+  }
+  function labelSheetSources(metadata) {
+    for (const side of ['left', 'right']) {
+      const source = metadata[side];
+      showSheets(side, source.sheets, source.sheet ?? null);
+      uiSetText($(side + '-meta'), uiMessage("{0}{1} rows · {2} columns · replace file", {
+        0: source.sheet ? uiMessage("Sheet «{0}» · ", {0:source.sheet}) : '', 1:source.row_count, 2:source.headers.length,
+      }));
+    }
+  }
+  function putSimpleValue(cell, value) {
+    if (value === null) {
+      cell.append(element('span', '—'));
+    } else {
+      cell.append(element('span', value === '' ? uiMessage("(empty value)") : value));
+    }
+  }
+  function showSimplePage(page) {
+    simplePage = page;
+    const {items, contexts, summary} = page;
+    uiSetText($('simple-sheet-heading'), page.total ? uiMessage("Differences: {0}", {0:page.total}) : uiMessage("No differences found."));
+    uiSetText($('simple-sheet-method'), page.key ? uiMessage("Key matching: A {0} ↔ B {1}.", {0:page.key[0], 1:page.key[1]}) : uiMessage("Rows compared by position."));
+    uiSetText($('simple-sheet-a'), page.left.name);
+    uiSetText($('simple-sheet-b'), page.right.name);
+    const counts = $('simple-sheet-summary');
+    counts.replaceChildren();
+    for (const [count, caption] of [[summary.removedRows, uiMessage("Only in A")], [summary.addedRows, uiMessage("Only in B")]]) {
+      if (count) counts.append(element('span', uiMessage("{0}: {1}", {0:caption, 1:count})));
+    }
+    counts.hidden = !counts.childElementCount;
+    const formulas = $('simple-sheet-formulas');
+    formulas.replaceChildren();
+    if (page.left.formulas?.cached || page.right.formulas?.cached) formulas.append(element('span', uiMessage("Formula results are shown as saved in the workbook.")));
+    if (page.left.formulas?.uncached || page.right.formulas?.uncached) formulas.append(element('span', uiMessage("Formulas without a saved result are shown as expressions.")));
+    formulas.hidden = !formulas.childElementCount;
+    const rows = document.createDocumentFragment(), expandedRows = new Set();
+    for (const item of items) {
+      const row = element('tr'), id = element('th'); id.scope = 'row';
+      const record = item.leftRow ?? item.rightRow, side = item.leftRow == null ? 'right' : 'left';
+      const rowName = item.label || (record == null ? uiMessage("Column") : uiMessage("Record {0}", {0:record}));
+      const context = contexts?.[side]?.[record];
+      const contextKey = side + ':' + record;
+      if (context?.length && !expandedRows.has(contextKey)) {
+        expandedRows.add(contextKey);
+        const details = element('details'), fields = element('dl');
+        for (const [name, value] of context) fields.append(element('dt', name), element('dd', value));
+        details.append(element('summary', rowName), fields); id.append(details);
+      } else id.append(element('span', rowName));
+      if (page.mode === 'position' && record != null && item.label) id.append(element('small', uiMessage("Record {0}", {0:record})));
+      const field = element('td', item.column), before = element('td'), after = element('td');
+      if (item.kind.endsWith('-added')) field.append(element('small', uiMessage("Only in B")));
+      if (item.kind.endsWith('-removed')) field.append(element('small', uiMessage("Only in A")));
+      putSimpleValue(before, item.before); putSimpleValue(after, item.after);
+      row.append(id, field, before, after); rows.append(row);
+    }
+    $('simple-sheet-rows').replaceChildren(rows);
+    $('simple-sheet-scroll').hidden = !items.length;
+    $('simple-sheet-pager').hidden = !previousOffsets.length && page.nextOffset == null;
+    $('simple-sheet-prev').disabled = !previousOffsets.length;
+    $('simple-sheet-next').disabled = page.nextOffset == null;
+    uiSetText($('simple-sheet-range'), items.length ? (page.offset + 1) + '–' + (page.offset + items.length) + ' / ' + page.total : '');
+    $('simple-sheet-result').hidden = false;
+    document.body.classList.add('simple-sheet-mode');
+  }
+  async function turnSimplePage(forward) {
+    if (state.busy || !simplePage) return;
+    const offset = forward ? simplePage.nextOffset : previousOffsets.at(-1);
+    if (offset == null) return;
+    const revision = state.revision;
+    busy(true);
+    try {
+      const next = await api('/api/simple-sheet', {...state.sources, offset});
+      if (revision !== state.revision) return;
+      if (forward) previousOffsets.push(simplePage.offset); else previousOffsets.pop();
+      showSimplePage(next);
+      notice(); $('simple-sheet-heading').focus();
+    } catch (error) {
+      if (revision === state.revision && error.name !== 'AbortError') notice(uiError(error.message), true);
+    } finally { if (revision === state.revision) busy(false); }
+  }
+  async function prepare(prefetched = null) {
     clearResult(); state.metadata = null; state.suggested = [];
     $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
     $('rules').hidden = true; $('rules').disabled = true; $('rules-empty').hidden = false;
     uiSetText($('rules-summary'), uiMessage("Detect automatically"));
-    $('settings').hidden = textSourcesSelected();
+    const excel = isExcelPair(), simple = excel && !advancedSheets;
+    $('settings').hidden = simple || textSourcesSelected();
+    $('simple-sheet-back').hidden = !excel || !advancedSheets;
     if (!state.sources.left || !state.sources.right) { notice(uiMessage("Add the second file to start comparing automatically.")); officeReset(uiMessage("The first file is ready. Add the second, and I'll match the items and explain the results.")); return; }
     busy(true); notice(uiMessage("Reading files and finding matches…"));
     const revision = state.revision; let ready = false;
     try {
-      const metadata = await api('/api/prepare', {...state.sources, delimiter: delimiter()});
+      const metadata = prefetched || await api(simple ? '/api/simple-sheet' : '/api/prepare', {...state.sources, delimiter: delimiter()});
       if (revision !== state.revision) return;
       if (metadata.needs_sheet) {
         for (const side of ['left', 'right']) showSheets(side, metadata.sheets[side], metadata.selected[side]);
         notice(uiMessage("Choose a sheet in each Excel file that has multiple sheets with data. I'll compare only the selected sheets."));
         officeReset(uiMessage("This workbook has multiple sheets with data. Choose a sheet next to the file to continue."));
+        return;
+      }
+      if (simple) {
+        labelSheetSources(metadata);
+        $('source-picker').open = false;
+        showSimplePage(metadata);
+        notice();
+        recordProductEvent('comparison_complete', {comparison_type:'table'});
         return;
       }
       state.metadata = metadata;
@@ -355,16 +465,22 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       } else {
         $('settings').hidden = false;
         state.suggested = metadata.rules.fields; state.delimiter = metadata.delimiter;
+        labelSheetSources(metadata);
         for (const side of ['left', 'right']) {
-          showSheets(side, metadata[side].sheets, metadata[side].sheet ?? null);
-          uiSetText($(side + '-meta'), uiMessage("{0}{1} rows · {2} columns · replace file", { 0: metadata[side].sheet ? uiMessage("Sheet «{0}» · ", { 0: metadata[side].sheet }) : '', 1: metadata[side].row_count, 2: metadata[side].headers.length }));
           options($(side + '-key'), metadata[side].headers, uiMessage("Choose an identifier"));
         }
         if (metadata.rules.key) { chooseColumn($('left-key'), metadata.rules.key[0]); chooseColumn($('right-key'), metadata.rules.key[1]); }
+        $('composite-key').checked = false;
+        $('second-key-controls').hidden = true;
+        for (const side of ['left', 'right']) fillSecondIdentifier(side);
         $('membership').checked = !!metadata.rules.key && metadata.left.headers.length === 1 && metadata.right.headers.length === 1;
         $('strip').checked = false; $('mapping-panel').hidden = $('membership').checked;
         mapping(false); $('rules').hidden = false; $('rules-empty').hidden = true;
         ready = metadata.ready;
+        if (excel && advancedSheets) {
+          $('settings').open = true; notice();
+          return;
+        }
         if (!ready) {
           uiSetText($('question-text'), metadata.question);
           $('setup-question').hidden = false;
@@ -384,22 +500,27 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   async function loadFile(side, file) {
     if (!file || state.busy) return;
     if (/\.doc$/i.test(file.name)) { visualReview?.closeWorkspaceTools?.(); notice(uiMessage("Old Word files (.doc) are not supported. Open the file in Word or LibreOffice and save it as .docx, then try again."), true); $('notice').scrollIntoView({block: 'nearest'}); return; }
+    advancedSheets = false; $('simple-sheet-back').hidden = true;
     const version = ++loads[side]; clearResult(); state.sources[side] = null; state.metadata = null;
     showSheets(side); $('settings').hidden = textSourcesSelected();
     $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
     $('rules').hidden = true; $('rules').disabled = true; $('rules-empty').hidden = false; sourceLabel(side, null);
-    if (file.size > MAX_FILE_BYTES) { notice(uiMessage("This file exceeds 2 MiB. Choose a smaller file."), true); return; }
+    if (file.size > window.cttFileLimits.MAX_FILE_BYTES) { notice(uiMessage("This file exceeds 25 MiB. Choose a smaller file."), true); return; }
     if (/\.(txt|docx|pdf)$/i.test(file.name) && !window.KristinaTransport) { notice(uiMessage("The document engine could not load. Reload this page and try again."), true); return; }
     if (/\.(xlsx|xls|xlsm|xlsb|ods)$/i.test(file.name) && !window.KristinaTransport) { notice(uiMessage("The spreadsheet engine could not load. Reload this page and try again."), true); return; }
     try {
       const bytes = new Uint8Array(await file.arrayBuffer());
       if (version !== loads[side]) return;
-      state.sources[side] = {name: file.name, data: encode(bytes)}; sourceLabel(side, file); await prepare();
+      state.sources[side] = {name: file.name, data: encode(bytes)};
+      uploadedSources.add(state.sources[side]);
+      sourceLabel(side, file); await prepare();
     } catch (error) { if (version === loads[side]) { clearResult(); state.metadata = null; notice(uiMessage("Couldn't open the file. {0}", { 0: uiError(error.message) }), true); } }
   }
   function selectedRules() {
     const key = [selectedColumn($('left-key')), selectedColumn($('right-key'))];
     if (key.some(value => !value)) throw new Error("Choose an identifier for the same item in both files.");
+    const secondKey = $('composite-key').checked && [selectedColumn($('left-key2')), selectedColumn($('right-key2'))];
+    if (secondKey && secondKey.some(value => !value)) throw new Error("Choose a second identifier in both files.");
     const fields = [], used = new Set();
     if (!$('membership').checked) {
       for (const row of $('field-mapping').children) {
@@ -409,7 +530,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       }
       if (!fields.length) throw new Error("Choose values to check or enable “Check only whether items are present.”");
     }
-    return {key, fields, strip: $('strip').checked};
+    return {key, ...(secondKey && {second_key: secondKey}), fields, strip: $('strip').checked};
   }
   async function compare() {
     if (state.busy || !state.metadata) return;
@@ -424,6 +545,10 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       await renderResult(); officeDescribe(); notice();
       if (revision === state.revision && state.report === result.report && result.report.status === 'complete') {
         recordProductEvent('comparison_complete', {comparison_type: result.report.kind === 'text' ? 'text' : 'table'});
+        if (visualReview && isUploadedWordPair(result.report, state.sources)) recordProductEvent('word_pair_compare', {});
+        else if (visualReview && ['left', 'right'].every(side => exampleSources.get(state.sources[side]) === 'contract')) {
+          recordProductEvent('contract_demo_view', {});
+        }
       }
     } catch (error) { if (error.name !== 'AbortError' && revision === state.revision) { clearResult(); notice(uiMessage("Comparison failed. {0}", { 0: uiError(error.message) }), true); officeReset(uiMessage("Comparison failed. Correct the data or settings described in the error message.")); busy(false); } }
     finally { if (revision === state.revision) busy(false); }
@@ -481,9 +606,10 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       if (report.moved?.length || report.reflow?.length) uiAppendText($('audit-explanation'), uiMessage(" Matched section pairs are shown; their display order may differ from the original. Labels show original locations. Moves and line break changes are highlighted separately. Line break changes are detected by a line-joining heuristic, without assessing whether the meaning is equivalent."));
       for (const side of ['left', 'right']) for (const note of (report.sources[side].notes || [])) notes.append(element('li', (side === 'left' ? uiMessage("A: {0}", { 0: uiError(note) }) : uiMessage("B: {0}", { 0: uiError(note) }))));
     } else {
-      uiSetText($('result-context'), uiMessage("Rows are paired by «{0}». Record numbers refer to the original files.", { 0: report.rules.key.join('» ↔ «') }));
+      const keyLabel = report.rules.key.map((name, i) => report.rules.second_key ? name + ' + ' + report.rules.second_key[i] : name).join('» ↔ «');
+      uiSetText($('result-context'), uiMessage("Rows are paired by «{0}». Record numbers refer to the original files.", { 0: keyLabel }));
       const numeric = report.rules.fields.filter(f => f[2] === 'number').map(f => f[0]);
-      uiSetText($('rules-summary'), numeric.length ? uiMessage("By «{0}» · numeric fields: {1}", {0: report.rules.key.join('» ↔ «'), 1: numeric.join(', ')}) : uiMessage("By «{0}» · exact text comparison", {0: report.rules.key.join('» ↔ «')}));
+      uiSetText($('rules-summary'), numeric.length ? uiMessage("By «{0}» · numeric fields: {1}", {0: keyLabel, 1: numeric.join(', ')}) : uiMessage("By «{0}» · exact text comparison", {0: keyLabel}));
       uiSetText($('audit-explanation'), uiMessage("Showing the selected tables. Rows are paired by identifier, and record numbers refer to the original files (the header is record 1). Only checked fields are highlighted; other fields are labeled separately. Units and currencies are not converted."));
     }
     notes.hidden = !notes.children.length;
@@ -523,9 +649,10 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       if (abort.signal.aborted || state.report !== report) return;
       document.body.classList.add('visual-mode'); $('visual-review').hidden = false;
       uiSetText($('result-context'), uiMessage("Both documents are ready. Click any text to edit it."));
-      uiSetText($('source-privacy'), uiMessage("Documents and edits are saved in this browser. You can download your edited documents."));
       const sources = {...state.sources};
-      const review = await mount($('visual-review'), {report, sources, restoredState, signal: abort.signal,
+      const isExample = exampleSources.has(sources.left) || exampleSources.has(sources.right);
+      uiSetText($('source-privacy'), isExample ? uiMessage("Your documents stay on this device. Download a copy when you are ready.") : uiMessage("Documents and edits are saved in this browser. You can download your edited documents."));
+      const review = await mount($('visual-review'), {report, sources, restoredState, signal: abort.signal, uploadedWordPair: isUploadedWordPair(report, sources),
         onSelectionChange: context => { if (!abort.signal.aborted) officeUpdateContext(context); },
         onExplain: () => { if (!abort.signal.aborted) officeToggle(true); },
         onStateChange: () => { if (!abort.signal.aborted) sessionUI?.changed(); }, onRevision: changed => {
@@ -540,7 +667,8 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
         $('source-picker').open = false;
         await sessionReady;
         if (!abort.signal.aborted) {
-          sessionUI?.activate(() => ({version: 1, sources, report, review: review.snapshot()}));
+          // A guide link must never overwrite a visitor's existing saved documents.
+          if (!isExample) sessionUI?.activate(() => ({version: 1, sources, report, review: review.snapshot()}));
           if (!document.body.classList.contains('single-mode')) mountWorkspaceTools(review);
         }
       }
@@ -564,6 +692,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       const renderSaved = saved.report.kind === 'text' ? (await import(textReportModuleURL.href)).renderTextHtml : (await import(tableReportModuleURL.href)).renderHtml;
       if (revision !== state.revision) return;
       state.sources = saved.sources; state.report = saved.report;
+      advancedSheets = isExcelPair(); $('simple-sheet-back').hidden = !advancedSheets;
       state.html = renderSaved(saved.report); state.metadata = saved.report.kind === 'text' ? {kind:'text'} : null;
       for (const side of ['left', 'right']) {
         loads[side]++; $(side + '-file').value = ''; sourceLabel(side, state.sources[side]); showSheets(side);
@@ -573,6 +702,9 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
         state.metadata = {left:saved.report.sources.left,right:saved.report.sources.right}; state.suggested=saved.report.rules.fields; state.delimiter=saved.report.rules.delimiter;
         $('delimiter').value=saved.report.rules.delimiter==='\t'?'tab':saved.report.rules.delimiter;
         for(const [i,side] of ['left','right'].entries()) {options($(side+'-key'),state.metadata[side].headers,uiMessage("Choose an identifier"));chooseColumn($(side+'-key'),saved.report.rules.key[i]);showSheets(side,state.metadata[side].sheets,state.metadata[side].sheet??null);}
+        $('composite-key').checked = !!saved.report.rules.second_key;
+        $('second-key-controls').hidden = !$('composite-key').checked;
+        for (const [i, side] of ['left', 'right'].entries()) fillSecondIdentifier(side, saved.report.rules.second_key?.[i]);
         $('membership').checked=saved.report.rules.fields.length===0;$('strip').checked=saved.report.rules.strip;$('mapping-panel').hidden=$('membership').checked;mapping(false);for(const row of $('field-mapping').children) if(!saved.report.rules.fields.some(field=>field[0]===row.dataset.left)){row.querySelector('.field-target').value='';row.querySelector('.field-mode').disabled=true;}updateUnmapped();$('rules').hidden=false;$('rules-empty').hidden=true;
       }
       await renderResult(saved.review);
@@ -587,6 +719,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     } finally { busy(false); }
   }
   function finishSession() {
+    advancedSheets = false; $('simple-sheet-back').hidden = true;
     clearResult(); state.metadata = null; state.sources = {left: null, right: null};
     state.suggested = [];
     for (const side of ['left', 'right']) {
@@ -596,7 +729,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
     $('rules').hidden = true; $('rules').disabled = true; $('rules-empty').hidden = false;
     uiSetText($('rules-summary'), uiMessage("Detect automatically"));
-    uiSetText($('source-privacy'), uiMessage("Comparison starts automatically. Files are processed in your browser. Up to 2 MiB per file."));
+    uiSetText($('source-privacy'), uiMessage("Comparison starts automatically. Files are processed in your browser. Up to 25 MiB per file."));
     officeReset(); notice(uiMessage("Session ended. Saved documents and edits have been deleted from this browser."));
   }
   // A bounded, linear prefix/suffix highlight. Preserve every original character.
@@ -719,7 +852,8 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     uiSetAttr(panel, 'aria-label', (isLeft ? uiMessage("A · {0}", { 0: item.key }) : uiMessage("B · {0}", { 0: item.key })));
     if (!row) { panel.classList.add('absent'); panel.append(element('p', uiMessage("This item is missing"))); return panel; }
     const title = element('div', undefined, 'record-title'), keyName = state.report.rules.key[index];
-    title.append(element('strong', `${keyName}: ${row.values[keyName]}`), element('span', row.sheet ? uiMessage("«{0}» · row {1} · {2}", { 0: row.sheet, 1: row.record, 2: row.cells[keyName] }) : uiMessage("Record {0}", { 0: row.record }), 'record-number'));
+    const keyNames = [keyName, state.report.rules.second_key?.[index]].filter(Boolean);
+    title.append(element('strong', keyNames.map(name => `${name}: ${row.values[name]}`).join(' · ')), element('span', row.sheet ? uiMessage("«{0}» · row {1} · {2}", { 0: row.sheet, 1: row.record, 2: row.cells[keyName] }) : uiMessage("Record {0}", { 0: row.record }), 'record-number'));
     const labels = {changed: uiMessage("Changes found"), only_left: uiMessage("Only in A"), only_right: uiMessage("Only in B"), matched: uiMessage("Checked fields match")};
     title.append(element('span', labels[item.category], 'record-status')); panel.append(title);
     const values = element('dl', undefined, 'document-values');
@@ -727,7 +861,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     const checked = new Map(state.report.rules.fields.map(f => [f[index], f]));
     for (const name of state.report.sources[side].headers) {
       const value = row.values[name];
-      if (name === keyName) continue;
+      if (keyNames.includes(name)) continue;
       const block = element('div', undefined, 'document-field'), label = element('dt', name), dd = element('dd');
       block.dataset.field = name;
       if (row.cells?.[name]) label.append(element('span', ' · ' + row.cells[name], 'cell-address'));
@@ -904,7 +1038,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   });
   document.addEventListener('ctt:home', () => restoreWorkspaceTools());
   document.addEventListener('ctt:new-comparison', event => {
-    const {files, complete} = event.detail || {};
+    const {files, complete, example, sheets} = event.detail || {};
     if (typeof complete !== 'function') return;
     void (async () => {
       if (state.busy) return {ok:false, message:'Wait for the current operation to finish, then try again.'};
@@ -914,18 +1048,27 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
         const next = {};
         for (const side of ['left', 'right']) {
           const file = files?.[side];
-          if (!file || !/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.test(file.name)) throw new Error('Choose two supported files. Old .doc files must first be saved as .docx in Word or LibreOffice.');
-          if (file.size > MAX_FILE_BYTES) throw new Error('Choose files up to 2 MB each.');
-          next[side] = {name:file.name, data:encode(new Uint8Array(await file.arrayBuffer()))};
+          if (!file || !/\.(docx|pdf|txt|xlsx?|csv|tsv)$/i.test(file.name)) throw new Error('Choose two supported files. Old .doc files must first be saved as .docx in Word or LibreOffice.');
+          if (file.size > window.cttFileLimits.MAX_FILE_BYTES) throw new Error('Choose files up to 25 MB each.');
+          const data = side === 'right' && file === files.left ? next.left.data : encode(new Uint8Array(await file.arrayBuffer()));
+          next[side] = {name:file.name, data};
+          if (sheets) next[side].sheet = sheets[side];
         }
         // Parse both files before replacing anything. An invalid new document
         // must not destroy the previous comparison, its saved draft or Undo.
-        await window.KristinaTransport.request('/api/prepare', {...next, delimiter:'auto'});
+        const prefetched = await window.KristinaTransport.request(isExcelPair(next) ? '/api/simple-sheet' : '/api/prepare', {...next, delimiter:'auto'});
         if ((state.report || state.sources.left || state.sources.right) && !window.confirm(String(uiMessage("Replace the previous comparison and its saved draft? Download your edited files first if you want to keep them.")))) return {ok:false};
-        loads.left++; loads.right++; clearResult(); state.sources = next;
+        if (example === 'contract' || example === 'workbook') {
+          exampleSources.set(next.left, example);
+          exampleSources.set(next.right, example);
+        } else if (!example) {
+          uploadedSources.add(next.left);
+          uploadedSources.add(next.right);
+        }
+        loads.left++; loads.right++; clearResult(); state.sources = next; advancedSheets = false;
         for (const side of ['left', 'right']) { showSheets(side); $(side + '-file').value = ''; sourceLabel(side, next[side]); }
         $('delimiter').value = 'auto'; $('settings').open = false;
-        busy(false); await prepare();
+        busy(false); await prepare(prefetched);
         return {ok:true};
       } catch (error) { return {ok:false, message:error.message || 'Could not open the new files. Your previous work is still open.'}; }
       finally { busy(false); }
@@ -951,11 +1094,11 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   })() : Promise.resolve();
   if (window.KristinaTransport) {
     uiSetText($('supported-formats'), uiMessage("CSV/Excel tables, TXT/DOCX text, and PDFs with a text layer, including those with logos and images. Images are not compared; scans without text, forms, and comments are not supported."));
-    uiSetText($('source-privacy'), uiMessage("Comparison starts automatically. Files are processed locally, without sending them to an LLM. Up to 2 MiB per file."));
+    uiSetText($('source-privacy'), uiMessage("Comparison starts automatically. Files are processed locally, without sending them to an LLM. Up to 25 MiB per file."));
   }
   for (const side of ['left', 'right']) {
     if (window.KristinaTransport) {
-      $(side + '-file').accept += ',.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.txt,text/plain,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf';
+      $(side + '-file').accept += ',.xls,application/vnd.ms-excel,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.txt,text/plain,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf';
       sourceLabel(side, null);
       const label = element('label', uiMessage("Sheet to compare"), 'sheet-choice'), select = element('select');
       select.id = side + '-sheet'; uiSetAttr(select, 'aria-label', uiMessage("Sheet to compare {0}", { 0: side === 'left' ? 'A' : 'B' }));
@@ -971,8 +1114,16 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     const zone = $(side + '-drop'); zone.addEventListener('dragover', event => { event.preventDefault(); if (!state.busy) zone.classList.add('dragging'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('dragging'));
     zone.addEventListener('drop', event => { event.preventDefault(); zone.classList.remove('dragging'); loadFile(side, event.dataTransfer.files[0]); });
-    $(side + '-key').addEventListener('change', () => { dirty(); mapping(); });
+    $(side + '-key').addEventListener('change', () => {
+      fillSecondIdentifier(side, selectedColumn($(side + '-key2')));
+      dirty(); mapping();
+    });
+    $(side + '-key2').addEventListener('change', () => { dirty(); mapping(); });
   }
+  $('composite-key').addEventListener('change', () => {
+    $('second-key-controls').hidden = !$('composite-key').checked;
+    dirty(); mapping();
+  });
   $('demo').addEventListener('click', async () => {
     if (state.busy) return;
     if (!window.CTTDemoDocuments) { notice(uiMessage("The example could not load. Reload this page and try again."), true); return; }
@@ -998,7 +1149,20 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     for (const side of ['left', 'right']) { const [name, text] = examples[side]; state.sources[side] = {name, data: encode(new TextEncoder().encode(text))}; $(side + '-file').value = ''; sourceLabel(side, {name}); }
     await prepare();
   });
-  $('delimiter').addEventListener('change', prepare);
+  $('simple-sheet-prev').addEventListener('click', () => turnSimplePage(false));
+  $('simple-sheet-next').addEventListener('click', () => turnSimplePage(true));
+  $('simple-sheet-advanced').addEventListener('click', async () => {
+    if (state.busy) return;
+    advancedSheets = true;
+    await prepare();
+    if (!$('settings').hidden) $('settings').querySelector('summary').focus();
+  });
+  $('simple-sheet-back').addEventListener('click', async () => {
+    if (state.busy) return;
+    advancedSheets = false; $('settings').open = false;
+    await prepare(); if (simplePage) $('simple-sheet-heading').focus();
+  });
+  $('delimiter').addEventListener('change', () => prepare());
   $('membership').addEventListener('change', () => { dirty(); $('mapping-panel').hidden = $('membership').checked; });
   $('strip').addEventListener('change', dirty); $('compare').addEventListener('click', compare); $('answer').addEventListener('click', compare);
   $('search').addEventListener('input', () => { state.page = 0; state.active = -1; changePage = 0; renderRows(); });

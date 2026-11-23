@@ -13,7 +13,7 @@ Obsah dokumentov sa neprekladá.
 Voliteľné pilotné doplnky pre Word a Google Docs sa inštalujú samostatne a majú vlastné podmienky ochrany súkromia. Toto rozšírenie ich neinštaluje automaticky.
 
 OBMEDZENIA
-- Každý súbor najviac 2 MiB. PDF musí mať textovú vrstvu: naskenované obrázky, OCR, interaktívne polia formulárov ani komentáre PDF nie sú podporované.
+- Každý súbor najviac 25 MiB. PDF musí mať textovú vrstvu: naskenované obrázky, OCR, interaktívne polia formulárov ani komentáre PDF nie sú podporované.
 - Obrázky a formátovanie sa neporovnávajú. Zložité rozloženie sa môže exportovať len ako text; rozloženie Wordu sa môže líšiť od Microsoft Wordu.
 - Poznámky pod čiarou, koncové poznámky a komentáre DOCX sa neimportujú. Najprv ich v kópii presuňte do hlavného textu.
 - Porovnávanie tabuliek vyžaduje jeden riadok hlavičky, žiadne zlúčené bunky a hodnoty namiesto vzorcov.

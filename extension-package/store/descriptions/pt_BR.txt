@@ -18,7 +18,7 @@ Os documentos são processados no seu dispositivo. A extensão funciona offline 
 
 ANTES DE COMEÇAR
 - O conteúdo dos documentos não é traduzido.
-- Cada arquivo de entrada pode ter até 2 MiB.
+- Cada arquivo de entrada pode ter até 25 MiB.
 - Os PDFs precisam de uma camada de texto: imagens digitalizadas sem texto não são compatíveis e não há reconhecimento óptico de caracteres (OCR). Espaços destinados ao preenchimento à mão são diferentes dos campos interativos de formulários PDF. Campos interativos e comentários em PDF não são compatíveis.
 - Imagens e formatação não são comparadas. A preservação do layout do PDF depende do documento; layouts complexos podem exigir uma exportação somente de texto. O layout de arquivos Word pode ser diferente do exibido no Microsoft Word.
 - Antes de importar um DOCX, mova as notas de rodapé, notas de fim e comentários para os parágrafos principais de uma cópia do documento.

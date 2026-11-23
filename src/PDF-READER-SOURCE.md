@@ -75,7 +75,7 @@ system fonts, XFA, WASM, image decoding and canvas support. Its external-data fa
 always rejects. A standard PDF font may use PDF.js's built-in encoding/metrics;
 files requiring external CMaps or unusable font mappings fail.
 
-Import is limited to 2 MiB, 100 pages, 2000 extracted lines, 500000 Unicode code
+Import is limited to 25 MiB, 100 pages, 2000 extracted lines, 500000 Unicode code
 points, 100000 text items and 15 seconds per document. The existing application
 Worker timeout is the outer bound for synchronous parser work. Decompression has
 the independent per-stream limit above. The importer rejects encrypted documents,

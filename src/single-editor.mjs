@@ -1,30 +1,39 @@
 /** One-document entry point. Existing editors receive a stable original reference,
  * with comparison decisions and the reference panel disabled in single mode. */
+import {decodeBase64Bytes, isValidEncodedSource} from './file-limits.mjs';
 import {sheetMerges} from './sheet-merges.mjs';
 import {validateZip} from './xlsx-source.mjs';
 import {read, utils} from './xlsx-vendor.mjs';
 import {parseCsv} from './sheet-document.mjs';
 const fail=message=>{throw Error(message);};
-export function sourceBytes(source){
- if(!source||typeof source.name!=='string'||!source.name.trim()||source.name.length>255||typeof source.data!=='string'||source.data.length>4*Math.ceil(2097152/3)||!/^[A-Za-z0-9+/]*={0,2}$/.test(source.data)||source.data.length%4)fail('Choose a valid file up to 2 MB.');
- const bytes=Uint8Array.from(atob(source.data),c=>c.charCodeAt(0));if(bytes.length>2097152)fail('Choose a file up to 2 MB.');return bytes;
+function validateSource(source) {
+ if (!source || typeof source.name !== 'string' || !source.name.trim() ||
+     source.name.length > 255 || !isValidEncodedSource(source.data)) {
+   fail('Choose a valid file up to 25 MB.');
+ }
+}
+export function sourceBytes(source) {
+ validateSource(source);
+ return decodeBase64Bytes(source.data);
 }
 export async function inspectSingleSource(source){
- const raw=sourceBytes(source),format=/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.exec(source.name)?.[1].toLowerCase();
+ validateSource(source);
+ const format=/\.(docx|pdf|txt|xlsx|csv|tsv)$/i.exec(source.name)?.[1].toLowerCase();
  if(!format)fail('Choose a Word (.docx), text-based PDF, Excel (.xlsx), CSV, or UTF-8 TXT file.');
  if(format==='docx'||format==='pdf'||format==='txt')return {format};
+ const raw=decodeBase64Bytes(source.data);
  if(format==='xlsx'){
-  await validateZip(raw);const book=read(raw,{type:'array',bookSheets:true});if(book.SheetNames.length>100)fail('This workbook has more than 100 sheets. Choose a smaller workbook.');
+  const book=read(await validateZip(raw),{type:'array',bookSheets:true});if(book.SheetNames.length>100)fail('This workbook has more than 100 sheets. Choose a smaller workbook.');
   return {format,sheets:book.SheetNames};
  }
  let text;try{text=new TextDecoder('utf-8',{fatal:true}).decode(raw);}catch{fail('Save this CSV as UTF-8, then open it again.');}
- const scores=[',',';','\t'].map(delimiter=>{try{const rows=parseCsv(text,delimiter).slice(0,20),width=rows[0]?.length||1;return {delimiter,width,consistent:rows.every(r=>r.length===width)};}catch{return {delimiter,width:0};}});
+ const scores=[',',';','\t'].map(delimiter=>{try{const rows=parseCsv(text,delimiter,20),width=rows[0]?.length||1;return {delimiter,width,consistent:rows.every(r=>r.length===width)};}catch{return {delimiter,width:0};}});
  const best=scores.filter(s=>s.consistent&&s.width>1).sort((a,b)=>b.width-a.width)[0];return {format,delimiter:format==='tsv'?'\t':best?.delimiter||','};
 }
 export async function singleSheetMetadata(source,{sheet,delimiter=','}={}){
  const raw=sourceBytes(source),xlsx=/\.xlsx$/i.test(source.name);let grid,range;
  if(xlsx){
-  await validateZip(raw);const book=read(raw,{type:'array',cellFormula:true});if(book.SheetNames.length>100)fail('Choose a workbook with at most 100 sheets.');
+  const book=read(await validateZip(raw),{type:'array',cellFormula:true});if(book.SheetNames.length>100)fail('Choose a workbook with at most 100 sheets.');
   if(!sheet||!book.SheetNames.includes(sheet))fail('Choose a worksheet.');grid=book.Sheets[sheet];
   const entries=Object.entries(grid).filter(([a])=>/^[A-Z]+[1-9]\d*$/.test(a));
   if(entries.length>100000)fail('This sheet has too many cells. Choose a smaller sheet.');

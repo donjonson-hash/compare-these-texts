@@ -18,7 +18,7 @@ Die Dokumente werden auf deinem Gerät verarbeitet. Die Erweiterung funktioniert
 
 BEVOR DU BEGINNST
 - Dokumentinhalte werden nicht übersetzt.
-- Eingabedateien dürfen jeweils bis zu 2 MiB groß sein.
+- Eingabedateien dürfen jeweils bis zu 25 MiB groß sein.
 - PDFs benötigen eine Textebene: Gescannte Bilder ohne Text werden nicht unterstützt, eine Texterkennung (OCR) ist nicht enthalten. Gedruckte Leerstellen sind keine interaktiven PDF-Formularfelder. Interaktive Felder und PDF-Kommentare werden nicht unterstützt.
 - Bilder und Formatierungen werden nicht verglichen. Ob das PDF-Layout erhalten bleibt, hängt vom Dokument ab. Bei komplexen Layouts kann ein reiner Textexport nötig sein. Das Layout von Word-Dateien kann von der Darstellung in Microsoft Word abweichen.
 - Fußnoten, Endnoten und Kommentare in DOCX-Dateien müssen vor dem Import in einer Kopie in die normalen Textabsätze verschoben werden.

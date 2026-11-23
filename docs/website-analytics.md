@@ -8,6 +8,9 @@ The Chrome Web Store analytics property is separate and is not used here.
 | --- | --- | --- |
 | `comparison_complete` | A current, complete comparison has rendered | `comparison_type`: `text` or `table` |
 | `document_download` | A prepared result has been handed to the browser download mechanism | `file_format`: `docx`, `pdf`, `txt`, `csv`, `tsv`, `xlsx`, `html`, `json`; `workspace`: `comparison` or `editor` |
+| `contract_demo_view` | Both contract samples rendered as a comparison from the contract demo | None |
+| `word_pair_compare` | A completed comparison of two user-opened DOCX files rendered in the review workspace | None |
+| `word_pair_download` | The comparison workspace handed a DOCX download from two user-opened DOCX files to the browser | None |
 | `chrome_store_click` | Click on this product's actual Chrome Web Store link | None |
 
 The sink forwards only fixed vocabulary and explicitly routes events to the
@@ -26,10 +29,19 @@ per prepared version. Opening a PDF in a separate browser viewer cannot confirm
 whether the user subsequently saves it. A store click does not confirm install.
 
 After publication, complete a comparison, download a result and follow the
-store link. Confirm the three event names in the website property's Realtime
+store link. Confirm the event names in the website property's Realtime
 report. Mark `document_download` as a key event if measuring completed product
 use; keep `chrome_store_click` separate from the store-managed `install` event.
 Parameter breakdowns in reports may require event-scoped custom dimensions.
+
+For the Word guide experiment, use a closed, ordered GA4 funnel:
+`contract_demo_view` → `word_pair_compare` → `word_pair_download`. Count users
+reaching each step. Direct uploads also produce the latter two events, so
+standalone event totals cannot measure demo conversion. A demo download,
+mixed sample/upload pair, restored draft or single-file export does not count
+as an uploaded pair download. This funnel adds no document identifiers or
+client-side attribution storage; it measures progression, not the identity of
+a specific document across visits.
 
 ## On-site store links
 

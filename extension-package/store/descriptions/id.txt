@@ -18,7 +18,7 @@ Dokumen diproses di perangkat Anda. Ekstensi bekerja secara offline dan tidak me
 
 SEBELUM MEMULAI
 - Isi dokumen tidak diterjemahkan.
-- Ukuran setiap file masukan maksimal 2 MiB.
+- Ukuran setiap file masukan maksimal 25 MiB.
 - PDF harus memiliki lapisan teks: gambar hasil pemindaian tanpa teks tidak didukung dan OCR tidak tersedia. Bagian kosong tercetak berbeda dari kolom formulir PDF interaktif; kolom interaktif dan komentar PDF tidak didukung.
 - Gambar dan pemformatan tidak dibandingkan. Kemampuan mempertahankan tata letak PDF bergantung pada dokumennya; tata letak yang rumit mungkin memerlukan ekspor teks saja. Tata letak Word mungkin berbeda dari tampilan di Microsoft Word.
 - Sebelum impor, pindahkan catatan kaki, catatan akhir, dan komentar DOCX ke paragraf utama dalam salinan dokumen.
