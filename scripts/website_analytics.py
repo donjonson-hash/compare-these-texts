@@ -46,6 +46,11 @@ BOOTSTRAP = """
     }
   }
   const campaignSuffix = campaignQuery.toString();
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied'
+  });
   gtag('js', new Date());
   gtag('config', 'G-J33QPHR8L3', {
     allow_google_signals: false,
