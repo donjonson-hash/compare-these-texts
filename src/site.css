@@ -1,3 +1,9 @@
+/* Local PT Serif font-face */
+@font-face{font-family:"PT Serif";font-style:normal;font-weight:400;font-display:swap;src:url("/pt-serif-cyrillic-400.woff2") format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"PT Serif";font-style:normal;font-weight:400;font-display:swap;src:url("/pt-serif-latin-400.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"PT Serif";font-style:normal;font-weight:700;font-display:swap;src:url("/pt-serif-cyrillic-700.woff2") format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"PT Serif";font-style:normal;font-weight:700;font-display:swap;src:url("/pt-serif-latin-700.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
 :root{--green:#205a45;--bg:#f6f5f0;--paper:#fffefb;--ink:#24382f;--line:#dadfd6}
 .topbar{padding:22px 38px;gap:24px}.brand{font-size:20px;letter-spacing:-.6px}.brand-icon{width:43px;height:43px;font:700 13px system-ui;letter-spacing:-1px}.brand small{display:block;margin:4px 0 0;font-size:11px;letter-spacing:.3px}.topbar nav,.site-footer nav{display:flex;gap:25px;align-items:center}.topbar nav a,.site-footer a{text-decoration:none;font-size:13px}.topbar nav a:hover,.site-footer a:hover{text-decoration:underline}.topbar nav [aria-current]{color:var(--green);font-weight:650}
 .hero{padding:36px 0 28px;gap:30px}.hero .hero-title{font-size:clamp(35px,3.6vw,51px);letter-spacing:-1.8px;line-height:1.08}.hero .eyebrow{font-size:9px;letter-spacing:1.8px}.hero .intro{margin-top:17px;font-size:15px;line-height:1.55}.hero-actions{display:flex;flex-direction:column;gap:18px;align-items:flex-end}.hero-actions .local-badge{padding:9px 14px;border-radius:30px;border:1px solid #d4e2d5;background:#edf3e9}.hero-actions .button{padding:13px 19px}.source-card{border:1px solid #dce3d7;background:#eaf0e5;padding:20px}.source-card:nth-child(2){background:#f0ece3;border-color:#e5dfd4}.dropzone{min-height:151px;background:#fffefbcc}.dropzone:hover{border-color:var(--green);background:#fff}.source-heading h2{font-weight:550}.letter{height:32px;min-width:32px;font-size:14px}.workspace-layout{gap:23px}.office-panel{background:#fffefb}.site-footer{display:flex;justify-content:space-between;gap:20px;padding:28px 0;margin-top:42px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.footer-dot{padding:0 10px}
@@ -167,3 +173,368 @@ body.home-mode{background:#f8faf9}
 .workbook-inputs label{display:grid;gap:4px;font-size:.94rem}
 .workbook-inputs input,.workbook-inputs select{max-width:100%;min-width:0}
 #workbook-filename{flex-basis:100%;overflow-wrap:anywhere}
+
+/* 2026 Modern UI: Bento + Liquid Glass + Hyperminimalism */
+body.home-mode {
+  background: #eef2f0;
+  color: #10241d;
+}
+
+/* Чёткая шапка без перетягивания фокуса */
+.home-mode .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #d4ded9;
+}
+.home-mode .topbar nav a.chrome-cta {
+  background: #edf5f0;
+  color: #0b4f34;
+  border: 1.5px solid #0b4f34;
+  font-weight: 700;
+}
+.home-mode .topbar nav a.chrome-cta:hover {
+  background: #0b4f34;
+  color: #fff;
+}
+
+/* Якорь внимания: тёмно-изумрудный Hero-блок */
+.home-mode .start-menu { padding-top: 20px; }
+.home-intro {
+  margin: 0 0 22px;
+  padding: 28px 32px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0b241c 0%, #123d2e 60%, #17523d 100%);
+  color: #ffffff;
+  box-shadow: 0 14px 36px rgba(11, 36, 28, 0.18);
+}
+.home-intro h1 {
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #ffffff;
+  margin: 0 0 10px;
+}
+.home-intro p {
+  font-size: 18px;
+  line-height: 1.45;
+  color: #d7ebe2;
+  margin: 0;
+}
+.home-intro .home-privacy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  font-size: 14px;
+  font-weight: 600;
+  color: #a7f3d0;
+}
+
+/* Контрастные карточки A (было) и B (стало) */
+.home-sources { gap: 20px; }
+.home-source {
+  border: 2px solid #cbd7d1;
+  border-top-width: 5px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(16, 36, 29, 0.06);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+#home-left-drop { border-top-color: #d97706; }
+#home-right-drop { border-top-color: #059669; }
+#home-left-drop:focus-within {
+  border-color: #d97706;
+  box-shadow: 0 8px 26px rgba(217, 119, 6, 0.14);
+}
+#home-right-drop:focus-within {
+  border-color: #059669;
+  box-shadow: 0 8px 26px rgba(5, 150, 105, 0.16);
+}
+.home-source-heading {
+  min-height: 58px;
+  padding: 12px 18px;
+  background: #f8faf9;
+  border-bottom: 1px solid #e1e8e4;
+}
+.home-source-heading h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #10241d;
+}
+.home-source-heading .letter {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 800;
+  font-size: 13px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 0;
+  color: #fff;
+}
+#home-left-drop .letter { background: #d97706; }
+#home-right-drop .letter { background: #059669; }
+
+.home-upload {
+  padding: 8px 15px;
+  border: 1.5px solid #0b4f34;
+  border-radius: 10px;
+  background: #edf7f2;
+  color: #0b4f34;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 6px;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.home-upload::before { content: "↑"; font-weight: 800; }
+.home-upload:hover {
+  background: #0b4f34;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+.home-text {
+  height: 235px;
+  padding: 18px 20px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #10241d;
+}
+.home-text::placeholder { color: #546b62; }
+.home-file-card { min-height: 235px; background: #ffffff; }
+.home-source-footer {
+  padding: 10px 18px;
+  background: #f8faf9;
+  border-top: 1px solid #e1e8e4;
+  color: #364d44;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Панель действий: выраженный CTA и кликабельные примеры */
+.home-mode .start-actions {
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1.5px solid #cbd7d1;
+  box-shadow: 0 4px 14px rgba(16, 36, 29, 0.05);
+}
+.home-primary-actions .primary {
+  padding: 14px 34px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  background: #059669;
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.28);
+}
+.home-primary-actions .primary:disabled {
+  background: #335c4d;
+  opacity: 0.72;
+  box-shadow: none;
+}
+.home-primary-actions .primary:not(:disabled):hover {
+  background: #047857;
+  transform: translateY(-1px);
+}
+.home-primary-actions .plain, #home-swap {
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1.5px solid #cbd7d1;
+  background: #f4f8f6;
+  color: #10241d;
+  text-decoration: none;
+}
+.home-primary-actions .plain:hover, #home-swap:hover {
+  border-color: #0b4f34;
+  background: #e6f2ec;
+}
+
+/* Читаемый низ: Excel, форматы, руководства */
+.home-excel-tools {
+  margin: 14px 0 0;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #d4ded9;
+  font-size: 14.5px;
+}
+.home-mode .home-formats {
+  margin-top: 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #364d44;
+}
+.home-guides {
+  font-size: 13.5px;
+  color: #364d44;
+  margin-top: 8px;
+}
+.home-guides a { font-weight: 600; }
+
+@media (max-width: 700px) {
+  .home-intro { padding: 20px; border-radius: 16px; }
+  .home-intro p { font-size: 15.5px; }
+  .home-text { height: 185px; font-size: 16px; }
+  .home-file-card { min-height: 185px; }
+}
+
+/* PT Serif & SEO Bento Grid */
+body.home-mode,
+.home-intro h1,
+.home-about h2,
+.home-about h3 {
+  font-family: "PT Serif", Georgia, Cambria, "Times New Roman", Times, serif;
+}
+.home-mode .topbar,
+.home-source-heading,
+.home-source-footer,
+.home-mode .start-actions,
+.home-excel-tools,
+.home-mode .home-formats,
+.home-guides {
+  font-family: "PT Serif", Georgia, "Times New Roman", serif;
+}
+.home-about {
+  max-width: 100%;
+  margin: 44px 0 12px;
+  padding-top: 32px;
+  border-top: 1.5px solid #cbd7d1;
+}
+.home-about-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 22px 0 28px;
+}
+.home-about-card {
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1.5px solid #d4ded9;
+  box-shadow: 0 4px 14px rgba(16, 36, 29, 0.04);
+}
+.home-about-card h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  color: #0b241c;
+}
+.home-about-card p, .home-about-card li {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: #243b30;
+}
+@media (max-width: 760px) {
+  .home-about-grid { grid-template-columns: 1fr; }
+}
+
+/* Bottom Bento: Steps, FAQ & Footer */
+/* 3 шага в виде Bento-карточек с нумерацией */
+.home-about ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 32px;
+  counter-reset: ctt-step;
+}
+.home-about ol li {
+  counter-increment: ctt-step;
+  position: relative;
+  margin: 0;
+  padding: 20px 20px 20px 22px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1.5px solid #d4ded9;
+  box-shadow: 0 4px 14px rgba(16, 36, 29, 0.04);
+  font-size: 15px;
+  line-height: 1.6;
+  color: #243b30;
+}
+.home-about ol li::before {
+  content: counter(ctt-step);
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background: #0b4f34;
+  color: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  font-weight: 800;
+}
+.home-about ol li strong:first-child {
+  display: block;
+  margin-bottom: 4px;
+  color: #0b241c;
+  font-size: 16px;
+}
+
+/* FAQ в виде отдельных карточек */
+.home-about details {
+  margin-bottom: 10px;
+  padding: 15px 20px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1.5px solid #d4ded9;
+  box-shadow: 0 2px 8px rgba(16, 36, 29, 0.03);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.home-about details:hover {
+  border-color: #8bb5a2;
+}
+.home-about details[open] {
+  border-color: #059669;
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.08);
+}
+.home-about summary {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0b241c;
+}
+.home-about details p {
+  margin: 10px 0 2px;
+  font-size: 15px;
+  color: #243b30;
+}
+
+/* Тёмно-изумрудный футер в пару к Hero-блоку */
+.home-mode .site-footer {
+  margin: 36px 0 24px;
+  padding: 20px 26px;
+  border-radius: 16px;
+  border: 0;
+  background: linear-gradient(135deg, #0b241c 0%, #123d2e 100%);
+  color: #d7ebe2;
+  font-size: 14px;
+}
+.home-mode .site-footer .footer-dot {
+  color: #34d399;
+}
+.home-mode .site-footer nav a {
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.home-mode .site-footer nav a:hover {
+  color: #a7f3d0;
+  text-decoration: underline;
+}
+
+@media (max-width: 820px) {
+  .home-about ol { grid-template-columns: 1fr; }
+  .home-mode .site-footer { padding: 18px; }
+}

@@ -55,7 +55,7 @@ export async function renderPreservedPdf(source,entries,{blocks,signal,onLayout}
     const plan={...box,text:change.text},sample=change.added?{background:[255,255,255],foreground:[0,0,0],patch:{x:box.x*scale,y:box.y*scale,width:0,height:0}}:samplePdfPatch(ctx,plan,scale,canvas,{ignoreRects:originals.filter(b=>b.record!==change.block.record).flatMap(b=>b.visual.rects)});
     if(!change.added){const oldEnd=sample.patch.y+sample.patch.height;sample.patch.y=Math.max(sample.patch.y,Math.floor(box.y*scale));sample.patch.height=Math.min(oldEnd,Math.ceil((box.y+box.height)*scale))-sample.patch.y;}
     const top=sample.patch.y/scale,bottom=(sample.patch.y+sample.patch.height)/scale;
-    if(images.some(i=>(top<i.y+i.height+2&&bottom>i.y-2&&box.x<i.x+i.width+2&&box.x+box.width>i.x-2)||(top>i.y-2&&top<i.y+i.height+2)||(bottom>i.y-2&&bottom<i.y+i.height+2)))fail('This edit shares a band with an image.');
+    if(images.some(i=>top<i.y+i.height+2&&bottom>i.y-2&&box.x<i.x+i.width+2&&box.x+box.width>i.x-2))fail('This edit shares a band with an image.');
     if(originals.some(b=>b.record!==change.block.record&&!removed.has(b.record)&&b.visual.rects.some(r=>r.x<(sample.patch.x+sample.patch.width)/scale&&r.x+r.width>sample.patch.x/scale&&r.y<bottom&&r.y+r.height>top)))fail('Text areas overlap here.');
     const selected=await viewer.editFont(change.block,change.text,output);
     if(change.text&&change.styleBlocks?.length>1){
