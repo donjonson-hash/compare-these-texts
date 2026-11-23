@@ -62,7 +62,21 @@ if (!Map.prototype.getOrInsert) Object.defineProperty(Map.prototype, 'getOrInser
   ]) bundled = replaceOnce(bundled, expression, expression.replace('Math.sumPrecise', 'pdfIntegerSum'));
   bundled = '// Compatibility for integer-only font sizes and DOM lengths in older browsers.\n' +
     'const pdfIntegerSum=values=>values.reduce((sum,value)=>sum+value,0);\n' + bundled;
-  const expected = '599b1521b3c10f542ef254afee75ba2d9cbda0bb8d92ca4c27eef5d7fd977da7';
+  // Apply the Type 3 change to the byte-verified 0.33.4 bundle. PDF.js returns
+  // early for Type 3 fonts, before it fills gaps using inferred glyph names.
+  // Keep only the explicit non-identity ToUnicode map as character evidence.
+  if (sha256(bundled) !== '599b1521b3c10f542ef254afee75ba2d9cbda0bb8d92ca4c27eef5d7fd977da7') {
+    throw new Error('0.33.4 PDF.js bundle checksum mismatch');
+  }
+  bundled = replaceOnce(bundled,
+    's.type==="Type3"){for(let f=0;f<256;f++)',
+    's.type==="Type3"){this.hasType3UnicodeMap=s.hasIncludedToUnicodeMap&&!(s.toUnicode instanceof fs);for(let f=0;f<256;f++)');
+  const legacyType3Message = 'PDF: графические шрифты Type3 не поддерживаются.'.replace(/[^\x00-\x7f]/g,
+    ch => '\\u' + ch.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0'));
+  bundled = replaceOnce(bundled,
+    `if(oe.isType3Font)throw new Y("${legacyType3Message}");`,
+    'if(oe.isType3Font&&!oe.hasType3UnicodeMap)throw new Y("PDF: Type 3 text requires an embedded Unicode character map. Export a searchable PDF and try again.");');
+  const expected = 'd325ee650371101ecad33a941117b3b28965aa377b48c5bdf55815c5fefb9701';
   if (sha256(bundled) !== expected) throw new Error('Final PDF.js bundle checksum mismatch; no asset was written');
   const license = await readFile(join(packagePath, 'LICENSE'));
   if (checkOnly) {
