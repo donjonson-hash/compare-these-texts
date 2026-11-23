@@ -54,8 +54,9 @@ Every upstream patch must match exactly once or the build fails.
 2. Retain upstream text extraction for raster XObjects and inline images: skip
    image content and recurse into Form XObjects for text. The earlier image rejection
    patches were removed in 0.10.0; image rendering and comparison are not requested.
-3. Reject `ErrorFont`, graphic Type3 fonts and characters without a usable Unicode
-   mapping, instead of silently dropping glyphs or substituting a raw PDF character code.
+3. Read Type 3 text using the font’s embedded ToUnicode map. Reject missing
+   maps, identity fallbacks and unmapped codes used by the document. The reader
+   continues to reject `ErrorFont` and unusable Unicode values.
 4. Limit a decoded stream buffer to 32 MiB before allocation and a single text
    fragment to 500000 PDF code units before conversion to glyphs.
 5. Install non-enumerable compatibility methods only when missing:
@@ -117,6 +118,13 @@ This is a Worker protocol check, not a claim of native-browser visual verificati
 The six `Math.sumPrecise` calls in the font parser and DOM text length calculation sum integer byte sizes or text lengths. They use a local integer sum helper so older browsers and Node versions can render embedded TrueType fonts instead of falling back to missing glyphs. Other upstream calls are unchanged. No global Math polyfill is installed.
 
 Patched bundle SHA-256: `599b1521b3c10f542ef254afee75ba2d9cbda0bb8d92ca4c27eef5d7fd977da7`.
+
+## Type 3 text import
+
+After verifying the 0.33.4 bundle, the build updates the Type 3 text guard.
+It requires an explicit character map and uses the existing per-glyph Unicode
+validation. Type 3 glyph drawings and encoding-derived guesses are outside the
+text comparison. Current bundle SHA-256: `d325ee650371101ecad33a941117b3b28965aa377b48c5bdf55815c5fefb9701`.
 
 ## Browser URL compatibility
 
