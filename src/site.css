@@ -181,3 +181,25 @@ body.home-mode{background:#f8faf9}
 .workbook-inputs label{display:grid;gap:4px;font-size:.94rem}
 .workbook-inputs input,.workbook-inputs select{max-width:100%;min-width:0}
 #workbook-filename{flex-basis:100%;overflow-wrap:anywhere}
+
+.simple-sheet-mode .hero{display:none}
+.simple-sheet-mode .source-picker>summary{display:list-item;cursor:pointer;padding:.5rem 0;font-weight:600}
+.simple-sheet-result{margin-block:1.1rem 2rem}
+.simple-sheet-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.simple-sheet-header h2{margin:0}
+.simple-sheet-header p{margin:.45rem 0}
+.simple-sheet-scroll{overflow-x:auto;margin-top:1rem;border:1px solid #cbd6ce;border-radius:10px;background:#fff}
+.simple-sheet-scroll table{width:100%;min-width:32rem;border-collapse:collapse;table-layout:fixed;text-align:start}
+.simple-sheet-scroll th,.simple-sheet-scroll td{padding:.65rem .85rem;text-align:start;vertical-align:top;border-bottom:1px solid #e1e8e2;overflow-wrap:anywhere}
+.simple-sheet-scroll thead{background:#eef3ed}
+.simple-sheet-scroll small{display:block;font-weight:400;line-height:1.3;margin:.24rem 0}
+.simple-sheet-scroll td{white-space:pre-wrap}
+.simple-sheet-scroll td:nth-last-child(2){background:#faf7f3}
+.simple-sheet-scroll td:last-child{background:#eff6ee}
+.simple-sheet-scroll summary{cursor:pointer;color:#245d49}
+.simple-sheet-scroll dl{font-size:.86rem;margin:.5rem 0;font-weight:400}
+.simple-sheet-scroll dt{font-weight:600}
+.simple-sheet-scroll dd{margin:0 0 .32rem}
+.simple-sheet-pager{display:flex;gap:.75rem;align-items:center;justify-content:center;margin-top:1rem}
+#simple-sheet-back{margin-block:.6rem}
+#simple-sheet-summary>span+span,#simple-sheet-formulas>span+span{margin-inline-start:.75rem}

@@ -2170,5 +2170,11 @@
   "97c0a7ed2af5": "{0}: impossibile confrontare cartelle di lavoro XLS protette da password.",
   "0541847f12bc": "Confronto documenti aperto",
   "71327f623703": "Confronta testi e file",
-  "0d811c4f2835": "Testi e documenti"
+  "0d811c4f2835": "Testi e documenti",
+  "d06238d70267": "Le righe sono state confrontate in base alla loro posizione.",
+  "d6861831f3c7": "Voce / riga",
+  "3fdc9a587693": "Colonna",
+  "4aefb0ef967d": "Confronto semplice",
+  "3273999e1eac": "I risultati delle formule sono mostrati così come sono stati salvati nella cartella di lavoro.",
+  "8a99a9882005": "Se non è stato salvato alcun risultato, viene mostrata la formula stessa."
 }

@@ -2169,5 +2169,11 @@
   "97c0a7ed2af5": "{0}: nie można porównywać skoroszytów XLS chronionych hasłem.",
   "0541847f12bc": " Porównanie otwartych dokumentów ",
   "71327f623703": "Porównaj teksty i pliki",
-  "0d811c4f2835": "Teksty i dokumenty"
+  "0d811c4f2835": "Teksty i dokumenty",
+  "d06238d70267": "Wiersze porównano według ich kolejności.",
+  "d6861831f3c7": "Pozycja / wiersz",
+  "3fdc9a587693": "Kolumna",
+  "4aefb0ef967d": "Proste porównanie",
+  "3273999e1eac": "Wyniki formuł są wyświetlane tak, jak zapisano je w skoroszycie.",
+  "8a99a9882005": "Jeśli wynik nie został zapisany, wyświetlana jest sama formuła."
 }
