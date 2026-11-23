@@ -2,7 +2,6 @@ import './i18n.js';
 import {MAX_FILE_BYTES} from './file-limits.mjs';
 import {readWorkbook} from './xlsx-source.mjs';
 import {prepare, inspect, compare} from './engine.mjs';
-import {simpleSheet} from './simple-sheet.mjs';
 import {renderHtml, renderJson} from './report.mjs';
 import {prepareText, compareText} from './text-engine.mjs';
 import {renderTextHtml} from './text-report.mjs';
@@ -45,7 +44,6 @@ export async function handleRequest(path, payload) {
     }
     throw new Error("Unknown operation.");
   }
-  if (path === '/api/simple-sheet') return simpleSheet(payload);
   if (path === '/api/prepare') {
     const result = await prepare(payload);
     renderJson(result); // Bound amplified metadata before transferring it.

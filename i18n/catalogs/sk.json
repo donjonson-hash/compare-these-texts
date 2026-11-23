@@ -2165,13 +2165,5 @@
   "f01711bf73bd": "{0}: podporované sú formáty CSV, TSV, XLS a XLSX. Uložte zošit vo formáte XLSX.",
   "7208e54b5a60": "{0}: očakáva sa zošit Excelu 97–2003 vo formáte XLS. Otvorte súbor v Exceli alebo LibreOffice a uložte ho vo formáte XLSX.",
   "97c0a7ed2af5": "{0}: zošity XLS chránené heslom nemožno porovnať.",
-  "0541847f12bc": "Porovnanie otvorených dokumentov",
-  "71327f623703": "Porovnať texty a súbory",
-  "0d811c4f2835": "Texty a dokumenty",
-  "d06238d70267": "Riadky boli porovnané podľa poradia.",
-  "d6861831f3c7": "Položka / riadok",
-  "3fdc9a587693": "Stĺpec",
-  "4aefb0ef967d": "Jednoduché porovnanie",
-  "3273999e1eac": "Výsledky vzorcov sa zobrazujú tak, ako sú uložené v zošite.",
-  "8a99a9882005": "Ak výsledok nie je uložený, zobrazí sa samotný vzorec."
+  "0541847f12bc": "Porovnanie otvorených dokumentov"
 }

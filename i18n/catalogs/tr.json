@@ -2167,13 +2167,5 @@
   "f01711bf73bd": "{0}: CSVTSV ve XLS/XLSX Desteklenir. Çalışma kitabını aşağıdaki gibi kaydedin: XLSX.",
   "7208e54b5a60": "{0}: Excel 97–2003 biçiminde bir XLS çalışma kitabı bekleniyor. Dosyayı Excel veya LibreOffice ile açıp XLSX olarak kaydedin.",
   "97c0a7ed2af5": "{0}: parola korumalı XLS çalışma kitapları karşılaştırılamaz.",
-  "0541847f12bc": "Açık belge karşılaştırması",
-  "71327f623703": "Metinleri ve dosyaları karşılaştır",
-  "0d811c4f2835": "Metinler ve belgeler",
-  "d06238d70267": "Satırlar sıralarına göre karşılaştırıldı.",
-  "d6861831f3c7": "Öğe / satır",
-  "3fdc9a587693": "Sütun",
-  "4aefb0ef967d": "Basit karşılaştırma",
-  "3273999e1eac": "Formül sonuçları çalışma kitabında kaydedildiği gibi gösterilir.",
-  "8a99a9882005": "Kaydedilmiş bir sonuç yoksa formülün kendisi gösterilir."
+  "0541847f12bc": "Açık belge karşılaştırması"
 }

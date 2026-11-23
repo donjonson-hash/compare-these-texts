@@ -2168,13 +2168,5 @@
   "f01711bf73bd": "{0}: podporovány jsou formáty CSV, TSV, XLS a XLSX. Uložte sešit ve formátu XLSX.",
   "7208e54b5a60": "{0}: očekává se sešit Excelu 97–2003 ve formátu XLS. Otevřete soubor v Excelu nebo LibreOffice a uložte ho ve formátu XLSX.",
   "97c0a7ed2af5": "{0}: sešity XLS chráněné heslem nelze porovnat.",
-  "0541847f12bc": "Otevřít porovnání dokumentů",
-  "71327f623703": "Porovnat texty a soubory",
-  "0d811c4f2835": "Texty a dokumenty",
-  "d06238d70267": "Řádky byly porovnány podle pořadí.",
-  "d6861831f3c7": "Položka / řádek",
-  "3fdc9a587693": "Sloupec",
-  "4aefb0ef967d": "Jednoduché porovnání",
-  "3273999e1eac": "Výsledky vzorců se zobrazují tak, jak jsou uložené v sešitu.",
-  "8a99a9882005": "Pokud výsledek není uložený, zobrazí se samotný vzorec."
+  "0541847f12bc": "Otevřít porovnání dokumentů"
 }
