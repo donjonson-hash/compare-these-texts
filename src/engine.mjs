@@ -54,7 +54,7 @@ function bounded(result) {
   return result;
 }
 
-async function inputs(payload, auto = false) {
+async function inputs(payload, auto = false, simple = false) {
   if (!object(payload)) fail('Expected a JSON object');
   const delimiter = own(payload, 'delimiter') ? payload.delimiter : auto ? 'auto' : ',';
   if (![...DELIMITERS, ...(auto ? ['auto'] : [])].includes(delimiter)) fail('delimiter must be comma, semicolon, or tab');
@@ -73,7 +73,7 @@ async function inputs(payload, auto = false) {
     if (raw.length > MAX_SOURCE_BYTES) fail(`${side}: source exceeds 25 MiB`);
     const sha256 = [...new Uint8Array(await crypto.subtle.digest('SHA-256', raw))].map(n => n.toString(16).padStart(2, '0')).join('');
     if (/\.xlsx?$/i.test(name)) {
-      sources[side] = {name, sha256, workbook: await readWorkbook(raw, {name, sha256, sheet: item.sheet})};
+      sources[side] = {name, sha256, workbook: await readWorkbook(raw, {name, sha256, sheet: item.sheet, simple})};
       continue;
     }
     if (/\.(xlsm|xlsb|ods)$/i.test(name) || raw[0] === 0x50 && raw[1] === 0x4b) fail(`${name}: CSV, TSV, XLS and XLSX are supported. Save the workbook as XLSX.`);
@@ -195,14 +195,20 @@ export async function inspect(payload) {
   })));
 }
 
-export async function prepare(payload) {
-  const input = await inputs(payload, true);
+export async function loadTables(payload, {simple = false} = {}) {
+  const input = await inputs(payload, true, simple);
   if (Object.values(input.sources).some(s => s.workbook && !s.workbook.parsed)) {
     return bounded({needs_sheet: true, ready: false,
       sheets: Object.fromEntries(Object.entries(input.sources).map(([side, s]) => [side, s.workbook?.sheets || []])),
       selected: Object.fromEntries(Object.entries(input.sources).map(([side, s]) => [side, s.workbook?.selected ?? null]))});
   }
-  const {parsed, delimiter} = parseSources(input.sources, input.delimiter);
+  return parseSources(input.sources, input.delimiter);
+}
+
+export async function prepare(payload) {
+  const tables = await loadTables(payload);
+  if (tables.needs_sheet) return tables;
+  const {parsed, delimiter} = tables;
   const {left, right} = parsed, {pairs, unmatched} = mapHeaders(left.meta.headers, right.meta.headers);
   const candidates = pairs.filter(([a, b]) => meaning(a)?.startsWith('identifier_') && meaning(a) === meaning(b));
   let key = null, invalidNumeric = false;

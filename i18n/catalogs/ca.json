@@ -2168,5 +2168,13 @@
   "f01711bf73bd": "{0}: s'admeten CSV, TSV i XLS/XLSX. Deseu el llibre de treball com a XLSX.",
   "7208e54b5a60": "{0}: s’esperava un llibre XLS de l’Excel 97–2003. Obriu el fitxer amb l’Excel o el LibreOffice i deseu-lo com a XLSX.",
   "97c0a7ed2af5": "{0}: no es poden comparar llibres XLS protegits amb contrasenya.",
-  "0541847f12bc": "Obre la comparació de documents"
+  "0541847f12bc": "Obre la comparació de documents",
+  "71327f623703": "Compara textos i fitxers",
+  "0d811c4f2835": "Textos i documents",
+  "d06238d70267": "Les files s’han comparat segons la seva posició.",
+  "d6861831f3c7": "Element / fila",
+  "3fdc9a587693": "Columna",
+  "4aefb0ef967d": "Comparació senzilla",
+  "3273999e1eac": "Els resultats de les fórmules es mostren tal com s’han desat al llibre.",
+  "8a99a9882005": "Quan no hi ha cap resultat desat, es mostra la fórmula."
 }

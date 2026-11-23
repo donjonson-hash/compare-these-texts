@@ -2151,5 +2151,13 @@
   "f01711bf73bd": "{0}: CSV, TSV dan XLS/XLSX Tidak didukung. Simpan buku kerja sebagai XLSX.",
   "7208e54b5a60": "{0}: buku kerja XLS dalam format Excel 97–2003 diperlukan. Buka fail dalam Excel atau LibreOffice dan simpan sebagai XLSX.",
   "97c0a7ed2af5": "{0}: buku kerja XLS yang dilindungi kata laluan tidak dapat dibandingkan.",
-  "0541847f12bc": "Dokumen perbandingan Terbuka dokumen dokumen berdokumenName"
+  "0541847f12bc": "Dokumen perbandingan Terbuka dokumen dokumen berdokumenName",
+  "71327f623703": "Bandingkan teks dan fail",
+  "0d811c4f2835": "Teks dan dokumen",
+  "d06238d70267": "Baris dibandingkan mengikut turutan.",
+  "d6861831f3c7": "Item / baris",
+  "3fdc9a587693": "Lajur",
+  "4aefb0ef967d": "Perbandingan ringkas",
+  "3273999e1eac": "Hasil formula dipaparkan seperti yang disimpan dalam buku kerja.",
+  "8a99a9882005": "Jika tiada hasil yang disimpan, formula itu sendiri dipaparkan."
 }

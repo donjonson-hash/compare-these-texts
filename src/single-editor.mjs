@@ -23,7 +23,7 @@ export async function inspectSingleSource(source){
  if(format==='docx'||format==='pdf'||format==='txt')return {format};
  const raw=decodeBase64Bytes(source.data);
  if(format==='xlsx'){
-  await validateZip(raw);const book=read(raw,{type:'array',bookSheets:true});if(book.SheetNames.length>100)fail('This workbook has more than 100 sheets. Choose a smaller workbook.');
+  const book=read(await validateZip(raw),{type:'array',bookSheets:true});if(book.SheetNames.length>100)fail('This workbook has more than 100 sheets. Choose a smaller workbook.');
   return {format,sheets:book.SheetNames};
  }
  let text;try{text=new TextDecoder('utf-8',{fatal:true}).decode(raw);}catch{fail('Save this CSV as UTF-8, then open it again.');}
@@ -33,7 +33,7 @@ export async function inspectSingleSource(source){
 export async function singleSheetMetadata(source,{sheet,delimiter=','}={}){
  const raw=sourceBytes(source),xlsx=/\.xlsx$/i.test(source.name);let grid,range;
  if(xlsx){
-  await validateZip(raw);const book=read(raw,{type:'array',cellFormula:true});if(book.SheetNames.length>100)fail('Choose a workbook with at most 100 sheets.');
+  const book=read(await validateZip(raw),{type:'array',cellFormula:true});if(book.SheetNames.length>100)fail('Choose a workbook with at most 100 sheets.');
   if(!sheet||!book.SheetNames.includes(sheet))fail('Choose a worksheet.');grid=book.Sheets[sheet];
   const entries=Object.entries(grid).filter(([a])=>/^[A-Z]+[1-9]\d*$/.test(a));
   if(entries.length>100000)fail('This sheet has too many cells. Choose a smaller sheet.');

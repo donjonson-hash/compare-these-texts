@@ -159,11 +159,47 @@ body.home-mode{background:#f8faf9}
 .home-about a{color:var(--green)}
 @media(max-width:700px){.home-about{margin-top:40px}.home-about h2{font-size:22px}}
 
-.home-excel-tools{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 24px;margin:18px 0}
-.home-excel-tools>a{font-weight:600;color:var(--green)}
-.home-workbook{color:var(--green)}
-.home-workbook summary{width:fit-content;cursor:pointer;font-weight:600}
+
+.home-task-nav{display:flex;flex-wrap:wrap;gap:.45rem;margin:0 0 1.1rem}
+.home-task-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.55rem .9rem;border:1px solid #c3d2ca;border-radius:8px;color:var(--green);font-size:1rem;font-weight:600;line-height:1.3;text-decoration:none}
+.home-task-nav a[aria-current=page]{background:var(--green);border-color:var(--green);color:white}
+.home-task-nav a:hover:not([aria-current]){background:#eaf3ee}
+.home-task-nav a:focus-visible,.excel-file-slot:focus-within{outline:3px solid var(--green);outline-offset:3px}
+.excel-file-slot{position:relative;display:flex;flex-direction:column;justify-content:center;gap:.5rem;min-width:0;min-height:92px;padding:1rem 1.15rem;border:1px dashed #799585;border-radius:10px;background:white;cursor:pointer}
+.excel-file-slot:hover{background:#f4f9f6}
+.excel-slot-label{display:flex;gap:.55rem;align-items:center;color:var(--green);font-size:1rem;font-weight:650}
+.excel-slot-label .letter{display:inline-grid;place-content:center;min-width:24px;min-height:24px;border-radius:5px;background:#e5efe9;color:#355e49;font-size:.875rem}
+.excel-file-slot input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.excel-slot-name{max-width:100%;overflow-wrap:anywhere;color:#43594c;font-size:.94rem}
+.excel-slot-name:empty{display:none}
+.excel-file-format{margin:.7rem 0;color:#4c6055;font-size:.875rem}
+.excel-pair-actions{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem 1rem;margin:1rem 0}
+#excel-pair-next{font-size:.94rem;color:#465e50}
+.home-workbook{color:var(--green);border:1px solid #c3d2ca;border-radius:10px;padding:1rem;background:white}
+@media(max-width:700px){.home-task-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.home-task-nav a{justify-content:flex-start;text-align:start;padding:.55rem .65rem}.excel-file-slot{min-height:66px}}
 .workbook-inputs{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px;padding-block:8px}
 .workbook-inputs label{display:grid;gap:4px;font-size:.94rem}
 .workbook-inputs input,.workbook-inputs select{max-width:100%;min-width:0}
 #workbook-filename{flex-basis:100%;overflow-wrap:anywhere}
+
+.simple-sheet-mode .hero{display:none}
+.simple-sheet-mode .source-picker>summary{display:list-item;cursor:pointer;padding:.5rem 0;font-weight:600}
+.simple-sheet-result{margin-block:1.1rem 2rem}
+.simple-sheet-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.simple-sheet-header h2{margin:0}
+.simple-sheet-header p{margin:.45rem 0}
+.simple-sheet-scroll{overflow-x:auto;margin-top:1rem;border:1px solid #cbd6ce;border-radius:10px;background:#fff}
+.simple-sheet-scroll table{width:100%;min-width:32rem;border-collapse:collapse;table-layout:fixed;text-align:start}
+.simple-sheet-scroll th,.simple-sheet-scroll td{padding:.65rem .85rem;text-align:start;vertical-align:top;border-bottom:1px solid #e1e8e2;overflow-wrap:anywhere}
+.simple-sheet-scroll thead{background:#eef3ed}
+.simple-sheet-scroll small{display:block;font-weight:400;line-height:1.3;margin:.24rem 0}
+.simple-sheet-scroll td{white-space:pre-wrap}
+.simple-sheet-scroll td:nth-last-child(2){background:#faf7f3}
+.simple-sheet-scroll td:last-child{background:#eff6ee}
+.simple-sheet-scroll summary{cursor:pointer;color:#245d49}
+.simple-sheet-scroll dl{font-size:.86rem;margin:.5rem 0;font-weight:400}
+.simple-sheet-scroll dt{font-weight:600}
+.simple-sheet-scroll dd{margin:0 0 .32rem}
+.simple-sheet-pager{display:flex;gap:.75rem;align-items:center;justify-content:center;margin-top:1rem}
+#simple-sheet-back{margin-block:.6rem}
+#simple-sheet-summary>span+span,#simple-sheet-formulas>span+span{margin-inline-start:.75rem}

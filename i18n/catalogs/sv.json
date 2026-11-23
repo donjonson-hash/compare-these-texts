@@ -2153,5 +2153,13 @@
   "f01711bf73bd": "{0}: CSV, TSV och XLS/XLSX stöds. Spara arbetsboken som XLSX.",
   "7208e54b5a60": "{0}: en XLS-arbetsbok för Excel 97–2003 förväntades. Öppna filen i Excel eller LibreOffice och spara den som XLSX.",
   "97c0a7ed2af5": "{0}: det går inte att jämföra lösenordsskyddade XLS-arbetsböcker.",
-  "0541847f12bc": "Öppna dokumentjämförelse"
+  "0541847f12bc": "Öppna dokumentjämförelse",
+  "71327f623703": "Jämför texter och filer",
+  "0d811c4f2835": "Texter och dokument",
+  "d06238d70267": "Raderna jämfördes i den ordning de förekommer.",
+  "d6861831f3c7": "Post / rad",
+  "3fdc9a587693": "Kolumn",
+  "4aefb0ef967d": "Enkel jämförelse",
+  "3273999e1eac": "Formelresultaten visas så som de har sparats i arbetsboken.",
+  "8a99a9882005": "Om det inte finns något sparat resultat visas själva formeln."
 }

@@ -2126,5 +2126,13 @@
   "f01711bf73bd": "{0}: CSV, TSV, en XLS/XLSX worden ondersteund. Sla het werkboek op als XLSX.",
   "7208e54b5a60": "{0}: een XLS-werkmap van Excel 97–2003 is vereist. Open het bestand in Excel of LibreOffice en sla het op als XLSX.",
   "97c0a7ed2af5": "{0}: XLS-werkmappen met wachtwoordbeveiliging kunnen niet worden vergeleken.",
-  "0541847f12bc": "Vergelijk document openen"
+  "0541847f12bc": "Vergelijk document openen",
+  "71327f623703": "Teksten en bestanden vergelijken",
+  "0d811c4f2835": "Teksten en documenten",
+  "d06238d70267": "De rijen zijn op volgorde vergeleken.",
+  "d6861831f3c7": "Item / rij",
+  "3fdc9a587693": "Kolom",
+  "4aefb0ef967d": "Eenvoudige vergelijking",
+  "3273999e1eac": "Formuleresultaten worden weergegeven zoals ze in de werkmap zijn opgeslagen.",
+  "8a99a9882005": "Als er geen resultaat is opgeslagen, wordt de formule zelf weergegeven."
 }

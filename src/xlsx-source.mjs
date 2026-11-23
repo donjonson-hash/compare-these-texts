@@ -16,6 +16,8 @@ const crcUpdate = (crc, bytes) => {
 
 // Validate the actual expanded ZIP bytes before handing the archive to SheetJS.
 // Central-directory declarations alone do not protect against forged ZIP sizes.
+// Return the original bytes for ordinary XLSX archives and a reader-compatible
+// copy when a streaming writer used ZIP64 data descriptors for bounded parts.
 export async function validateZip(raw) {
   const v = new DataView(raw.buffer, raw.byteOffset, raw.byteLength);
   const u16 = i => v.getUint16(i, true), u32 = i => v.getUint32(i, true);
@@ -26,7 +28,7 @@ export async function validateZip(raw) {
   if (end < Math.max(0, raw.length - 65557) || end + 22 + u16(end + 20) !== raw.length) bad();
   const count = u16(end + 10), start = u32(end + 16);
   if (u16(end + 4) || u16(end + 6) || count !== u16(end + 8) || !count || count > 1024 || start + u32(end + 12) !== end) bad();
-  let cursor = start, total = 0;
+  let cursor = start, total = 0, readerView;
   const names = new Set(), ranges = [];
   for (let n = 0; n < count; n++) {
     if (cursor + 46 > end || u32(cursor) !== 0x02014b50) bad();
@@ -47,8 +49,25 @@ export async function validateZip(raw) {
     if (flags & 8) {
       let descriptor = dataEnd;
       if (descriptor + 4 <= start && u32(descriptor) === 0x08074b50) descriptor += 4;
-      if (descriptor + 12 > start || u32(descriptor) !== checksum || u32(descriptor + 4) !== compressed || u32(descriptor + 8) !== size) bad();
-      rangeEnd = descriptor + 12;
+      if (descriptor + 12 > start || u32(descriptor) !== checksum || u32(descriptor + 4) !== compressed) bad();
+      // Bounded parts fit in 32 bits even when the writer streams both sizes
+      // as 64-bit fields. The central directory may still be ordinary ZIP32.
+      const wide = u16(local + 4) >= 45 && descriptor + 20 <= start &&
+        u32(descriptor + 8) === 0 && u32(descriptor + 12) === size && u32(descriptor + 16) === 0;
+      if (wide) {
+        // SheetJS expects a classic descriptor. Expose the validated sizes in
+        // its local header instead. All offsets and compressed bytes stay put.
+        readerView ??= new DataView(new Uint8Array(raw).buffer);
+        readerView.setUint16(local + 6, flags & ~8, true);
+        readerView.setUint16(cursor + 8, flags & ~8, true);
+        readerView.setUint32(local + 14, checksum, true);
+        readerView.setUint32(local + 18, compressed, true);
+        readerView.setUint32(local + 22, size, true);
+        rangeEnd = descriptor + 20;
+      } else {
+        if (u32(descriptor + 8) !== size) bad();
+        rangeEnd = descriptor + 12;
+      }
     }
     ranges.push([local, rangeEnd]);
     let actual = 0, crc = 0xffffffff;
@@ -72,6 +91,7 @@ export async function validateZip(raw) {
   }
   ranges.sort((a, b) => a[0] - b[0]);
   if (cursor !== end || ranges.some((range, i) => i && range[0] < ranges[i - 1][1]) || !names.has('[Content_Types].xml') || !names.has('xl/workbook.xml')) bad();
+  return readerView ? new Uint8Array(readerView.buffer) : raw;
 }
 
 function decimal(value) {
@@ -139,14 +159,14 @@ function readLegacy(raw, name, options) {
   try { return parse_xlscfb(archive, options); } catch { invalid(); }
 }
 
-export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, listOnly = false}) {
+export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, listOnly = false, simple = false}) {
   const legacy = /\.xls$/i.test(name);
-  const options = {type: 'array', cellFormula: true, sheetStubs: true, cellNF: true, cellText: false, cellDates: false, dense: false};
+  const options = {type: 'array', cttFormulaCache: simple, cellFormula: true, sheetStubs: true, cellNF: true, cellText: false, cellDates: false, dense: false};
   let workbook;
   if (legacy) workbook = readLegacy(raw, name, options);
   else {
-    await validateZip(raw);
-    try { workbook = read(raw, options); }
+    const checked = await validateZip(raw);
+    try { workbook = read(checked, options); }
     catch { fail(`${name}: could not read the XLSX. Save the workbook again.`); }
   }
   if (workbook.SheetNames.length > 100) fail(`${name}: more than 100 sheets. Split the workbook into smaller files.`);
@@ -174,21 +194,40 @@ export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, li
   const rowNumbers = [...new Set(coords.map(c => c.r))].sort((a, b) => a - b);
   if (rowNumbers.length > 5001) fail(`${name}: more than 5,000 data rows.`);
   const date1904 = !!workbook.Workbook?.WBProps?.date1904;
+  const formulas = {cached: 0, uncached: 0};
+  function readCell(address, identifier = false, uncachedHeaders, header) {
+    const cell = ws[address];
+    if (!simple || !cell || (cell.f === undefined && cell.F === undefined)) {
+      return valueOf(cell, prefix(address), date1904, identifier);
+    }
+    // BIFF8 formula records carry a typed result. OOXML may omit the cache
+    // altogether, which must remain distinct from a real zero or empty string.
+    const cached = legacy ? cell.v !== undefined && cell.v !== null : cell.cttCached === true;
+    if (cached) {
+      formulas.cached++;
+      if (cell.t === 'e') return utils.format_cell(cell);
+      return valueOf({t: cell.t, v: cell.v, z: cell.z}, prefix(address), date1904, identifier);
+    }
+    formulas.uncached++;
+    if (uncachedHeaders) Object.defineProperty(uncachedHeaders, header, {value: true, enumerable: true});
+    const expression = cell.f ?? ws[cell.F?.split(':')[0]]?.f;
+    return expression ? valueOf({t: 's', v: '=' + expression}, prefix(address), date1904) : '';
+  }
   const headerCells = {}, headers = [];
   for (let c = minCol; c <= maxCol; c++) {
-    const addr = utils.encode_cell({r: minRow, c}), value = valueOf(ws[addr], prefix(addr), date1904);
+    const addr = utils.encode_cell({r: minRow, c}), value = readCell(addr);
     if (!value.trim() || headers.includes(value)) fail(`${prefix(addr)}: headers must be nonempty and unique.`);
     headers.push(value); Object.defineProperty(headerCells, value, {value: addr, enumerable: true});
   }
   const rows = rowNumbers.slice(1).map(r => {
-    const values = {}, cells = {};
+    const values = {}, cells = {}, uncachedFormulas = Object.create(null);
     headers.forEach((header, i) => {
       const addr = utils.encode_cell({r, c: minCol + i});
       const identifier = /^(sku|артикул|id|идентификатор|product_id|код|код товара|код_товара)$/i.test(header.trim());
-      Object.defineProperty(values, header, {value: valueOf(ws[addr], prefix(addr), date1904, identifier), enumerable: true});
+      Object.defineProperty(values, header, {value: readCell(addr, identifier, uncachedFormulas, header), enumerable: true});
       Object.defineProperty(cells, header, {value: addr, enumerable: true});
     });
-    return {record: r + 1, values, cells, sheet: selected.name};
+    return {record: r + 1, values, cells, sheet: selected.name, ...(Object.keys(uncachedFormulas).length ? {uncachedFormulas} : {})};
   });
   if (asXlsx && legacy) {
     // A values-only working copy deliberately omits links, macros, names and embedded objects.
@@ -204,7 +243,8 @@ export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, li
     return new Uint8Array(write(copy, {bookType:'xlsx', type:'array', compression:true}));
   }
   return {sheets, selected: selected.name, parsed: {meta: {name, sha256, format: legacy ? 'xls' : 'xlsx', sheet: selected.name, sheets, headers, header_cells: headerCells, row_count: rows.length,
-    notes: ["Only the selected sheet is compared, including hidden rows and columns. Empty rows are skipped. The first filled row contains the headers.", "Numbers are compared by value; a simple 000… format preserves leading zeros. Dates are converted to ISO format. Formatting, comments, images, and formulas are not compared."]}, rows}};
+    ...(simple ? {formulas} : {}),
+    notes: simple ? [] : ["Only the selected sheet is compared, including hidden rows and columns. Empty rows are skipped. The first filled row contains the headers.", "Numbers are compared by value; a simple 000… format preserves leading zeros. Dates are converted to ISO format. Formatting, comments, images, and formulas are not compared."]}, rows}};
 }
 
 export {valueOf as comparisonCellValue};

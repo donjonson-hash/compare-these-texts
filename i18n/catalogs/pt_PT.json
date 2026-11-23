@@ -2130,5 +2130,13 @@
   "f01711bf73bd": "{0}: CSV, TSV e XLS/XLSX são suportados. Guarde a pasta de trabalho como XLSX.",
   "7208e54b5a60": "{0}: era esperado um livro XLS do Excel 97–2003. Abra o ficheiro no Excel ou no LibreOffice e guarde-o como XLSX.",
   "97c0a7ed2af5": "{0}: não é possível comparar livros XLS protegidos por palavra-passe.",
-  "0541847f12bc": "Comparação de documento aberto"
+  "0541847f12bc": "Comparação de documento aberto",
+  "71327f623703": "Comparar textos e ficheiros",
+  "0d811c4f2835": "Textos e documentos",
+  "d06238d70267": "As linhas foram comparadas pela ordem em que aparecem.",
+  "d6861831f3c7": "Elemento / linha",
+  "3fdc9a587693": "Coluna",
+  "4aefb0ef967d": "Comparação simples",
+  "3273999e1eac": "Os resultados das fórmulas são apresentados tal como foram guardados no livro.",
+  "8a99a9882005": "Se não houver um resultado guardado, é apresentada a própria fórmula."
 }

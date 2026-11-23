@@ -2165,5 +2165,13 @@
   "f01711bf73bd": "{0}: podprte so oblike CSV, TSV, XLS in XLSX. Shranite delovni zvezek v obliki XLSX.",
   "7208e54b5a60": "{0}: pričakovan je delovni zvezek programa Excel 97–2003 v obliki XLS. Odprite datoteko v Excelu ali LibreOfficeu in jo shranite v obliki XLSX.",
   "97c0a7ed2af5": "{0}: delovnih zvezkov XLS, zaščitenih z geslom, ni mogoče primerjati.",
-  "0541847f12bc": " Primerjava odprtih dokumentov"
+  "0541847f12bc": " Primerjava odprtih dokumentov",
+  "71327f623703": "Primerjaj besedila in datoteke",
+  "0d811c4f2835": "Besedila in dokumenti",
+  "d06238d70267": "Vrstice so primerjane po vrstnem redu.",
+  "d6861831f3c7": "Postavka / vrstica",
+  "3fdc9a587693": "Stolpec",
+  "4aefb0ef967d": "Preprosta primerjava",
+  "3273999e1eac": "Rezultati formul so prikazani tako, kot so shranjeni v delovnem zvezku.",
+  "8a99a9882005": "Če rezultat ni shranjen, je prikazana sama formula."
 }

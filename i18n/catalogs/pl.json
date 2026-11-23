@@ -2167,5 +2167,13 @@
   "f01711bf73bd": "{0}: obsługiwane formaty to CSV, TSV, XLS i XLSX. Zapisz skoroszyt w formacie XLSX.",
   "7208e54b5a60": "{0}: oczekiwano skoroszytu programu Excel 97–2003 w formacie XLS. Otwórz plik w Excelu lub LibreOffice i zapisz go jako XLSX.",
   "97c0a7ed2af5": "{0}: nie można porównywać skoroszytów XLS chronionych hasłem.",
-  "0541847f12bc": " Porównanie otwartych dokumentów "
+  "0541847f12bc": " Porównanie otwartych dokumentów ",
+  "71327f623703": "Porównaj teksty i pliki",
+  "0d811c4f2835": "Teksty i dokumenty",
+  "d06238d70267": "Wiersze porównano według ich kolejności.",
+  "d6861831f3c7": "Pozycja / wiersz",
+  "3fdc9a587693": "Kolumna",
+  "4aefb0ef967d": "Proste porównanie",
+  "3273999e1eac": "Wyniki formuł są wyświetlane tak, jak zapisano je w skoroszycie.",
+  "8a99a9882005": "Jeśli wynik nie został zapisany, wyświetlana jest sama formuła."
 }
