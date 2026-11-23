@@ -1,0 +1,34 @@
+#compare-columns .column-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+#compare-columns label { font-weight: 600; }
+#compare-columns textarea {
+  display: block;
+  width: 100%;
+  margin-top: .35rem;
+  padding: .75rem;
+  border: 1px solid #a9b9ae;
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 1rem/1.5 ui-monospace, monospace;
+  resize: vertical;
+}
+.column-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+#compare-columns .button { font-size: .9375rem; }
+#column-results { margin-top: 1.5rem; }
+#column-results [aria-pressed=true] { background: var(--green); color: white; }
+.column-group-count { font-variant-numeric: tabular-nums; }
+#column-status, #column-error { margin: 1rem 0 .5rem; }
+#column-error { color: #92382d; }
+#column-table { width: 100%; border-collapse: collapse; }
+#column-table th, #column-table td { padding: .6rem .75rem; text-align: start; border-bottom: 1px solid var(--line); }
+#column-table th { background: #edf3ee; }
+#column-table td:first-child { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  #compare-columns .column-inputs { grid-template-columns: 1fr; }
+  #column-table th, #column-table td { padding: .5rem; }
+}

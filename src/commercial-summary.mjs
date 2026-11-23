@@ -72,8 +72,8 @@ function resolve(report) {
   for (const [role, label] of [['unit', "units"], ['currency', "currencies"], ['tax', "VAT"], ['tax_basis', "VAT inclusion"], ['price_basis', "price basis"]]) {
     if (headers.some(h => h.filter(header => kind(header) === role).length > 1)) problems.push(`Ambiguous columns: ${label}.`);
   }
-  const key = report.rules?.key || [];
-  if (['quantity', 'price'].some(role => roles[role].some((column, i) => column && column === key[i]))) problems.push("The row key is also the quantity or price column.");
+  const keys = [report.rules?.key, report.rules?.second_key].filter(Boolean);
+  if (['quantity', 'price'].some(role => roles[role].some((column, i) => column && keys.some(key => column === key[i])))) problems.push("The row key is also the quantity or price column.");
   return {roles, selected, problems};
 }
 function reference(row, index, roles, quantity, price) {
@@ -97,7 +97,7 @@ export function buildCommercialSummary(report) {
   ];
   const counts = {paired: paired.length, price_changed: null, quantity_changed: null, only_left: (report.only_left || []).length, only_right: (report.only_right || []).length};
   for (const role of ['price', 'quantity']) {
-    if (!paired.length || !selected(role) || roles[role].some((column, i) => column === report.rules?.key?.[i])) continue;
+    if (!paired.length || !selected(role) || roles[role].some((column, i) => column === report.rules?.key?.[i] || column === report.rules?.second_key?.[i])) continue;
     let count = 0, valid = true;
     for (const item of paired) {
       const a = decimal(item.left.values[roles[role][0]], report.rules?.strip), b = decimal(item.right.values[roles[role][1]], report.rules?.strip);

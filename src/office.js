@@ -76,7 +76,8 @@
   function ruleLines(report, compact = true) {
     const show = compact ? short : quote;
     const rules = report.rules || {}, selected = fields(report);
-    const lines = [...sheetLines(report, compact), t("Key matching: A {0} ↔ B {1}.", [show(rules.key?.[0] ?? ''), show(rules.key?.[1] ?? '')])];
+    const keyLabel = i => [rules.key?.[i], rules.second_key?.[i]].filter(Boolean).map(name => show(name)).join(' + ');
+    const lines = [...sheetLines(report, compact), t("Key matching: A {0} ↔ B {1}.", [keyLabel(0), keyLabel(1)])];
     if (!selected.length) lines.push(t("Only key presence was checked. Values in other columns were not compared."));
     else {
       lines.push(t("Checked fields:"));
@@ -402,10 +403,12 @@
     if (fieldRequest) {
       const name = normalize(fieldRequest[1]);
       const mentioned = ['left', 'right'].flatMap(side => report.sources[side].headers.filter(header => normalize(header) === name).map(header => ({side, header})));
-      if (mentioned.some(({side, header}) => report.rules?.key?.[side === 'left' ? 0 : 1] === header)) {
+      const identifiers = [report.rules?.key, report.rules?.second_key].filter(Boolean);
+      if (mentioned.some(({side, header}) => identifiers.some(pair => pair[side === 'left' ? 0 : 1] === header))) {
         return response(mentioned.map(({side, header}) => {
           const index = side === 'left' ? 0 : 1, label = index === 0 ? 'A' : 'B', other = index === 0 ? 'B' : 'A';
-          if (report.rules.key[index] === header) return t("In {0}, column {1} is used as the key for matching rows to column {2} in {3}. It does not need to be added separately to the fields being compared.", [label, short(header), short(report.rules.key[1 - index]), other]);
+          const keyPair = identifiers.find(pair => pair[index] === header);
+          if (keyPair) return t("In {0}, column {1} is used as the key for matching rows to column {2} in {3}. It does not need to be added separately to the fields being compared.", [label, short(header), short(keyPair[1 - index]), other]);
           const mapping = fields(report).find(f => f[index] === header);
           if (mapping) return t("In {0}, column {1} is included in the value comparison with column {2} in {3}; mode: {4}.", [label, short(header), short(mapping[1 - index]), other, mapping[2] === 'number' ? t("number") : t("text")]);
           return t("In {0}, column {1} is neither a matching key nor a field selected for comparison. Its values were not checked for matches.", [label, short(header)]);

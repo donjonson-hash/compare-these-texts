@@ -3,7 +3,7 @@ import {decodeBase64Bytes} from './file-limits.mjs';
 import {createSheetCalculator} from './sheet-formulas.mjs';
 import {sheetMerges} from './sheet-merges.mjs';
 import {read, utils, CFB, SSF} from './xlsx-vendor.mjs';
-import {validateZip} from './xlsx-source.mjs';
+import {validateZip, readWorkbook} from './xlsx-source.mjs';
 import {DOMParser} from './xml-vendor.mjs';
 import {insertWorkbookRows} from './sheet-row-insert.mjs';
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -56,9 +56,11 @@ export function parseCsv(text, delimiter, sampleRows = Infinity) {
  return rows;
 }
 export async function openSheetDocument(source, meta, delimiter=',') {
- const raw=decodeBase64Bytes(source.data),xlsx=meta.format==='xlsx';
- const sheetPaths=new Map();let workbook,grid,archive,sheetPath,xml,range,newline='\n',bom=false,ending=true;
- if(xlsx){await validateZip(raw);workbook=read(raw,{type:'array',cellStyles:true,cellNF:true,cellFormula:true,cellText:true});grid=workbook.Sheets[meta.sheet];if(!grid)fail('Selected sheet is missing.');range=utils.decode_range(grid['!ref']||'A1');archive=CFB.read(raw,{type:'array'});
+ let raw=decodeBase64Bytes(source.data);
+ const legacy=meta.format==='xls',xlsx=legacy||meta.format==='xlsx';
+ if(legacy)raw=await readWorkbook(raw,{name:source.name,sheet:meta.sheet,asXlsx:true});
+ const sheetPaths=new Map();let readerBytes,workbook,grid,archive,sheetPath,xml,range,newline='\n',bom=false,ending=true;
+ if(xlsx){readerBytes=await validateZip(raw);workbook=read(readerBytes,{type:'array',cellStyles:true,cellNF:true,cellFormula:true,cellText:true});grid=workbook.Sheets[meta.sheet];if(!grid)fail('Selected sheet is missing.');range=utils.decode_range(grid['!ref']||'A1');archive=CFB.read(readerBytes,{type:'array'});
   const part=name=>{const file=CFB.find(archive,'/'+name);if(!file)fail('Workbook part is missing.');return file.content;};
   const wb=parseXML(part('xl/workbook.xml'));const rels=parseXML(part('xl/_rels/workbook.xml.rels'));
   for(const item of descendants(wb,'sheet')){const rid=Array.from(item.attributes).find(a=>a.localName==='id')?.value,target=descendants(rels,'Relationship').find(r=>r.getAttribute('Id')===rid)?.getAttribute('Target');if(target&&!target.includes('..')&&!target.includes('://'))sheetPaths.set(item.getAttribute('name'),target.startsWith('/')?target.slice(1):'xl/'+target);}
@@ -109,7 +111,7 @@ export async function openSheetDocument(source, meta, delimiter=',') {
   export(){
    if(!patches.size&&!insertions.length&&(!xlsx||!Object.values(workbook.Sheets).some(sheet=>Object.values(sheet).some(cell=>cell?.f!==undefined||cell?.F!==undefined))))return raw.slice();
    if(!xlsx){const rows=[];for(let r=0;r<=endRow();r++){const values=[];for(let c=0;c<=range.e.c;c++){const value=String(get(utils.encode_cell({r,c})).v??'');values.push(/["\r\n]/.test(value)||value.includes(delimiter)?'"'+value.replaceAll('"','""')+'"':value);}rows.push(values.join(delimiter));}return encode((bom?'\ufeff':'')+rows.join(newline)+(ending?newline:''));}
-   const out=CFB.read(raw,{type:'array'});insertWorkbookRows(out,sheetPath,meta.sheet,insertions);
+   const out=CFB.read(readerBytes,{type:'array'});insertWorkbookRows(out,sheetPath,meta.sheet,insertions);
    const doc=insertions.length?parseXML(CFB.find(out,'/'+sheetPath).content):xml.cloneNode(true),ns=doc.documentElement.namespaceURI,data=descendants(doc,'sheetData')[0];if(!data)fail('Sheet data is missing.');
    const make=name=>doc.createElementNS(ns,name);
    for(const [addr,cell]of patches){const {r,c}=utils.decode_cell(addr);let row=children(data,'row').find(n=>Number(n.getAttribute('r'))===r+1);if(!row){row=make('row');row.setAttribute('r',String(r+1));const next=children(data,'row').find(n=>Number(n.getAttribute('r'))>r+1);data.insertBefore(row,next||null);}

@@ -127,7 +127,7 @@ export function renderHtml(report) {
         let note;
         if (only) note = t("Only in {0} — no paired record", [label]);
         else if (change) note = t("Different · value {0}", [label]);
-        else if (column === report.rules.key[index]) note = t("Matching key");
+        else if ((column === report.rules.key[index] || column === report.rules.second_key?.[index])) note = t("Matching key");
         else if (!checked[index].has(column)) note = t("Not compared");
         else note = checked[index].get(column) === 'number' ? t("Matches numerically") : t("Matches under the comparison rule");
         if (value === '') note = t("Empty value · {0}", [note]);

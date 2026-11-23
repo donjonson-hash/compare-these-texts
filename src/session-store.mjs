@@ -55,9 +55,12 @@ export function validateSessionPayload(payload) {
   } else {
     if (report.kind !== undefined || report.status !== 'complete' || !object(report.sources) || !object(report.rules) || payload.review.kind !== 'sheet') invalid();
     if (!Array.isArray(report.rules.key) || report.rules.key.length !== 2 || !Array.isArray(report.rules.fields) || report.rules.fields.length > 200 || ![',',';','\t'].includes(report.rules.delimiter)) invalid();
-    for (const side of ['left','right']) {
+    const secondKey = report.rules.second_key;
+    if (secondKey !== undefined && (!Array.isArray(secondKey) || secondKey.length !== 2)) invalid();
+    for (const [index, side] of ['left','right'].entries()) {
       const meta=report.sources[side];
-      if (!object(meta) || ![undefined,'csv','xlsx'].includes(meta.format) || !Array.isArray(meta.headers) || !meta.headers.length || meta.headers.length > 200 || meta.headers.some(h=>typeof h!=='string') || new Set(meta.headers).size!==meta.headers.length) invalid();
+      if (!object(meta) || ![undefined,'csv','xls','xlsx'].includes(meta.format) || !Array.isArray(meta.headers) || !meta.headers.length || meta.headers.length > 200 || meta.headers.some(h=>typeof h!=='string') || new Set(meta.headers).size!==meta.headers.length) invalid();
+      if (secondKey && (!meta.headers.includes(secondKey[index]) || secondKey[index] === report.rules.key[index])) invalid();
     }
     let count=0; const keys=new Set();
     for (const category of ['matched','changed','only_left','only_right']) {
