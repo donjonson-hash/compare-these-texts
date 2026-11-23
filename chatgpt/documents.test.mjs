@@ -135,7 +135,7 @@ test('unsupported, corrupted and oversized documents fail instead of returning p
     source('broken.docx', 'not a ZIP archive'),
     {name: 'broken.docx', data: 'not base64'},
   ]) await assert.rejects(compareDocuments({original, revised: good}));
-  await assert.rejects(compareDocuments({original: source('large.txt', Buffer.alloc(2 * 1024 * 1024 + 1, 65)), revised: good}), /2 MiB/);
+  await assert.rejects(compareDocuments({original: source('large.txt', Buffer.alloc(2 * 1024 * 1024 + 1, 65)), revised: good}), /500,000 characters/);
   await assert.rejects(compareDocuments({original: pdf([]), revised: good}), /no usable text layer|Empty pages and scans/);
   const footnote = word('footnote.docx', ['Body'], {extraEntries: {'word/footnotes.xml': `<w:footnotes xmlns:w="${W}"><w:footnote w:id="1"><w:p><w:r><w:t>Uncompared note</w:t></w:r></w:p></w:footnote></w:footnotes>`}});
   await assert.rejects(compareDocuments({original: footnote, revised: good}), /footnotes or endnotes/);
