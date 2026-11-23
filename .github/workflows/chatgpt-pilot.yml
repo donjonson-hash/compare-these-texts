@@ -1,0 +1,30 @@
+name: ChatGPT pilot
+on:
+  pull_request:
+    paths:
+      - 'chatgpt/**'
+      - 'src/**'
+      - 'tests/fixtures/**'
+      - '.github/workflows/chatgpt-pilot.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'chatgpt/**'
+      - 'src/**'
+      - 'tests/fixtures/**'
+      - '.github/workflows/chatgpt-pilot.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: chatgpt/package-lock.json
+      - run: npm ci --prefix chatgpt
+      - run: npm test --prefix chatgpt
+      - run: npm run build --prefix chatgpt
