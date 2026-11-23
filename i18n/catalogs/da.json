@@ -2168,13 +2168,5 @@
   "f01711bf73bd": "{0}: CSV, TSV og XLS/XLSX understøttes. Gem projektmappen som XLSX.",
   "7208e54b5a60": "{0}: der forventedes en XLS-projektmappe fra Excel 97–2003. Åbn filen i Excel eller LibreOffice, og gem den som XLSX.",
   "97c0a7ed2af5": "{0}: adgangskodebeskyttede XLS-projektmapper kan ikke sammenlignes.",
-  "0541847f12bc": "Åben dokumentsammenligning",
-  "71327f623703": "Sammenlign tekster og filer",
-  "0d811c4f2835": "Tekster og dokumenter",
-  "d06238d70267": "Rækkerne er sammenlignet efter deres placering.",
-  "d6861831f3c7": "Element / række",
-  "3fdc9a587693": "Kolonne",
-  "4aefb0ef967d": "Enkel sammenligning",
-  "3273999e1eac": "Formlernes resultater vises, som de er gemt i projektmappen.",
-  "8a99a9882005": "Hvis der ikke er gemt et resultat, vises selve formlen."
+  "0541847f12bc": "Åben dokumentsammenligning"
 }

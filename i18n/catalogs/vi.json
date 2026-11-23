@@ -2158,13 +2158,5 @@
   "f01711bf73bd": "{0}: CSV, TSV, và XLS/XLSX đã được hỗ trợ. Lưu sổ làm việc dạng XLSX.",
   "7208e54b5a60": "{0}: cần sổ làm việc XLS ở định dạng Excel 97–2003. Mở tệp trong Excel hoặc LibreOffice rồi lưu dưới dạng XLSX.",
   "97c0a7ed2af5": "{0}: không thể so sánh các sổ làm việc XLS được bảo vệ bằng mật khẩu.",
-  "0541847f12bc": "So sánh tài liệu mở",
-  "71327f623703": "So sánh văn bản và tệp",
-  "0d811c4f2835": "Văn bản và tài liệu",
-  "d06238d70267": "Các hàng được so sánh theo thứ tự xuất hiện.",
-  "d6861831f3c7": "Mục / hàng",
-  "3fdc9a587693": "Cột",
-  "4aefb0ef967d": "So sánh đơn giản",
-  "3273999e1eac": "Kết quả công thức được hiển thị theo giá trị đã lưu trong sổ làm việc.",
-  "8a99a9882005": "Nếu chưa lưu kết quả, công thức sẽ được hiển thị."
+  "0541847f12bc": "So sánh tài liệu mở"
 }

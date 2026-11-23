@@ -2159,13 +2159,5 @@
   "f01711bf73bd": "{0}: sunt acceptate formatele CSV, TSV, XLS și XLSX. Salvează registrul de lucru în format XLSX.",
   "7208e54b5a60": "{0}: se așteaptă un registru de lucru Excel 97–2003 în format XLS. Deschide fișierul în Excel sau LibreOffice și salvează-l în format XLSX.",
   "97c0a7ed2af5": "{0}: registrele de lucru XLS protejate prin parolă nu pot fi comparate.",
-  "0541847f12bc": "Comparație de documente deschise",
-  "71327f623703": "Compară texte și fișiere",
-  "0d811c4f2835": "Texte și documente",
-  "d06238d70267": "Rândurile au fost comparate în ordinea în care apar.",
-  "d6861831f3c7": "Element / rând",
-  "3fdc9a587693": "Coloană",
-  "4aefb0ef967d": "Comparație simplă",
-  "3273999e1eac": "Rezultatele formulelor sunt afișate așa cum au fost salvate în registrul de lucru.",
-  "8a99a9882005": "Dacă rezultatul nu a fost salvat, se afișează formula."
+  "0541847f12bc": "Comparație de documente deschise"
 }

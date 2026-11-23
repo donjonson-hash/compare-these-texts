@@ -2167,13 +2167,5 @@
   "f01711bf73bd": "{0}: tiek atbalstīti CSV, TSV un XLS/XLSX. Saglabājiet darbgrāmatu kā XLSX.",
   "7208e54b5a60": "{0}: bija paredzēta Excel 97–2003 XLS darbgrāmata. Atveriet failu programmā Excel vai LibreOffice un saglabājiet to XLSX formātā.",
   "97c0a7ed2af5": "{0}: ar paroli aizsargātas XLS darbgrāmatas nevar salīdzināt.",
-  "0541847f12bc": "Atvērt dokumentu salīdzināšanu",
-  "71327f623703": "Salīdzināt tekstus un failus",
-  "0d811c4f2835": "Teksti un dokumenti",
-  "d06238d70267": "Rindas salīdzinātas pēc to secības.",
-  "d6861831f3c7": "Vienība / rinda",
-  "3fdc9a587693": "Kolonna",
-  "4aefb0ef967d": "Vienkārša salīdzināšana",
-  "3273999e1eac": "Formulu rezultāti tiek parādīti tādi, kādi tie saglabāti darbgrāmatā.",
-  "8a99a9882005": "Ja rezultāts nav saglabāts, tiek parādīta pati formula."
+  "0541847f12bc": "Atvērt dokumentu salīdzināšanu"
 }

@@ -2168,13 +2168,5 @@
   "f01711bf73bd": "{0}: palaikomi CSV, TSV ir XLS/XLSX. Išsaugokite darbaknygę kaip XLSX.",
   "7208e54b5a60": "{0}: tikėtasi „Excel 97–2003“ XLS darbaknygės. Atverkite failą naudodami „Excel“ arba „LibreOffice“ ir išsaugokite XLSX formatu.",
   "97c0a7ed2af5": "{0}: slaptažodžiu apsaugotų XLS darbaknygių palyginti negalima.",
-  "0541847f12bc": "Atidaryti dokumentų palyginimą",
-  "71327f623703": "Palyginti tekstus ir failus",
-  "0d811c4f2835": "Tekstai ir dokumentai",
-  "d06238d70267": "Eilutės palygintos pagal jų eiliškumą.",
-  "d6861831f3c7": "Elementas / eilutė",
-  "3fdc9a587693": "Stulpelis",
-  "4aefb0ef967d": "Paprastas palyginimas",
-  "3273999e1eac": "Formulių rezultatai rodomi tokie, kokie įrašyti darbaknygėje.",
-  "8a99a9882005": "Jei rezultatas neįrašytas, rodoma pati formulė."
+  "0541847f12bc": "Atidaryti dokumentų palyginimą"
 }

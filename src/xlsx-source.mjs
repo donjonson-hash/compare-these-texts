@@ -159,9 +159,9 @@ function readLegacy(raw, name, options) {
   try { return parse_xlscfb(archive, options); } catch { invalid(); }
 }
 
-export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, listOnly = false, simple = false}) {
+export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, listOnly = false}) {
   const legacy = /\.xls$/i.test(name);
-  const options = {type: 'array', cttFormulaCache: simple, cellFormula: true, sheetStubs: true, cellNF: true, cellText: false, cellDates: false, dense: false};
+  const options = {type: 'array', cellFormula: true, sheetStubs: true, cellNF: true, cellText: false, cellDates: false, dense: false};
   let workbook;
   if (legacy) workbook = readLegacy(raw, name, options);
   else {
@@ -194,40 +194,21 @@ export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, li
   const rowNumbers = [...new Set(coords.map(c => c.r))].sort((a, b) => a - b);
   if (rowNumbers.length > 5001) fail(`${name}: more than 5,000 data rows.`);
   const date1904 = !!workbook.Workbook?.WBProps?.date1904;
-  const formulas = {cached: 0, uncached: 0};
-  function readCell(address, identifier = false, uncachedHeaders, header) {
-    const cell = ws[address];
-    if (!simple || !cell || (cell.f === undefined && cell.F === undefined)) {
-      return valueOf(cell, prefix(address), date1904, identifier);
-    }
-    // BIFF8 formula records carry a typed result. OOXML may omit the cache
-    // altogether, which must remain distinct from a real zero or empty string.
-    const cached = legacy ? cell.v !== undefined && cell.v !== null : cell.cttCached === true;
-    if (cached) {
-      formulas.cached++;
-      if (cell.t === 'e') return utils.format_cell(cell);
-      return valueOf({t: cell.t, v: cell.v, z: cell.z}, prefix(address), date1904, identifier);
-    }
-    formulas.uncached++;
-    if (uncachedHeaders) Object.defineProperty(uncachedHeaders, header, {value: true, enumerable: true});
-    const expression = cell.f ?? ws[cell.F?.split(':')[0]]?.f;
-    return expression ? valueOf({t: 's', v: '=' + expression}, prefix(address), date1904) : '';
-  }
   const headerCells = {}, headers = [];
   for (let c = minCol; c <= maxCol; c++) {
-    const addr = utils.encode_cell({r: minRow, c}), value = readCell(addr);
+    const addr = utils.encode_cell({r: minRow, c}), value = valueOf(ws[addr], prefix(addr), date1904);
     if (!value.trim() || headers.includes(value)) fail(`${prefix(addr)}: headers must be nonempty and unique.`);
     headers.push(value); Object.defineProperty(headerCells, value, {value: addr, enumerable: true});
   }
   const rows = rowNumbers.slice(1).map(r => {
-    const values = {}, cells = {}, uncachedFormulas = Object.create(null);
+    const values = {}, cells = {};
     headers.forEach((header, i) => {
       const addr = utils.encode_cell({r, c: minCol + i});
       const identifier = /^(sku|артикул|id|идентификатор|product_id|код|код товара|код_товара)$/i.test(header.trim());
-      Object.defineProperty(values, header, {value: readCell(addr, identifier, uncachedFormulas, header), enumerable: true});
+      Object.defineProperty(values, header, {value: valueOf(ws[addr], prefix(addr), date1904, identifier), enumerable: true});
       Object.defineProperty(cells, header, {value: addr, enumerable: true});
     });
-    return {record: r + 1, values, cells, sheet: selected.name, ...(Object.keys(uncachedFormulas).length ? {uncachedFormulas} : {})};
+    return {record: r + 1, values, cells, sheet: selected.name};
   });
   if (asXlsx && legacy) {
     // A values-only working copy deliberately omits links, macros, names and embedded objects.
@@ -243,8 +224,7 @@ export async function readWorkbook(raw, {name, sha256, sheet, asXlsx = false, li
     return new Uint8Array(write(copy, {bookType:'xlsx', type:'array', compression:true}));
   }
   return {sheets, selected: selected.name, parsed: {meta: {name, sha256, format: legacy ? 'xls' : 'xlsx', sheet: selected.name, sheets, headers, header_cells: headerCells, row_count: rows.length,
-    ...(simple ? {formulas} : {}),
-    notes: simple ? [] : ["Only the selected sheet is compared, including hidden rows and columns. Empty rows are skipped. The first filled row contains the headers.", "Numbers are compared by value; a simple 000… format preserves leading zeros. Dates are converted to ISO format. Formatting, comments, images, and formulas are not compared."]}, rows}};
+    notes: ["Only the selected sheet is compared, including hidden rows and columns. Empty rows are skipped. The first filled row contains the headers.", "Numbers are compared by value; a simple 000… format preserves leading zeros. Dates are converted to ISO format. Formatting, comments, images, and formulas are not compared."]}, rows}};
 }
 
 export {valueOf as comparisonCellValue};
