@@ -42,7 +42,10 @@ async function page(t, target, browserCompatibility = false, realModules = false
   class WebWorker {
     constructor(url, options) {
       assert.equal(options.type, 'module');
-      assert.equal(fileURLToPath(url), path.join(directory, 'worker.mjs'));
+      const workerName = target === 'web'
+        ? JSON.parse(readFileSync(path.join(directory, 'release/provenance.json'))).website_runtime_assets['worker.mjs']
+        : 'worker.mjs';
+      assert.equal(fileURLToPath(url), path.join(directory, workerName));
       this.terminated = false;
       // Use the packaged worker's actual message handler. Only the browser
       // platform event bridge is adapted; no algorithm or API is substituted.
@@ -81,7 +84,8 @@ async function page(t, target, browserCompatibility = false, realModules = false
   }
   const virtualConsole = new VirtualConsole();
   virtualConsole.on('jsdomError', error => errors.push(error.message));
-  const dom = new JSDOM(readFileSync(path.join(directory, 'index.html'), 'utf8').replace('href="/site.css"', 'href="site.css"').replace('href="/favicon.svg"', 'href="favicon.svg"'), {url: pathToFileURL(path.join(directory, 'index.html')).href,
+  const pageHtml = readFileSync(path.join(directory, 'index.html'), 'utf8').replace(/href="\/(site(?:\.[0-9a-f]{16})?\.css|favicon\.svg)"/g, 'href="$1"');
+  const dom = new JSDOM(pageHtml, {url: pathToFileURL(path.join(directory, 'index.html')).href,
     resources: localResources, runScripts: realModules ? 'outside-only' : 'dangerously', virtualConsole,
     beforeParse(window) {
       window.Worker = WebWorker;
@@ -501,4 +505,34 @@ test('final check commits visible spreadsheet input and retains honest kept and 
  action('download').click();await until(()=>p.downloads.length===1);assert.equal(await p.downloads[0].blob.text(),'sku,price\nX,10\nY,20\nZ,30\n');
  q('[data-sheet-undo]').click();assert.equal(state(),'stale');action('check').click();assert.equal(state(),'kept');
  q('[data-side="right"][data-cell="B2"]').click();q('[aria-label="Cell type in B"]').value='number';q('[data-edit-side="right"]').value='invalid number';q('[data-edit-side="right"]').dispatchEvent(new p.dom.window.Event('input'));action('check').click();assert.equal(state(),'stale');assert.match(q('.visual-notice').textContent,/Enter a number/);assert.equal(q('[data-side="right"][data-cell="B2"]').textContent,'12');
+});
+
+test('two Excel files open at the original and revised values without mapping controls; advanced rules are opt-in',async t=>{
+  function inventory(quantity) {
+    const workbook=utils.book_new();
+    utils.book_append_sheet(workbook,utils.aoa_to_sheet([
+      ['Product','Unit','Quantity','Price USD','Total USD'], ['Chairs','pcs',quantity,100,quantity*100],
+    ]),'Quote');
+    return new Uint8Array(write(workbook,{type:'array',bookType:'xlsx'}));
+  }
+  const p=await page(t,'web',false,true);
+  await p.file('left',inventory(100),'original.xlsx');
+  await p.file('right',inventory(95),'revised.xlsx');
+  const rows=p.$('simple-sheet-rows'), fieldValues=row=>Array.from(row.cells).slice(1).map(cell=>cell.textContent);
+  assert.equal(p.$('simple-sheet-result').hidden,false,p.$('notice').textContent);
+  assert.equal(p.$('source-picker').open,false);
+  assert.equal(p.$('setup-question').hidden,true);
+  assert.equal(p.$('settings').hidden,true);
+  assert.equal(p.$('field-mapping').childElementCount,0,'default comparison never creates the advanced mapping');
+  assert.deepEqual(Array.from(rows.rows,fieldValues),[['Quantity','100','95'],['Total USD','10000','9500']]);
+  assert.match(rows.querySelector('details').textContent,/Chairs.*Unitpcs.*Quantity100.*Price USD100/);
+  p.$('simple-sheet-advanced').click();
+  await until(()=>p.$('settings').open && !p.$('compare').disabled);
+  assert.equal(p.$('field-mapping').childElementCount,5);
+  p.$('simple-sheet-back').click();
+  await until(()=>!p.$('simple-sheet-result').hidden && !p.$('compare').disabled);
+  assert.equal(p.$('settings').hidden,true);
+  await p.file('right',inventory(100),'same.xlsx');
+  assert.equal(p.$('simple-sheet-heading').textContent,'No differences found.');
+  assert.equal(rows.childElementCount,0,'new comparisons clear the previous results');
 });

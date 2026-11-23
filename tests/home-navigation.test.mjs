@@ -27,6 +27,7 @@ function page(t, beforeNavigation = () => {}, url = 'https://example.invalid/') 
   window.HTMLDialogElement.prototype.close = function () { this.open = false; };
   const commands = [];
   document.addEventListener('ctt:new-comparison', event => commands.push(event.detail));
+  window.eval(readFileSync(new URL('../src/file-limits.js', import.meta.url), 'utf8'));
   beforeNavigation({window, document, $});
   const navigation = new URL('../src/navigation.js', import.meta.url);
   const script = new Script(readFileSync(navigation, 'utf8'), {
@@ -118,8 +119,8 @@ test('file rejection, failed preparation and cancellation keep current editor ob
   p.upload('left', new File(['legacy'], 'old.doc'));
   assert.match(p.$('home-notice').textContent, /\.doc.*not supported/);
   assert.equal(p.$('home-left-name').textContent, 'a.txt', 'a rejected file must not replace the previously staged valid source');
-  p.upload('left', {name:'large.txt', size:2 * 1024 * 1024 + 1});
-  assert.match(p.$('home-notice').textContent, /up to 2 MB/);
+  p.upload('left', {name:'large.txt', size:25 * 1024 * 1024 + 1});
+  assert.match(p.$('home-notice').textContent, /up to 25 MB/);
   p.$('start-new-compare').click();
   assert.equal(p.commands[0].files.left, valid);
   p.commands[0].complete({ok:false, message:'Invalid document archive'}); await nextTurn();
@@ -271,4 +272,101 @@ test('the Word guide opens its editable sample once and exports the negotiated t
   assert.ok(p.$('start-menu').hidden);
   assert.equal(p.window.location.search, '');
   assert.equal(page(t, undefined, p.window.location.href).commands.length, 0, 'refresh must not launch another demo');
+});
+
+test('one uploaded workbook offers distinct populated sheets and keeps pasted sources available', async t => {
+  const {createInventoryExample} = await import('../src/workbook-example.mjs');
+  const {handleRequest} = await import('../src/worker.mjs');
+  const {file} = createInventoryExample();
+  const p = page(t, ({window}) => { window.KristinaTransport = {request: handleRequest}; }, 'https://example.invalid/?excel=sheets');
+  assert.equal(p.$('home-workbook').hidden, false);
+  const available = new Promise(resolve => {
+    const observer = new p.window.MutationObserver(() => {
+      if (!p.$('workbook-choices').hidden) { observer.disconnect(); resolve(); }
+    });
+    observer.observe(p.$('workbook-choices'), {attributes:true});
+  });
+  const chooser = p.$('workbook-file');
+  Object.defineProperty(chooser, 'files', {value:[file]});
+  chooser.dispatchEvent(new p.window.Event('change'));
+  await available;
+  assert.deepEqual(Array.from(p.$('workbook-left').options, option => option.value), ['October', 'November']);
+  p.$('workbook-left').value = 'November';
+  p.$('workbook-left').dispatchEvent(new p.window.Event('change'));
+  assert.equal(p.$('workbook-right').value, 'October');
+  p.$('workbook-compare').click();
+  const command = p.commands[0];
+  assert.equal(command.files.left, command.files.right);
+  assert.equal(command.files.right, file);
+  assert.equal(command.sheets.left, 'November');
+  assert.equal(command.sheets.right, 'October');
+  command.complete({ok:true}); await nextTurn();
+  p.$('workspace-home').click();
+  assert.equal(p.$('workbook-filename').textContent, file.name);
+  assert.equal(p.$('home-right-text').value, '');
+});
+
+test('inventory example uses the real selected worksheets and exports an independently edited sheet', async t => {
+  const {handleRequest} = await import('../src/worker.mjs');
+  const {openSheetDocument} = await import('../src/sheet-document.mjs');
+  const {read} = await import('../src/xlsx-vendor.mjs');
+  let capture;
+  const opened = new Promise(resolve => { capture = resolve; });
+  const p = page(t, ({document}) => document.addEventListener('ctt:new-comparison', e => capture(e.detail)), 'https://example.invalid/?excel=example');
+  const {files, example, sheets, complete} = await opened;
+  assert.equal(example, 'workbook');
+  const data = Buffer.from(await files.left.arrayBuffer()).toString('base64');
+  const left = {name:files.left.name, data, sheet:sheets.left};
+  const right = {...left, sheet:sheets.right};
+  const metadata = await handleRequest('/api/prepare', {left, right, delimiter:'auto'});
+  assert.equal(metadata.ready, true);
+  const {report} = await handleRequest('/api/compare', {left, right, ...metadata.rules, delimiter:metadata.delimiter});
+  assert.equal(report.changed.length, 2);
+  assert.equal(report.only_left.length, 1);
+  assert.equal(report.only_right.length, 1);
+  const lamp = report.changed.find(row => row.key === 'LAMP-01');
+  assert.equal(lamp.right.values.Quantity, '10');
+  const edited = await openSheetDocument(right, metadata.right);
+  edited.edit(lamp.right.cells.Quantity, '11', 'number');
+  const exported = read(edited.export(), {type:'array'});
+  assert.equal(exported.Sheets.November[lamp.right.cells.Quantity].v, 11);
+  assert.equal(exported.Sheets.October[lamp.left.cells.Quantity].v, 12);
+  complete({ok:true}); await nextTurn();
+  assert.ok(p.$('start-menu').hidden);
+  assert.equal(p.window.location.search, '');
+});
+
+test('two-file Excel task stays on the requested pair, preserves other inputs and sends both files', async t => {
+  const p = page(t);
+  p.paste('left', 'keep this text');
+  const select = task => p.document.querySelector('[data-home-task="' + task + '"]').click();
+  const pick = (side, file) => {
+    const input = p.$('excel-' + side + '-file');
+    Object.defineProperty(input, 'files', {configurable:true, value:[file]});
+    input.dispatchEvent(new p.window.Event('change'));
+  };
+  select('files');
+  assert.equal(p.window.location.search, '?excel=files');
+  assert.ok(p.$('home-general-inputs').hidden);
+  const original = new File(['test'], 'inventory-old.xls'), revised = new File(['test'], 'inventory-new.xlsx');
+  pick('left', original);
+  assert.ok(p.$('excel-pair-compare').disabled);
+  assert.equal(p.$('excel-pair-next').textContent, 'Upload changed file');
+  assert.ok(p.$('home-workbook').hidden);
+  pick('right', new File(['test'], 'wrong.pdf'));
+  assert.match(p.$('home-notice').textContent, /XLS/);
+  select('general');
+  assert.equal(p.$('home-left-text').value, 'keep this text');
+  select('files');
+  assert.equal(p.$('excel-left-name').textContent, original.name);
+  pick('right', revised);
+  p.$('excel-pair-compare').click();
+  assert.equal(p.commands.length, 1);
+  assert.equal(p.commands[0].files.left, original);
+  assert.equal(p.commands[0].files.right, revised);
+  p.commands[0].complete({ok:true}); await nextTurn();
+  const direct = page(t, undefined, 'https://example.invalid/?excel=files');
+  assert.equal(direct.$('home-excel-pair').hidden, false);
+  assert.ok(direct.$('home-general-inputs').hidden);
+  assert.equal(direct.document.activeElement.id, 'excel-left-file');
 });

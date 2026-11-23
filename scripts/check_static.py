@@ -5,6 +5,7 @@ import io,json,zipfile,subprocess,re,uuid,importlib.util,html
 import xml.etree.ElementTree as ET
 from store_metadata import LOCALES, message_files
 from website_analytics import SCRIPT_HASH, TAG
+from website_assets import HOME_ENTRIES, runtime_assets
 from firefox_package import split_color_emoji, MODULE_LIMIT
 root=Path(__file__).resolve().parents[1]/'dist'
 release=json.loads((root.parent/'release.json').read_text())
@@ -20,6 +21,14 @@ word_pages={'word-addin/index.html','word-addin/taskpane.html'}
 firefox_emoji={'emoji-color-vendor.mjs':(root.parent/'src/emoji-color-vendor.mjs').read_bytes()}
 split_color_emoji(firefox_emoji)
 minified_files={entry['file'] for entry in json.loads((root/'release/provenance.json').read_text())['website_minification']['files']}
+# Only the published website uses fingerprinted runtime assets. The offline
+# archives and existing clients retain their original local paths.
+website_assets = {}
+for name, target, data in runtime_assets(root):
+ assert (root / target).read_bytes() == data, (name, 'fingerprinted asset mismatch')
+ website_assets[name] = target
+assert website_assets == json.loads((root / 'release/provenance.json').read_text())['website_runtime_assets']
+website_only_files = {'robots.txt', 'sitemap.xml', 'llms.txt', '_headers', *website_assets.values()}
 assert release['homepage_url']=='https://comparetwotexts.pro/'
 assert release['privacy_url']==release['homepage_url']+'privacy/'
 assert release['support_url']==release['homepage_url']+'support/'
@@ -57,6 +66,9 @@ canonical_pages=set(); descriptions=set()
 for p in root.rglob('*.html'):
  content=p.read_text();parser=Parser();parser.feed(content);assert len(parser.ids)==len(set(parser.ids)),p
  relative=p.relative_to(root).as_posix()
+ asset_names={Path(urlparse(ref).path).name for ref in parser.resources}
+ assert not asset_names.intersection(website_assets),(p,'stale runtime asset reference')
+ if relative=='index.html':assert {website_assets[name] for name in HOME_ENTRIES}<=asset_names,(p,'missing fingerprinted runtime assets')
  route=relative.removesuffix('index.html')
  canonical='https://comparetwotexts.pro/'+route
  assert parser.h1_count==1,(p,'expected one main heading')
@@ -73,7 +85,7 @@ for p in root.rglob('*.html'):
   assert "base-uri 'none'" in parser.csp and "form-action 'none'" in parser.csp,(p,'Word CSP base/form restrictions')
   if relative=='word-addin/taskpane.html':
    assert not parser.canonicals,(p,'task pane is not an SEO page')
-   assert len(parser.scripts)==3 and {urljoin(canonical,src) for src in parser.scripts}=={'https://officeapis.public.onecdn.static.microsoft/1/office.js','https://comparetwotexts.pro/word-addin/taskpane.mjs','https://comparetwotexts.pro/i18n.js'},(p,'unexpected Word scripts')
+   assert len(parser.scripts)==3 and {urljoin(canonical,src) for src in parser.scripts}=={'https://officeapis.public.onecdn.static.microsoft/1/office.js','https://comparetwotexts.pro/word-addin/taskpane.mjs',release['homepage_url']+website_assets['i18n.js']},(p,'unexpected Word scripts')
    directives={item.strip().split()[0]:item.strip().split()[1:] for item in parser.csp.split(';') if item.strip()}
    assert directives.get('default-src')==["'none'"],(p,'Word default CSP')
    assert set(directives.get('script-src',[]))=={"'self'",'https://officeapis.public.onecdn.static.microsoft'},(p,'Word script CSP')
@@ -82,7 +94,7 @@ for p in root.rglob('*.html'):
    assert all(not urlparse(ref).scheme or ref=='https://officeapis.public.onecdn.static.microsoft/1/office.js' for ref in parser.resources),(p,'unexpected external Word resource')
   else:
    assert parser.canonicals==[canonical],(p,'Word setup canonical')
-   assert len(parser.scripts)==1 and urljoin(canonical,parser.scripts[0])=='https://comparetwotexts.pro/i18n.js' and "connect-src 'none'" in parser.csp,(p,'Word setup is a static guide')
+   assert len(parser.scripts)==1 and urljoin(canonical,parser.scripts[0])==release['homepage_url']+website_assets['i18n.js'] and "connect-src 'none'" in parser.csp,(p,'Word setup is a static guide')
  else:
   assert not relative.startswith('word-addin/'),(p,'unknown Word page requires explicit validation')
   assert parser.canonicals==[canonical],(p,'canonical mismatch')
@@ -199,7 +211,7 @@ for p in (root/'downloads').glob('*.zip'):
      assert not u.path.startswith('/'),(p,ref)
      assert u.path in z.namelist(),(p,ref)
   if p.name in (f"ctt-chrome-{release['version']}.zip",f"ctt-firefox-{release['version']}.zip"):
-   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in ('robots.txt','sitemap.xml','llms.txt','_headers')} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
+   expected={f.name for f in root.iterdir() if f.is_file() and f.name not in website_only_files} | {'manifest.json','launcher.html','launcher.css','launcher.js','privacy.html','support.html','terms.html','welcome.html','welcome.css','background.js','welcome-entry.mjs'}
    expected.update(page+'.html' for page in offline_guides)
    expected.update('downloads/'+name for name in office_downloads)
    if is_chrome:expected.update(localized_files)
@@ -212,7 +224,7 @@ for p in (root/'downloads').glob('*.zip'):
    check_google_archive(z.read('downloads/'+google_archive),str(p)+' nested Google Docs')
    assert not any(name.startswith('word-addin/') for name in z.namelist()),(p,'Word host code must remain outside the offline extension')
    for f in root.iterdir():
-    if f.is_file() and f.name not in ('index.html','robots.txt','sitemap.xml','llms.txt','_headers'):
+    if f.is_file() and f.name!='index.html' and f.name not in website_only_files:
      expected_file=root.parent/'src'/f.name if f.name in minified_files else f
      expected_data=firefox_emoji[f.name] if not is_chrome and f.name in firefox_emoji else expected_file.read_bytes()
      assert z.read(f.name)==expected_data,(p,f.name)

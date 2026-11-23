@@ -1,6 +1,7 @@
 /** Deterministic, offline tabular engine. No network, storage, or model access. */
 import {readWorkbook} from './xlsx-source.mjs';
-export const MAX_SOURCE_BYTES = 2 * 1024 * 1024;
+import {MAX_FILE_BYTES, maxEncodedLength, decodeBase64Bytes} from './file-limits.mjs';
+export const MAX_SOURCE_BYTES = MAX_FILE_BYTES;
 export const MAX_REPORT_BYTES = 16 * 1024 * 1024;
 const MAX_RECORDS = 5000, MAX_COLUMNS = 200, MAX_FIELD_CHARS = 131072, MAX_ISSUES = 100;
 const DELIMITERS = [',', ';', '\t'];
@@ -53,7 +54,7 @@ function bounded(result) {
   return result;
 }
 
-async function inputs(payload, auto = false) {
+async function inputs(payload, auto = false, simple = false) {
   if (!object(payload)) fail('Expected a JSON object');
   const delimiter = own(payload, 'delimiter') ? payload.delimiter : auto ? 'auto' : ',';
   if (![...DELIMITERS, ...(auto ? ['auto'] : [])].includes(delimiter)) fail('delimiter must be comma, semicolon, or tab');
@@ -65,18 +66,17 @@ async function inputs(payload, auto = false) {
     if (typeof name !== 'string' || !strip(name) || [...name].length > 255 || name.includes('\0')) fail(`${side}: name must be a nonblank string of at most 255 characters`);
     if (/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(name)) fail(`${side}: name must contain valid Unicode characters`);
     if (typeof data !== 'string') fail(`${side}: data must be base64 text`);
-    if (data.length > 4 * Math.ceil(MAX_SOURCE_BYTES / 3)) fail(`${side}: source exceeds 2 MiB`);
+    if (data.length > maxEncodedLength()) fail(`${side}: source exceeds 25 MiB`);
     if (/[^A-Za-z0-9+/=]/.test(data) || data.length % 4 || !/^[A-Za-z0-9+/]*={0,2}$/.test(data)) fail(`${side}: invalid base64 data`);
-    let binary;
-    try { binary = atob(data); } catch { fail(`${side}: invalid base64 data`); }
-    const raw = Uint8Array.from(binary, ch => ch.charCodeAt(0));
-    if (raw.length > MAX_SOURCE_BYTES) fail(`${side}: source exceeds 2 MiB`);
+    let raw;
+    try { raw = decodeBase64Bytes(data); } catch { fail(`${side}: invalid base64 data`); }
+    if (raw.length > MAX_SOURCE_BYTES) fail(`${side}: source exceeds 25 MiB`);
     const sha256 = [...new Uint8Array(await crypto.subtle.digest('SHA-256', raw))].map(n => n.toString(16).padStart(2, '0')).join('');
-    if (/\.xlsx$/i.test(name)) {
-      sources[side] = {name, sha256, workbook: await readWorkbook(raw, {name, sha256, sheet: item.sheet})};
+    if (/\.xlsx?$/i.test(name)) {
+      sources[side] = {name, sha256, workbook: await readWorkbook(raw, {name, sha256, sheet: item.sheet, simple})};
       continue;
     }
-    if (/\.(xls|xlsm|xlsb|ods)$/i.test(name) || raw[0] === 0x50 && raw[1] === 0x4b) fail(`${name}: CSV, TSV, and XLSX are supported. Save the workbook as XLSX.`);
+    if (/\.(xlsm|xlsb|ods)$/i.test(name) || raw[0] === 0x50 && raw[1] === 0x4b) fail(`${name}: CSV, TSV, XLS and XLSX are supported. Save the workbook as XLSX.`);
     let text;
     try { text = new TextDecoder('utf-8', {fatal: true}).decode(raw); }
     catch { fail(`${name}: expected UTF-8 CSV`); }
@@ -98,13 +98,15 @@ function source(input, delimiter) {
     chars.push(ch);
     if (chars.length > MAX_FIELD_CHARS) fail(`${name}: invalid CSV: field larger than field limit (${MAX_FIELD_CHARS})`);
   }
-  function field() { cells.push(chars.join('')); chars = []; state = 'start'; }
+  function field() {
+    if (cells.length >= MAX_COLUMNS) fail(`${name}: more than ${MAX_COLUMNS} columns`);
+    cells.push(chars.join('')); chars = []; state = 'start';
+  }
   function record() {
     if (touched || cells.length || chars.length) field();
     if (headers === undefined) {
       headers = cells;
       if (!headers.length || headers.some(h => !strip(h))) fail(`${name}: headers must be nonblank`);
-      if (headers.length > MAX_COLUMNS) fail(`${name}: more than ${MAX_COLUMNS} columns`);
       if (new Set(headers).size !== headers.length) fail(`${name}: duplicate headers`);
     } else {
       if (rows.length >= MAX_RECORDS) fail(`${name}: more than ${MAX_RECORDS} data records`);
@@ -193,14 +195,20 @@ export async function inspect(payload) {
   })));
 }
 
-export async function prepare(payload) {
-  const input = await inputs(payload, true);
+export async function loadTables(payload, {simple = false} = {}) {
+  const input = await inputs(payload, true, simple);
   if (Object.values(input.sources).some(s => s.workbook && !s.workbook.parsed)) {
     return bounded({needs_sheet: true, ready: false,
       sheets: Object.fromEntries(Object.entries(input.sources).map(([side, s]) => [side, s.workbook?.sheets || []])),
       selected: Object.fromEntries(Object.entries(input.sources).map(([side, s]) => [side, s.workbook?.selected ?? null]))});
   }
-  const {parsed, delimiter} = parseSources(input.sources, input.delimiter);
+  return parseSources(input.sources, input.delimiter);
+}
+
+export async function prepare(payload) {
+  const tables = await loadTables(payload);
+  if (tables.needs_sheet) return tables;
+  const {parsed, delimiter} = tables;
   const {left, right} = parsed, {pairs, unmatched} = mapHeaders(left.meta.headers, right.meta.headers);
   const candidates = pairs.filter(([a, b]) => meaning(a)?.startsWith('identifier_') && meaning(a) === meaning(b));
   let key = null, invalidNumeric = false;
@@ -228,14 +236,18 @@ export async function prepare(payload) {
   return bounded({left: {...left.meta, preview: left.rows.slice(0, 5)}, right: {...right.meta, preview: right.rows.slice(0, 5)}, delimiter, rules: {key, fields, strip: false}, ready: !questions.length, question: questions.length ? questions.join(' ') : null, unmatched});
 }
 
-function validateRules(key, fields, trim) {
+function validateRules(key, secondKey, fields, trim) {
   if (typeof trim !== 'boolean') fail('strip must be a boolean');
   if (key !== null && (!Array.isArray(key) || key.length !== 2 || !key.every(c => typeof c === 'string' && c))) fail('key must contain one exact column name for each source');
+  if (secondKey !== null && (!key || !Array.isArray(secondKey) || secondKey.length !== 2 ||
+      !secondKey.every((name, side) => typeof name === 'string' && name && name !== key[side]))) {
+    fail('Choose two distinct identifier columns in each file.');
+  }
   if (fields !== null) {
     if (!Array.isArray(fields)) fail('fields must be a list of (left column, right column, mode)');
     for (const f of fields) if (!Array.isArray(f) || f.length !== 3 || !f.slice(0, 2).every(c => typeof c === 'string' && c) || !['text', 'number'].includes(f[2])) fail("each field needs two column names and mode 'text' or 'number'");
     for (const side of [0, 1]) {
-      const selected = [...(key ? [key[side]] : []), ...fields.map(f => f[side])];
+      const selected = [...(key ? [key[side]] : []), ...(secondKey ? [secondKey[side]] : []), ...fields.map(f => f[side])];
       if (selected.length !== new Set(selected).size) fail('key and compared columns must be mapped one-to-one without reuse');
     }
   }
@@ -267,9 +279,11 @@ function repr(value) {
 export async function compare(payload) {
   const {sources, delimiter} = await inputs(payload);
   const key = payload.key ?? null, fields = payload.fields ?? null, trim = own(payload, 'strip') ? payload.strip : false;
-  validateRules(key, fields, trim);
+  const secondKey = payload.second_key ?? null;
+  validateRules(key, secondKey, fields, trim);
+  const keys = [key, secondKey].filter(Boolean);
   const left = source(sources.left, delimiter), right = source(sources.right, delimiter);
-  const result = {schema_version: 1, status: 'needs_clarification', sources: {left: left.meta, right: right.meta}, rules: {key, fields, strip: trim, delimiter}, questions: [], issues: [], summary: null, matched: [], changed: [], only_left: [], only_right: []};
+  const result = {schema_version: 1, status: 'needs_clarification', sources: {left: left.meta, right: right.meta}, rules: {key, ...(secondKey && {second_key: secondKey}), fields, strip: trim, delimiter}, questions: [], issues: [], summary: null, matched: [], changed: [], only_left: [], only_right: []};
   const questionSet = new Set(); let suppressed = 0;
   function issue(code, message, details = {}) {
     if (result.issues.length >= MAX_ISSUES) { suppressed++; return; }
@@ -283,7 +297,7 @@ export async function compare(payload) {
   if (key === null) issue('missing_key', "Select the exact key column name in each source before comparing.");
   if (fields === null) issue('missing_fields', "Select fields and text/number modes, or explicitly compare only which rows are present (fields=[]).");
   for (const [side, parsed, index] of [['left', left, 0], ['right', right, 1]]) {
-    for (const column of [...(key ? [key[index]] : []), ...(fields || []).map(f => f[index])]) {
+    for (const column of [...keys.map(pair => pair[index]), ...(fields || []).map(f => f[index])]) {
       if (!parsed.meta.headers.includes(column)) issue('missing_column', `Specify an existing column in source ${side} instead of ${repr(column)}.`, {side, column});
     }
   }
@@ -291,9 +305,13 @@ export async function compare(payload) {
   const normalize = trim ? strip : value => value, indexes = {}, numeric = new Map();
   for (const [side, parsed, index] of [['left', left, 0], ['right', right, 1]]) {
     const keyed = new Map();
+    const columns = keys.map(pair => pair[index]);
     for (const row of parsed.rows) {
-      const value = normalize(row.values[key[index]]);
-      if (!strip(value)) issue('empty_key', `Fill in the key in record ${row.record} of source ${side}.`, {side, record: row.record, column: key[index]});
+      const parts = columns.map(column => normalize(row.values[column]));
+      // JSON tuples keep embedded quotes, delimiters and line breaks unambiguous.
+      const value = secondKey ? JSON.stringify(parts) : parts[0];
+      const empty = parts.findIndex(part => !strip(part));
+      if (empty >= 0) issue('empty_key', `Fill in the key in record ${row.record} of source ${side}.`, {side, record: row.record, column: columns[empty]});
       else if (keyed.has(value)) issue('duplicate_key', `Resolve the duplicate key ${repr(value)} in source ${side}.`, {side, key: value, records: [keyed.get(value).record, row.record]});
       else keyed.set(value, row);
       const rowNumbers = new Map(); numeric.set(row, rowNumbers);

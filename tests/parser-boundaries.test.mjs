@@ -1,21 +1,32 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {crc32, deflateRawSync} from 'node:zlib';
+import {createHash} from 'node:crypto';
+import {writeDocxVisual} from '../src/docx-visual.mjs';
 import {unzipDocument} from '../src/text-zip.mjs';
-import {validateZip} from '../src/xlsx-source.mjs';
+import {validateZip, readWorkbook} from '../src/xlsx-source.mjs';
+import {utils, write} from '../src/xlsx-vendor.mjs';
+import {openSheetDocument} from '../src/sheet-document.mjs';
 import {readDocxPackage} from '../src/text-source.mjs';
 
 // Construct archives explicitly so central/local headers and expansion claims can
 // disagree independently. Fixtures do not need an external ZIP executable.
-function zip(parts, {deflate = false, descriptor = false, signed = true} = {}) {
+function zip(parts, {deflate = false, descriptor = false, signed = true, wide = false} = {}) {
   const locals = [], centrals = [], offsets = []; let offset = 0;
   for (const [name, text] of parts) {
     const filename = Buffer.from(name), data = Buffer.from(text), packed = deflate ? deflateRawSync(data) : data, crc = crc32(data);
-    const local = Buffer.alloc(30); local.writeUInt32LE(0x04034b50); local.writeUInt16LE(20, 4); local.writeUInt16LE(descriptor ? 8 : 0, 6); local.writeUInt16LE(deflate ? 8 : 0, 8);
+    const local = Buffer.alloc(30); local.writeUInt32LE(0x04034b50); local.writeUInt16LE(wide ? 45 : 20, 4); local.writeUInt16LE(descriptor ? 8 : 0, 6); local.writeUInt16LE(deflate ? 8 : 0, 8);
     if (!descriptor) { local.writeUInt32LE(crc, 14); local.writeUInt32LE(packed.length, 18); local.writeUInt32LE(data.length, 22); }
     local.writeUInt16LE(filename.length, 26);
-    const tail = Buffer.alloc(descriptor ? signed ? 16 : 12 : 0);
-    if (descriptor) { const p = signed ? 4 : 0; if (signed) tail.writeUInt32LE(0x08074b50); tail.writeUInt32LE(crc, p); tail.writeUInt32LE(packed.length, p + 4); tail.writeUInt32LE(data.length, p + 8); }
+    const width = wide ? 8 : 4;
+    const tail = Buffer.alloc(descriptor ? (signed ? 8 : 4) + 2 * width : 0);
+    if (descriptor) {
+      const p = signed ? 4 : 0;
+      if (signed) tail.writeUInt32LE(0x08074b50);
+      tail.writeUInt32LE(crc, p);
+      tail.writeUInt32LE(packed.length, p + 4);
+      tail.writeUInt32LE(data.length, p + 4 + width);
+    }
     const central = Buffer.alloc(46); central.writeUInt32LE(0x02014b50); central.writeUInt16LE(20, 6); central.writeUInt16LE(descriptor ? 8 : 0, 8); central.writeUInt16LE(deflate ? 8 : 0, 10); central.writeUInt32LE(crc, 16); central.writeUInt32LE(packed.length, 20); central.writeUInt32LE(data.length, 24); central.writeUInt16LE(filename.length, 28); central.writeUInt32LE(offset, 42);
     offsets.push({local: offset, data: offset + 30 + filename.length, descriptor: offset + 30 + filename.length + packed.length});
     locals.push(local, filename, packed, tail); centrals.push(central, filename); offset += local.length + filename.length + packed.length + tail.length;
@@ -55,13 +66,35 @@ for (const [format, parse] of parsers) {
     await assert.rejects(parse(forged.bytes), /Invalid.*ZIP/);
   });
 }
+test('XLSX compares and edits small streamed ZIP64 entries without changing the uploaded bytes', async () => {
+  const book = utils.book_new();
+  utils.book_append_sheet(book, utils.aoa_to_sheet([['Keyword', 'Position'], ['sample', 12]]), 'Positions');
+  const parts = [...await unzipDocument(new Uint8Array(write(book, {type:'array', bookType:'xlsx'})))];
+  for (const signed of [false, true]) {
+    const {bytes, offsets} = zip(parts, {deflate:true, descriptor:true, signed, wide:true});
+    const original = Buffer.from(bytes), name = 'positions.xlsx';
+    const result = await readWorkbook(bytes, {name});
+    assert.equal(result.parsed.rows[0].values.Position, '12');
+    const doc = await openSheetDocument({name, data:bytes.toString('base64')}, result.parsed.meta);
+    assert.deepEqual(Buffer.from(doc.export()), original);
+    doc.edit('B2', '7', 'number');
+    assert.equal((await readWorkbook(doc.export(), {name})).parsed.rows[0].values.Position, '7');
+    assert.deepEqual(bytes, original);
+    for (const highWord of [8, 16]) {
+      const corrupt = Buffer.from(original);
+      corrupt.writeUInt32LE(1, offsets[0].descriptor + (signed ? 4 : 0) + highWord);
+      await assert.rejects(validateZip(corrupt), /Invalid XLSX/);
+    }
+  }
+});
 const W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
 const doc = content => `<w:document xmlns:w="${W}"><w:body>${content}</w:body></w:document>`;
-function word(xml) {
+function word(xml, extraParts = []) {
   return zip([
     ['[Content_Types].xml', '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'],
     ['_rels/.rels', '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="r1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],
     ['word/document.xml', xml],
+    ...extraParts,
   ]).bytes;
 }
 test('DOCX XML rejects DTD, external/custom entities, malformed XML and excessive nesting', async () => {
@@ -76,4 +109,24 @@ test('DOCX XML rejects DTD, external/custom entities, malformed XML and excessiv
 test('DOCX rejects invalid merged table structure instead of silently hiding text', async () => {
   const table = '<w:tbl><w:tblGrid><w:gridCol w:w="1000"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:vMerge/></w:tcPr><w:p/></w:tc></w:tr></w:tbl>';
   await assert.rejects(readDocxPackage(word(doc(table))), /vertical cell merge is invalid/);
+});
+
+
+test('DOCX can edit, recompress and reopen a package with more than 16 MiB of media', async () => {
+  // Opaque, unreferenced media is preserved byte-for-byte by Word export.
+  const picture = Buffer.alloc(17 * 1024 * 1024);
+  let seed = 7421;
+  for (let i = 0; i < 3 * 1024 * 1024; i++) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    picture[i] = seed >>> 24;
+  }
+  const path = 'word/media/image1.jpg';
+  const sourceBytes = word(doc('<w:p><w:r><w:t>30 days</w:t></w:r></w:p>'), [[path, picture]]);
+  const source = {name: 'terms.docx', data: sourceBytes.toString('base64')};
+  const output = await writeDocxVisual(source, [{record: 1, text: '14 days'}]);
+  assert.ok(output.length > 2 * 1024 * 1024 && output.length < sourceBytes.length);
+  const reopened = await readDocxPackage(output);
+  assert.deepEqual(reopened.texts, ['14 days']);
+  const digest = data => createHash('sha256').update(data).digest('hex');
+  assert.equal(digest(reopened.entries.get(path)), digest(picture));
 });

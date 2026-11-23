@@ -13,7 +13,7 @@ No tradueix el contingut dels documents.
 Els complements pilot opcionals per a Word i Google Docs s'instal·len per separat i tenen condicions de privadesa pròpies. Aquesta extensió no els instal·la automàticament.
 
 LIMITACIONS
-- Fins a 2 MiB per fitxer. Els PDF necessiten capa de text: no s'admeten imatges escanejades ni OCR, camps de formulari interactius ni comentaris PDF.
+- Fins a 25 MiB per fitxer. Els PDF necessiten capa de text: no s'admeten imatges escanejades ni OCR, camps de formulari interactius ni comentaris PDF.
 - Les imatges i el format no es comparen. Els dissenys complexos poden exportar-se només com a text; la disposició de Word pot diferir de Microsoft Word.
 - No s'importen notes al peu, notes finals ni comentaris DOCX. Mou-los abans al text principal d'una còpia.
 - Comparar taules requereix una sola fila de capçalera, cap cel·la combinada i valors en lloc de fórmules.

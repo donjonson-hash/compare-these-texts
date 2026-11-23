@@ -18,7 +18,7 @@ Sa iyong device pinoproseso ang mga dokumento. Gumagana ang extension nang offli
 
 BAGO MAGSIMULA
 - Hindi isinasalin ang nilalaman ng mga dokumento.
-- Hanggang 2 MiB ang laki ng bawat input file.
+- Hanggang 25 MiB ang laki ng bawat input file.
 - Kailangan ng PDF ng text layer: hindi suportado ang mga na-scan na larawan na walang teksto, at walang OCR. Iba ang mga nakalimbag na puwang sa mga interactive na field ng PDF form; hindi suportado ang mga interactive na field at komento sa PDF.
 - Hindi inihahambing ang mga larawan at formatting. Nakadepende sa dokumento kung mapapanatili ang layout ng PDF; maaaring kailanganin ang text-only na export para sa mga komplikadong layout. Maaaring mag-iba ang layout ng Word kumpara sa Microsoft Word.
 - Bago mag-import ng DOCX, ilipat ang mga footnote, endnote, at komento sa mga pangunahing talata ng isang kopya ng dokumento.

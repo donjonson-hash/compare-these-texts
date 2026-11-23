@@ -18,6 +18,7 @@ test('a delayed saved document restore cannot replace a newly selected compariso
   'single-editor.mjs':{mountSingleEditor:async(root,options)=>{mountStarted=true;await new Promise(resolve=>{release=resolve;});root.textContent='Previous saved document';return {snapshot:()=>options.restoredState,changed:false,dispose(){}};}},
  };
  const modules={};for(const[name,values]of Object.entries(exports)){const module=new SyntheticModule(Object.keys(values),function(){for(const[key,value]of Object.entries(values))this.setExport(key,value);},{context});await module.link(()=>{});await module.evaluate();modules[name]=module;}
+ window.eval(readFileSync(new URL('../src/file-limits.js',import.meta.url),'utf8'));
  new Script(readFileSync(new URL('../src/single-entry.js',import.meta.url),'utf8'),{importModuleDynamically:specifier=>modules[specifier.split('/').at(-1)]}).runInContext(context);
  await until(()=>!!resume);
  document.body.classList.remove('home-mode');

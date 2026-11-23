@@ -8,6 +8,7 @@ import subprocess
 import sys
 from website_analytics import add_website_analytics
 from website_meta import add_social_meta
+from website_assets import fingerprint_website_assets
 from build_i18n import collect, build as build_i18n
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,6 +65,7 @@ def build():
     dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "--", "."], cwd=ROOT, text=True).strip())
     record = {
         "website_minification": minification,
+        "website_runtime_assets": fingerprint_website_assets(OUTPUT),
         "product": "Compare Two Texts",
         "version": release["version"],
         "source_commit": revision,

@@ -13,7 +13,7 @@ Dokumentų turinys neverčiamas.
 Pasirenkami bandomieji Word ir Google Docs priedai diegiami atskirai ir turi atskiras privatumo sąlygas. Šis plėtinys jų neįdiegia automatiškai.
 
 APRIBOJIMAI
-- Kiekvienas failas iki 2 MiB. PDF būtinas teksto sluoksnis: nuskenuoti vaizdai, OCR, interaktyvūs formų laukai ir PDF komentarai nepalaikomi.
+- Kiekvienas failas iki 25 MiB. PDF būtinas teksto sluoksnis: nuskenuoti vaizdai, OCR, interaktyvūs formų laukai ir PDF komentarai nepalaikomi.
 - Vaizdai ir formatavimas nelyginami. Sudėtingas maketas gali būti eksportuojamas tik kaip tekstas; Word maketas gali skirtis nuo Microsoft Word.
 - DOCX išnašos, galinės išnašos ir komentarai neimportuojami. Pirmiausia perkelkite juos į dokumento kopijos pagrindinį tekstą.
 - Lentelių palyginimui reikia vienos antraščių eilutės, nesujungtų langelių ir reikšmių vietoje formulių.

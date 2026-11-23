@@ -13,7 +13,7 @@ Vsebina dokumentov se ne prevaja.
 Izbirni poskusni dodatki za Word in Google Docs se namestijo ločeno in imajo svoje pogoje zasebnosti. Ta razširitev jih ne namesti samodejno.
 
 OMEJITVE
-- Do 2 MiB na datoteko. PDF potrebuje besedilno plast: skenirane slike, OCR, interaktivna polja obrazcev in komentarji PDF niso podprti.
+- Do 25 MiB na datoteko. PDF potrebuje besedilno plast: skenirane slike, OCR, interaktivna polja obrazcev in komentarji PDF niso podprti.
 - Slike in oblikovanje se ne primerjajo. Zahtevne postavitve se lahko izvozijo le kot besedilo; postavitev Worda se lahko razlikuje od Microsoft Worda.
 - Sprotne opombe, končne opombe in komentarji DOCX se ne uvozijo. Najprej jih v kopiji premaknite v glavno besedilo.
 - Primerjava preglednic zahteva eno naslovno vrstico, brez združenih celic in z vrednostmi namesto formul.

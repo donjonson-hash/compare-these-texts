@@ -18,7 +18,7 @@ Dokumentene behandles på enheten din. Utvidelsen fungerer uten internett og las
 
 FØR DU BEGYNNER
 - Innholdet i dokumentene oversettes ikke.
-- Hver inndatafil kan være opptil 2 MiB.
+- Hver inndatafil kan være opptil 25 MiB.
 - PDF-filer må ha et tekstlag: skannede bilder uten tekst støttes ikke, og det finnes ingen OCR. Trykte, tomme linjer er ikke det samme som interaktive PDF-skjemafelt; interaktive felt og PDF-kommentarer støttes ikke.
 - Bilder og formatering sammenlignes ikke. Om PDF-oppsettet kan bevares, avhenger av dokumentet; komplekse oppsett kan kreve eksport som ren tekst. Word-oppsettet kan avvike fra Microsoft Word.
 - Fotnoter, sluttnoter og kommentarer i DOCX må flyttes til avsnittene i hovedteksten i en kopi før import.

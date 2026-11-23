@@ -13,7 +13,7 @@ Sadržaj dokumenata ne prevodi se.
 Neobavezni probni dodaci za Word i Google Docs instaliraju se zasebno i imaju zasebne uvjete privatnosti. Ovo proširenje ne instalira ih automatski.
 
 OGRANIČENJA
-- Do 2 MiB po datoteci. PDF mora imati tekstualni sloj: skenirane slike, OCR, interaktivna polja obrazaca i PDF komentari nisu podržani.
+- Do 25 MiB po datoteci. PDF mora imati tekstualni sloj: skenirane slike, OCR, interaktivna polja obrazaca i PDF komentari nisu podržani.
 - Slike i oblikovanje ne uspoređuju se. Složeni rasporedi mogu se izvesti samo kao tekst; raspored Worda može se razlikovati od Microsoft Worda.
 - Fusnote, krajnje bilješke i komentari DOCX ne uvoze se. Prvo ih u kopiji premjestite u glavni tekst.
 - Usporedba tablica zahtijeva jedan redak zaglavlja, bez spojenih ćelija i s vrijednostima umjesto formula.

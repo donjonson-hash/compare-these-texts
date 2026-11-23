@@ -171,7 +171,7 @@ test('pricing page answers "is it free" for people and directories', () => {
   const page = doc.querySelector('#pricing');
   assert.equal(page.getAttribute('lang'), 'en');
   const text = page.textContent.replace(/\s+/g, ' ').toLowerCase();
-  for (const claim of ['no account', '2 mb per file', 'no document uploads']) assert.match(text, new RegExp(claim), claim);
+  for (const claim of ['no account', '25 mb per file', 'no document uploads']) assert.match(text, new RegExp(claim), claim);
   assert.equal(page.querySelectorAll('[data-i18n], [data-i18n-text]').length, 0, 'English-only copy outside the catalogs');
   for (const href of ['/privacy/', '/support/', '/terms/', '/extension/', '/']) assert.ok(page.querySelector(`a[href="${href}"]`), href);
   assert.ok(load(new URL('index.html', dist)).querySelector('#home-about a[href="/pricing/"]'), 'linked from the home FAQ');

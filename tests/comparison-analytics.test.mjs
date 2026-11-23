@@ -46,6 +46,7 @@ async function setup(t, intercept = null) {
     const module=new SyntheticModule(Object.keys(exports),function(){for(const [key,value]of Object.entries(exports))this.setExport(key,value);},{context,identifier:url});
     await module.link(()=>{});await module.evaluate();moduleCache.set(url,module);return module;
   }
+  window.eval(readFileSync(new URL('../src/file-limits.js',import.meta.url),'utf8'));
   window.eval(readFileSync(new URL('../src/office.js',import.meta.url),'utf8'));
   new Script(readFileSync(new URL('../src/app.js',import.meta.url),'utf8'),{importModuleDynamically:load}).runInContext(context);
   for(let i=0;!sessionOptions&&i<100;i++)await delay(1);

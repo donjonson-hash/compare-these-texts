@@ -18,7 +18,7 @@ Dokumenterne behandles på din enhed. Udvidelsen fungerer offline og uploader ik
 
 FØR DU STARTER
 - Dokumenternes indhold oversættes ikke.
-- Hver inputfil må højst fylde 2 MiB.
+- Hver inputfil må højst fylde 25 MiB.
 - PDF-filer skal have et tekstlag: scannede billeder uden tekst understøttes ikke, og der er ingen OCR. Trykte tomme linjer er ikke det samme som interaktive PDF-formularfelter; interaktive felter og PDF-kommentarer understøttes ikke.
 - Billeder og formatering sammenlignes ikke. Om PDF-layoutet kan bevares, afhænger af dokumentet; komplekse layouts kan kræve eksport som ren tekst. Word-layoutet kan afvige fra Microsoft Word.
 - Fodnoter, slutnoter og kommentarer i DOCX skal flyttes til brødtekstens afsnit i en kopi før import.
