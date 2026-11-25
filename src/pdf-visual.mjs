@@ -265,7 +265,7 @@ export async function drawPdfOriginalText(page, block, viewer, output, fallback,
 }
 
 /** A flattened copy: original pixels plus corrections, never original hidden text. */
-export async function renderPdfRevision(source, edits, {signal, blocks, allowReplacementFont = false} = {}) {
+export async function renderPdfRevision(source, edits, {signal, blocks, allowReplacementFont = false, onLayout} = {}) {
   if (!Array.isArray(blocks) || !blocks.length || blocks.length > 2000) fail("saving requires the full document text. Run the comparison again.");
   const ordered = blocks.slice().sort((a, b) => a.record - b.record), originals = new Map(ordered.map(block => [block.record, block]));
   if (originals.size !== ordered.length || ordered.some((block, index) => block.record !== index + 1 || typeof block.text !== 'string' || !block.visual?.rects?.length)) fail("saving requires the full document text. Run the comparison again.");
@@ -281,6 +281,7 @@ export async function renderPdfRevision(source, edits, {signal, blocks, allowRep
     const output = await PDFDocument.create(); output.registerFontkit(fontkit);
     const font = await output.embedFont(Uint8Array.from(atob(fontBase64), char => char.charCodeAt(0)), {subset: true, features: {liga: false}});
     let imageBytes = 0;
+    const layout = [];
     // Validate edits with missing coordinates even if the document has no matching page.
     for (const edit of edits) if (edit.text !== edit.block?.text && (!edit.block?.visual || edit.block.visual.page < 1 || edit.block.visual.page > viewer.pageCount)) fail("to add sections, save a text version.");
     for (let pageNumber = 1; pageNumber <= viewer.pageCount; pageNumber++) {
@@ -298,6 +299,11 @@ export async function renderPdfRevision(source, edits, {signal, blocks, allowRep
         for (const block of ordered.filter(block => block.visual.page === pageNumber)) {
           const text = replacements.has(block.record) ? replacements.get(block.record) : block.text;
           if (!text) continue;
+          if (onLayout) {
+            const area = painted.find(plan => plan.record === block.record);
+            const rects = area ? [{page:pageNumber,x:area.x/width,y:area.y/height,width:area.width/width,height:area.height/height}] : pdfBlockRects(block);
+            for (const rect of rects) layout.push({...rect, key:block.key, record:block.record});
+          }
           const rect = block.visual.rects[0], angle = -rect.angle;
           const changed = replacements.has(block.record) && (text !== block.text || edits.find(e=>e.block.record===block.record)?.box);
           if (!changed) { await drawPdfOriginalText(page, block, viewer, output, font, {height}); continue; }
@@ -312,7 +318,10 @@ export async function renderPdfRevision(source, edits, {signal, blocks, allowRep
         }
       } finally { canvas.width = canvas.height = 0; }
     }
-    abort(signal); return output.save();
+    abort(signal);
+    const data = await output.save();
+    abort(signal); onLayout?.(layout);
+    return data;
   } finally { await viewer.dispose(); }
 }
 

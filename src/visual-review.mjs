@@ -427,13 +427,15 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     pdfErrors[side] = error;
     const failure = previewFailures[side]?.revision === drafts[side].revision ? previewFailures[side] : null;
     const issue = failure ? pdfIssue(failure.message) : null;
-    uiSetText(ui[side].pdfState, issue ? uiMessage("{0} Your edits are kept. {1} A text-only PDF will not include images or page formatting.", { 0: issue[0], 1: issue[1] }) : '');
+    const substituted = pdfPreviews[side]?.revision === drafts[side].revision && pdfPreviews[side].substituted;
+    uiSetText(ui[side].pdfState, issue ? uiMessage("{0} Your edits are kept. {1} A text-only PDF will not include images or page formatting.", { 0: issue[0], 1: issue[1] }) :
+      substituted ? uiMessage("Edited text uses a replacement font in the preview and downloaded PDF.") : '');
     ui[side].pdfRecovery.hidden = !issue;
     ui[side].pdfSubstitute.hidden = failure?.code !== 'PDF_FONT_UNAVAILABLE' || (single && hasFill());
     ui[side].pdfSubstitute.disabled = exporting[side] || pdfChecking[side];
     ui[side].pdfUndo.disabled = !drafts[side].canUndo;
-    uiSetText(ui[side].save, uiMessage("Download PDF"));
-    ui[side].save.dataset.pdfMode = error ? 'reflow' : 'original';
+    uiSetText(ui[side].save, substituted ? uiMessage("Download PDF with replacement font") : uiMessage("Download PDF"));
+    ui[side].save.dataset.pdfMode = substituted ? 'replacement-font' : error ? 'reflow' : 'original';
     ui[side].save.disabled = exporting[side] || pdfChecking[side] || !!failure;
     if(ui[side].print)ui[side].print.disabled=ui[side].save.disabled||!!printJob;
     updatePdfControls(side);
@@ -805,7 +807,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     if (pdfPreviews[side]) void pdfPreviews[side].viewer.dispose().catch(() => {});
     delete pdfPreviews[side]; delete previewFailures[side];
   }
-  async function ensurePdfPreview(side) {
+  async function ensurePdfPreview(side, checkedError, edits) {
     const revision = drafts[side].revision;
     if (pdfPreviews[side]?.revision === revision) return pdfPreviews[side];
     if (previewFailures[side]?.revision === revision) {
@@ -819,12 +821,25 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       let viewer;
       try {
         const {renderPreservedPdf} = await import('./pdf-layout.mjs');
-        let layout;
-        const data = await renderPreservedPdf(sources[side], entries, {blocks, signal:controller.signal, onLayout:rects => {layout = rects;}});
-        const {openPdfVisual} = await import('./pdf-visual.mjs');
+        const {openPdfVisual, renderPdfRevision} = await import('./pdf-visual.mjs');
+        let layout, data, substituted = false;
+        const options = {blocks, signal:controller.signal, onLayout:rects => {layout = rects;}};
+        // First keep the source fonts, including when a longer edit needs reflow.
+        try {
+          data = await renderPreservedPdf(sources[side], entries, options);
+        } catch (error) {
+          if (controller.signal.aborted || (error.code !== 'PDF_FONT_UNAVAILABLE' && checkedError?.code !== 'PDF_FONT_UNAVAILABLE')) throw error;
+          substituted = true;
+          const replacement = {...options, allowReplacementFont:true};
+          if (edits) {
+            try { data = await renderPdfRevision(sources[side], edits, replacement); }
+            catch (overlayError) { if (controller.signal.aborted || overlayError.name === 'AbortError') throw overlayError; }
+          }
+          if (!data) data = await renderPreservedPdf(sources[side], entries, replacement);
+        }
         viewer = await openPdfVisual({data}, {signal:controller.signal, generated:true});
         if (!alive() || controller.signal.aborted || drafts[side].revision !== revision) throw new DOMException('Canceled', 'AbortError');
-        return pdfPreviews[side] = {revision, data, layout, viewer};
+        return pdfPreviews[side] = {revision, data, layout, viewer, substituted};
       } catch (error) {
         if (viewer) await viewer.dispose().catch(() => {});
         if (alive() && !controller.signal.aborted && drafts[side].revision === revision) previewFailures[side] = {revision, message:error.message, code:error.code};
@@ -838,7 +853,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     if(side==='left'){inlineFill?.dispose();inlineFill=null;}
     const generation = ++generations[side], {scroll} = ui[side], scrollTop = scroll.scrollTop; scroll.setAttribute('aria-busy', 'true');
     try {
-      let checkedEdits = [], checkedError = null, preview = null;
+      let checkedEdits = null, checkedError = null, preview = null;
       if (report.sources[side].format === 'pdf') {
         ui[side].pageNav.hidden = textViews[side];
         updatePdfControls(side);
@@ -867,20 +882,14 @@ export async function mountVisualReview(root, {report, sources, single = false, 
           }
         } catch(error) {checkedError=error;}
         if (!alive() || generation !== generations[side]) return;
-        if (checkedError && drafts[side].changed && !textViews[side]) {
+        if (checkedError && drafts[side].changed && (!textViews[side] || checkedError.code === 'PDF_FONT_UNAVAILABLE')) {
           uiSetText(ui[side].pdfState, uiMessage("Updating document…"));
-          try { preview = await ensurePdfPreview(side); }
+          try { preview = await ensurePdfPreview(side, checkedError, checkedEdits); }
           catch (error) {
             if (!alive() || generation !== generations[side]) return;
-            textViews[side] = true; automaticText[side] = true;
+            if (!textViews[side]) { textViews[side] = true; automaticText[side] = true; }
           }
           if (!alive() || generation !== generations[side]) return;
-        }
-        // The strict overlay may fail on its font while page reflow reports a
-        // neighboring table border. The opt-in download validates both again.
-        const failure = previewFailures[side];
-        if (checkedError?.code === 'PDF_FONT_UNAVAILABLE' && failure?.revision === drafts[side].revision) {
-          failure.code = checkedError.code;
         }
         pdfChecking[side] = false; pdfStateChanged(side, checkedError?.message ?? null);
         ui[side].pageNav.hidden = textViews[side];
@@ -1067,6 +1076,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   }
   async function fillBase() {
     if (!drafts.left.changed) return {data:decodeBase64Bytes(sources.left.data), name:sources.left.name};
+    if (pdfPreviews.left?.revision === drafts.left.revision) return {data:pdfPreviews.left.data,name:sources.left.name};
     const entries = drafts.left.entries(), blocks = sourceBlocks('left');
     const {renderPdfRevision} = await import('./pdf-visual.mjs');
     let data;
@@ -1148,20 +1158,22 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       const edited = drafts[side].changed;
       const word = format === 'docx' ? {sequence: docxSequence(side), rowPlan: drafts[side].rowPlan?.()} : null;
       let pdf = null;
-      if(format === 'pdf' && (edited||textOnly)){pdf={entries:drafts[side].entries(),blocks:sourceBlocks(side),edits:null,data:pdfPreviews[side]?.revision===revision?pdfPreviews[side].data:null,reflow:textOnly||(!allowReplacementFont && !!pdfErrors[side])};try{pdf.edits=pdfEdits(side);}catch{pdf.reflow=true;}}
+      const prepared = pdfPreviews[side]?.revision === revision ? pdfPreviews[side] : null;
+      if(format === 'pdf' && (edited||textOnly)){pdf={entries:drafts[side].entries(),blocks:sourceBlocks(side),edits:null,data:prepared?.data,reflow:textOnly||(!allowReplacementFont && !!pdfErrors[side])};try{pdf.edits=pdfEdits(side);}catch{pdf.reflow=true;}}
       if (format === 'pdf') {
         if (!edited&&!textOnly) download(decodeBase64Bytes(sources[side].data), filename(side, 'pdf'), 'application/pdf');
         else {
           const {renderPdfRevision,renderReflowedPdf} = await import('./pdf-visual.mjs');
           if (!alive()) return;
           let data;
-          if(!pdf.reflow){try{data=await renderPdfRevision(sources[side],pdf.edits,{signal,blocks:pdf.blocks,allowReplacementFont});}catch(error){if(error.name==='AbortError'||!alive())throw error;pdf.reflow=true;}}
-          if(pdf.reflow){
+          if (!textOnly && prepared) data = prepared.data;
+          if(!data && !pdf.reflow){try{data=await renderPdfRevision(sources[side],pdf.edits,{signal,blocks:pdf.blocks,allowReplacementFont});}catch(error){if(error.name==='AbortError'||!alive())throw error;pdf.reflow=true;}}
+          if(!data && pdf.reflow){
             if(textOnly){const visual=pdf.blocks[0]?.visual;data=await renderReflowedPdf(pdf.entries,{signal,pageSize:visual?[visual.width,visual.height]:undefined});}
             else{const {renderPreservedPdf}=await import('./pdf-layout.mjs');if(!alive())return;data=pdf.data || await renderPreservedPdf(sources[side],pdf.entries,{blocks:pdf.blocks,signal,allowReplacementFont});if(drafts[side].revision===revision)pdfStateChanged(side,uiMessage("Expanded layout"));}
           }
           if (!alive()) return;
-          if (allowReplacementFont) download(data, filename(side,'pdf').replace(/\.pdf$/, '-replacement-font.pdf'), 'application/pdf');
+          if (!textOnly && (allowReplacementFont || prepared?.substituted)) download(data, filename(side,'pdf').replace(/\.pdf$/, '-replacement-font.pdf'), 'application/pdf');
           else download(data, pdf.reflow ? filename(side, 'pdf').replace(/\.pdf$/, textOnly?'-text-only.pdf':'-updated-layout.pdf') : filename(side, 'pdf'), 'application/pdf');
         }
       } else if (format === 'docx') {

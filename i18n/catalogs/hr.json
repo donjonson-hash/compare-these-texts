@@ -2177,5 +2177,6 @@
   "99816043f744": "DOCX: Veza s dijelom dokumenta s komentarima nije valjana.",
   "c2973c4a81a3": "DOCX: Nedostaje veza s dijelom dokumenta s komentarima.",
   "6d61b741c442": "DOCX: Način sidrenja komentara nije podržan.",
-  "deaa84ddc746": "DOCX: Sidrenje komentara nije potpuno."
+  "deaa84ddc746": "DOCX: Sidrenje komentara nije potpuno.",
+  "afb719770e7e": "Uređeni tekst prikazuje se zamjenskim fontom u pretpregledu i u preuzetom PDF-u."
 }

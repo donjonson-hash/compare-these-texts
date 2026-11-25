@@ -2177,5 +2177,6 @@
   "99816043f744": "DOCX: La relación con la parte de comentarios no es válida.",
   "c2973c4a81a3": "DOCX: Falta la relación con la parte de comentarios.",
   "6d61b741c442": "DOCX: El anclaje del comentario no es compatible.",
-  "deaa84ddc746": "DOCX: El anclaje del comentario está incompleto."
+  "deaa84ddc746": "DOCX: El anclaje del comentario está incompleto.",
+  "afb719770e7e": "El texto editado se muestra con una fuente de sustitución en la vista previa y en el PDF descargado."
 }

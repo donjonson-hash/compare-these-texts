@@ -2177,5 +2177,6 @@
   "99816043f744": "DOCX: Érvénytelen a megjegyzéseket tartalmazó részre mutató kapcsolat.",
   "c2973c4a81a3": "DOCX: Hiányzik a megjegyzéseket tartalmazó részre mutató kapcsolat.",
   "6d61b741c442": "DOCX: A megjegyzés rögzítési módja nem támogatott.",
-  "deaa84ddc746": "DOCX: A megjegyzés rögzítési adatai hiányosak."
+  "deaa84ddc746": "DOCX: A megjegyzés rögzítési adatai hiányosak.",
+  "afb719770e7e": "A módosított szöveg az előnézetben és a letöltött PDF-ben is helyettesítő betűtípussal jelenik meg."
 }

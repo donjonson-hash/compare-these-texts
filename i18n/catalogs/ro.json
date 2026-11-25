@@ -2168,5 +2168,6 @@
   "99816043f744": "DOCX: Relația către partea cu comentarii nu este validă.",
   "c2973c4a81a3": "DOCX: Lipsește relația către partea cu comentarii.",
   "6d61b741c442": "DOCX: Modul de ancorare a comentariului nu este acceptat.",
-  "deaa84ddc746": "DOCX: Ancorarea comentariului este incompletă."
+  "deaa84ddc746": "DOCX: Ancorarea comentariului este incompletă.",
+  "afb719770e7e": "Textul editat este afișat cu un font de înlocuire în previzualizare și în PDF-ul descărcat."
 }

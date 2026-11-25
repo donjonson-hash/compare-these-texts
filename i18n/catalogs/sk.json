@@ -2174,5 +2174,6 @@
   "99816043f744": "DOCX: Neplatná väzba na časť dokumentu s komentármi.",
   "c2973c4a81a3": "DOCX: Chýba väzba na časť dokumentu s komentármi.",
   "6d61b741c442": "DOCX: Nepodporovaný spôsob ukotvenia komentára.",
-  "deaa84ddc746": "DOCX: Neúplné ukotvenie komentára."
+  "deaa84ddc746": "DOCX: Neúplné ukotvenie komentára.",
+  "afb719770e7e": "V náhľade aj v stiahnutom PDF sa upravený text zobrazí náhradným písmom."
 }
