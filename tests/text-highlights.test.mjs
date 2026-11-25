@@ -31,7 +31,7 @@ test('word highlighting preserves rich runs and images and never marks common wo
   dom.window.close();
 });
 
-async function harness(t, left, right, {leftName = 'A.txt', aggregate = false} = {}) {
+async function harness(t, left, right, {leftName = 'A.txt', aggregate = false, onStateChange} = {}) {
   const dom = new JSDOM('<main></main>'), root = dom.window.document.querySelector('main');
   globalThis.window = dom.window; globalThis.document = dom.window.document;
   window.KristinaTextEditor = editor; window.Element.prototype.scrollIntoView = () => {};
@@ -41,11 +41,12 @@ async function harness(t, left, right, {leftName = 'A.txt', aggregate = false} =
     report.matched = []; report.only_left = []; report.only_right = [];
     report.changed = [{key: 'text-1', left: await block('left'), right: await block('right')}];
   }
-  let view = await mountVisualReview(root, {report, sources});
+  const options = {report, sources, onStateChange: () => onStateChange?.(view)};
+  let view = await mountVisualReview(root, options);
   t.after(() => { view.dispose(); dom.window.close(); delete globalThis.window; delete globalThis.document; });
   const paragraphs = side => [...root.querySelectorAll('.visual-column')][side === 'left' ? 0 : 1].querySelectorAll('.visual-paragraph');
   return {dom, root, report, paragraphs, get view() { return view; },
-    async restore() { const saved = view.snapshot(); view.dispose(); view = await mountVisualReview(root, {report, sources, restoredState: saved}); },
+    async restore(saved = view.snapshot()) { view.dispose(); view = await mountVisualReview(root, {...options, restoredState: saved}); },
   };
 }
 
@@ -69,6 +70,35 @@ test('live paragraphs mark changed words only and refresh through edit, undo and
   p.root.querySelector('[aria-label="Undo edit in B"]').click();
   check(['5', '100'], ['10', '150']);
   await p.restore(); check(['5', '100'], ['10', '150']);
+});
+
+test('typing in either version updates the open document and survives reopening without Done', async t => {
+  const originals = {left: 'Delivery in 5 days.', right: 'Delivery in 10 days.'};
+  let saved;
+  const p = await harness(t, originals.left, originals.right, {onStateChange: view => { saved = view.snapshot(); }});
+  const key = p.report.changed[0].key;
+  for (const [side, letter] of [['left', 'A'], ['right', 'B']]) {
+    const other = side === 'left' ? 'right' : 'left';
+    await p.view.select(key, side);
+    const field = p.root.querySelector(`[data-edit-side="${side}"]`);
+    field.focus();
+    for (const value of ['Delivery in 7', 'Delivery in 7 days.']) {
+      field.value = value;
+      field.dispatchEvent(new p.dom.window.Event('input', {bubbles: true}));
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.equal(p.paragraphs(side)[0].textContent, value);
+      assert.equal(p.paragraphs(other)[0].textContent, originals[other]);
+      assert.equal(p.dom.window.document.activeElement, field);
+    }
+    assert.equal(p.root.querySelector('.visual-inspector').hidden, false);
+    assert.ok(saved, 'The current session was saved while the editor was open');
+    await p.restore(saved);
+    assert.equal(p.paragraphs(side)[0].textContent, 'Delivery in 7 days.');
+    const undo = p.root.querySelector(`[aria-label="Undo edit in ${letter}"]`);
+    undo.click();
+    assert.equal(p.paragraphs(side)[0].textContent, originals[side]);
+    assert.equal(undo.disabled, true, 'One undo restores the entire typing session');
+  }
 });
 
 for (const format of ['txt', 'docx']) test(`copied multi-block groups keep correct ranges in ${format.toUpperCase()} paragraphs`, async t => {

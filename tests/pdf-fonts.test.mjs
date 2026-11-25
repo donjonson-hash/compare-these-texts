@@ -103,7 +103,7 @@ test('mixed and unsupported custom fonts never silently become another font',asy
  await assert.rejects(()=>renderPreservedPdf(grouped,[{key:'group',record:1,text:'A combined replacement'}],{blocks:groupedBlocks}),/combines different fonts/);
 });
 
-test('copying text between custom-font PDFs keeps the target artwork in Document view and in the download', async t => {
+test('custom-font PDFs keep copied and typed text in Document view and in the download', async t => {
   canvasEnvironment(t);
   window.KristinaTextEditor = editor;
   window.Element.prototype.scrollIntoView = () => {};
@@ -177,5 +177,36 @@ test('copying text between custom-font PDFs keeps the target artwork in Document
     } finally {
       view.dispose();
     }
+  }
+
+  const view = await mountVisualReview(root, {sources, report});
+  try {
+    const key = report.changed[0].key;
+    await view.select(key, 'right');
+    const field = root.querySelector('[data-edit-side="right"]');
+    const save = root.querySelector('[data-save-side="right"]');
+    const column = save.closest('.visual-column');
+    const typed = ['Contract fee 15', 'Contract fee 1500'];
+    for (const value of typed) {
+      field.value = value;
+      field.dispatchEvent(new window.Event('input', {bubbles: true}));
+      assert.equal(column.querySelector('.visual-pdf-page .pdf-typing-line')?.textContent, value,
+        'The page shows the latest input before the PDF finishes rendering');
+    }
+    const latest = typed.at(-1);
+    await waitFor(() => {
+      const page = column.querySelector('.visual-pdf-page[data-pdf-layout="updated"]');
+      return page?.dataset.pdfRevision === String(view.drafts.right.revision) &&
+        page.querySelector('canvas') && !page.querySelector('.pdf-typing-line') && !save.disabled;
+    }, 'The exact PDF preview did not replace its typing overlay');
+    assert.ok(column.querySelector('.visual-hotspot').getAttribute('aria-label').includes(latest));
+    assert.equal(root.querySelector('.visual-inspector').hidden, false);
+    assert.equal(view.drafts.left.get(key), labels.left);
+    save.click();
+    await waitFor(() => downloads.length === 1, 'No PDF downloaded while the edit field was open');
+    const reopened = await readTextSource(source(new Uint8Array(await downloads.pop().arrayBuffer())));
+    assert.deepEqual(reopened.blocks.map(block => block.text), [latest]);
+  } finally {
+    view.dispose();
   }
 });

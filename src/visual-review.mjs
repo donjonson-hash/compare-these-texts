@@ -1,3 +1,4 @@
+import {showPdfTypingPreview} from './pdf-typing-preview.mjs';
 import {decodeBase64Bytes} from './file-limits.mjs';
 import {uiMessage, uiError, uiSetText, uiSetAttr, uiTranslate, uiAppendText} from './ui-text.mjs';
 import {preparePdfPrintWindow} from './pdf-print.mjs';
@@ -279,7 +280,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   const reviewUse = button(uiMessage("Use A"), () => decideReview('use-a'), 'button primary'); reviewUse.dataset.reviewAction = 'use-a';
   const reviewKeep = button(uiMessage("Keep B"), () => decideReview('keep')); reviewKeep.dataset.reviewAction = 'keep';
   const reviewReopen = button(uiMessage("Review again"), () => { if (!selected) return; reviewQueue.reopen(selected); reviewHistory = []; changed(); stateChanged(); }); reviewReopen.dataset.reviewAction = 'reopen';
-  const reviewDecisionHint = el('span', uiMessage("Or edit below, then choose Done."), 'review-decision-hint');
+  const reviewDecisionHint = el('span', uiMessage("Edits appear in the document as you type."), 'review-decision-hint');
   reviewActions.append(reviewUse, reviewKeep, reviewReopen, reviewDecisionHint);
   inspector.append(inspectorHead, reviewActions); if(single)reviewActions.hidden=true;
   const fields = el('div', undefined, 'visual-edit-fields'); inspector.append(fields); root.append(inspector);
@@ -389,8 +390,28 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     fields.append(fieldLabel); input[side] = field;
     field.addEventListener('input', () => {
       if (!alive() || !selected) return;
-      try { const before = drafts[side].revision; drafts[side].edit(selected, field.value); changed(); if (drafts[side].revision !== before) stateChanged(); } catch (error) { field.value = value(side, selected) ?? ''; message(uiError(error.message)); }
-      clearTimeout(typingTimers[side]); typingTimers[side] = setTimeout(() => { if (alive()) renderSide(side); }, 350);
+      const before = drafts[side].revision;
+      try {
+        drafts[side].edit(selected, field.value);
+      } catch (error) {
+        field.value = value(side, selected) ?? '';
+        message(uiError(error.message));
+        return;
+      }
+      if (drafts[side].revision === before) return;
+      if (report.sources[side].format !== 'pdf') {
+        void renderSide(side, {alignSelection: false});
+        stateChanged();
+        return;
+      }
+      // Show the draft on the current page before rebuilding the downloadable PDF.
+      const scroll = ui[side].scroll;
+      if (textViews[side]) scroll.replaceChildren(textPaper(side));
+      else showPdfTypingPreview(scroll, selected, field.value, row(byKey.get(selected), side), pages[side]);
+      changed();
+      stateChanged();
+      clearTimeout(typingTimers[side]);
+      typingTimers[side] = setTimeout(() => { void renderSide(side, {alignSelection: false}); }, 180);
     });
     field.addEventListener('blur', () => drafts[side].endEdit());
     if(single&&side==='left'&&['txt','docx'].includes(report.sources[side].format))wording=mountWordingOptions(fieldLabel,{
@@ -742,12 +763,13 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     if(inlineFill&&!inlineFill.dirty)void inlineFill.flush();
     if (!byKey.has(key)) throw new Error("Section not found.");
     reviewingStructure = false;
-    for (const timer of Object.values(typingTimers)) clearTimeout(timer); const selection = ++selectionGeneration; selected = key; inspector.hidden = false; root.classList.add('is-editing');
+    const selection = ++selectionGeneration;
+    selected = key; inspector.hidden = false; root.classList.add('is-editing');
+    for (const side of sides) input[side].value = value(side, key) ?? '';
     const group = byKey.get(key);
     uiSetText(inspectorTitle, different(group) ? uiMessage("Edit here or use the text from the adjacent version") : uiMessage("You can edit both versions"));
     for (const side of sides) {
       if (!alive() || selection !== selectionGeneration) return;
-      input[side].value = value(side, key) ?? '';
       if (pdfChecking[side]) await renderSide(side);
       if (!alive() || selection !== selectionGeneration) return;
       const rects = pdfPreviews[side]?.layout.filter(rect => rect.key === key), location = row(group, side);
@@ -847,8 +869,79 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     })();
     return job.promise;
   }
-  async function renderSide(side) {
+  function textPaper(side) {
+    const paper = el('div', undefined, 'visual-paper');
+    if (report.sources[side].format === 'pdf') paper.append(el('p', uiMessage("Click any text to edit. Your changes also appear in Document view."), 'visual-instruction'));
+    const model = models[side]; if (model) paper.classList.add('visual-word');
+    if (model) {
+      paper.style.paddingLeft = `${model.page.marginLeft / model.page.width * 100}%`;
+      paper.style.paddingRight = `${model.page.marginRight / model.page.width * 100}%`;
+    }
+    const projected = model ? projectWord(model, docxSequence(side), {rowPlan: drafts[side].rowPlan?.()}) : null;
+    const entries = projected ? projected.blocks : drafts[side].entries();
+    const paragraphOrdinals = new Map();
+    function paragraph(entry) {
+      const p = el(entry.heading ? `h${entry.heading}` : 'p', undefined, 'visual-paragraph'); p.dir='auto'; p.setAttribute('translate','no');
+      style(p, entry.style);
+      let content = p;
+      if (entry.list) {
+        const list = entry.list, marker = el('span', list.label, 'visual-list-marker');
+        content = el('span', undefined, 'visual-list-content');
+        p.classList.add('visual-list-item'); p.dataset.listLevel = String(list.level);
+        marker.setAttribute('aria-hidden', 'true');
+        const hanging = Math.max(0, list.indent?.hanging ?? 18), left = Math.max(0, list.indent?.left ?? (list.level + 1) * 36);
+        const aligned = list.align === 'right' ? hanging : list.align === 'center' ? hanging / 2 : 0;
+        p.style.paddingLeft = `${Math.max(0, left - hanging - aligned)}pt`;
+        p.style.textIndent = '0';
+        p.style.setProperty('--list-marker-width', list.suffix === 'tab' ? `max(0px, calc(${hanging}pt - .3em))` : '0px');
+        p.style.setProperty('--list-gap', list.suffix === 'space' ? '.3em' : list.suffix === 'tab' ? `calc(${aligned}pt + .3em)` : '0px');
+        marker.style.textAlign = list.align;
+        if (list.fontFamily) marker.style.fontFamily = list.fontFamily;
+        style(marker, list.markerStyle);
+        if (list.label === '\u{1F87A}') marker.style.fontFamily = '"CTT List Symbols", sans-serif';
+        p.append(marker, content);
+      }
+      if (entry.runs) for (const run of entry.runs) {
+        if (run.image) { const img = el('img'); img.src = run.image.src; img.alt = run.image.alt || ''; img.width = run.image.width; img.height = run.image.height; content.append(img); }
+        else { const span = el('span', run.text); style(span, run.style); content.append(span); }
+      }
+      else content.append(document.createTextNode(entry.text));
+      if (!content.hasChildNodes()) content.append(el('br'));
+      if (entry.key) {
+        const ordinal = paragraphOrdinals.get(entry.key) || 0;
+        paragraphOrdinals.set(entry.key, ordinal + 1);
+        paragraphHighlights.set(p, {content, side, ordinal, aggregate: !!model && !drafts[side].rowPlan});
+        p.dataset.group = entry.key; p.tabIndex = 0; p.setAttribute('role', 'button'); uiSetAttr(p, 'aria-label', uiMessage("Edit{0}: {1}{2}", { 0: single ? '' : ' '+letter(side), 1: entry.list ? entry.list.label + ' ' : '', 2: (entry.text.slice(0, 100) || uiMessage("Empty paragraph")) }));
+        p.addEventListener('click', () => select(entry.key, side));
+        p.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); select(entry.key, side); } });
+      }
+      return p;
+    }
+    if (model?.hasTables) {
+      const byRecord = new Map(entries.map(entry => [entry.record, entry]));
+      for (const item of projected.content) {
+        if (item.type === 'paragraph') { paper.append(paragraph(byRecord.get(item.record))); continue; }
+        const table = el('table', undefined, 'visual-table');
+        uiSetAttr(table, 'aria-label', uiMessage("Table {0}, version {1}", { 0: item.index, 1: letter(side) })); style(table, item.style);
+        const colgroup = el('colgroup'), total = item.widths.reduce((n, w) => n + w, 0);
+        for (const width of item.widths) { const col = el('col'); if (total) col.style.width = `${width / total * 100}%`; colgroup.append(col); }
+        table.append(colgroup); const tbody = el('tbody'); table.append(tbody);
+        for (const row of item.rows) {
+          const tr = el('tr'); tbody.append(tr);
+          for (const cell of row.cells) {
+            const td = el('td'); td.colSpan = cell.colSpan; td.rowSpan = cell.rowSpan; style(td, cell.style);
+            for (const p of cell.content) td.append(paragraph(byRecord.get(p.record)));
+            tr.append(td);
+          }
+        }
+        paper.append(table);
+      }
+    } else for (const entry of entries) paper.append(paragraph(entry));
+    return paper;
+  }
+  async function renderSide(side, {alignSelection = true} = {}) {
     if (!alive() || single && side === 'right') return;
+    clearTimeout(typingTimers[side]);
     if(side==='left'){inlineFill?.dispose();inlineFill=null;}
     const generation = ++generations[side], {scroll} = ui[side], scrollTop = scroll.scrollTop; scroll.setAttribute('aria-busy', 'true');
     try {
@@ -917,14 +1010,19 @@ export async function mountVisualReview(root, {report, sources, single = false, 
         paper.dataset.pdfRevision = String(drafts[side].revision); paper.dataset.pdfLayout = preview ? 'updated' : 'original';
         paper.append(canvas);
         const layer = el('div', undefined, 'visual-hotspots');
+        const continuedKeys = new Set(preview?.layout.filter(rect => rect.page > pageNumber && rect.textStart != null).map(rect => rect.key));
         for (const group of groups) {
           const source = row(group, side);
-          let rects = preview ? preview.layout.filter(rect => rect.key === group.key) : source ? viewer.rects(source) : [];
-          if(!preview&&!checkedError&&source&&painted.some(p=>p.autoFit))rects=(source.source_blocks||[source]).flatMap(part=>{const fitted=painted.find(p=>p.autoFit&&p.record===part.record);return fitted?[{page:fitted.page,x:fitted.x/part.visual.width,y:fitted.y/part.visual.height,width:fitted.width/part.visual.width,height:fitted.height/part.visual.height}]:viewer.rects(part);});
+          let rects = preview ? preview.layout.filter(rect => rect.key === group.key) : source ? (source.source_blocks || [source]).flatMap(part => viewer.rects(part).map(rect => ({...rect, record:part.record}))) : [];
+          if(!preview&&!checkedError&&source&&painted.some(p=>p.autoFit))rects=(source.source_blocks||[source]).flatMap(part=>{const fitted=painted.find(p=>p.autoFit&&p.record===part.record);return fitted?[{record:part.record,page:fitted.page,x:fitted.x/part.visual.width,y:fitted.y/part.visual.height,width:fitted.width/part.visual.width,height:fitted.height/part.visual.height}]:viewer.rects(part).map(rect=>({...rect, record:part.record}));});
           const box=drafts[side].entries().find(e=>e.key===group.key)?.pdfBox;
-          if(!preview&&!checkedError&&box&&source){const visual=(source.source_blocks||[source])[0].visual;rects=[{page:visual.page,x:Math.min(...visual.rects.map(r=>r.x))/visual.width,y:Math.min(...visual.rects.map(r=>r.y))/visual.height,width:box.width/visual.width,height:box.height/visual.height}];}
+          if(!preview&&!checkedError&&box&&source){const visual=(source.source_blocks||[source])[0].visual;rects=[{record:(source.source_blocks || [source])[0].record,page:visual.page,x:Math.min(...visual.rects.map(r=>r.x))/visual.width,y:Math.min(...visual.rects.map(r=>r.y))/visual.height,width:box.width/visual.width,height:box.height/visual.height}];}
           for (const rect of rects.filter(rect => rect.page === pageNumber)) {
             const target = button('', () => select(group.key, side), 'visual-hotspot');
+            if (rect.record != null) target.dataset.pdfRecord = String(rect.record);
+            if (rect.textStart != null) target.dataset.pdfTextStart = String(rect.textStart);
+            if (rect.textEnd != null) target.dataset.pdfTextEnd = String(rect.textEnd);
+            if (continuedKeys.has(group.key)) target.dataset.pdfContinues = 'true';
             target.dataset.group = group.key; uiSetAttr(target, 'aria-label', (different(group) ? uiMessage("Difference. Edit{0}: {1}", { 0: single ? '' : ' '+letter(side), 1: (value(side, group.key) ?? '').slice(0, 120) }) : uiMessage("Edit{0}: {1}", { 0: single ? '' : ' '+letter(side), 1: (value(side, group.key) ?? '').slice(0, 120) })));
             uiSetAttr(target, "title", uiMessage("Click to edit"));
             Object.assign(target.style, {left: `${rect.x * 100}%`, top: `${rect.y * 100}%`, width: `${Math.max(.3, rect.width * 100)}%`, height: `${Math.max(.7, rect.height * 100)}%`}); layer.append(target);
@@ -970,74 +1068,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
         pdfStateChanged(side, editError?.message ?? null);
         if (editError && !preview) { const note = el('p', uiMessage("Original page shown for reference. Download the updated PDF to see the new text layout with its images."), 'visual-inline-notice'); scroll.prepend(note); }
       } else {
-        const paper = el('div', undefined, 'visual-paper');
-        if (report.sources[side].format === 'pdf') paper.append(el('p', uiMessage("Click any text to edit. Your changes also appear in Document view."), 'visual-instruction'));
-        const model = models[side]; if (model) paper.classList.add('visual-word');
-        if (model) {
-          paper.style.paddingLeft = `${model.page.marginLeft / model.page.width * 100}%`;
-          paper.style.paddingRight = `${model.page.marginRight / model.page.width * 100}%`;
-        }
-        const projected = model ? projectWord(model, docxSequence(side), {rowPlan: drafts[side].rowPlan?.()}) : null;
-        const entries = projected ? projected.blocks : drafts[side].entries();
-        const paragraphOrdinals = new Map();
-        function paragraph(entry) {
-          const p = el(entry.heading ? `h${entry.heading}` : 'p', undefined, 'visual-paragraph'); p.dir='auto'; p.setAttribute('translate','no');
-          style(p, entry.style);
-          let content = p;
-          if (entry.list) {
-            const list = entry.list, marker = el('span', list.label, 'visual-list-marker');
-            content = el('span', undefined, 'visual-list-content');
-            p.classList.add('visual-list-item'); p.dataset.listLevel = String(list.level);
-            marker.setAttribute('aria-hidden', 'true');
-            const hanging = Math.max(0, list.indent?.hanging ?? 18), left = Math.max(0, list.indent?.left ?? (list.level + 1) * 36);
-            const aligned = list.align === 'right' ? hanging : list.align === 'center' ? hanging / 2 : 0;
-            p.style.paddingLeft = `${Math.max(0, left - hanging - aligned)}pt`;
-            p.style.textIndent = '0';
-            p.style.setProperty('--list-marker-width', list.suffix === 'tab' ? `max(0px, calc(${hanging}pt - .3em))` : '0px');
-            p.style.setProperty('--list-gap', list.suffix === 'space' ? '.3em' : list.suffix === 'tab' ? `calc(${aligned}pt + .3em)` : '0px');
-            marker.style.textAlign = list.align;
-            if (list.fontFamily) marker.style.fontFamily = list.fontFamily;
-            style(marker, list.markerStyle);
-            if (list.label === '\u{1F87A}') marker.style.fontFamily = '"CTT List Symbols", sans-serif';
-            p.append(marker, content);
-          }
-          if (entry.runs) for (const run of entry.runs) {
-            if (run.image) { const img = el('img'); img.src = run.image.src; img.alt = run.image.alt || ''; img.width = run.image.width; img.height = run.image.height; content.append(img); }
-            else { const span = el('span', run.text); style(span, run.style); content.append(span); }
-          }
-          else content.append(document.createTextNode(entry.text));
-          if (!content.hasChildNodes()) content.append(el('br'));
-          if (entry.key) {
-            const ordinal = paragraphOrdinals.get(entry.key) || 0;
-            paragraphOrdinals.set(entry.key, ordinal + 1);
-            paragraphHighlights.set(p, {content, side, ordinal, aggregate: !!model && !drafts[side].rowPlan});
-            p.dataset.group = entry.key; p.tabIndex = 0; p.setAttribute('role', 'button'); uiSetAttr(p, 'aria-label', uiMessage("Edit{0}: {1}{2}", { 0: single ? '' : ' '+letter(side), 1: entry.list ? entry.list.label + ' ' : '', 2: (entry.text.slice(0, 100) || uiMessage("Empty paragraph")) }));
-            p.addEventListener('click', () => select(entry.key, side));
-            p.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); select(entry.key, side); } });
-          }
-          return p;
-        }
-        if (model?.hasTables) {
-          const byRecord = new Map(entries.map(entry => [entry.record, entry]));
-          for (const item of projected.content) {
-            if (item.type === 'paragraph') { paper.append(paragraph(byRecord.get(item.record))); continue; }
-            const table = el('table', undefined, 'visual-table');
-            uiSetAttr(table, 'aria-label', uiMessage("Table {0}, version {1}", { 0: item.index, 1: letter(side) })); style(table, item.style);
-            const colgroup = el('colgroup'), total = item.widths.reduce((n, w) => n + w, 0);
-            for (const width of item.widths) { const col = el('col'); if (total) col.style.width = `${width / total * 100}%`; colgroup.append(col); }
-            table.append(colgroup); const tbody = el('tbody'); table.append(tbody);
-            for (const row of item.rows) {
-              const tr = el('tr'); tbody.append(tr);
-              for (const cell of row.cells) {
-                const td = el('td'); td.colSpan = cell.colSpan; td.rowSpan = cell.rowSpan; style(td, cell.style);
-                for (const p of cell.content) td.append(paragraph(byRecord.get(p.record)));
-                tr.append(td);
-              }
-            }
-            paper.append(table);
-          }
-        } else for (const entry of entries) paper.append(paragraph(entry));
-        scroll.replaceChildren(paper);
+        scroll.replaceChildren(textPaper(side));
       }
       const absent = groups.filter(group => !group.dynamic && !models[side]?.hasTables && value(side, group.key) === null && value(other(side), group.key) !== null);
       if (absent.length) {
@@ -1045,8 +1076,8 @@ export async function mountVisualReview(root, {report, sources, single = false, 
         for (const group of absent) { const add = button(uiMessage('＋ {0}', {0:value(other(side), group.key).slice(0,100) || uiMessage('Empty paragraph')}), () => { if (!alive()) return; void select(group.key); copyTo(side); }); uiSetAttr(add, "title", uiMessage("Add from {0}", { 0: letter(other(side)) })); add.dataset.missingKey = group.key; missing.append(add); }
         scroll.append(missing);
       }
-      scroll.scrollTop = scrollTop;
-      if (selected) { const target = [...scroll.querySelectorAll('[data-group]')].find(node => node.dataset.group === selected); if (target) alignTarget(scroll, target); }
+      if (alignSelection) scroll.scrollTop = scrollTop;
+      if (alignSelection && selected) { const target = [...scroll.querySelectorAll('[data-group]')].find(node => node.dataset.group === selected); if (target) alignTarget(scroll, target); }
       scrollPositions[side] = readScroll(side);
       changed();
     } catch (error) { if (alive() && generation === generations[side]) { if (report.sources[side].format === 'pdf' && !textViews[side]) { textViews[side] = true; automaticText[side] = true; previewFailures[side] = {revision:drafts[side].revision,message:error.message,code:error.code}; pdfStateChanged(side, error.message); await renderSide(side); } else { scroll.replaceChildren(el('p', uiMessage("Couldn't display the page. {0}", { 0: uiError(error.message) }), 'visual-inline-notice')); } } }
