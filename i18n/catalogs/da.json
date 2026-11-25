@@ -244,7 +244,7 @@
   "08859a601ce5": "Til Windows desktop- eller organisationsomfattende implementering skal du bruge din administrators understøttede tilføjelsesimplementeringsproces. Webruten ovenfor er den enkleste indledende pilot; denne side installerer ikke software på din computer.",
   "1e8ea60da5c1": "For et DOCX-dokument skal du vælge <0>Word (.docx)</0> for at downloade den redigerede Word-fil. For at konvertere den skal du vælge <1>PDF (.pdf) → Preview PDF → Download PDF</1>. Gennemgå forhåndsvisningen før download. Understøttede tekstoverskrifter, sidefødder og sidetal er inkluderet.",
   "1a762c0501d0": "For en PDF, der er åbnet i Rediger & eksport, skal du bruge <0>Download PDF</0>. Hvis overførslen ikke starter, skal du vælge <1>Gem PDF på computer</1>, når filen er klar. <2>Udskriv</2> åbner udskrivningsarbejdsgangen. For et regneark eksporterer indstillingen PDF det valgte ark.",
-  "39412d1f2128": "For en problemrapport skal du inkludere version <0>0.37.8</0>, din browserversion, om du brugte webstedet eller udvidelsen, filtypen og trinene til at gengive den. Fortæl os, hvad du forventede, og hvad der skete i stedet for.",
+  "c37e98cda9bf": "For en problemrapport skal du inkludere version <0></0>, din browserversion, om du brugte webstedet eller udvidelsen, filtypen og trinene til at gengive den. Fortæl os, hvad du forventede, og hvad der skete i stedet for.",
   "d548535c74ea": "Bruger du allerede den udpakkede forhåndsvisning? Download alle dokumenter, du vil beholde, før du skifter. Gemte kladder overføres ikke automatisk til butiksinstallationen.",
   "8cb3aadd236c": "Tvetydige søjler: {0}.",
   "f15f4317dd02": "Beløb A",
@@ -1480,7 +1480,7 @@
   "c926c2c50e65": "Åbner...",
   "24e667e20318": "Åbner som et tekstdokument. Downloades som UTF-8 TXT.",
   "b8979d93416d": "Valgfri Word og Google Docs tilføjelsesprogrammer",
-  "37f69e1f27eb": "Eller rediger nedenfor, og vælg derefter Udført.",
+  "b7f51607d6fe": "Dine ændringer vises i dokumentet, mens du skriver.",
   "88d759ea02ce": "Original",
   "daa78c86d673": "Original sammenligning (før dine redigeringer):\n",
   "65ed6b47cf56": "Originale forskelle · PDF ↓",
@@ -2168,5 +2168,14 @@
   "f01711bf73bd": "{0}: CSV, TSV og XLS/XLSX understøttes. Gem projektmappen som XLSX.",
   "7208e54b5a60": "{0}: der forventedes en XLS-projektmappe fra Excel 97–2003. Åbn filen i Excel eller LibreOffice, og gem den som XLSX.",
   "97c0a7ed2af5": "{0}: adgangskodebeskyttede XLS-projektmapper kan ikke sammenlignes.",
-  "0541847f12bc": "Åben dokumentsammenligning"
+  "0541847f12bc": "Åben dokumentsammenligning",
+  "62932077ca3f": "Download PDF med erstatningsskrifttype",
+  "3607efb0668d": "Sammenligningen af brødteksten er skrivebeskyttet. Word-kommentarer og navnene på deres forfattere bevares i originalfilerne og indgår ikke i sammenligningen.",
+  "9d2c04a4e64c": "DOCX: Vælg »Sammenlign dokumenter« for at gennemgå brødteksten. Filer med Word-kommentarer kan ikke redigeres.",
+  "549319d3c5dd": "DOCX: Dokumentdelen med kommentarer er ugyldig.",
+  "54b50369d74b": "DOCX: Ugyldig kommentar eller dubleret kommentar-id.",
+  "99816043f744": "DOCX: Ugyldig relation til dokumentdelen med kommentarer.",
+  "c2973c4a81a3": "DOCX: Relationen til dokumentdelen med kommentarer mangler.",
+  "6d61b741c442": "DOCX: Kommentaren bruger en forankring, der ikke understøttes.",
+  "deaa84ddc746": "DOCX: Kommentarens forankring er ufuldstændig."
 }

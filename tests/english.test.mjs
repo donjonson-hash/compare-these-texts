@@ -215,6 +215,34 @@ test('English UI: real demo Worker, suggested questions, TXT source preservation
  noRussian(p.$('notice').textContent);
 });
 
+test('Home compares independent CSV and TSV delimiters and downloads edited sources in their original dialects', async t => {
+  const p = await page(t, 'web', false, true);
+  const {window} = p.dom, document = window.document;
+  for (const [side, name, data] of [
+    ['left', 'source.csv', 'sku;price\r\nX;10\r\n'],
+    ['right', 'source.tsv', 'sku\tprice\nX\t11\n'],
+  ]) {
+    const input = p.$('home-' + side + '-file');
+    Object.defineProperty(input, 'files', {value: [new File([data], name)]});
+    input.dispatchEvent(new window.Event('change', {bubbles:true}));
+  }
+  p.$('start-new-compare').click();
+  await p.result();
+  for (const [side, value, expectedName, expectedText] of [
+    ['left', '12', 'source-version-A.csv', 'sku;price\r\nX;12\r\n'],
+    ['right', '13', 'source-version-B.tsv', 'sku\tprice\nX\t13\n'],
+  ]) {
+    const cell = () => document.querySelector('[data-side="' + side + '"][data-cell="B2"]');
+    await until(cell);
+    cell().click();
+    document.querySelector('[data-edit-side="' + side + '"]').value = value;
+    document.querySelector('[data-apply-cell="' + side + '"]').click();
+    document.querySelector('[data-save-side="' + side + '"]').click();
+    await until(() => p.downloads.some(item => item.name === expectedName));
+    assert.equal(await p.downloads.find(item => item.name === expectedName).blob.text(), expectedText);
+  }
+});
+
 test('English questions return grounded results; drafts require an affirmative request; exact keys win',async()=>{
  const {report}=await handleRequest('/api/compare',csvPayload);
  assert.equal(report.changed.length,1);assert.equal(report.commercial.totals[0].currency,'USD');

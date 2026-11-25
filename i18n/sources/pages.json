@@ -261,7 +261,7 @@
   "For Windows desktop or organization-wide deployment, use your administrator’s supported add-in deployment process. The web route above is the simplest initial pilot; this page does not install software on your computer.",
   "For a DOCX document, choose <0>Word (.docx)</0> to download the edited Word file. To convert it, choose <1>PDF (.pdf) → Preview PDF → Download PDF</1>. Review the preview before downloading. Supported text headers, footers and page numbers are included.",
   "For a PDF opened in Edit & export, use <0>Download PDF</0>. If the download does not start, select <1>Save PDF to computer</1> when the file is ready. <2>Print</2> opens the print workflow. For a spreadsheet, the PDF option exports the selected sheet.",
-  "For a problem report, include version <0>0.37.8</0>, your browser version, whether you used the website or extension, the file type and the steps to reproduce it. Tell us what you expected and what happened instead.",
+  "For a problem report, include version <0></0>, your browser version, whether you used the website or extension, the file type and the steps to reproduce it. Tell us what you expected and what happened instead.",
   "Formulas are not recalculated or compared. If the selected sheet contains formulas, save a separate values-only copy first. Keep long product codes and identifiers as text so their digits are preserved.",
   "Free to use. Your documents stay yours.",
   "From two versions to your next draft.",

@@ -699,7 +699,7 @@
   "08859a601ce5": "Voor Windows desktop of organisatiebrede implementatie, gebruik uw beheerder ..ondersteund add-in implementatie proces. De webroute hierboven is de eenvoudigste eerste piloot; deze pagina installeert geen software op uw computer.",
   "1e8ea60da5c1": "Voor een DOCX document, kies <0>Word (.docx)</0> om het bewerkte Word-bestand te downloaden. Om het te converteren, kies <1>PDF (.pdf) → Preview PDF → Download PDF</1>. Bekijk het voorbeeld voordat u downloadt. Ondersteunde tekstkoppen, voetteksten en paginanummers zijn opgenomen.",
   "1a762c0501d0": "Voor een PDF geopend in Bewerken & exporteren, gebruiken <0>Downloaden PDF</0>. Als de download niet start, selecteer <1>Opslaan PDF naar computer</1> als het bestand klaar is. <2>Afdrukken</2> opent de print workflow. Voor een spreadsheet, de PDF optie exporteert het geselecteerde blad.",
-  "39412d1f2128": "Voor een probleemrapport, omvatten versie <0>0.37.8</0>, uw browserversie, of u de website of extensie, het bestandstype en de stappen om het te reproduceren. Vertel ons wat u verwachtte en wat er in plaats daarvan gebeurde.",
+  "c37e98cda9bf": "Voor een probleemrapport, omvatten versie <0></0>, uw browserversie, of u de website of extensie, het bestandstype en de stappen om het te reproduceren. Vertel ons wat u verwachtte en wat er in plaats daarvan gebeurde.",
   "6950597fd437": "Voor een niet-gepaard artikel draagt de ontbrekende zijde nul bij aan het totaal van de lijst; dit geeft niet aan hoeveel goederen of of zij zijn geleverd. Oorspronkelijke hoeveelheid en prijs waarden vermeld in de onderstaande documenten.",
   "71f4f346a7fd": "Voor een niet-gepaard item betekent nul geen bijdrage aan het totaal van de lijst, geen nulhoeveelheid of bevestiging van levering.",
   "b6d0d96a817d": "Bijvoorbeeld: wat is er veranderd in de tekst?",
@@ -999,7 +999,7 @@
   "c926c2c50e65": "Openen...",
   "24e667e20318": "Opent als tekstdocument. Downloads als UTF-8 TXT.",
   "b8979d93416d": "Optionele woord- en Google Docs invoegtoepassingen",
-  "37f69e1f27eb": "Of bewerk hieronder, kies dan Klaar.",
+  "b7f51607d6fe": "Wijzigingen verschijnen tijdens het typen in het document.",
   "daa78c86d673": "Originele vergelijking (voordat uw bewerking plaatsvindt):\n",
   "65ed6b47cf56": "Oorspronkelijke verschillen · PDF ↓",
   "ca5e29f8995d": "Oorspronkelijke verschillen · XLSX",
@@ -2126,5 +2126,14 @@
   "f01711bf73bd": "{0}: CSV, TSV, en XLS/XLSX worden ondersteund. Sla het werkboek op als XLSX.",
   "7208e54b5a60": "{0}: een XLS-werkmap van Excel 97–2003 is vereist. Open het bestand in Excel of LibreOffice en sla het op als XLSX.",
   "97c0a7ed2af5": "{0}: XLS-werkmappen met wachtwoordbeveiliging kunnen niet worden vergeleken.",
-  "0541847f12bc": "Vergelijk document openen"
+  "0541847f12bc": "Vergelijk document openen",
+  "62932077ca3f": "PDF met vervangend lettertype downloaden",
+  "3607efb0668d": "De vergelijking van de hoofdtekst is alleen-lezen. Word-opmerkingen en de namen van de auteurs blijven bewaard in de oorspronkelijke bestanden en worden buiten de vergelijking gehouden.",
+  "9d2c04a4e64c": "DOCX: Kies ‘Documenten vergelijken’ om de hoofdtekst te bekijken. Bestanden met Word-opmerkingen kunnen niet worden bewerkt.",
+  "549319d3c5dd": "DOCX: Het documentonderdeel met opmerkingen is ongeldig.",
+  "54b50369d74b": "DOCX: De opmerking is ongeldig of de opmerking-ID komt meermaals voor.",
+  "99816043f744": "DOCX: De relatie met het onderdeel voor opmerkingen is ongeldig.",
+  "c2973c4a81a3": "DOCX: De relatie met het onderdeel voor opmerkingen ontbreekt.",
+  "6d61b741c442": "DOCX: De verankering van de opmerking wordt niet ondersteund.",
+  "deaa84ddc746": "DOCX: De verankering van de opmerking is onvolledig."
 }

@@ -51,3 +51,36 @@ test('note relationships must resolve to validated local canonical parts',async(
   {'word/_rels/document.xml.rels':relationships('footnotes.xml','TargetMode="External"')},
  ])await assert.rejects(()=>readTextSource(fixture(extra)),/relationship|additional part/i);
 });
+
+test('empty comments and anonymous character styles survive an edited DOCX download', async () => {
+  const styles = `<w:styles xmlns:w="${W}"><w:style w:type="character"><w:name w:val="Unused"/></w:style></w:styles>`;
+  const comments = `<w:comments xmlns:w="${W}"/>`;
+  const relations = `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="c" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="comments.xml"/></Relationships>`;
+  const extra = {'word/comments.xml':comments, 'word/styles.xml':styles, 'word/_rels/document.xml.rels':relations};
+  const src = source(docx(['Body'], {extraEntries:extra}));
+  const updated = await writeDocxVisual(src, [{record:1, text:'Edited'}]);
+  assert.equal((await readTextSource(source(updated))).blocks[0].text, 'Edited');
+  const parts = await unzipDocument(updated);
+  for (const [name, xml] of Object.entries(extra)) assert.equal(new TextDecoder().decode(parts.get(name)), xml);
+  for (const [name, xml] of [
+    ['word/comments.xml', `<wrong xmlns="${W}"/>`],
+    ['word/_rels/document.xml.rels', relations.replace('Target="comments.xml"', 'Target="comments.xml" TargetMode="External"')],
+    ['word/styles.xml', styles.replace('character','paragraph')],
+  ]) await assert.rejects(readTextSource(source(docx(['Body'], {extraEntries:{...extra, [name]:xml}}))), /comments|external relationships|style IDs/);
+});
+
+test('classic Word comments compare in a read-only projection, with the package and its authorship intact',async()=>{
+ const comment = `<w:comments xmlns:w="${W}"><w:comment w:id="0" w:author="Reviewer"><w:p><w:r><w:t>Verify the price</w:t></w:r></w:p></w:comment></w:comments>`;
+ const rel = '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="c" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="comments.xml"/></Relationships>';
+ const markers = '<w:commentRangeStart w:id="0"/><w:r><w:t>100 USD</w:t></w:r><w:commentRangeEnd w:id="0"/><w:r><w:commentReference w:id="0"/></w:r>';
+ const make = (body, relationship=rel) => source(docx([], {xml:`<w:document xmlns:w="${W}"><w:body><w:p>${body}</w:p></w:body></w:document>`,extraEntries:{'word/comments.xml':comment,'word/_rels/document.xml.rels':relationship}}));
+ const original=make(markers),originalBytes=Buffer.from(original.data,'base64');
+ const parsed=await readTextSource(original);
+ assert.equal(parsed.meta.comment_count,1);
+ assert.deepEqual(parsed.blocks.map(b=>b.text),['100 USD']);
+ assert.match(parsed.meta.notes.join(' '),/Read-only comparison/);
+ await assert.rejects(writeDocxVisual(original,[{record:1,text:'200 USD'}]),/Editing is unavailable/);
+ assert.deepEqual(Buffer.from(original.data,'base64'),originalBytes);
+ await assert.rejects(readTextSource(make(markers.replace('commentReference w:id="0"', 'commentReference w:id="99"'))),/comment anchor/);
+ await assert.rejects(readTextSource(make(markers,rel.replace('Target="comments.xml"', 'Target="other.xml"'))),/comments relationship/);
+});

@@ -1,3 +1,4 @@
+import {delimiterForSide} from './csv-delimiters.mjs';
 import {uiMessage, uiError, uiSetText, uiSetAttr, uiTranslate} from './ui-text.mjs';
 import {sheetColumnWidth,sheetCellColors} from './sheet-display.mjs';
 import {mountFindReplace} from './find-replace.mjs';
@@ -13,7 +14,7 @@ const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefine
 const button=(text,fn,cls='button secondary')=>{const n=el('button',text,cls);n.type='button';n.addEventListener('click',fn);return n;};
 const normalizeNumber=value=>{const m=/^([+-]?)(\d+)(?:\.(\d+))?$/.exec(value);if(!m)return value;const whole=m[2].replace(/^0+(?=\d)/,''),fraction=(m[3]||'').replace(/0+$/,'');return (m[1]==='-'&&!(whole==='0'&&!fraction)?'-':'')+whole+(fraction?'.'+fraction:'');};
 export async function mountSheetReview(root,{report,sources,single=false,restoredState,signal,onStateChange=()=>{},onRevision=()=>{},onSelectionChange=()=>{},onExplain=()=>{}}){
- const docs=Object.fromEntries(await Promise.all(sides.map(async s=>[s,await openSheetDocument(sources[s],report.sources[s],report.rules.delimiter)])));
+ const docs=Object.fromEntries(await Promise.all(sides.map(async s=>[s,await openSheetDocument(sources[s],report.sources[s],delimiterForSide(report.rules.delimiter,s))])));
  let finder=null,pdfDialog=null,disposed=false,selected=null,started=false,added=Object.create(null),undo=[],rows=[];const pages={left:0,right:0},ui={},alive=()=>!disposed&&!signal?.aborted;
  const base= ['matched','changed','only_left','only_right'].flatMap(category=>(report[category]||[]).map((g,i)=>({key:g.key,left:g.left|| (category==='only_left'?g.row:null),right:g.right||(category==='only_right'?g.row:null)}))).sort((a,b)=>(a.left?.record??Infinity)-(b.left?.record??Infinity)||(a.right?.record??0)-(b.right?.record??0));
  const columns=Object.fromEntries(sides.map(s=>[s,report.sources[s].headers]));

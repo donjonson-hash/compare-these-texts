@@ -240,7 +240,7 @@
   "bd345c0930ee": "Deteta alterações em montantes ($, €, £, ₽, USD, EUR, GBP, RUB) e percentagens. Abra uma passagem para a editar. As restantes alterações no texto ainda têm de ser revistas.",
   "1e8ea60da5c1": "Para um documento DOCX, escolha <0>Palavra (.docx)</0> para transferir o ficheiro do Word editado. Para convertê-lo, escolha <1>PDF (.pdf)  →  Pré-visualização PDF  →  Transferência PDF</1>. Revise a visualização antes de transferir.",
   "1a762c0501d0": "Para um PDF aberto em Editar e exportar, use <0>Transferir PDF</0>. Se a transferência não for iniciado, selecione <1>Guardar PDF para computador</1> quando o ficheiro estiver pronto. <2>Imprimir</2> abre o fluxo de trabalho de impressão. Para uma folha de cálculo, a opção PDF exporta a folha de cálculo selecionada.",
-  "39412d1f2128": "Para um relatório de problema, inclua a versão <0>0.37.8</0>, a versão do navegador, se você usou o site ou a extensão, o tipo de ficheiro e as etapas para reproduzi-lo. Diga-nos o que você esperava e o que aconteceu em vez disso.",
+  "c37e98cda9bf": "Para um relatório de problema, inclua a versão <0></0>, a versão do navegador, se você usou o site ou a extensão, o tipo de ficheiro e as etapas para reproduzi-lo. Diga-nos o que você esperava e o que aconteceu em vez disso.",
   "de26a95744e6": "Para comparação de texto, faça upload TXT, DOCX ou PDF ficheiros com uma camada de texto.",
   "5dc3e4e64b28": "Formato {0} ainda não é suportado. Para texto, selecione TXT, DOCX ou PDF ficheiros com uma camada de texto.",
   "bc042896d0e2": "As fórmulas são mantidas. Alguns totais mostram o resultado guardado Excel; Excel atualiza-os quando aberto.",

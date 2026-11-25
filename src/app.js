@@ -483,7 +483,8 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   function renderResult(restoredState) {
     const report = state.report, complete = report.status === 'complete', textMode = report.kind === 'text';
     reviewMode(complete, textMode);
-    $('text-editor').hidden = !(complete && textMode);
+    const commentsReadOnly = textMode && Object.values(report.sources).some(source => source.comment_count > 0);
+    $('text-editor').hidden = !(complete && textMode) || commentsReadOnly;
     editorStatus();
     changePage = 0;
     exportEnable();
@@ -537,6 +538,26 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     uiSetText($('document-left-name'), report.sources.left.name); uiSetText($('document-right-name'), report.sources.right.name);
     $('no-overlap').hidden = textMode || !(report.summary.left_rows && report.summary.right_rows && report.summary.matched + report.summary.changed === 0);
     renderRows();
+    if (commentsReadOnly) {
+      const context = $('result-context');
+      uiSetText(context, uiError('Read-only comparison of body text. Word comments and their authors are preserved in the original files and excluded from the comparison.'));
+      for (const [side, metadata] of Object.entries(report.sources)) {
+        if (!metadata.comment_count) continue;
+        const source = state.sources[side];
+        const button = element('button', uiMessage("Download {0}", {0:source.name}), 'button plain');
+        button.type = 'button';
+        button.addEventListener('click', () => {
+          const bytes = window.cttFileLimits.decodeBase64Bytes(source.data);
+          const blob = new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+          const url = URL.createObjectURL(blob), link = element('a');
+          link.href = url; link.download = source.name;
+          document.body.append(link); link.click(); link.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        });
+        context.append(' ', button);
+      }
+      return;
+    }
     if (window.KristinaTransport) return startVisualReview(report, restoredState);
   }
   async function startVisualReview(report, restoredState) {
@@ -599,7 +620,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
       $('advanced-key-home').append($('key-controls')); $('setup-question').hidden = true;
       if (saved.report.kind !== 'text') {
         state.metadata = {left:saved.report.sources.left,right:saved.report.sources.right}; state.suggested=saved.report.rules.fields; state.delimiter=saved.report.rules.delimiter;
-        $('delimiter').value=saved.report.rules.delimiter==='\t'?'tab':saved.report.rules.delimiter;
+        $('delimiter').value = typeof state.delimiter === 'object' ? 'auto' : state.delimiter === '\t' ? 'tab' : state.delimiter;
         for(const [i,side] of ['left','right'].entries()) {options($(side+'-key'),state.metadata[side].headers,uiMessage("Choose an identifier"));chooseColumn($(side+'-key'),saved.report.rules.key[i]);showSheets(side,state.metadata[side].sheets,state.metadata[side].sheet??null);}
         $('composite-key').checked = !!saved.report.rules.second_key;
         $('second-key-controls').hidden = !$('composite-key').checked;

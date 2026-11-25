@@ -2,7 +2,11 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {writeFileSync} from 'node:fs';
-import {PDFDocument, fontkit} from '../dist/pdf-vendor.mjs';
+import {setTimeout as delay} from 'node:timers/promises';
+import {handleRequest} from '../dist/worker.mjs';
+import {mountVisualReview} from '../dist/visual-review.mjs';
+import editor from '../dist/text-editor.js';
+import {PDFDocument, PDFName, fontkit, rgb, beginText, endText, setFontAndSize, setTextMatrix, showText} from '../dist/pdf-vendor.mjs';
 import {readTextSource} from '../dist/text-source.mjs';
 import {openPdfVisual, renderPdfRevision, measurePdfBlockFont} from '../dist/pdf-visual.mjs';
 import {renderPreservedPdf} from '../dist/pdf-layout.mjs';
@@ -78,8 +82,131 @@ test('mixed and unsupported custom fonts never silently become another font',asy
  const doc=await PDFDocument.create();doc.registerFontkit(fontkit);const page=doc.addPage([400,500]),regular=await doc.embedFont('Times-Roman'),bold=await doc.embedFont('Times-Bold');
  page.drawText('Regular ',{x:40,y:450,size:14,font:regular});page.drawText('bold',{x:40+regular.widthOfTextAtSize('Regular ',14),y:450,size:14,font:bold});
  const custom=await doc.embedFont(Buffer.from(boldFont,'base64'),{subset:true});page.drawText('Custom heading',{x:40,y:400,size:14,font:custom});
+ // A narrow source run can fit at the right edge even if its substitute is wider.
+ const edge='Reference number', scale=0.45, size=14;
+ const key=page.node.newFontDictionary('NarrowSource',custom.ref);
+ page.pushOperators(beginText(),setFontAndSize(key,size),
+   setTextMatrix(scale,0,0,1,399-custom.widthOfTextAtSize(edge,size)*scale,350),showText(custom.encodeText(edge)),endText());
  const input=source(await doc.save()),{blocks}=await readTextSource(input),viewer=await openPdfVisual(input);
- try {assert.equal(blocks.length,2);await assert.rejects(()=>viewer.editFont(blocks[0],'New wording'),/different fonts/);await assert.rejects(()=>viewer.editFont(blocks[1],'New heading'),/not supported for editing/);}finally{await viewer.dispose();}
+ try {assert.equal(blocks.length,3);await assert.rejects(()=>viewer.editFont(blocks[0],'New wording'),/different fonts/);await assert.rejects(()=>viewer.editFont(blocks[1],'New heading'),/not supported for editing/);}finally{await viewer.dispose();}
+ // Keep custom fonts strict by default. Only the explicit download may substitute one.
+ const edit={block:blocks[1],text:'Новый текст'};
+ await assert.rejects(renderPdfRevision(input,[edit],{blocks}),{code:'PDF_FONT_UNAVAILABLE'});
+ const output=await renderPdfRevision(input,[edit],{blocks,allowReplacementFont:true});
+ const restored=await readTextSource(source(output));
+ assert.equal(restored.meta.page_count,1);
+ assert.deepEqual(restored.blocks.map(b=>b.text),[blocks[0].text,edit.text,edge]);
+ const pageAfter=(await PDFDocument.load(output)).getPages()[0];
+ assert.deepEqual(pageAfter.getSize(),page.getSize());
+ assert.ok(pageAfter.node.Resources().lookup(PDFName.of('XObject')).keys().length,'The original page artwork is embedded');
  const grouped=await fixture(['Times-Roman','Times-Bold']),groupedRead=await readTextSource(grouped),groupedBlocks=groupedRead.blocks.map(b=>({...b,key:'group'}));
  await assert.rejects(()=>renderPreservedPdf(grouped,[{key:'group',record:1,text:'A combined replacement'}],{blocks:groupedBlocks}),/combines different fonts/);
+});
+
+test('custom-font PDFs keep copied and typed text in Document view and in the download', async t => {
+  canvasEnvironment(t);
+  window.KristinaTextEditor = editor;
+  window.Element.prototype.scrollIntoView = () => {};
+  const root = document.querySelector('main');
+  const downloads = [];
+  t.mock.method(URL, 'createObjectURL', blob => { downloads.push(blob); return 'blob:edited-pdf'; });
+  t.mock.method(URL, 'revokeObjectURL', () => {});
+  t.mock.method(window.HTMLAnchorElement.prototype, 'click', () => {});
+
+  async function makePdf(text, color) {
+    const pdf = await PDFDocument.create();
+    pdf.registerFontkit(fontkit);
+    const font = await pdf.embedFont(Buffer.from(boldFont, 'base64'), {subset: true});
+    const page = pdf.addPage([400, 500]);
+    page.drawRectangle({x: 20, y: 450, width: 40, height: 30, color});
+    page.drawText(text, {x: 45, y: 360, size: 16, font});
+    return source(await pdf.save());
+  }
+  async function waitFor(condition, message) {
+    for (let i = 0; i < 250; i++) {
+      if (condition()) return;
+      await delay(20);
+    }
+    assert.fail(message);
+  }
+  const labels = {left: 'Contract fee 1200', right: 'Contract fee 1400'};
+  const sources = {
+    left: await makePdf(labels.left, rgb(1, 0, 0)),
+    right: await makePdf(labels.right, rgb(0, 0, 1)),
+  };
+  const {report} = await handleRequest('/api/compare', sources);
+  assert.equal(report.changed.length, 1);
+  for (const [target, donor, letter, color] of [
+    ['left', 'right', 'A', [255, 0, 0]],
+    ['right', 'left', 'B', [0, 0, 255]],
+  ]) {
+    const view = await mountVisualReview(root, {sources, report});
+    try {
+      await view.select(report.changed[0].key);
+      const column = root.querySelector(`[data-save-side="${target}"]`).closest('.visual-column');
+      const save = column.querySelector(`[data-save-side="${target}"]`);
+      root.querySelector(`[data-copy-to="${target}"]`).click();
+      await waitFor(() => column.querySelector('.visual-scroll').getAttribute('aria-busy') === 'false',
+        `Copy to ${letter} did not finish drawing the target`);
+      assert.equal(column.querySelector('[data-pdf-view]').getAttribute('aria-pressed'), 'true');
+      assert.ok(column.querySelector('.visual-pdf-page[data-pdf-layout="updated"] canvas'));
+      assert.equal(column.querySelector('.pdf-recovery').hidden, true);
+      assert.equal(column.querySelector('.pdf-export-state').textContent, '');
+      assert.equal(save.disabled, false);
+      assert.equal(save.textContent, 'Download PDF with replacement font');
+
+      save.click();
+      await waitFor(() => downloads.length === 1, `No edited PDF downloaded for ${letter}`);
+      const bytes = new Uint8Array(await downloads.pop().arrayBuffer());
+      const reopened = await readTextSource(source(bytes));
+      assert.equal(reopened.meta.page_count, 1);
+      assert.deepEqual(reopened.blocks.map(block => block.text), [labels[donor]]);
+      const exported = await openPdfVisual(source(bytes));
+      try {
+        const canvas = document.createElement('canvas');
+        await exported.renderPage(1, canvas);
+        assert.deepEqual([canvas.width, canvas.height], [400, 500]);
+        const pixel = canvas.getContext('2d').getImageData(35, 35, 1, 1).data;
+        assert.deepEqual(Array.from(pixel).slice(0, 3), color, 'Target page artwork survives the transfer');
+      } finally {
+        await exported.dispose();
+      }
+      column.querySelector(`[aria-label="Undo edit in ${letter}"]`).click();
+      await waitFor(() => column.querySelector('.visual-pdf-page[data-pdf-layout="original"] canvas')
+        && !save.disabled && save.textContent === 'Download PDF', `Undo did not restore PDF ${letter}`);
+    } finally {
+      view.dispose();
+    }
+  }
+
+  const view = await mountVisualReview(root, {sources, report});
+  try {
+    const key = report.changed[0].key;
+    await view.select(key, 'right');
+    const field = root.querySelector('[data-edit-side="right"]');
+    const save = root.querySelector('[data-save-side="right"]');
+    const column = save.closest('.visual-column');
+    const typed = ['Contract fee 15', 'Contract fee 1500'];
+    for (const value of typed) {
+      field.value = value;
+      field.dispatchEvent(new window.Event('input', {bubbles: true}));
+      assert.equal(column.querySelector('.visual-pdf-page .pdf-typing-line')?.textContent, value,
+        'The page shows the latest input before the PDF finishes rendering');
+    }
+    const latest = typed.at(-1);
+    await waitFor(() => {
+      const page = column.querySelector('.visual-pdf-page[data-pdf-layout="updated"]');
+      return page?.dataset.pdfRevision === String(view.drafts.right.revision) &&
+        page.querySelector('canvas') && !page.querySelector('.pdf-typing-line') && !save.disabled;
+    }, 'The exact PDF preview did not replace its typing overlay');
+    assert.ok(column.querySelector('.visual-hotspot').getAttribute('aria-label').includes(latest));
+    assert.equal(root.querySelector('.visual-inspector').hidden, false);
+    assert.equal(view.drafts.left.get(key), labels.left);
+    save.click();
+    await waitFor(() => downloads.length === 1, 'No PDF downloaded while the edit field was open');
+    const reopened = await readTextSource(source(new Uint8Array(await downloads.pop().arrayBuffer())));
+    assert.deepEqual(reopened.blocks.map(block => block.text), [latest]);
+  } finally {
+    view.dispose();
+  }
 });

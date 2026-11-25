@@ -537,7 +537,7 @@
   "08859a601ce5": "Per a la implementació d'escriptori Windows o a tota l'organització, utilitzeu el procés de desplegament de complements compatible amb el vostre administrador. La ruta web de dalt és el pilot inicial més senzill; aquesta pàgina no instal·la programari al vostre ordinador.",
   "1e8ea60da5c1": "Per a un document DOCX, trieu <0>Word (.docx)</0> per baixar el fitxer de Word editat. Per convertir-lo, trieu <1>PDF (.pdf) → Vista prèvia de PDF → Baixa PDF</1>. Reviseu la vista prèvia abans de baixar-la. S'inclouen les capçaleres, peus de pàgina i números de pàgina admesos.",
   "1a762c0501d0": "Per a un PDF obert a Edita i exporta, utilitzeu <0>Baixa PDF</0>. Si la descàrrega no s'inicia, seleccioneu <1>Desa PDF a l'ordinador</1> quan el fitxer estigui a punt. <2>Imprimeix</2> obre el flux de treball d'impressió. Per a un full de càlcul, l'opció PDF exporta el full seleccionat.",
-  "39412d1f2128": "Per a un informe de problemes, incloeu la versió <0>0.37.8</0>, la versió del vostre navegador, si heu utilitzat el lloc web o l'extensió, el tipus de fitxer i els passos per reproduir-lo. Explica'ns què esperaves i què va passar.",
+  "c37e98cda9bf": "Per a un informe de problemes, incloeu la versió <0></0>, la versió del vostre navegador, si heu utilitzat el lloc web o l'extensió, el tipus de fitxer i els passos per reproduir-lo. Explica'ns què esperaves i què va passar.",
   "20cd55ff9540": "DOCX: {0}",
   "9406abdb65c2": "Registres de dades A",
   "9ecde9a229a0": "Registres de dades B",
@@ -726,7 +726,7 @@
   "c926c2c50e65": "Obertura…",
   "24e667e20318": "S'obre com a document de text. Descàrregues com a UTF-8 TXT.",
   "b8979d93416d": "Complements opcionals de Word i Google Docs",
-  "37f69e1f27eb": "O edita a continuació i tria Fet.",
+  "b7f51607d6fe": "Els canvis apareixen al document mentre escriviu.",
   "88d759ea02ce": "Original",
   "daa78c86d673": "Comparació original (abans de les vostres edicions):\n",
   "65ed6b47cf56": "Diferències originals · PDF ↓",
@@ -2168,5 +2168,14 @@
   "f01711bf73bd": "{0}: s'admeten CSV, TSV i XLS/XLSX. Deseu el llibre de treball com a XLSX.",
   "7208e54b5a60": "{0}: s’esperava un llibre XLS de l’Excel 97–2003. Obriu el fitxer amb l’Excel o el LibreOffice i deseu-lo com a XLSX.",
   "97c0a7ed2af5": "{0}: no es poden comparar llibres XLS protegits amb contrasenya.",
-  "0541847f12bc": "Obre la comparació de documents"
+  "0541847f12bc": "Obre la comparació de documents",
+  "62932077ca3f": "Descarrega el PDF amb un tipus de lletra alternatiu",
+  "3607efb0668d": "La comparació del cos del text és només de lectura. Els comentaris del Word i els noms dels autors es conserven als fitxers originals i queden exclosos de la comparació.",
+  "9d2c04a4e64c": "DOCX: Tria «Comparar documents» per revisar el cos del text. Els fitxers amb comentaris del Word no es poden editar.",
+  "549319d3c5dd": "DOCX: La part dels comentaris no és vàlida.",
+  "54b50369d74b": "DOCX: El comentari no és vàlid o l’identificador del comentari està duplicat.",
+  "99816043f744": "DOCX: La relació amb la part dels comentaris no és vàlida.",
+  "c2973c4a81a3": "DOCX: Falta la relació amb la part dels comentaris.",
+  "6d61b741c442": "DOCX: L’ancoratge del comentari no és compatible.",
+  "deaa84ddc746": "DOCX: L’ancoratge del comentari és incomplet."
 }

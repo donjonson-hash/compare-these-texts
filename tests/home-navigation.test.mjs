@@ -12,6 +12,14 @@ import {readTextSource} from '../src/text-source.mjs';
 import {setImmediate as nextTurn} from 'node:timers/promises';
 import {JSDOM, VirtualConsole} from 'jsdom';
 
+function excelGuideLink(label) {
+  const html = readFileSync(new URL('../src/compare-excel-files/index.html', import.meta.url), 'utf8');
+  const guide = new JSDOM(html, {url:'https://example.invalid/compare-excel-files/'});
+  try {
+    return guide.window.document.querySelector('a[data-i18n-text="' + label + '"]').href;
+  } finally { guide.window.close(); }
+}
+
 function page(t, beforeNavigation = () => {}, url = 'https://example.invalid/') {
   const errors = [];
   const console = new VirtualConsole();
@@ -278,7 +286,7 @@ test('one uploaded workbook offers distinct populated sheets and keeps pasted so
   const {createInventoryExample} = await import('../src/workbook-example.mjs');
   const {handleRequest} = await import('../src/worker.mjs');
   const {file} = createInventoryExample();
-  const p = page(t, ({window}) => { window.KristinaTransport = {request: handleRequest}; }, 'https://example.invalid/?excel=sheets');
+  const p = page(t, ({window}) => { window.KristinaTransport = {request: handleRequest}; }, excelGuideLink('Compare sheets in one workbook'));
   assert.ok(p.$('home-workbook').open);
   p.upload('left', file);
   assert.equal(p.$('start-new-compare').disabled, false);
@@ -312,7 +320,7 @@ test('inventory example uses the real selected worksheets and exports an indepen
   const {read} = await import('../src/xlsx-vendor.mjs');
   let capture;
   const opened = new Promise(resolve => { capture = resolve; });
-  const p = page(t, ({document}) => document.addEventListener('ctt:new-comparison', e => capture(e.detail)), 'https://example.invalid/?excel=example');
+  const p = page(t, ({document}) => document.addEventListener('ctt:new-comparison', e => capture(e.detail)), excelGuideLink('Try the inventory example'));
   const {files, example, sheets, complete} = await opened;
   assert.equal(example, 'workbook');
   const data = Buffer.from(await files.left.arrayBuffer()).toString('base64');

@@ -714,7 +714,7 @@
   "08859a601ce5": "Pre Windows desktop alebo celoorganizačné nasadenie, použite administrátor podporovaný proces add-in nasadenie. webová trasa vyššie je najjednoduchší počiatočný pilot; táto stránka neinštaluje softvér na vašom počítači.",
   "1e8ea60da5c1": "Pre DOCX dokument, vyberte <0>Word (.docx)</0> stiahnuť upravený súbor programu Word. Ak ho chcete previesť, vyberte <1>PDF (.pdf) → Náhľad PDF → Stiahnuť PDF</1>. Prezrite náhľad pred stiahnutím. Podporované textové hlavičky, pätky a čísla strán sú zahrnuté.",
   "1a762c0501d0": "Pre PDF otvorené v Edit & exporte, použi <0>Stiahnuť PDF </0>. Ak sa sťahovanie nezačne, vyberte <1> Uložiť PDF do počítača </1>, kedy je súbor pripravený. <2> Print </2> otvára tlačový proces. Pre tabuľku, možnosť PDF exportuje vybraný list.",
-  "39412d1f2128": "Pre správu o probléme, zahrnúť verziu <0>0.37.8</0>, verzia vášho prehliadača, či už ste použili webové stránky alebo rozšírenie, typ súboru a kroky na jeho reprodukciu. Povedzte nám, čo ste očakávali a čo sa stalo namiesto toho.",
+  "c37e98cda9bf": "Pre správu o probléme, zahrnúť verziu <0></0>, verzia vášho prehliadača, či už ste použili webové stránky alebo rozšírenie, typ súboru a kroky na jeho reprodukciu. Povedzte nám, čo ste očakávali a čo sa stalo namiesto toho.",
   "6950597fd437": "Pre nepárovanú položku, chýbajúca strana predstavuje nulu pre celkový zoznam; to neznamená množstvo tovaru alebo či bol dodaný. Pôvodné množstvo a ceny sú uvedené v nižšie uvedených dokumentoch.",
   "71f4f346a7fd": "Pre nepárovanú položku nula znamená žiadny príspevok do celkového zoznamu, nie nulové množstvo alebo potvrdenie dodávky.",
   "b6d0d96a817d": "Napríklad: Čo sa zmenilo v texte?",
@@ -1025,7 +1025,7 @@
   "c926c2c50e65": "Otváram...",
   "24e667e20318": "Otvorí sa ako textový dokument. Stiahne sa ako UTF-8 TXT.",
   "b8979d93416d": "Nepovinné doplnky Word a Google Docs",
-  "37f69e1f27eb": "Alebo upraviť nižšie, potom vyberte Hotovo.",
+  "b7f51607d6fe": "Zmeny sa v dokumente zobrazujú už počas písania.",
   "88d759ea02ce": "Originál",
   "daa78c86d673": "Pôvodné porovnanie (pred úpravou):\n",
   "65ed6b47cf56": "Pôvodné rozdiely · PDF ↓",
@@ -2165,5 +2165,14 @@
   "f01711bf73bd": "{0}: podporované sú formáty CSV, TSV, XLS a XLSX. Uložte zošit vo formáte XLSX.",
   "7208e54b5a60": "{0}: očakáva sa zošit Excelu 97–2003 vo formáte XLS. Otvorte súbor v Exceli alebo LibreOffice a uložte ho vo formáte XLSX.",
   "97c0a7ed2af5": "{0}: zošity XLS chránené heslom nemožno porovnať.",
-  "0541847f12bc": "Porovnanie otvorených dokumentov"
+  "0541847f12bc": "Porovnanie otvorených dokumentov",
+  "62932077ca3f": "Stiahnuť PDF s náhradným písmom",
+  "3607efb0668d": "Porovnanie hlavného textu je len na čítanie. Komentáre vo Worde a mená ich autorov zostávajú v pôvodných súboroch a do porovnania sa nezahŕňajú.",
+  "9d2c04a4e64c": "DOCX: Ak chcete skontrolovať hlavný text, vyberte možnosť „Porovnať dokumenty“. Súbory s komentármi vo Worde nemožno upravovať.",
+  "549319d3c5dd": "DOCX: Časť dokumentu s komentármi je neplatná.",
+  "54b50369d74b": "DOCX: Neplatný komentár alebo duplicitný identifikátor komentára.",
+  "99816043f744": "DOCX: Neplatná väzba na časť dokumentu s komentármi.",
+  "c2973c4a81a3": "DOCX: Chýba väzba na časť dokumentu s komentármi.",
+  "6d61b741c442": "DOCX: Nepodporovaný spôsob ukotvenia komentára.",
+  "deaa84ddc746": "DOCX: Neúplné ukotvenie komentára."
 }

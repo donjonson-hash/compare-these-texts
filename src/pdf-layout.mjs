@@ -35,11 +35,11 @@ function collectChanges(entries,blocks){
  for(const [key,texts]of current){if(groups.has(key))continue;const keys=[...current.keys()],i=keys.indexOf(key),next=keys.slice(i+1).find(k=>groups.has(k)),previous=keys.slice(0,i).reverse().find(k=>groups.has(k));const anchor=next?groups.get(next)[0]:previous?groups.get(previous).at(-1):blocks[0];if(!anchor)fail('An original text position is required.');const box=bounds(anchor);changes.push({key,text:texts.join('\n'),added:true,box:{...box,y:next?Math.max(0,box.y-2):box.y+box.height+2,height:0},block:anchor});}
  return changes;
 }
-export async function renderPreservedPdf(source,entries,{blocks,signal,onLayout}={}){
+export async function renderPreservedPdf(source,entries,{blocks,signal,onLayout,allowReplacementFont=false}={}){
  abort(signal);
  if(entries?.some(e=>e.pdfBox))fail('A replacement block cannot be combined with page reflow yet. Adjust the other overflowing text first.');
  if(!Array.isArray(entries)||entries.some(e=>typeof e.text!=='string')||entries.reduce((n,e)=>n+e.text.length,0)>500000||!Array.isArray(blocks)||!blocks.length||blocks.some(b=>typeof b.key!=='string'))fail('Full document text is required.');
- const viewer=await openPdfVisual(source,{signal});
+ const viewer=await openPdfVisual(source,{signal,allowReplacementFont});
  try {blocks=await viewer.refineBlocks(blocks);} catch(error){await viewer.dispose();throw error;}
  let changes;try{changes=collectChanges(entries,blocks);}catch(error){await viewer.dispose();throw error;}
  const layout=[],removed=new Set(changes.filter(c=>!c.added).map(c=>c.block.record));

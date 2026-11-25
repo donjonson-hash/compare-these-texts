@@ -797,7 +797,7 @@
   "08859a601ce5": "A Windows asztali vagy szervezeti szintű telepítéséhez használja a rendszergazda által támogatott bővítmény-telepítési folyamatot. A fenti webes útvonal a legegyszerűbb kezdeti pilot; ez az oldal nem telepít szoftvert a számítógépére.",
   "1e8ea60da5c1": "DOCX dokumentum esetén válassza a <0>Word (.docx)</0> lehetőséget a szerkesztett Word-fájl letöltéséhez. A konvertálásához válassza a <1>PDF (.pdf) → Előnézet PDF → PDF letöltése</1> lehetőséget. Letöltés előtt tekintse át az előnézetet. Támogatott szöveges fejlécek, láblécek és oldalszámok szerepelnek benne.",
   "1a762c0501d0": "A Szerkesztés és exportálás funkcióval megnyitott PDF esetén használja a <0>PDF letöltése</0> parancsot. Ha a letöltés nem indul el, válassza a <1>PDF mentése számítógépre</1> lehetőséget, amikor a fájl készen áll. A <2>Nyomtatás</2> megnyitja a nyomtatási munkafolyamatot. Táblázat esetén a PDF opció exportálja a kiválasztott lapot.",
-  "39412d1f2128": "A problémajelentéshez adja meg a <0>0.37.8</0> verziót, a böngésző verzióját, azt, hogy használta-e a webhelyet vagy a bővítményt, a fájltípust és a reprodukálás lépéseit. Mondja el, mit várt, és mi történt helyette.",
+  "c37e98cda9bf": "A problémajelentéshez adja meg a <0></0> verziót, a böngésző verzióját, azt, hogy használta-e a webhelyet vagy a bővítményt, a fájltípust és a reprodukálás lépéseit. Mondja el, mit várt, és mi történt helyette.",
   "8c67eda57961": "A kiválasztott táblázatok megjelenítése. A sorokat azonosító párosítja, és a rekordszámok az eredeti fájlokra vonatkoznak (a fejléc az 1. rekord). Csak a bejelölt mezők vannak kiemelve; a többi mezőt külön címkézzük. Az egységeket és a pénznemeket nem váltják át.",
   "00a73286bfc4": "Ugrás a kezdéshez",
   "2d14f371c386": "Egyes számított cellák frissítéséhez Excel szükséges. Töltse le a Excel-t, nyissa meg és mentse ott, majd nyissa meg újra itt a PDF létrehozásához.",
@@ -870,7 +870,7 @@
   "c926c2c50e65": "Megnyitás…",
   "24e667e20318": "Szöveges dokumentumként nyílik meg. Letöltések UTF-8 TXT néven.",
   "b8979d93416d": "Opcionális Word és Google Docs bővítmények",
-  "37f69e1f27eb": "Vagy szerkessze alább, majd válassza a Kész lehetőséget.",
+  "b7f51607d6fe": "A módosítások gépelés közben megjelennek a dokumentumban.",
   "88d759ea02ce": "Eredeti",
   "daa78c86d673": "Eredeti összehasonlítás (a szerkesztések előtt):\n",
   "65ed6b47cf56": "Eredeti eltérések · PDF ↓",
@@ -2168,5 +2168,14 @@
   "f01711bf73bd": "{0}: A CSV, a TSV és a XLS/XLSX támogatott. Mentse el a munkafüzetet XLSX néven.",
   "7208e54b5a60": "{0}: a várt formátum Excel 97–2003 XLS-munkafüzet. Nyissa meg a fájlt Excelben vagy LibreOffice-ban, és mentse XLSX formátumban.",
   "97c0a7ed2af5": "{0}: jelszóval védett XLS-munkafüzetek nem hasonlíthatók össze.",
-  "0541847f12bc": "Nyitott dokumentum-összehasonlítás"
+  "0541847f12bc": "Nyitott dokumentum-összehasonlítás",
+  "62932077ca3f": "PDF letöltése helyettesítő betűtípussal",
+  "3607efb0668d": "A törzsszöveg összehasonlítása csak olvasható. A Word-megjegyzések és szerzőik neve az eredeti fájlokban megmarad, de az összehasonlításban nem szerepel.",
+  "9d2c04a4e64c": "DOCX: A törzsszöveg áttekintéséhez válassza a(z) „Hasonlítsa össze a dokumentumokat” lehetőséget. A Word-megjegyzéseket tartalmazó fájlok nem szerkeszthetők.",
+  "549319d3c5dd": "DOCX: Érvénytelen a megjegyzéseket tartalmazó dokumentumrész.",
+  "54b50369d74b": "DOCX: Érvénytelen megjegyzés vagy ismétlődő megjegyzésazonosító.",
+  "99816043f744": "DOCX: Érvénytelen a megjegyzéseket tartalmazó részre mutató kapcsolat.",
+  "c2973c4a81a3": "DOCX: Hiányzik a megjegyzéseket tartalmazó részre mutató kapcsolat.",
+  "6d61b741c442": "DOCX: A megjegyzés rögzítési módja nem támogatott.",
+  "deaa84ddc746": "DOCX: A megjegyzés rögzítési adatai hiányosak."
 }

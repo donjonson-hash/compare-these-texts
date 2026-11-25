@@ -1,3 +1,4 @@
+import {showPdfTypingPreview} from './pdf-typing-preview.mjs';
 import {decodeBase64Bytes} from './file-limits.mjs';
 import {uiMessage, uiError, uiSetText, uiSetAttr, uiTranslate, uiAppendText} from './ui-text.mjs';
 import {preparePdfPrintWindow} from './pdf-print.mjs';
@@ -279,7 +280,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   const reviewUse = button(uiMessage("Use A"), () => decideReview('use-a'), 'button primary'); reviewUse.dataset.reviewAction = 'use-a';
   const reviewKeep = button(uiMessage("Keep B"), () => decideReview('keep')); reviewKeep.dataset.reviewAction = 'keep';
   const reviewReopen = button(uiMessage("Review again"), () => { if (!selected) return; reviewQueue.reopen(selected); reviewHistory = []; changed(); stateChanged(); }); reviewReopen.dataset.reviewAction = 'reopen';
-  const reviewDecisionHint = el('span', uiMessage("Or edit below, then choose Done."), 'review-decision-hint');
+  const reviewDecisionHint = el('span', uiMessage("Edits appear in the document as you type."), 'review-decision-hint');
   reviewActions.append(reviewUse, reviewKeep, reviewReopen, reviewDecisionHint);
   inspector.append(inspectorHead, reviewActions); if(single)reviewActions.hidden=true;
   const fields = el('div', undefined, 'visual-edit-fields'); inspector.append(fields); root.append(inspector);
@@ -324,7 +325,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       }
       panel.append(note,details);
     }
-    let pdfDocument, pdfText, pdfPreview, pdfHint, pdfRecovery, pdfUndo, pdfAdjust;
+    let pdfDocument, pdfText, pdfPreview, pdfHint, pdfRecovery, pdfUndo, pdfAdjust, pdfSubstitute;
     const pdfState = el('p', '', 'pdf-export-state'); pdfState.setAttribute('role', 'status'); pdfState.id = `${single ? "single-" : ""}pdf-status-${side}`;
     if (report.sources[side].format === 'pdf') {
       const controls = el('div', undefined, 'pdf-view-controls'), views = el('div', undefined, 'pdf-view-switch');
@@ -343,7 +344,10 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       const keepEditing = button(uiMessage("Continue editing"), () => {const key=selected || drafts[side].entries()[0]?.key;if(key)void select(key,side);}); keepEditing.dataset.pdfContinue = side;
       const textOnly = button(uiMessage("Download text-only PDF"), () => saveSide(side,{textOnly:true})); textOnly.dataset.pdfFallback = side;
       pdfAdjust = button(uiMessage("Adjust text area"), async () => {const key=pdfRepairKey(side);if(key){await select(key,side);await replacePdfBlock(side);}}, 'button primary');pdfAdjust.dataset.pdfAdjust=side;
-      pdfRecovery.append(pdfAdjust, pdfUndo, keepEditing, textOnly);
+      pdfSubstitute = button(uiMessage("Download PDF with replacement font"), () => saveSide(side, {allowReplacementFont:true}));
+      pdfSubstitute.dataset.pdfSubstitute = side;
+      pdfSubstitute.hidden = true;
+      pdfRecovery.append(pdfAdjust, pdfUndo, keepEditing, pdfSubstitute, textOnly);
       save.setAttribute('aria-describedby',pdfState.id);
       panel.append(controls, pdfHint, pdfState, pdfRecovery);
       if (report.sources[side].link_count > 0) {
@@ -359,7 +363,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     uiSetAttr(previous, 'aria-label', single ? uiMessage("Previous page") : uiMessage("Previous page of {0}", { 0: letter(side) })); uiSetAttr(following, 'aria-label', single ? uiMessage("Next page") : uiMessage("Next page of {0}", { 0: letter(side) }));
     pageNav.append(previous, pageLabel, following); panel.append(pageNav);
     const scroll = el('div', undefined, 'visual-scroll'); uiSetAttr(scroll, 'aria-label', single ? uiMessage("Document") : uiMessage("Document {0}", { 0: letter(side) })); panel.append(scroll); grid.append(panel);
-    ui[side] = {panel, scroll, pageLabel, previous, following, undo, save, print, outputFormat, pdfState, pdfDocument, pdfText, pdfPreview, pdfHint, pdfRecovery, pdfUndo, pdfAdjust, pageNav};
+    ui[side] = {panel, scroll, pageLabel, previous, following, undo, save, print, outputFormat, pdfState, pdfDocument, pdfText, pdfPreview, pdfHint, pdfRecovery, pdfUndo, pdfAdjust, pdfSubstitute, pageNav};
     scroll.addEventListener('scroll', () => { if (!alive()) return; const position = readScroll(side), before = scrollPositions[side]; if (position.top !== before.top || position.left !== before.left) { scrollPositions[side] = position; stateChanged(); } });
     const fieldLabel = el('div', undefined, 'visual-edit-label'), field = el('textarea'); field.rows = 3; field.maxLength = 500000;
     field.id = `${single ? "single-" : ""}visual-edit-${side}`;
@@ -386,8 +390,28 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     fields.append(fieldLabel); input[side] = field;
     field.addEventListener('input', () => {
       if (!alive() || !selected) return;
-      try { const before = drafts[side].revision; drafts[side].edit(selected, field.value); changed(); if (drafts[side].revision !== before) stateChanged(); } catch (error) { field.value = value(side, selected) ?? ''; message(uiError(error.message)); }
-      clearTimeout(typingTimers[side]); typingTimers[side] = setTimeout(() => { if (alive()) renderSide(side); }, 350);
+      const before = drafts[side].revision;
+      try {
+        drafts[side].edit(selected, field.value);
+      } catch (error) {
+        field.value = value(side, selected) ?? '';
+        message(uiError(error.message));
+        return;
+      }
+      if (drafts[side].revision === before) return;
+      if (report.sources[side].format !== 'pdf') {
+        void renderSide(side, {alignSelection: false});
+        stateChanged();
+        return;
+      }
+      // Show the draft on the current page before rebuilding the downloadable PDF.
+      const scroll = ui[side].scroll;
+      if (textViews[side]) scroll.replaceChildren(textPaper(side));
+      else showPdfTypingPreview(scroll, selected, field.value, row(byKey.get(selected), side), pages[side]);
+      changed();
+      stateChanged();
+      clearTimeout(typingTimers[side]);
+      typingTimers[side] = setTimeout(() => { void renderSide(side, {alignSelection: false}); }, 180);
     });
     field.addEventListener('blur', () => drafts[side].endEdit());
     if(single&&side==='left'&&['txt','docx'].includes(report.sources[side].format))wording=mountWordingOptions(fieldLabel,{
@@ -424,11 +448,14 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     pdfErrors[side] = error;
     const failure = previewFailures[side]?.revision === drafts[side].revision ? previewFailures[side] : null;
     const issue = failure ? pdfIssue(failure.message) : null;
+    const substituted = pdfPreviews[side]?.revision === drafts[side].revision && pdfPreviews[side].substituted;
     uiSetText(ui[side].pdfState, issue ? uiMessage("{0} Your edits are kept. {1} A text-only PDF will not include images or page formatting.", { 0: issue[0], 1: issue[1] }) : '');
     ui[side].pdfRecovery.hidden = !issue;
+    ui[side].pdfSubstitute.hidden = failure?.code !== 'PDF_FONT_UNAVAILABLE' || (single && hasFill());
+    ui[side].pdfSubstitute.disabled = exporting[side] || pdfChecking[side];
     ui[side].pdfUndo.disabled = !drafts[side].canUndo;
-    uiSetText(ui[side].save, uiMessage("Download PDF"));
-    ui[side].save.dataset.pdfMode = error ? 'reflow' : 'original';
+    uiSetText(ui[side].save, substituted ? uiMessage("Download PDF with replacement font") : uiMessage("Download PDF"));
+    ui[side].save.dataset.pdfMode = substituted ? 'replacement-font' : error ? 'reflow' : 'original';
     ui[side].save.disabled = exporting[side] || pdfChecking[side] || !!failure;
     if(ui[side].print)ui[side].print.disabled=ui[side].save.disabled||!!printJob;
     updatePdfControls(side);
@@ -736,12 +763,13 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     if(inlineFill&&!inlineFill.dirty)void inlineFill.flush();
     if (!byKey.has(key)) throw new Error("Section not found.");
     reviewingStructure = false;
-    for (const timer of Object.values(typingTimers)) clearTimeout(timer); const selection = ++selectionGeneration; selected = key; inspector.hidden = false; root.classList.add('is-editing');
+    const selection = ++selectionGeneration;
+    selected = key; inspector.hidden = false; root.classList.add('is-editing');
+    for (const side of sides) input[side].value = value(side, key) ?? '';
     const group = byKey.get(key);
     uiSetText(inspectorTitle, different(group) ? uiMessage("Edit here or use the text from the adjacent version") : uiMessage("You can edit both versions"));
     for (const side of sides) {
       if (!alive() || selection !== selectionGeneration) return;
-      input[side].value = value(side, key) ?? '';
       if (pdfChecking[side]) await renderSide(side);
       if (!alive() || selection !== selectionGeneration) return;
       const rects = pdfPreviews[side]?.layout.filter(rect => rect.key === key), location = row(group, side);
@@ -800,10 +828,13 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     if (pdfPreviews[side]) void pdfPreviews[side].viewer.dispose().catch(() => {});
     delete pdfPreviews[side]; delete previewFailures[side];
   }
-  async function ensurePdfPreview(side) {
+  async function ensurePdfPreview(side, checkedError, edits) {
     const revision = drafts[side].revision;
     if (pdfPreviews[side]?.revision === revision) return pdfPreviews[side];
-    if (previewFailures[side]?.revision === revision) throw Error(previewFailures[side].message);
+    if (previewFailures[side]?.revision === revision) {
+      const failure = previewFailures[side];
+      throw Object.assign(Error(failure.message), {code:failure.code});
+    }
     if (previewJobs[side]?.revision === revision) return previewJobs[side].promise;
     const controller = new AbortController(), entries = drafts[side].entries(), blocks = sourceBlocks(side);
     const job = {revision, controller}; previewJobs[side] = job;
@@ -811,26 +842,110 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       let viewer;
       try {
         const {renderPreservedPdf} = await import('./pdf-layout.mjs');
-        let layout;
-        const data = await renderPreservedPdf(sources[side], entries, {blocks, signal:controller.signal, onLayout:rects => {layout = rects;}});
-        const {openPdfVisual} = await import('./pdf-visual.mjs');
+        const {openPdfVisual, renderPdfRevision} = await import('./pdf-visual.mjs');
+        let layout, data, substituted = false;
+        const options = {blocks, signal:controller.signal, onLayout:rects => {layout = rects;}};
+        // First keep the source fonts, including when a longer edit needs reflow.
+        try {
+          data = await renderPreservedPdf(sources[side], entries, options);
+        } catch (error) {
+          if (controller.signal.aborted || (error.code !== 'PDF_FONT_UNAVAILABLE' && checkedError?.code !== 'PDF_FONT_UNAVAILABLE')) throw error;
+          substituted = true;
+          const replacement = {...options, allowReplacementFont:true};
+          if (edits) {
+            try { data = await renderPdfRevision(sources[side], edits, replacement); }
+            catch (overlayError) { if (controller.signal.aborted || overlayError.name === 'AbortError') throw overlayError; }
+          }
+          if (!data) data = await renderPreservedPdf(sources[side], entries, replacement);
+        }
         viewer = await openPdfVisual({data}, {signal:controller.signal, generated:true});
         if (!alive() || controller.signal.aborted || drafts[side].revision !== revision) throw new DOMException('Canceled', 'AbortError');
-        return pdfPreviews[side] = {revision, data, layout, viewer};
+        return pdfPreviews[side] = {revision, data, layout, viewer, substituted};
       } catch (error) {
         if (viewer) await viewer.dispose().catch(() => {});
-        if (alive() && !controller.signal.aborted && drafts[side].revision === revision) previewFailures[side] = {revision, message:error.message};
+        if (alive() && !controller.signal.aborted && drafts[side].revision === revision) previewFailures[side] = {revision, message:error.message, code:error.code};
         throw error;
       }
     })();
     return job.promise;
   }
-  async function renderSide(side) {
+  function textPaper(side) {
+    const paper = el('div', undefined, 'visual-paper');
+    if (report.sources[side].format === 'pdf') paper.append(el('p', uiMessage("Click any text to edit. Your changes also appear in Document view."), 'visual-instruction'));
+    const model = models[side]; if (model) paper.classList.add('visual-word');
+    if (model) {
+      paper.style.paddingLeft = `${model.page.marginLeft / model.page.width * 100}%`;
+      paper.style.paddingRight = `${model.page.marginRight / model.page.width * 100}%`;
+    }
+    const projected = model ? projectWord(model, docxSequence(side), {rowPlan: drafts[side].rowPlan?.()}) : null;
+    const entries = projected ? projected.blocks : drafts[side].entries();
+    const paragraphOrdinals = new Map();
+    function paragraph(entry) {
+      const p = el(entry.heading ? `h${entry.heading}` : 'p', undefined, 'visual-paragraph'); p.dir='auto'; p.setAttribute('translate','no');
+      style(p, entry.style);
+      let content = p;
+      if (entry.list) {
+        const list = entry.list, marker = el('span', list.label, 'visual-list-marker');
+        content = el('span', undefined, 'visual-list-content');
+        p.classList.add('visual-list-item'); p.dataset.listLevel = String(list.level);
+        marker.setAttribute('aria-hidden', 'true');
+        const hanging = Math.max(0, list.indent?.hanging ?? 18), left = Math.max(0, list.indent?.left ?? (list.level + 1) * 36);
+        const aligned = list.align === 'right' ? hanging : list.align === 'center' ? hanging / 2 : 0;
+        p.style.paddingLeft = `${Math.max(0, left - hanging - aligned)}pt`;
+        p.style.textIndent = '0';
+        p.style.setProperty('--list-marker-width', list.suffix === 'tab' ? `max(0px, calc(${hanging}pt - .3em))` : '0px');
+        p.style.setProperty('--list-gap', list.suffix === 'space' ? '.3em' : list.suffix === 'tab' ? `calc(${aligned}pt + .3em)` : '0px');
+        marker.style.textAlign = list.align;
+        if (list.fontFamily) marker.style.fontFamily = list.fontFamily;
+        style(marker, list.markerStyle);
+        if (list.label === '\u{1F87A}') marker.style.fontFamily = '"CTT List Symbols", sans-serif';
+        p.append(marker, content);
+      }
+      if (entry.runs) for (const run of entry.runs) {
+        if (run.image) { const img = el('img'); img.src = run.image.src; img.alt = run.image.alt || ''; img.width = run.image.width; img.height = run.image.height; content.append(img); }
+        else { const span = el('span', run.text); style(span, run.style); content.append(span); }
+      }
+      else content.append(document.createTextNode(entry.text));
+      if (!content.hasChildNodes()) content.append(el('br'));
+      if (entry.key) {
+        const ordinal = paragraphOrdinals.get(entry.key) || 0;
+        paragraphOrdinals.set(entry.key, ordinal + 1);
+        paragraphHighlights.set(p, {content, side, ordinal, aggregate: !!model && !drafts[side].rowPlan});
+        p.dataset.group = entry.key; p.tabIndex = 0; p.setAttribute('role', 'button'); uiSetAttr(p, 'aria-label', uiMessage("Edit{0}: {1}{2}", { 0: single ? '' : ' '+letter(side), 1: entry.list ? entry.list.label + ' ' : '', 2: (entry.text.slice(0, 100) || uiMessage("Empty paragraph")) }));
+        p.addEventListener('click', () => select(entry.key, side));
+        p.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); select(entry.key, side); } });
+      }
+      return p;
+    }
+    if (model?.hasTables) {
+      const byRecord = new Map(entries.map(entry => [entry.record, entry]));
+      for (const item of projected.content) {
+        if (item.type === 'paragraph') { paper.append(paragraph(byRecord.get(item.record))); continue; }
+        const table = el('table', undefined, 'visual-table');
+        uiSetAttr(table, 'aria-label', uiMessage("Table {0}, version {1}", { 0: item.index, 1: letter(side) })); style(table, item.style);
+        const colgroup = el('colgroup'), total = item.widths.reduce((n, w) => n + w, 0);
+        for (const width of item.widths) { const col = el('col'); if (total) col.style.width = `${width / total * 100}%`; colgroup.append(col); }
+        table.append(colgroup); const tbody = el('tbody'); table.append(tbody);
+        for (const row of item.rows) {
+          const tr = el('tr'); tbody.append(tr);
+          for (const cell of row.cells) {
+            const td = el('td'); td.colSpan = cell.colSpan; td.rowSpan = cell.rowSpan; style(td, cell.style);
+            for (const p of cell.content) td.append(paragraph(byRecord.get(p.record)));
+            tr.append(td);
+          }
+        }
+        paper.append(table);
+      }
+    } else for (const entry of entries) paper.append(paragraph(entry));
+    return paper;
+  }
+  async function renderSide(side, {alignSelection = true} = {}) {
     if (!alive() || single && side === 'right') return;
+    clearTimeout(typingTimers[side]);
     if(side==='left'){inlineFill?.dispose();inlineFill=null;}
     const generation = ++generations[side], {scroll} = ui[side], scrollTop = scroll.scrollTop; scroll.setAttribute('aria-busy', 'true');
     try {
-      let checkedEdits = [], checkedError = null, preview = null;
+      let checkedEdits = null, checkedError = null, preview = null;
       if (report.sources[side].format === 'pdf') {
         ui[side].pageNav.hidden = textViews[side];
         updatePdfControls(side);
@@ -842,7 +957,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
             viewers[side] = viewer;
           } catch (error) {
             if (!alive() || generation !== generations[side]) return;
-            previewFailures[side] = {revision:drafts[side].revision,message:error.message};
+            previewFailures[side] = {revision:drafts[side].revision,message:error.message,code:error.code};
             textViews[side] = true; automaticText[side] = true;
           }
         }
@@ -859,12 +974,12 @@ export async function mountVisualReview(root, {report, sources, single = false, 
           }
         } catch(error) {checkedError=error;}
         if (!alive() || generation !== generations[side]) return;
-        if (checkedError && drafts[side].changed && !textViews[side]) {
+        if (checkedError && drafts[side].changed && (!textViews[side] || checkedError.code === 'PDF_FONT_UNAVAILABLE')) {
           uiSetText(ui[side].pdfState, uiMessage("Updating document…"));
-          try { preview = await ensurePdfPreview(side); }
+          try { preview = await ensurePdfPreview(side, checkedError, checkedEdits); }
           catch (error) {
             if (!alive() || generation !== generations[side]) return;
-            textViews[side] = true; automaticText[side] = true;
+            if (!textViews[side]) { textViews[side] = true; automaticText[side] = true; }
           }
           if (!alive() || generation !== generations[side]) return;
         }
@@ -895,14 +1010,19 @@ export async function mountVisualReview(root, {report, sources, single = false, 
         paper.dataset.pdfRevision = String(drafts[side].revision); paper.dataset.pdfLayout = preview ? 'updated' : 'original';
         paper.append(canvas);
         const layer = el('div', undefined, 'visual-hotspots');
+        const continuedKeys = new Set(preview?.layout.filter(rect => rect.page > pageNumber && rect.textStart != null).map(rect => rect.key));
         for (const group of groups) {
           const source = row(group, side);
-          let rects = preview ? preview.layout.filter(rect => rect.key === group.key) : source ? viewer.rects(source) : [];
-          if(!preview&&!checkedError&&source&&painted.some(p=>p.autoFit))rects=(source.source_blocks||[source]).flatMap(part=>{const fitted=painted.find(p=>p.autoFit&&p.record===part.record);return fitted?[{page:fitted.page,x:fitted.x/part.visual.width,y:fitted.y/part.visual.height,width:fitted.width/part.visual.width,height:fitted.height/part.visual.height}]:viewer.rects(part);});
+          let rects = preview ? preview.layout.filter(rect => rect.key === group.key) : source ? (source.source_blocks || [source]).flatMap(part => viewer.rects(part).map(rect => ({...rect, record:part.record}))) : [];
+          if(!preview&&!checkedError&&source&&painted.some(p=>p.autoFit))rects=(source.source_blocks||[source]).flatMap(part=>{const fitted=painted.find(p=>p.autoFit&&p.record===part.record);return fitted?[{record:part.record,page:fitted.page,x:fitted.x/part.visual.width,y:fitted.y/part.visual.height,width:fitted.width/part.visual.width,height:fitted.height/part.visual.height}]:viewer.rects(part).map(rect=>({...rect, record:part.record}));});
           const box=drafts[side].entries().find(e=>e.key===group.key)?.pdfBox;
-          if(!preview&&!checkedError&&box&&source){const visual=(source.source_blocks||[source])[0].visual;rects=[{page:visual.page,x:Math.min(...visual.rects.map(r=>r.x))/visual.width,y:Math.min(...visual.rects.map(r=>r.y))/visual.height,width:box.width/visual.width,height:box.height/visual.height}];}
+          if(!preview&&!checkedError&&box&&source){const visual=(source.source_blocks||[source])[0].visual;rects=[{record:(source.source_blocks || [source])[0].record,page:visual.page,x:Math.min(...visual.rects.map(r=>r.x))/visual.width,y:Math.min(...visual.rects.map(r=>r.y))/visual.height,width:box.width/visual.width,height:box.height/visual.height}];}
           for (const rect of rects.filter(rect => rect.page === pageNumber)) {
             const target = button('', () => select(group.key, side), 'visual-hotspot');
+            if (rect.record != null) target.dataset.pdfRecord = String(rect.record);
+            if (rect.textStart != null) target.dataset.pdfTextStart = String(rect.textStart);
+            if (rect.textEnd != null) target.dataset.pdfTextEnd = String(rect.textEnd);
+            if (continuedKeys.has(group.key)) target.dataset.pdfContinues = 'true';
             target.dataset.group = group.key; uiSetAttr(target, 'aria-label', (different(group) ? uiMessage("Difference. Edit{0}: {1}", { 0: single ? '' : ' '+letter(side), 1: (value(side, group.key) ?? '').slice(0, 120) }) : uiMessage("Edit{0}: {1}", { 0: single ? '' : ' '+letter(side), 1: (value(side, group.key) ?? '').slice(0, 120) })));
             uiSetAttr(target, "title", uiMessage("Click to edit"));
             Object.assign(target.style, {left: `${rect.x * 100}%`, top: `${rect.y * 100}%`, width: `${Math.max(.3, rect.width * 100)}%`, height: `${Math.max(.7, rect.height * 100)}%`}); layer.append(target);
@@ -948,74 +1068,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
         pdfStateChanged(side, editError?.message ?? null);
         if (editError && !preview) { const note = el('p', uiMessage("Original page shown for reference. Download the updated PDF to see the new text layout with its images."), 'visual-inline-notice'); scroll.prepend(note); }
       } else {
-        const paper = el('div', undefined, 'visual-paper');
-        if (report.sources[side].format === 'pdf') paper.append(el('p', uiMessage("Click any text to edit. Your changes also appear in Document view."), 'visual-instruction'));
-        const model = models[side]; if (model) paper.classList.add('visual-word');
-        if (model) {
-          paper.style.paddingLeft = `${model.page.marginLeft / model.page.width * 100}%`;
-          paper.style.paddingRight = `${model.page.marginRight / model.page.width * 100}%`;
-        }
-        const projected = model ? projectWord(model, docxSequence(side), {rowPlan: drafts[side].rowPlan?.()}) : null;
-        const entries = projected ? projected.blocks : drafts[side].entries();
-        const paragraphOrdinals = new Map();
-        function paragraph(entry) {
-          const p = el(entry.heading ? `h${entry.heading}` : 'p', undefined, 'visual-paragraph'); p.dir='auto'; p.setAttribute('translate','no');
-          style(p, entry.style);
-          let content = p;
-          if (entry.list) {
-            const list = entry.list, marker = el('span', list.label, 'visual-list-marker');
-            content = el('span', undefined, 'visual-list-content');
-            p.classList.add('visual-list-item'); p.dataset.listLevel = String(list.level);
-            marker.setAttribute('aria-hidden', 'true');
-            const hanging = Math.max(0, list.indent?.hanging ?? 18), left = Math.max(0, list.indent?.left ?? (list.level + 1) * 36);
-            const aligned = list.align === 'right' ? hanging : list.align === 'center' ? hanging / 2 : 0;
-            p.style.paddingLeft = `${Math.max(0, left - hanging - aligned)}pt`;
-            p.style.textIndent = '0';
-            p.style.setProperty('--list-marker-width', list.suffix === 'tab' ? `max(0px, calc(${hanging}pt - .3em))` : '0px');
-            p.style.setProperty('--list-gap', list.suffix === 'space' ? '.3em' : list.suffix === 'tab' ? `calc(${aligned}pt + .3em)` : '0px');
-            marker.style.textAlign = list.align;
-            if (list.fontFamily) marker.style.fontFamily = list.fontFamily;
-            style(marker, list.markerStyle);
-            if (list.label === '\u{1F87A}') marker.style.fontFamily = '"CTT List Symbols", sans-serif';
-            p.append(marker, content);
-          }
-          if (entry.runs) for (const run of entry.runs) {
-            if (run.image) { const img = el('img'); img.src = run.image.src; img.alt = run.image.alt || ''; img.width = run.image.width; img.height = run.image.height; content.append(img); }
-            else { const span = el('span', run.text); style(span, run.style); content.append(span); }
-          }
-          else content.append(document.createTextNode(entry.text));
-          if (!content.hasChildNodes()) content.append(el('br'));
-          if (entry.key) {
-            const ordinal = paragraphOrdinals.get(entry.key) || 0;
-            paragraphOrdinals.set(entry.key, ordinal + 1);
-            paragraphHighlights.set(p, {content, side, ordinal, aggregate: !!model && !drafts[side].rowPlan});
-            p.dataset.group = entry.key; p.tabIndex = 0; p.setAttribute('role', 'button'); uiSetAttr(p, 'aria-label', uiMessage("Edit{0}: {1}{2}", { 0: single ? '' : ' '+letter(side), 1: entry.list ? entry.list.label + ' ' : '', 2: (entry.text.slice(0, 100) || uiMessage("Empty paragraph")) }));
-            p.addEventListener('click', () => select(entry.key, side));
-            p.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); select(entry.key, side); } });
-          }
-          return p;
-        }
-        if (model?.hasTables) {
-          const byRecord = new Map(entries.map(entry => [entry.record, entry]));
-          for (const item of projected.content) {
-            if (item.type === 'paragraph') { paper.append(paragraph(byRecord.get(item.record))); continue; }
-            const table = el('table', undefined, 'visual-table');
-            uiSetAttr(table, 'aria-label', uiMessage("Table {0}, version {1}", { 0: item.index, 1: letter(side) })); style(table, item.style);
-            const colgroup = el('colgroup'), total = item.widths.reduce((n, w) => n + w, 0);
-            for (const width of item.widths) { const col = el('col'); if (total) col.style.width = `${width / total * 100}%`; colgroup.append(col); }
-            table.append(colgroup); const tbody = el('tbody'); table.append(tbody);
-            for (const row of item.rows) {
-              const tr = el('tr'); tbody.append(tr);
-              for (const cell of row.cells) {
-                const td = el('td'); td.colSpan = cell.colSpan; td.rowSpan = cell.rowSpan; style(td, cell.style);
-                for (const p of cell.content) td.append(paragraph(byRecord.get(p.record)));
-                tr.append(td);
-              }
-            }
-            paper.append(table);
-          }
-        } else for (const entry of entries) paper.append(paragraph(entry));
-        scroll.replaceChildren(paper);
+        scroll.replaceChildren(textPaper(side));
       }
       const absent = groups.filter(group => !group.dynamic && !models[side]?.hasTables && value(side, group.key) === null && value(other(side), group.key) !== null);
       if (absent.length) {
@@ -1023,11 +1076,11 @@ export async function mountVisualReview(root, {report, sources, single = false, 
         for (const group of absent) { const add = button(uiMessage('＋ {0}', {0:value(other(side), group.key).slice(0,100) || uiMessage('Empty paragraph')}), () => { if (!alive()) return; void select(group.key); copyTo(side); }); uiSetAttr(add, "title", uiMessage("Add from {0}", { 0: letter(other(side)) })); add.dataset.missingKey = group.key; missing.append(add); }
         scroll.append(missing);
       }
-      scroll.scrollTop = scrollTop;
-      if (selected) { const target = [...scroll.querySelectorAll('[data-group]')].find(node => node.dataset.group === selected); if (target) alignTarget(scroll, target); }
+      if (alignSelection) scroll.scrollTop = scrollTop;
+      if (alignSelection && selected) { const target = [...scroll.querySelectorAll('[data-group]')].find(node => node.dataset.group === selected); if (target) alignTarget(scroll, target); }
       scrollPositions[side] = readScroll(side);
       changed();
-    } catch (error) { if (alive() && generation === generations[side]) { if (report.sources[side].format === 'pdf' && !textViews[side]) { textViews[side] = true; automaticText[side] = true; previewFailures[side] = {revision:drafts[side].revision,message:error.message}; pdfStateChanged(side, error.message); await renderSide(side); } else { scroll.replaceChildren(el('p', uiMessage("Couldn't display the page. {0}", { 0: uiError(error.message) }), 'visual-inline-notice')); } } }
+    } catch (error) { if (alive() && generation === generations[side]) { if (report.sources[side].format === 'pdf' && !textViews[side]) { textViews[side] = true; automaticText[side] = true; previewFailures[side] = {revision:drafts[side].revision,message:error.message,code:error.code}; pdfStateChanged(side, error.message); await renderSide(side); } else { scroll.replaceChildren(el('p', uiMessage("Couldn't display the page. {0}", { 0: uiError(error.message) }), 'visual-inline-notice')); } } }
     finally { if (alive() && generation === generations[side]) scroll.setAttribute('aria-busy', 'false'); }
   }
   function docxSequence(side) {
@@ -1053,6 +1106,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
   }
   async function fillBase() {
     if (!drafts.left.changed) return {data:decodeBase64Bytes(sources.left.data), name:sources.left.name};
+    if (pdfPreviews.left?.revision === drafts.left.revision) return {data:pdfPreviews.left.data,name:sources.left.name};
     const entries = drafts.left.entries(), blocks = sourceBlocks('left');
     const {renderPdfRevision} = await import('./pdf-visual.mjs');
     let data;
@@ -1110,8 +1164,8 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     } catch(error){target.close();if(alive())message(uiError(error.message));}
     finally {printJob=null;exporting.left=false;if(alive())pdfStateChanged('left',pdfErrors.left);}
   }
-  async function saveSide(side, {textOnly=false}={}) {
-    if (!alive() || exporting[side] || !textOnly && ui[side].save.disabled || (inlineFill?.dirty && !await flushFill())) return;
+  async function saveSide(side, {textOnly=false, allowReplacementFont=false}={}) {
+    if (!alive() || exporting[side] || !textOnly && !allowReplacementFont && ui[side].save.disabled || (inlineFill?.dirty && !await flushFill())) return;
     // The PDF preview is outside the native tools dialog. Close the dialog first
     // so it cannot leave the preview inert or intercept its download button.
     closeWorkspaceTools();
@@ -1134,20 +1188,23 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       const edited = drafts[side].changed;
       const word = format === 'docx' ? {sequence: docxSequence(side), rowPlan: drafts[side].rowPlan?.()} : null;
       let pdf = null;
-      if(format === 'pdf' && (edited||textOnly)){pdf={entries:drafts[side].entries(),blocks:sourceBlocks(side),edits:null,data:pdfPreviews[side]?.revision===revision?pdfPreviews[side].data:null,reflow:textOnly||!!pdfErrors[side]};try{pdf.edits=pdfEdits(side);}catch{pdf.reflow=true;}}
+      const prepared = pdfPreviews[side]?.revision === revision ? pdfPreviews[side] : null;
+      if(format === 'pdf' && (edited||textOnly)){pdf={entries:drafts[side].entries(),blocks:sourceBlocks(side),edits:null,data:prepared?.data,reflow:textOnly||(!allowReplacementFont && !!pdfErrors[side])};try{pdf.edits=pdfEdits(side);}catch{pdf.reflow=true;}}
       if (format === 'pdf') {
         if (!edited&&!textOnly) download(decodeBase64Bytes(sources[side].data), filename(side, 'pdf'), 'application/pdf');
         else {
           const {renderPdfRevision,renderReflowedPdf} = await import('./pdf-visual.mjs');
           if (!alive()) return;
           let data;
-          if(!pdf.reflow){try{data=await renderPdfRevision(sources[side],pdf.edits,{signal,blocks:pdf.blocks});}catch(error){if(error.name==='AbortError'||!alive())throw error;pdf.reflow=true;}}
-          if(pdf.reflow){
+          if (!textOnly && prepared) data = prepared.data;
+          if(!data && !pdf.reflow){try{data=await renderPdfRevision(sources[side],pdf.edits,{signal,blocks:pdf.blocks,allowReplacementFont});}catch(error){if(error.name==='AbortError'||!alive())throw error;pdf.reflow=true;}}
+          if(!data && pdf.reflow){
             if(textOnly){const visual=pdf.blocks[0]?.visual;data=await renderReflowedPdf(pdf.entries,{signal,pageSize:visual?[visual.width,visual.height]:undefined});}
-            else{const {renderPreservedPdf}=await import('./pdf-layout.mjs');if(!alive())return;data=pdf.data || await renderPreservedPdf(sources[side],pdf.entries,{blocks:pdf.blocks,signal});if(drafts[side].revision===revision)pdfStateChanged(side,uiMessage("Expanded layout"));}
+            else{const {renderPreservedPdf}=await import('./pdf-layout.mjs');if(!alive())return;data=pdf.data || await renderPreservedPdf(sources[side],pdf.entries,{blocks:pdf.blocks,signal,allowReplacementFont});if(drafts[side].revision===revision)pdfStateChanged(side,uiMessage("Expanded layout"));}
           }
           if (!alive()) return;
-          download(data, pdf.reflow ? filename(side, 'pdf').replace(/\.pdf$/, textOnly?'-text-only.pdf':'-updated-layout.pdf') : filename(side, 'pdf'), 'application/pdf');
+          if (!textOnly && (allowReplacementFont || prepared?.substituted)) download(data, filename(side,'pdf').replace(/\.pdf$/, '-replacement-font.pdf'), 'application/pdf');
+          else download(data, pdf.reflow ? filename(side, 'pdf').replace(/\.pdf$/, textOnly?'-text-only.pdf':'-updated-layout.pdf') : filename(side, 'pdf'), 'application/pdf');
         }
       } else if (format === 'docx') {
         const {writeDocxVisual} = await import('./docx-visual.mjs');
@@ -1159,8 +1216,10 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       message(single ? drafts[side].revision === revision ? uiMessage("Your document is ready to download.") : uiMessage("Your document was downloaded. Download again to include your latest edits.") : drafts[side].revision === revision ? pdf?.reflow ? textOnly ? uiMessage("Text-only PDF {0} is ready. Original images and page formatting are not included.", { 0: letter(side) }) : uiMessage("Updated PDF {0} is ready, with images and unchanged page content preserved.", { 0: letter(side) }) : uiMessage("Version {0} is ready to download.", { 0: letter(side) }) : uiMessage("Version {0} downloaded as it was when you clicked. You continued editing while it was being prepared. Download again for your latest version.", { 0: letter(side) }));
     } catch (error) {
       if (!alive()) return;
-      if (report.sources[side].format === 'pdf' && !textOnly && drafts[side].revision === revision) {
-        previewFailures[side] = {revision, message:error.message}; textViews[side] = true; automaticText[side] = true;
+      if (allowReplacementFont) {
+        message(uiError(error.message));
+      } else if (report.sources[side].format === 'pdf' && !textOnly && drafts[side].revision === revision) {
+        previewFailures[side] = {revision, message:error.message, code:error.code}; textViews[side] = true; automaticText[side] = true;
         pdfStateChanged(side,error.message); message(single ? uiMessage("Your edits are kept. Check the saving options above your document.") : uiMessage("Your edits are kept. Check the saving options in version {0}.", { 0: letter(side) })); void renderSide(side);
       } else message(report.sources[side].format === 'pdf' ? uiMessage("The PDF could not be downloaded. Your edits are kept. Please try again.") : uiError(error.message));
     }

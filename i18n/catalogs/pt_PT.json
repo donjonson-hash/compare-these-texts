@@ -700,7 +700,7 @@
   "08859a601ce5": "Para a implantação de desktop ou organização Windows, use o processo de implantação de suplemento suportado pelo administrador. A rota da Web acima é o piloto inicial mais simples; esta página não instala software no seu computador.",
   "1e8ea60da5c1": "Para um documento DOCX, escolha <0>Palavra (.docx)</0> para baixar o arquivo do Word editado. Para convertê-lo, escolha <1>PDF (.pdf)  ⁇  Pré-visualização PDF  ⁇  Download PDF</1>. Revise a visualização antes de baixar.",
   "1a762c0501d0": "Para um PDF aberto em Editar e exportar, use <0>Baixar PDF</0>. Se o download não for iniciado, selecione <1>Salvar PDF para computador</1> quando o arquivo estiver pronto. <2>Imprimir</2> abre o fluxo de trabalho de impressão. Para uma planilha, a opção PDF exporta a planilha selecionada.",
-  "39412d1f2128": "Para um relatório de problema, inclua a versão <0>0.37.8</0>, a versão do navegador, se você usou o site ou a extensão, o tipo de arquivo e as etapas para reproduzi-lo. Diga-nos o que você esperava e o que aconteceu em vez disso.",
+  "c37e98cda9bf": "Para um relatório de problema, inclua a versão <0></0>, a versão do navegador, se você usou o site ou a extensão, o tipo de arquivo e as etapas para reproduzi-lo. Diga-nos o que você esperava e o que aconteceu em vez disso.",
   "6950597fd437": "Para um item não emparelhado, o lado ausente contribui com zero para o total da lista; isso não indica a quantidade de mercadorias ou se elas foram entregues. Quantidade original e valores de preço aparecem nos documentos abaixo.",
   "71f4f346a7fd": "Para um item não emparelhado, zero significa nenhuma contribuição para o total da lista, não uma quantidade zero ou confirmação de entrega.",
   "b6d0d96a817d": "Por exemplo: o que mudou no texto?",
@@ -1002,7 +1002,7 @@
   "c926c2c50e65": "A abrir...",
   "24e667e20318": "Abre como um documento de texto. Downloads como UTF-8 TXT.",
   "b8979d93416d": "Palavra opcional e Google Docs suplementos",
-  "37f69e1f27eb": "Ou edite abaixo, depois escolha Concluído.",
+  "b7f51607d6fe": "As alterações aparecem no documento à medida que escreve.",
   "daa78c86d673": "Comparação original (antes de suas edições):\n",
   "65ed6b47cf56": "Diferenças originais  ⁇  PDF  ⁇",
   "ca5e29f8995d": "Diferenças originais  ⁇  XLSX",
@@ -2130,5 +2130,14 @@
   "f01711bf73bd": "{0}: CSV, TSV e XLS/XLSX são suportados. Guarde a pasta de trabalho como XLSX.",
   "7208e54b5a60": "{0}: era esperado um livro XLS do Excel 97–2003. Abra o ficheiro no Excel ou no LibreOffice e guarde-o como XLSX.",
   "97c0a7ed2af5": "{0}: não é possível comparar livros XLS protegidos por palavra-passe.",
-  "0541847f12bc": "Comparação de documento aberto"
+  "0541847f12bc": "Comparação de documento aberto",
+  "62932077ca3f": "Transferir PDF com um tipo de letra de substituição",
+  "3607efb0668d": "A comparação do corpo do texto é só de leitura. Os comentários do Word e os nomes dos autores são preservados nos ficheiros originais e ficam excluídos da comparação.",
+  "9d2c04a4e64c": "DOCX: Selecione «Comparar documentos» para rever o corpo do texto. Não é possível editar ficheiros com comentários do Word.",
+  "549319d3c5dd": "DOCX: A parte do documento que contém os comentários é inválida.",
+  "54b50369d74b": "DOCX: Comentário inválido ou identificador de comentário duplicado.",
+  "99816043f744": "DOCX: A relação com a parte dos comentários é inválida.",
+  "c2973c4a81a3": "DOCX: Falta a relação com a parte dos comentários.",
+  "6d61b741c442": "DOCX: A ancoragem do comentário não é suportada.",
+  "deaa84ddc746": "DOCX: A ancoragem do comentário está incompleta."
 }

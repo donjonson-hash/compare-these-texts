@@ -26,6 +26,7 @@ the build must never automatically regenerate the manifest.
 | xmldom 0.9.12 | `src/XMLDOM-SOURCE.md`; historical tarball and bundle hashes, bundling command |
 | DejaVu Sans and Sans Bold | `src/PDF-SOURCE.md` and `src/PDF-LICENSES.txt`; embedded TTF hashes in the manifest |
 | Noto Emoji, static weight 400 | `src/NOTO-EMOJI-SOURCE.txt` and `src/NOTO-EMOJI-LICENSE.txt`; variable-font source and derived TTF hashes |
+| PT Serif, Regular and Bold | Latin and Cyrillic WOFF2 files match [Fontsource’s PT Serif files](https://github.com/fontsource/font-files/tree/main/fonts/google/pt-serif/files) byte for byte. The corresponding upstream filenames end in `-normal.woff2`. [Google Fonts](https://github.com/google/fonts/tree/main/ofl/ptserif) credits ParaType and supplies the OFL 1.1 license in `src/PT-SERIF-LICENSE.txt`. |
 
 The PDF.js and SheetJS builders were independently run on 2026-10-16 and
 reproduced the committed runtime modules byte for byte. All three embedded font

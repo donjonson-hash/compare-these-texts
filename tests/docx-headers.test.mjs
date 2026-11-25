@@ -52,3 +52,26 @@ test('single and comparison views disclose read-only headers and allow PDF expor
   }}finally{view.dispose();root.replaceChildren();}
  }
 });
+
+test('compound page fields keep adjacent text and export as live page numbers', async () => {
+  const footer = String.raw`<w:ftr xmlns:w="${W}"><w:p>
+    <w:r><w:t>Page </w:t><w:fldChar w:fldCharType="begin"/></w:r>
+    <w:r><w:instrText> PA</w:instrText></w:r><w:r><w:instrText>GE \* MERGEFORMAT </w:instrText></w:r>
+    <w:r><w:fldChar w:fldCharType="separate"/></w:r>
+    <w:r><w:rPr><w:b/></w:rPr><w:t>99</w:t></w:r>
+    <w:r><w:fldChar w:fldCharType="end"/><w:t>.</w:t></w:r>
+    </w:p></w:ftr>`;
+  const make = xml => fixture({extra:{'word/footer1.xml':xml}});
+  const src = make(footer), model = await readDocxVisual(src);
+  assert.equal(model.headersFooters.find(part => part.kind === 'footer').text, 'Page [Page number].');
+  const runs = model.peripherals.footer.default[0].runs;
+  assert.deepEqual(runs.map(run => run.field || run.text), ['Page ', 'PAGE', '.']);
+  assert.equal(runs[1].style.fontWeight, 'bold');
+  const after = await unzipDocument(await writeDocxVisual(src, [{record:1, text:'Edited'}]));
+  assert.equal(new TextDecoder().decode(after.get('word/footer1.xml')), footer);
+  for (const invalid of [
+    footer.replace(' PA',' INCLUDETEXT').replace('GE ', ' '),
+    footer.replace('fldCharType="end"', 'fldCharType="begin"'),
+    footer.replace('<w:t>99</w:t>', '<w:object/>'),
+  ]) await assert.rejects(readTextSource(make(invalid)), /header or footer/);
+});
