@@ -428,8 +428,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     const failure = previewFailures[side]?.revision === drafts[side].revision ? previewFailures[side] : null;
     const issue = failure ? pdfIssue(failure.message) : null;
     const substituted = pdfPreviews[side]?.revision === drafts[side].revision && pdfPreviews[side].substituted;
-    uiSetText(ui[side].pdfState, issue ? uiMessage("{0} Your edits are kept. {1} A text-only PDF will not include images or page formatting.", { 0: issue[0], 1: issue[1] }) :
-      substituted ? uiMessage("Edited text uses a replacement font in the preview and downloaded PDF.") : '');
+    uiSetText(ui[side].pdfState, issue ? uiMessage("{0} Your edits are kept. {1} A text-only PDF will not include images or page formatting.", { 0: issue[0], 1: issue[1] }) : '');
     ui[side].pdfRecovery.hidden = !issue;
     ui[side].pdfSubstitute.hidden = failure?.code !== 'PDF_FONT_UNAVAILABLE' || (single && hasFill());
     ui[side].pdfSubstitute.disabled = exporting[side] || pdfChecking[side];

@@ -151,7 +151,7 @@ test('copying text between custom-font PDFs keeps the target artwork in Document
       assert.equal(column.querySelector('[data-pdf-view]').getAttribute('aria-pressed'), 'true');
       assert.ok(column.querySelector('.visual-pdf-page[data-pdf-layout="updated"] canvas'));
       assert.equal(column.querySelector('.pdf-recovery').hidden, true);
-      assert.match(column.querySelector('.pdf-export-state').textContent, /font/i);
+      assert.equal(column.querySelector('.pdf-export-state').textContent, '');
       assert.equal(save.disabled, false);
       assert.equal(save.textContent, 'Download PDF with replacement font');
 
