@@ -21,7 +21,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
 
 /* Independent local draft; switching modes retains both workspaces. */
 (() => {
- const $=id=>document.getElementById(id),moduleURL=new URL('single-editor.mjs',document.currentScript.src),sessionURL=new URL('single-session.mjs',document.currentScript.src);
+ const $=id=>document.getElementById(id);
  let controller=null,view=null,generation=0,candidate=null,busy=false,operating=false,session=null,navigationRevision=0,operationNavigation=null;
  const note=(text,error=false)=>{const notice=$('single-notice');notice.classList.toggle('error',error);notice.setAttribute('role',error?'alert':'status');notice.setAttribute('aria-live',error?'assertive':'polite');uiSetText(notice, text);notice.hidden=!text;};
  function chooseMode(next){
@@ -50,7 +50,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   generation++;controller?.abort();view?.dispose();controller=null;view=null;candidate=null;
   $('single-editor-host').replaceChildren();$('single-options').hidden=true;uiSetText($('single-current'), '');$('single-current').hidden=true;note('');sourcePanel(true);
  }
- const ready=import(sessionURL.href).then(({mountSingleSession})=>mountSingleSession($('single-session'),{
+ const ready=import('./single-session.mjs').then(({mountSingleSession})=>mountSingleSession($('single-session'),{
   onResume:async payload=>{const navigation=operationNavigation??navigationRevision;await install(payload,true);if(navigation===navigationRevision){chooseMode('single');focusDocument();}},onFinish:closeDocument,
   onOperating:value=>{operating=value;if(value){operationNavigation=navigationRevision;generation++;}else operationNavigation=null;controls();if(!value&&!view&&!document.body.classList.contains('home-mode')&&!$('single-workspace').hidden)$('single-file').focus({preventScroll:true});}
  })).then(ui=>{session=ui;session.setBusy(busy);return ui;}).catch(()=>{note(uiMessage("Automatic saving is unavailable. Download your edits before closing this tab."),true);return null;});
@@ -59,7 +59,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
  async function install(payload,resuming=false){
   const ticket=++generation,abort=new AbortController(),stage=document.createElement('div');let next;setBusy(true);note(resuming ? uiMessage("Restoring your document…") : uiMessage("Opening your document…"));
   try{
-   const {mountSingleEditor}=await import(moduleURL.href);
+   const {mountSingleEditor}=await import('./single-editor.mjs');
    next=await mountSingleEditor(stage,{source:payload.source,sheet:payload.sheet,delimiter:payload.delimiter,restoredState:resuming?payload.review:undefined,signal:abort.signal,onStateChange:()=>{if(view===next)session?.changed();}});
    if(ticket!==generation){abort.abort();next.dispose();return;}
    await session?.flush();if(ticket!==generation){abort.abort();next.dispose();return;}
@@ -83,7 +83,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
   try{
    if(file.size>window.cttFileLimits.MAX_FILE_BYTES)throw Error('Choose a file up to 25 MB.');note(uiMessage("Reading your file…"));
    const bytes=new Uint8Array(await file.arrayBuffer());
-   const source={name:file.name,data:window.cttFileLimits.encodeBase64Bytes(bytes)},{inspectSingleSource}=await import(moduleURL.href),info=await inspectSingleSource(source);if(ticket!==generation)return;candidate=source;
+   const source={name:file.name,data:window.cttFileLimits.encodeBase64Bytes(bytes)},{inspectSingleSource}=await import('./single-editor.mjs'),info=await inspectSingleSource(source);if(ticket!==generation)return;candidate=source;
    $('single-sheet-label').hidden=info.format!=='xlsx';$('single-delimiter-label').hidden=!['csv','tsv'].includes(info.format);
    $('single-sheet').replaceChildren();for(const name of info.sheets||[]){const option=document.createElement('option');option.value=uiSetText(option, name);$('single-sheet').append(option);}
    $('single-delimiter').value=info.delimiter||',';note('');setBusy(false);
