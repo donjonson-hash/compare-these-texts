@@ -5,7 +5,9 @@ import hashlib,io,json,zipfile,subprocess,re,uuid,importlib.util,html
 import xml.etree.ElementTree as ET
 from store_metadata import LOCALES, message_files
 from website_analytics import SCRIPT_HASH, TAG
-from firefox_package import split_color_emoji, MODULE_LIMIT
+from firefox_package import split_color_emoji, use_packaged_locales, MODULE_LIMIT
+from firefox_pdf_reader import use_bundled_pdf_reader
+from firefox_pdf_writer import remove_unused_eval_intrinsic
 root=Path(__file__).resolve().parents[1]/'dist'
 release=json.loads((root.parent/'release.json').read_text())
 localized_files=message_files()
@@ -19,6 +21,16 @@ office_downloads=(google_archive,'google-docs-setup-en.md','google-docs-setup-ru
 word_pages={'word-addin/index.html','word-addin/taskpane.html'}
 firefox_emoji={'emoji-color-vendor.mjs':(root.parent/'src/emoji-color-vendor.mjs').read_bytes()}
 split_color_emoji(firefox_emoji)
+source=root.parent/'src'
+firefox_locales=json.loads((root.parent/'i18n/locales.json').read_text())
+firefox_runtime={name:(source/name).read_bytes() for name in ('i18n.js','pdf-reader-vendor.mjs','pdf-vendor.mjs')}
+for locale in firefox_locales:
+ name=f"i18n-{locale['code']}.mjs"
+ firefox_runtime[name]=(root/name).read_bytes()
+use_packaged_locales(firefox_runtime, firefox_locales)
+use_bundled_pdf_reader(firefox_runtime)
+firefox_runtime['pdf-vendor.mjs']=remove_unused_eval_intrinsic(firefox_runtime['pdf-vendor.mjs'])
+firefox_assets={**firefox_emoji, **firefox_runtime}
 minified_files={entry['file'] for entry in json.loads((root/'release/provenance.json').read_text())['website_minification']['files']}
 # Only the published HTML uses fingerprinted navigation assets. The offline
 # archives and existing clients retain their original local paths.
@@ -227,7 +239,7 @@ for p in (root/'downloads').glob('*.zip'):
    for f in root.iterdir():
     if f.is_file() and f.name!='index.html' and f.name not in website_only_files:
      expected_file=root.parent/'src'/f.name if f.name in minified_files else f
-     expected_data=firefox_emoji[f.name] if not is_chrome and f.name in firefox_emoji else expected_file.read_bytes()
+     expected_data=firefox_assets[f.name] if not is_chrome and f.name in firefox_assets else expected_file.read_bytes()
      assert z.read(f.name)==expected_data,(p,f.name)
    parser=Parser();parser.feed(z.read('index.html').decode())
    assert manifest['content_security_policy']['extension_pages']==parser.csp

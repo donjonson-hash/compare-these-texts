@@ -31,12 +31,6 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     return ['left', 'right'].every(side => report.sources[side]?.format === 'docx' && uploadedSources.has(sources[side]));
   }
   const $ = (id) => document.getElementById(id);
-  const visualModuleURL = new URL('visual-review.mjs', document.currentScript.src);
-  const sheetModuleURL = new URL('sheet-review.mjs', document.currentScript.src);
-  const tableReportModuleURL = new URL('report.mjs', document.currentScript.src);
-  const sessionModuleURL = new URL('session-ui.mjs', document.currentScript.src);
-  const textReportModuleURL = new URL('text-report.mjs', document.currentScript.src);
-  const pdfReportLanguageURL = new URL('pdf-report-language.mjs', document.currentScript.src);
   let visualController = null, visualReview = null;
   let sessionUI = null;
   let restoreWorkspaceTools = () => {};
@@ -566,7 +560,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     $('visual-load-error').hidden = true;
     const abort = new AbortController(); visualController = abort;
     try {
-      const mount = report.kind === 'text' ? (await import(visualModuleURL.href)).mountVisualReview : (await import(sheetModuleURL.href)).mountSheetReview;
+      const mount = report.kind === 'text' ? (await import('./visual-review.mjs')).mountVisualReview : (await import('./sheet-review.mjs')).mountSheetReview;
       if (abort.signal.aborted || state.report !== report) return;
       document.body.classList.add('visual-mode'); $('visual-review').hidden = false;
       uiSetText($('result-context'), uiMessage("Both documents are ready. Click any text to edit it."));
@@ -610,7 +604,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     clearResult(); busy(true); const revision = state.revision;
     notice(uiMessage("Opening saved documents…"));
     try {
-      const renderSaved = saved.report.kind === 'text' ? (await import(textReportModuleURL.href)).renderTextHtml : (await import(tableReportModuleURL.href)).renderHtml;
+      const renderSaved = saved.report.kind === 'text' ? (await import('./text-report.mjs')).renderTextHtml : (await import('./report.mjs')).renderHtml;
       if (revision !== state.revision) return;
       state.sources = saved.sources; state.report = saved.report;
       state.html = renderSaved(saved.report); state.metadata = saved.report.kind === 'text' ? {kind:'text'} : null;
@@ -886,7 +880,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     let content;
     if (html) {
       try {
-        const renderer = await import(report.kind === 'text' ? textReportModuleURL.href : tableReportModuleURL.href);
+        const renderer = await (report.kind === 'text' ? import('./text-report.mjs') : import('./report.mjs'));
         if (revision !== state.revision || report !== state.report) return;
         content = report.kind === 'text' ? renderer.renderTextHtml(report) : renderer.renderHtml(report);
       } catch (error) { notice(uiError(error.message), true); return; }
@@ -917,7 +911,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     const current = () => !requestController.signal.aborted && revision === state.revision && report === state.report && exportController === requestController;
     try {
       if (format === 'pdf') {
-        const {pdfReportLocale} = await import(pdfReportLanguageURL.href);
+        const {pdfReportLocale} = await import('./pdf-report-language.mjs');
         const locale = globalThis.cttI18n?.getLocale() || 'en';
         pdfLabelsInEnglish = pdfReportLocale(locale) !== locale;
         if (!current()) return;
@@ -999,7 +993,7 @@ const uiTranslate = (source, params = {}) => String(uiMessage(source, params));
     const root = element('section'); root.id = 'saved-session'; root.hidden = true;
     uiSetAttr(root, 'aria-label', uiMessage("Saved work")); document.querySelector('.hero').after(root);
     try {
-      const {mountSessionUI} = await import(sessionModuleURL.href);
+      const {mountSessionUI} = await import('./session-ui.mjs');
       sessionUI = await mountSessionUI(root, {onResume: resumeSession, onFinish: finishSession,
         onOperating: value => {
           if (value) { loads.left++; loads.right++; document.dispatchEvent(new Event('ctt:comparison-operation-started')); }

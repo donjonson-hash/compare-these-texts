@@ -1,8 +1,25 @@
-"""Firefox-only AMO packaging of the offline emoji data, without changing glyphs."""
+"""Firefox-specific packaging for offline resources."""
 import json
 
 MODULE_LIMIT = 2 * 1024 * 1024
 NOTICE = '// Generated offline color glyphs. See COLOR-EMOJI-SOURCE.md and licenses.\n'
+
+
+def use_packaged_locales(files, locales):
+    # Firefox can inspect every import target while still loading only the selected language.
+    runtime = files['i18n.js'].decode()
+    dynamic_load = "      return (await import(new URL('i18n-' + code + '.mjs', baseURL).href)).default;"
+    if runtime.count(dynamic_load) != 1:
+        raise ValueError('Expected a single default UI catalog loader')
+    cases = ['      switch (code) {']
+    for locale in locales:
+        code = locale['code']
+        name = f'i18n-{code}.mjs'
+        if name not in files:
+            raise ValueError(f'Missing packaged UI catalog: {name}')
+        cases.append(f'        case {json.dumps(code)}: return (await import({json.dumps("./" + name)})).default;')
+    cases.extend(["        default: throw new Error('Missing packaged UI language');", '      }'])
+    files['i18n.js'] = runtime.replace(dynamic_load, '\n'.join(cases)).encode()
 
 
 def module(value):

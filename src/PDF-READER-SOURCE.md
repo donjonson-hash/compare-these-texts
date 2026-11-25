@@ -133,3 +133,12 @@ Application consumers import `pdf-reader.mjs`, which first installs a local
 link-annotation evidence and unsupported-action checks active. Vendored PDF.js
 bytes are unchanged. `tests/pdf-reader-compat.test.mjs` runs the existing link
 import/edit/export scenarios with native URL.parse deliberately absent.
+
+## Firefox extension packaging
+
+The Firefox packager runs `scripts/firefox_pdf_reader.py` against the pinned
+Type 3 bundle identified above. PDF.js uses the bundled worker message handler
+directly. The package omits the generic worker URL loader and CDN wrapper.
+The optional no-WASM image codecs are absent from the offline distribution,
+so the codec lookup returns the same unavailable result locally. PDF.js keeps
+its embedded decoders and its existing handling of unsupported image formats.
