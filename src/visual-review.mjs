@@ -399,8 +399,11 @@ export async function mountVisualReview(root, {report, sources, single = false, 
         return;
       }
       if (drafts[side].revision === before) return;
+      const add = [...ui[other(side)].scroll.querySelectorAll('[data-missing-key]')].find(node => node.dataset.missingKey === selected);
+      if (add) uiSetText(add, missingLabel(side, selected));
       if (report.sources[side].format !== 'pdf') {
-        void renderSide(side, {alignSelection: false});
+        if (report.sources[side].format === 'txt' && updatePlainParagraph(side, selected, field.value)) changed();
+        else void renderSide(side, {alignSelection: false});
         stateChanged();
         return;
       }
@@ -588,6 +591,10 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     }).map(group => group.key));
   }
   function different(group) { return !single && !!group && diffKeys.has(group.key); }
+  function sameHighlights(previous, current) {
+    return previous === current || previous && current && previous.length === current.length &&
+      previous.every((part, i) => part.changed === current[i].changed && part.text === current[i].text);
+  }
   function refreshTextHighlights() {
     if (single) return;
     const revision = sides.map(side => drafts[side].revision).join(':');
@@ -614,7 +621,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       const segments = entries.length && diffKeys.has(node.dataset.group) ? highlightSegments.get(node.dataset.group)?.[info.side] : undefined;
       const offset = info.aggregate ? 0 : current?.offset || 0;
       const expected = info.aggregate ? entries.map(entry => entry.text).join('\n') : current?.text ?? '';
-      if (!info.highlighted || info.segments !== segments || info.offset !== offset || info.expected !== expected) {
+      if (!info.highlighted || info.offset !== offset || info.expected !== expected || !sameHighlights(info.segments, segments)) {
         markTextChanges(info.content, segments, offset, expected);
         Object.assign(info, {highlighted: true, segments, offset, expected});
       }
@@ -869,6 +876,23 @@ export async function mountVisualReview(root, {report, sources, single = false, 
     })();
     return job.promise;
   }
+  function missingLabel(sourceSide, key) {
+    return uiMessage('＋ {0}', {0:value(sourceSide, key).slice(0,100) || uiMessage('Empty paragraph')});
+  }
+  function paragraphLabel(side, text, list) {
+    return uiMessage("Edit{0}: {1}{2}", {0: single ? '' : ' '+letter(side), 1: list ? list.label + ' ' : '', 2: text.slice(0, 100) || uiMessage("Empty paragraph")});
+  }
+  function updatePlainParagraph(side, key, text) {
+    // A missing group is inserted and a multi-block group collapses on edit.
+    // Both change the paragraph structure and need the normal document renderer.
+    const nodes = [...ui[side].scroll.querySelectorAll('.visual-paragraph.is-selected')].filter(node => node.dataset.group === key);
+    if (nodes.length !== 1) return false;
+    const node = nodes[0];
+    node.textContent = text;
+    paragraphHighlights.get(node).highlighted = false;
+    uiSetAttr(node, 'aria-label', paragraphLabel(side, text));
+    return true;
+  }
   function textPaper(side) {
     const paper = el('div', undefined, 'visual-paper');
     if (report.sources[side].format === 'pdf') paper.append(el('p', uiMessage("Click any text to edit. Your changes also appear in Document view."), 'visual-instruction'));
@@ -911,7 +935,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
         const ordinal = paragraphOrdinals.get(entry.key) || 0;
         paragraphOrdinals.set(entry.key, ordinal + 1);
         paragraphHighlights.set(p, {content, side, ordinal, aggregate: !!model && !drafts[side].rowPlan});
-        p.dataset.group = entry.key; p.tabIndex = 0; p.setAttribute('role', 'button'); uiSetAttr(p, 'aria-label', uiMessage("Edit{0}: {1}{2}", { 0: single ? '' : ' '+letter(side), 1: entry.list ? entry.list.label + ' ' : '', 2: (entry.text.slice(0, 100) || uiMessage("Empty paragraph")) }));
+        p.dataset.group = entry.key; p.tabIndex = 0; p.setAttribute('role', 'button'); uiSetAttr(p, 'aria-label', paragraphLabel(side, entry.text, entry.list));
         p.addEventListener('click', () => select(entry.key, side));
         p.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); select(entry.key, side); } });
       }
@@ -1073,7 +1097,7 @@ export async function mountVisualReview(root, {report, sources, single = false, 
       const absent = groups.filter(group => !group.dynamic && !models[side]?.hasTables && value(side, group.key) === null && value(other(side), group.key) !== null);
       if (absent.length) {
         const missing = el('div', undefined, 'visual-missing'); missing.append(el('strong', uiMessage("Missing in {0}", { 0: letter(side) })));
-        for (const group of absent) { const add = button(uiMessage('＋ {0}', {0:value(other(side), group.key).slice(0,100) || uiMessage('Empty paragraph')}), () => { if (!alive()) return; void select(group.key); copyTo(side); }); uiSetAttr(add, "title", uiMessage("Add from {0}", { 0: letter(other(side)) })); add.dataset.missingKey = group.key; missing.append(add); }
+        for (const group of absent) { const add = button(missingLabel(other(side), group.key), () => { if (!alive()) return; void select(group.key); copyTo(side); }); uiSetAttr(add, "title", uiMessage("Add from {0}", { 0: letter(other(side)) })); add.dataset.missingKey = group.key; missing.append(add); }
         scroll.append(missing);
       }
       if (alignSelection) scroll.scrollTop = scrollTop;

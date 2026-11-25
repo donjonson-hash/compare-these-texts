@@ -1,8 +1,10 @@
 /** Show the draft in the current page while its exact PDF rendering is prepared. */
 export function showPdfTypingPreview(scroll, key, text, block, pageNumber) {
   const paper = scroll.querySelector('.visual-pdf-page');
-  if (!paper || !block) return;
-  const parts = block.source_blocks || [block];
+  if (!paper) return;
+  // Transferred paragraphs have layout offsets on the current page, but no
+  // corresponding block in the target's original PDF.
+  const parts = block?.source_blocks || (block ? [block] : []);
   const lines = text.split('\n');
   const pageParts = parts.filter(part => part.visual?.page === pageNumber);
   const areas = new Map();
@@ -39,12 +41,11 @@ export function showPdfTypingPreview(scroll, key, text, block, pageNumber) {
   const spans = [];
   for (const [index, area] of boxes.entries()) {
     const part = parts.find(item => item.record === area.record) || pageParts[index] || parts[0];
-    const sourceIndex = parts.indexOf(part);
     const line = paper.ownerDocument.createElement('div');
     line.className = 'pdf-typing-line'; line.dir = 'auto';
     Object.assign(line.style, {left:area.left + '%', top:area.top + '%',
       width:(area.right - area.left) + '%', height:(area.bottom - area.top) + '%'});
-    const size = part.visual?.rects?.[0]?.fontSize;
+    const size = part?.visual?.rects?.[0]?.fontSize;
     if (size > 0 && part.visual.width > 0) line.style.fontSize = (100 * size / part.visual.width) + 'cqw';
     const span = paper.ownerDocument.createElement('span');
     if (Number.isFinite(area.start)) {
@@ -52,7 +53,9 @@ export function showPdfTypingPreview(scroll, key, text, block, pageNumber) {
       const end = Number.isFinite(next) ? next : area.continues ? area.end : undefined;
       span.textContent = text.slice(area.start, end);
     } else {
-      span.textContent = sourceIndex === parts.length - 1 ? lines.slice(sourceIndex).join('\n') : lines[sourceIndex] || '';
+      const sourceIndex = part ? parts.indexOf(part) : index;
+      const isLast = part ? sourceIndex === parts.length - 1 : index === boxes.length - 1;
+      span.textContent = isLast ? lines.slice(sourceIndex).join('\n') : lines[sourceIndex] || '';
     }
     line.append(span);
     spans.push(span);

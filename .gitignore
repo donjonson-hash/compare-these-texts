@@ -7,3 +7,8 @@ __pycache__/
 # Local archive of dist/ prepared for manual site upload
 /ctt-site-dist.zip
 /dist.zip
+
+# Local environment settings
+.env
+.env.*
+!.env.example
