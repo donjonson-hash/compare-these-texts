@@ -44,6 +44,13 @@ def build():
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     shutil.copytree(SOURCE, OUTPUT)
+    release = json.loads((ROOT / "release.json").read_text())
+    support_page = OUTPUT / "support/index.html"
+    support_html = support_page.read_text()
+    version_marker = "<!-- CTT-RELEASE-VERSION -->"
+    if support_html.count(version_marker) != 1:
+        raise RuntimeError("Support page must contain one release version marker")
+    support_page.write_text(support_html.replace(version_marker, html.escape(release["version"])))
     collect()
     build_i18n(OUTPUT)
     # One authoritative license supplies the website and every downloadable copy.
@@ -77,7 +84,6 @@ def build():
     # Only the website is minified; extension ZIPs retain their original payload.
     minification = json.loads(subprocess.check_output(
         ["node", str(ROOT / "scripts/minify_website.mjs")], cwd=ROOT, text=True))
-    release = json.loads((ROOT / "release.json").read_text())
     revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "--", "."], cwd=ROOT, text=True).strip())
     record = {

@@ -63,7 +63,20 @@ function hyperlinkInstruction(instruction) {
   if (!address && !anchor) fail();
 }
 
+export function pageFieldType(instruction) {
+  const field = /^\s*(PAGE|NUMPAGES|SECTIONPAGES)(?:\s+\\\*\s+MERGEFORMAT)?\s*$/i.exec(instruction);
+  return field?.[1].toUpperCase();
+}
+
 export function normalizeDocxHyperlinkFields(doc) {
+  return processComplexFields(doc, null, fail);
+}
+
+export function collectHeaderFooterFields(doc, markers, unsupported) {
+  processComplexFields(doc, markers, unsupported);
+}
+
+function processComplexFields(doc, markers, fail) {
   const nodes = walk(doc.documentElement);
   const controls = nodes.filter(node => is(node, 'fldChar') || is(node, 'instrText'));
   if (!controls.length) return 0;
@@ -99,7 +112,11 @@ export function normalizeDocxHyperlinkFields(doc) {
             field = {phase: 'instruction', instruction: '', result: false};
           } else if (type === 'separate') {
             if (field?.phase !== 'instruction') fail();
-            hyperlinkInstruction(field.instruction); field.phase = 'result';
+            if (markers) {
+              field.type = pageFieldType(field.instruction);
+              if (!field.type) fail();
+            } else hyperlinkInstruction(field.instruction);
+            field.phase = 'result';
           } else if (type === 'end') {
             if (field?.phase !== 'result' || !field.result) fail();
             field = null;
@@ -114,6 +131,7 @@ export function normalizeDocxHyperlinkFields(doc) {
         }
         if (field) {
           if (field.phase !== 'result' || !W.has(node.namespaceURI) || !['t','tab','br','cr','noBreakHyphen','softHyphen'].includes(node.localName) || elements(node).length || !is(node, 't') && node.textContent.trim()) fail();
+          if (markers) markers.set(node, field.result ? null : field.type);
           field.result = true;
         }
       }
@@ -122,6 +140,9 @@ export function normalizeDocxHyperlinkFields(doc) {
   }
   if (remove.length !== controls.length) fail();
   // Validate the complete document before mutating any field.
-  for (const node of remove) node.parentNode.removeChild(node);
+  for (const node of remove) {
+    if (!markers) node.parentNode.removeChild(node);
+    else if (!markers.has(node)) markers.set(node, null);
+  }
   return count;
 }

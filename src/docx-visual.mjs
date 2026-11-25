@@ -17,7 +17,7 @@ const enabled = node => node && !['0','false','off'].includes(attr(node));
 const finite = (value,min,max) => value !== null && Number.isFinite(Number(value)) && Number(value) >= min && Number(value) <= max;
 function stylesFor(checked) {
   const root=checked.docs.get('word/styles.xml')?.documentElement, styles=new Map(); let defaultParagraph=null;
-  for (const node of elements(root)) if (is(node,'style')) {
+  for (const node of elements(root)) if (is(node,'style') && attr(node,'styleId')) {
     styles.set(attr(node,'styleId'),node);
     if (attr(node,'type')==='paragraph' && ['1','true','on'].includes(attr(node,'default'))) defaultParagraph=attr(node,'styleId');
   }
@@ -108,6 +108,11 @@ export async function readDocxVisual(source) {
     function visit(node,style={}) {
       if(shapeIs(node,'mc','AlternateContent')) return;
       if (is(node,'r')) style={...style,...formatting.run(node)};
+      if (checked.headerFooterFields.has(node)) {
+        const field = checked.headerFooterFields.get(node);
+        if (field) runs.push({field, text:'', style});
+        return;
+      }
       if (is(node,'fldSimple')) { const field=/^\s*(PAGE|NUMPAGES|SECTIONPAGES)\b/i.exec(attr(node,'instr')||'')?.[1]?.toUpperCase(); if(field){runs.push({field,text:'',style:{...style,...formatting.run(child(node,'r'))}});return;} }
       if (textual(node)) { runs.push({text:textOf(node),style,...(is(node,'br')&&attr(node,'type')==='page'?{pageBreak:true}:{})}); return; }
       if (is(node,'drawing')||isVmlPicture(node)) { const img=(isVmlPicture(node)?validateDocxVmlImage:validateDocxDrawing)(node,checked.entries,checked.docs); if(!imageSources.has(img.path))imageSources.set(img.path,`data:${img.mime};base64,${encodeBase64Bytes(img.bytes)}`); runs.push({image:{src:imageSources.get(img.path),width:img.width,height:img.height,alt:img.alt}}); return; }

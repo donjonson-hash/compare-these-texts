@@ -715,7 +715,7 @@
   "08859a601ce5": "Para la implementación de escritorio Windows o en toda la organización, utilice el proceso de implementación de complementos admitido por su administrador. La ruta web anterior es el piloto inicial más sencillo; Esta página no instala software en su computadora.",
   "1e8ea60da5c1": "Para un documento DOCX, elija <0>Word (.docx)</0> para descargar el archivo de Word editado. Para convertirlo, elija <1>PDF (.pdf) → Vista previa de PDF → Descargar PDF</1>. Revise la vista previa antes de descargar. Se incluyen encabezados, pies de página y números de página de texto admitidos.",
   "1a762c0501d0": "Para un PDF abierto en Editar y exportar, utilice <0>Descargar PDF</0>. Si la descarga no comienza, seleccione <1>Guardar PDF en la computadora</1> cuando el archivo esté listo. <2>Imprimir</2> abre el flujo de trabajo de impresión. Para una hoja de cálculo, la opción PDF exporta la hoja seleccionada.",
-  "39412d1f2128": "Para obtener un informe de problema, incluya la versión <0>0.37.8</0>, la versión de su navegador, si utilizó el sitio web o la extensión, el tipo de archivo y los pasos para reproducirlo. Cuéntanos qué esperabas y qué pasó en su lugar.",
+  "c37e98cda9bf": "Para obtener un informe de problema, incluya la versión <0></0>, la versión de su navegador, si utilizó el sitio web o la extensión, el tipo de archivo y los pasos para reproducirlo. Cuéntanos qué esperabas y qué pasó en su lugar.",
   "6950597fd437": "Para un elemento no emparejado, el lado faltante aporta cero al total de la lista; esto no indica la cantidad de bienes ni si fueron entregados. Los valores originales de cantidad y precio aparecen en los documentos siguientes.",
   "71f4f346a7fd": "Para un artículo no emparejado, cero significa que no hay contribución al total de la lista, no una cantidad cero ni confirmación de entrega.",
   "b6d0d96a817d": "Por ejemplo: ¿qué cambió en el texto?",
@@ -2168,5 +2168,14 @@
   "f01711bf73bd": "{0}: Se admiten CSV, TSV y XLS/XLSX. Guarde el libro de trabajo como XLSX.",
   "7208e54b5a60": "{0}: se esperaba un libro XLS de Excel 97–2003. Abre el archivo en Excel o LibreOffice y guárdalo como XLSX.",
   "97c0a7ed2af5": "{0}: no se pueden comparar libros XLS protegidos con contraseña.",
-  "0541847f12bc": "Abrir comparación de documentos"
+  "0541847f12bc": "Abrir comparación de documentos",
+  "62932077ca3f": "Descargar PDF con una fuente de sustitución",
+  "3607efb0668d": "La comparación del cuerpo del texto es de solo lectura. Los comentarios de Word y los nombres de sus autores se conservan en los archivos originales y quedan fuera de la comparación.",
+  "9d2c04a4e64c": "DOCX: Selecciona «Comparar documentos» para revisar el cuerpo del texto. Los archivos con comentarios de Word no se pueden editar.",
+  "549319d3c5dd": "DOCX: La parte de comentarios no es válida.",
+  "54b50369d74b": "DOCX: El comentario no es válido o su identificador está duplicado.",
+  "99816043f744": "DOCX: La relación con la parte de comentarios no es válida.",
+  "c2973c4a81a3": "DOCX: Falta la relación con la parte de comentarios.",
+  "6d61b741c442": "DOCX: El anclaje del comentario no es compatible.",
+  "deaa84ddc746": "DOCX: El anclaje del comentario está incompleto."
 }

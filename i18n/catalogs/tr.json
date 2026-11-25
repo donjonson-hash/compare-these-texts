@@ -715,7 +715,7 @@
   "08859a601ce5": "Windows masaüstü veya kuruluş çapında dağıtım için yöneticinizin desteklenen eklenti dağıtım sürecini kullanın. Yukarıdaki web yolu en basit ilk pilottur; bu sayfa bilgisayarınıza yazılım yüklemez.",
   "1e8ea60da5c1": "A için DOCX belge, seçin <0>Word (.docx)</0> Düzenlenen Word dosyasını indirmek için. Dönüştürmek için seçin <1>PDF (.pdf) → Önizleme PDF → İndir PDF</1>. İndirmeden önce önizlemeyi inceleyin. Desteklenen metin başlıkları, altbilgiler ve sayfa numaraları dahildir.",
   "1a762c0501d0": "A için PDF Düzenle ve dışa aktarmada açıldı, kullanın <0>İNDİR PDF</0>. İndirme başlatılmazsa, seçin <1>Kaydet PDF Bilgisayara</1> Dosya hazır olduğunda. <2>Basım</2> yazdırma iş akışını açar. Bir tablo için, PDF seçeneği seçilen sayfayı dışa aktarır.",
-  "39412d1f2128": "Bir sorun raporu için sürüm ekleyin <0>0.37.8</0>, tarayıcı sürümünüz, web sitesini veya uzantısını, dosya türünü ve yeniden oluşturmak için adımları kullandıysanız. Ne beklediğinizi ve bunun yerine ne olduğunu bize bildirin.",
+  "c37e98cda9bf": "Bir sorun raporu için sürüm ekleyin <0></0>, tarayıcı sürümünüz, web sitesini veya uzantısını, dosya türünü ve yeniden oluşturmak için adımları kullandıysanız. Ne beklediğinizi ve bunun yerine ne olduğunu bize bildirin.",
   "6950597fd437": "Eşlenmemiş bir öge için, eksik taraf toplam listeye sıfır katkıda bulunur; bu, malların miktarını veya teslim edilip edilmediğini göstermez. Orijinal miktar ve fiyat değerleri aşağıdaki belgelerde görünür.",
   "71f4f346a7fd": "Eşlenmemiş bir öge için sıfır, liste toplamına hiçbir katkı anlamına gelmez, sıfır miktar veya teslimat onayı değildir.",
   "b6d0d96a817d": "Örneğin: metinde ne değişti?",
@@ -2167,5 +2167,14 @@
   "f01711bf73bd": "{0}: CSVTSV ve XLS/XLSX Desteklenir. Çalışma kitabını aşağıdaki gibi kaydedin: XLSX.",
   "7208e54b5a60": "{0}: Excel 97–2003 biçiminde bir XLS çalışma kitabı bekleniyor. Dosyayı Excel veya LibreOffice ile açıp XLSX olarak kaydedin.",
   "97c0a7ed2af5": "{0}: parola korumalı XLS çalışma kitapları karşılaştırılamaz.",
-  "0541847f12bc": "Açık belge karşılaştırması"
+  "0541847f12bc": "Açık belge karşılaştırması",
+  "62932077ca3f": "Yedek yazı tipiyle PDF indir",
+  "3607efb0668d": "Ana metnin karşılaştırması salt okunurdur. Word açıklamaları ve yazarlarının adları özgün dosyalarda korunur ve karşılaştırmaya dahil edilmez.",
+  "9d2c04a4e64c": "DOCX: Ana metni gözden geçirmek için “Belgeleri karşılaştır” seçeneğini kullanın. Word açıklamaları içeren dosyalar düzenlenemez.",
+  "549319d3c5dd": "DOCX: Açıklamaları içeren belge bölümü geçersiz.",
+  "54b50369d74b": "DOCX: Açıklama geçersiz veya açıklama kimliği yinelenmiş.",
+  "99816043f744": "DOCX: Açıklamalar bölümüne giden ilişki geçersiz.",
+  "c2973c4a81a3": "DOCX: Açıklamalar bölümüne giden ilişki eksik.",
+  "6d61b741c442": "DOCX: Açıklamayı metne bağlama yöntemi desteklenmiyor.",
+  "deaa84ddc746": "DOCX: Açıklamayı metne bağlama bilgileri eksik."
 }

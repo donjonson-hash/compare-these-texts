@@ -1,7 +1,8 @@
 /** Full, local PDF page rendering and bounded edits of existing text areas. */
 import {MAX_FILE_BYTES, decodeBase64Bytes, maxEncodedLength} from './file-limits.mjs';
 import {getDocument} from './pdf-reader.mjs';
-import {PDFDocument, fontkit, rgb} from './pdf-vendor.mjs';
+import {PDFDocument, fontkit, rgb, pushGraphicsState, popGraphicsState, beginText, endText,
+  setFontAndSize, setTextMatrix, setTextRenderingMode, showText} from './pdf-vendor.mjs';
 import fontBase64 from './pdf-font.mjs';
 import {refineRasterBounds} from './pdf-raster-bounds.mjs';
 import {createPdfEditFonts} from './pdf-edit-fonts.mjs';
@@ -154,7 +155,19 @@ async function paintPlans(canvas, plans, scale, {text = true, blocks = [], image
   return sampled;
 }
 
-export async function openPdfVisual(source, {signal, generated = false} = {}) {
+function trimPdfSpacingRuns(block) {
+  // PDF.js may synthesize a wide trailing space between table columns. It has
+  // no ink: keep it in the text layer, but never paint across the column gap.
+  const rects = block.visual.rects;
+  const hasInk = rect => !Number.isInteger(rect.textStart) || !Number.isInteger(rect.textEnd) ||
+    !!block.text.slice(rect.textStart, rect.textEnd).trim();
+  const first = rects.findIndex(hasInk), last = rects.findLastIndex(hasInk);
+  if (first < 0 || (first === 0 && last === rects.length-1)) return block;
+  const inkRects = rects.slice(first, last+1);
+  return {...block, visual:{...block.visual, rects:inkRects, fontItems:inkRects.map(r => r.textItemIndex)}};
+}
+
+export async function openPdfVisual(source, {signal, generated = false, allowReplacementFont = false} = {}) {
   abort(signal);
   const data = generated ? source?.data : bytes(source);
   if (generated && (!(data instanceof Uint8Array) || !data.length || data.length > 64 * 1024 * 1024)) fail('the generated preview is too large.');
@@ -176,10 +189,10 @@ export async function openPdfVisual(source, {signal, generated = false} = {}) {
     const editFont = createPdfEditFonts(doc, async () => {
       parsedBlocks ||= import('./pdf-source.mjs').then(({readPdfBytes}) => readPdfBytes(bytes(source))).then(result => result.blocks);
       return parsedBlocks;
-    });
+    }, allowReplacementFont);
     return {pageCount: doc.numPages, rects: pdfBlockRects, dispose, editFont,
       async refineBlocks(blocks) {
-        let result=blocks.slice();
+        let result=allowReplacementFont ? blocks.map(trimPdfSpacingRuns) : blocks.slice();
         for(const number of new Set(blocks.filter(b=>b.visual?.rasterBoundsVersion!==2).map(b=>b.visual.page))){
           abort(signal); const canvas=document.createElement('canvas');
           try {const {width,height,images}=await this.renderPage(number,canvas,{scale:2,trackImages:true});
@@ -216,28 +229,43 @@ export async function openPdfVisual(source, {signal, generated = false} = {}) {
 /** Preserve each original run's font in the rebuilt searchable layer as well.
  * This keeps later edits of untouched text tied to its original typeface.
  */
+const searchFontKeys = new WeakMap();
 export async function drawPdfOriginalText(page, block, viewer, output, fallback, {height, offsetY = 0} = {}) {
   const runs = block.visual.textRuns || block.visual.rects;
   for (const rect of runs) {
     const text = Number.isInteger(rect.textStart) ? block.text.slice(rect.textStart, rect.textEnd) : block.text;
     if (!text) continue;
-    let font = fallback;
+    let font = fallback, substituted = true;
     try {
       const part = Number.isInteger(rect.textItemIndex) ? {...block, visual:{...block.visual, fontItems:[rect.textItemIndex]}} : block;
-      font = (await viewer.editFont(part, text, output))?.font || fallback;
+      const resolved = await viewer.editFont(part, text, output);
+      if (resolved && !resolved.substituted) { font = resolved.font; substituted = false; }
     } catch (error) {
       // An unsupported font in untouched raster artwork must not prevent edits
       // elsewhere. The explicit text-only export remains available for it.
       if (!error.message?.startsWith('PDF:')) throw error;
     }
-    page.drawText(text, {x:rect.x, y:height-offsetY-(rect.baselineY ?? rect.y+rect.height*.8),
-      size:rect.fontSize, font, opacity:0, rotate:{type:'degrees',angle:-rect.angle}});
+    const y = height-offsetY-(rect.baselineY ?? rect.y+rect.height*.8);
+    if (substituted && Math.abs(rect.angle) < 0.01 && rect.width > 0) {
+      // A wider font can push the last characters outside the page's crop box.
+      // Keep the searchable replacement within the original horizontal run.
+      const measured = font.widthOfTextAtSize(text, rect.fontSize);
+      let key = searchFontKeys.get(page);
+      if (!key) {
+        key = page.node.newFontDictionary('SearchFont', font.ref);
+        searchFontKeys.set(page, key);
+      }
+      page.pushOperators(pushGraphicsState(), beginText(), setTextRenderingMode(3),
+        setFontAndSize(key, rect.fontSize), setTextMatrix(measured > 0 ? rect.width/measured : 1,0,0,1,rect.x,y),
+        showText(font.encodeText(text)), endText(), popGraphicsState());
+    } else page.drawText(text, {x:rect.x, y, size:rect.fontSize, font, opacity:0,
+      rotate:{type:'degrees',angle:-rect.angle}});
     if (!Number.isInteger(rect.textStart)) break;
   }
 }
 
 /** A flattened copy: original pixels plus corrections, never original hidden text. */
-export async function renderPdfRevision(source, edits, {signal, blocks} = {}) {
+export async function renderPdfRevision(source, edits, {signal, blocks, allowReplacementFont = false} = {}) {
   if (!Array.isArray(blocks) || !blocks.length || blocks.length > 2000) fail("saving requires the full document text. Run the comparison again.");
   const ordered = blocks.slice().sort((a, b) => a.record - b.record), originals = new Map(ordered.map(block => [block.record, block]));
   if (originals.size !== ordered.length || ordered.some((block, index) => block.record !== index + 1 || typeof block.text !== 'string' || !block.visual?.rects?.length)) fail("saving requires the full document text. Run the comparison again.");
@@ -246,7 +274,7 @@ export async function renderPdfRevision(source, edits, {signal, blocks} = {}) {
     if (!originals.has(edit.block?.record) || originals.get(edit.block.record).text !== edit.block.text || replacements.has(edit.block.record)) fail("to add or move sections, save a text version.");
     replacements.set(edit.block.record, edit.text);
   }
-  const viewer = await openPdfVisual(source, {signal});
+  const viewer = await openPdfVisual(source, {signal, allowReplacementFont});
   try {
     const refined=await viewer.refineBlocks(ordered),byRecord=new Map(refined.map(b=>[b.record,b]));
     ordered.splice(0,ordered.length,...refined);edits=edits.map(edit=>({...edit,block:byRecord.get(edit.block.record)}));

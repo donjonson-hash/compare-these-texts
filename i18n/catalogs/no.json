@@ -713,7 +713,7 @@
   "08859a601ce5": "For Windows skrivebords- eller organisasjonsoverflate distribusjon, bruk administratorens støttede tilleggsprogram. Nettruten ovenfor er den enkleste startpiloten; denne siden installerer ikke programvare på datamaskinen din.",
   "1e8ea60da5c1": "For en DOCX dokument, velg <0>Word (.docx)</0> å laste ned den redigerte Word-filen. Hvis du vil konvertere den, velger <1>PDF (.pdf) → Forhåndsvisning PDF → Last ned PDF</1>. Sjekk forhåndsvisningen før nedlasting. Støttede teksthoder, bunntekster og sidetall er inkludert.",
   "1a762c0501d0": "For en PDF åpnet i Rediger og eksport, bruk <0>Last ned PDF</0>Hvis nedlastingen ikke starter, velger du <1>Lagre PDF til datamaskinen</1> Når filen er klar. <2>Skriv ut</2> åpner utskriftsarbeidsflyten. For et regneark PDF alternativ eksport av det valgte ark.",
-  "39412d1f2128": "For en problemrapport, inkludert versjon <0>0.37.8</0>, nettleserversjonen din, enten du brukte nettstedet eller filtypen, filtypen og trinnene for å reprodusere det. Fortell oss hva du forventet og hva som skjedde i stedet.",
+  "c37e98cda9bf": "For en problemrapport, inkludert versjon <0></0>, nettleserversjonen din, enten du brukte nettstedet eller filtypen, filtypen og trinnene for å reprodusere det. Fortell oss hva du forventet og hva som skjedde i stedet.",
   "6950597fd437": "For et uparert element, den manglende siden bidrar null til listen total; dette indikerer ikke mengden varer eller om de ble levert. Opprinnelig mengde og prisverdier vises i dokumentene nedenfor.",
   "71f4f346a7fd": "For et uforenlig element betyr null ikke noe bidrag til listen totalt, ikke en null mengde eller bekreftelse av levering.",
   "b6d0d96a817d": "For eksempel: Hva endret seg i teksten?",
@@ -2163,5 +2163,14 @@
   "f01711bf73bd": "{0}: CSV, TSV og XLS/XLSX er støttet. Lagre arbeidsboken som XLSX.",
   "7208e54b5a60": "{0}: forventet en XLS-arbeidsbok fra Excel 97–2003. Åpne filen i Excel eller LibreOffice og lagre den som XLSX.",
   "97c0a7ed2af5": "{0}: passordbeskyttede XLS-arbeidsbøker kan ikke sammenlignes.",
-  "0541847f12bc": "Åpne dokumentsammenligning"
+  "0541847f12bc": "Åpne dokumentsammenligning",
+  "62932077ca3f": "Last ned PDF med erstatningsskrift",
+  "3607efb0668d": "Sammenligningen av brødteksten er skrivebeskyttet. Word-kommentarer og navnene på forfatterne bevares i originalfilene og holdes utenfor sammenligningen.",
+  "9d2c04a4e64c": "DOCX: Velg «Sammenlign dokumenter» for å gjennomgå brødteksten. Filer med Word-kommentarer kan ikke redigeres.",
+  "549319d3c5dd": "DOCX: Dokumentdelen for kommentarer er ugyldig.",
+  "54b50369d74b": "DOCX: Ugyldig kommentar eller duplisert kommentar-ID.",
+  "99816043f744": "DOCX: Relasjonen til kommentardelen er ugyldig.",
+  "c2973c4a81a3": "DOCX: Relasjonen til kommentardelen mangler.",
+  "6d61b741c442": "DOCX: Kommentarens forankringsmåte støttes ikke.",
+  "deaa84ddc746": "DOCX: Kommentarens forankring er ufullstendig."
 }

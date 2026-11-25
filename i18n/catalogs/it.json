@@ -446,7 +446,7 @@
   "08859a601ce5": "Per il desktop Windows o la distribuzione a livello di organizzazione, utilizzare il processo di distribuzione del componente aggiuntivo supportato dall'amministratore. Il percorso web riportato sopra è il pilota iniziale più semplice; questa pagina non installa software sul tuo computer.",
   "1e8ea60da5c1": "Per un documento DOCX, scegli <0>Word (.docx)</0> per scaricare il file Word modificato. Per convertirlo, scegli <1>PDF (.pdf) → Anteprima PDF → Scarica PDF</1>. Rivedi l'anteprima prima del download. Sono inclusi intestazioni di testo, piè di pagina e numeri di pagina supportati.",
   "1a762c0501d0": "Per un PDF aperto in Modifica ed esporta, utilizza <0>Scarica PDF</0>. Se il download non si avvia, seleziona <1>Salva PDF sul computer</1> quando il file è pronto. <2>Stampa</2> apre il flusso di lavoro di stampa. Per un foglio di calcolo, l'opzione PDF esporta il foglio selezionato.",
-  "39412d1f2128": "Per segnalare un problema, includi la versione <0>0.37.8</0>, la versione del tuo browser, se hai utilizzato il sito web o l'estensione, il tipo di file e i passaggi per riprodurlo. Raccontaci cosa ti aspettavi e cosa invece è successo.",
+  "c37e98cda9bf": "Per segnalare un problema, includi la versione <0></0>, la versione del tuo browser, se hai utilizzato il sito web o l'estensione, il tipo di file e i passaggi per riprodurlo. Raccontaci cosa ti aspettavi e cosa invece è successo.",
   "7c980527e019": "Chiarimento necessario: confronto non eseguito",
   "5529622509b5": "Chiarimenti",
   "71a715cce088": "Fai clic su un'area vuota della pagina o scegli Aggiungi testo per iniziare.",
@@ -2168,5 +2168,14 @@
   "f01711bf73bd": "{0}: sono supportati CSV, TSV e XLS/XLSX. Salva la cartella di lavoro come XLSX.",
   "7208e54b5a60": "{0}: è richiesta una cartella di lavoro XLS di Excel 97–2003. Apri il file in Excel o LibreOffice e salvalo in formato XLSX.",
   "97c0a7ed2af5": "{0}: impossibile confrontare cartelle di lavoro XLS protette da password.",
-  "0541847f12bc": "Confronto documenti aperto"
+  "0541847f12bc": "Confronto documenti aperto",
+  "62932077ca3f": "Scarica il PDF con un carattere sostitutivo",
+  "3607efb0668d": "Il confronto del corpo del testo è in sola lettura. I commenti di Word e i nomi dei loro autori si conservano nei file originali e sono esclusi dal confronto.",
+  "9d2c04a4e64c": "DOCX: Seleziona «Confronta documenti» per esaminare il corpo del testo. I file con commenti di Word non possono essere modificati.",
+  "549319d3c5dd": "DOCX: La parte del documento che contiene i commenti non è valida.",
+  "54b50369d74b": "DOCX: Commento non valido o identificatore di commento duplicato.",
+  "99816043f744": "DOCX: La relazione con la parte dei commenti non è valida.",
+  "c2973c4a81a3": "DOCX: Manca la relazione con la parte dei commenti.",
+  "6d61b741c442": "DOCX: L’ancoraggio del commento non è supportato.",
+  "deaa84ddc746": "DOCX: L’ancoraggio del commento è incompleto."
 }

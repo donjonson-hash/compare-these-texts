@@ -708,7 +708,7 @@
   "08859a601ce5": "* Untuk * Windows Deployment desktop atau organisasi-luas, gunakan proses add-in designment yang didukung oleh administrator Anda. Rute web di atas adalah pilot awal yang paling sederhana; halaman ini tidak memasang perangkat lunak di komputer Anda.",
   "1e8ea60da5c1": "Untuk sebuah DOCX Dokumen, pilih <0>Word (.docx)</0> Untuk mendownload file Word yang diedit. Untuk mengubahnya, pilih <1>PDF (.pdf→ Pratonton PDF → Diunduh PDF</1>. . Review preview sebelum download. header teks yang didukung, footers dan nomor halaman disertakan.",
   "1a762c0501d0": "Untuk sebuah PDF XOB dibuka dalam Edit & ekspor, gunakan <0>Muaturun PDF</0>Jika download tidak dimulai, pilih <1>Simpan PDF Komputer</1> Ketika file siap. <2>Cetakan</2> Untuk lembar kerja, PDF opsi ekspor lembar yang dipilih.",
-  "39412d1f2128": "Untuk laporan masalah, versi termasuk <0>0.37.8</0>Beritahu kami apa yang kau harapkan dan apa yang terjadi.",
+  "c37e98cda9bf": "Untuk laporan masalah, versi termasuk <0></0>Beritahu kami apa yang kau harapkan dan apa yang terjadi.",
   "6950597fd437": "Untuk barang yang tidak dipaku, sisi yang hilang menyumbang nol untuk daftar total; ini tidak menunjukkan kuantitas barang atau apakah mereka disampaikan. Nilai kuantiti dan harga asli muncul dalam dokumen di bawah.",
   "71f4f346a7fd": "Untuk barang yang tidak dipakir, nol berarti tidak ada kontribusi untuk daftar total, bukan kuantitas nol atau konfirmasi pengiriman.",
   "b6d0d96a817d": "Misalnya: apa yang berubah dalam teks?",
@@ -2151,5 +2151,14 @@
   "f01711bf73bd": "{0}: CSV, TSV dan XLS/XLSX Tidak didukung. Simpan buku kerja sebagai XLSX.",
   "7208e54b5a60": "{0}: buku kerja XLS dalam format Excel 97–2003 diperlukan. Buka fail dalam Excel atau LibreOffice dan simpan sebagai XLSX.",
   "97c0a7ed2af5": "{0}: buku kerja XLS yang dilindungi kata laluan tidak dapat dibandingkan.",
-  "0541847f12bc": "Dokumen perbandingan Terbuka dokumen dokumen berdokumenName"
+  "0541847f12bc": "Dokumen perbandingan Terbuka dokumen dokumen berdokumenName",
+  "62932077ca3f": "Muat turun PDF dengan fon gantian",
+  "3607efb0668d": "Perbandingan teks utama adalah untuk bacaan sahaja. Komen Word dan nama penulisnya disimpan dalam fail asal dan dikecualikan daripada perbandingan.",
+  "9d2c04a4e64c": "DOCX: Pilih “Bandingkan dokumen” untuk menyemak teks utama. Fail yang mengandungi komen Word tidak boleh disunting.",
+  "549319d3c5dd": "DOCX: Bahagian komen tidak sah.",
+  "54b50369d74b": "DOCX: Komen tidak sah atau ID komen digunakan lebih daripada sekali.",
+  "99816043f744": "DOCX: Hubungan dengan bahagian komen tidak sah.",
+  "c2973c4a81a3": "DOCX: Hubungan dengan bahagian komen tiada.",
+  "6d61b741c442": "DOCX: Kaedah menambat komen pada teks tidak disokong.",
+  "deaa84ddc746": "DOCX: Maklumat tambatan komen pada teks tidak lengkap."
 }

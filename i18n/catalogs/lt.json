@@ -1151,7 +1151,7 @@
   "08859a601ce5": "Jei norite įdiegti Windows darbalaukyje arba visoje organizacijoje, naudokite administratoriaus palaikomą priedo diegimo procesą. Aukščiau pateiktas žiniatinklio maršrutas yra paprasčiausias pradinis bandomasis variantas; šis puslapis neįdiegė programinės įrangos jūsų kompiuteryje.",
   "1e8ea60da5c1": "Jei naudojate DOCX dokumentą, pasirinkite <0>Word (.docx)</0>, kad atsisiųstumėte redaguotą „Word“ failą. Norėdami jį konvertuoti, pasirinkite <1>PDF (.pdf) → Peržiūrėti PDF → Atsisiųsti PDF</1>. Prieš atsisiųsdami peržiūrėkite peržiūrą. Palaikomos teksto antraštės, poraštės ir puslapių numeriai.",
   "1a762c0501d0": "Jei PDF atidarytas redagavimo ir eksportavimo parinktyje, naudokite <0>Atsisiųsti PDF</0>. Jei atsisiuntimas neprasideda, pasirinkite <1>Išsaugoti PDF kompiuteryje</1>, kai failas bus paruoštas. <2>Spausdinti</2> atidaroma spausdinimo darbo eiga. Skaičiuoklėje PDF parinktis eksportuoja pasirinktą lapą.",
-  "39412d1f2128": "Norėdami pranešti apie problemą, nurodykite versiją <0>0.37.8</0>, naršyklės versiją, ar naudojote svetainę, ar plėtinį, failo tipą ir jo atkūrimo veiksmus. Pasakykite mums, ko tikėjotės ir kas atsitiko vietoj to.",
+  "c37e98cda9bf": "Norėdami pranešti apie problemą, nurodykite versiją <0></0>, naršyklės versiją, ar naudojote svetainę, ar plėtinį, failo tipą ir jo atkūrimo veiksmus. Pasakykite mums, ko tikėjotės ir kas atsitiko vietoj to.",
   "a1eb6eb788e8": "Šiame dokumente naudojami keli puslapių išdėstymai arba teksto stulpeliai. Atsisiųskite DOCX, kad juos išsaugotumėte.",
   "0ea5d89fa235": "Šis dokumentas buvo išsaugotas naudojant kitą Compare Two Texts versiją.",
   "48419711540e": "Šiame juodraštyje aprašomas pradinis palyginimas. Prieš siųsdami peržiūrėkite jį pagal savo pakeitimus.",
@@ -2168,5 +2168,14 @@
   "f01711bf73bd": "{0}: palaikomi CSV, TSV ir XLS/XLSX. Išsaugokite darbaknygę kaip XLSX.",
   "7208e54b5a60": "{0}: tikėtasi „Excel 97–2003“ XLS darbaknygės. Atverkite failą naudodami „Excel“ arba „LibreOffice“ ir išsaugokite XLSX formatu.",
   "97c0a7ed2af5": "{0}: slaptažodžiu apsaugotų XLS darbaknygių palyginti negalima.",
-  "0541847f12bc": "Atidaryti dokumentų palyginimą"
+  "0541847f12bc": "Atidaryti dokumentų palyginimą",
+  "62932077ca3f": "Atsisiųsti PDF su pakaitiniu šriftu",
+  "3607efb0668d": "Pagrindinio teksto palyginimą galima tik skaityti. „Word“ komentarai ir jų autorių vardai išsaugomi pradiniuose failuose ir neįtraukiami į palyginimą.",
+  "9d2c04a4e64c": "DOCX: Norėdami peržiūrėti pagrindinį tekstą, pasirinkite „Palyginkite dokumentus“. Failų su „Word“ komentarais redaguoti negalima.",
+  "549319d3c5dd": "DOCX: Netinkama dokumento komentarų dalis.",
+  "54b50369d74b": "DOCX: Netinkamas komentaras arba pasikartojantis komentaro identifikatorius.",
+  "99816043f744": "DOCX: Netinkamas ryšys su komentarų dalimi.",
+  "c2973c4a81a3": "DOCX: Trūksta ryšio su komentarų dalimi.",
+  "6d61b741c442": "DOCX: Komentaro susiejimo su tekstu būdas nepalaikomas.",
+  "deaa84ddc746": "DOCX: Trūksta duomenų apie komentaro susiejimą su tekstu."
 }

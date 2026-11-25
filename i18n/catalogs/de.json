@@ -873,7 +873,7 @@
   "08859a601ce5": "Für die Windows-Desktop- oder organisationsweite Bereitstellung verwenden Sie den von Ihrem Administrator unterstützten Add-In-Bereitstellungsprozess. Die obige Webroute ist der einfachste erste Pilotversuch; Diese Seite installiert keine Software auf Ihrem Computer.",
   "1e8ea60da5c1": "Wählen Sie für ein DOCX-Dokument <0>Word (.docx)</0>, um die bearbeitete Word-Datei herunterzuladen. Um es zu konvertieren, wählen Sie <1>PDF (.pdf) → Vorschau PDF → PDF herunterladen</1>. Sehen Sie sich vor dem Herunterladen die Vorschau an. Unterstützte Textkopfzeilen, Fußzeilen und Seitenzahlen sind enthalten.",
   "1a762c0501d0": "Für ein in „Bearbeiten und Exportieren“ geöffnetes PDF verwenden Sie <0>PDF herunterladen</0>. Wenn der Download nicht startet, wählen Sie <1>PDF auf Computer speichern</1>, wenn die Datei fertig ist. <2>Drucken</2> öffnet den Druckworkflow. Bei einer Tabellenkalkulation exportiert die Option PDF das ausgewählte Blatt.",
-  "39412d1f2128": "Geben Sie für einen Problembericht die Version <0>0.37.8</0>, Ihre Browserversion, ob Sie die Website oder Erweiterung verwendet haben, den Dateityp und die Schritte zur Reproduktion an. Sagen Sie uns, was Sie erwartet haben und was stattdessen passiert ist.",
+  "c37e98cda9bf": "Geben Sie für einen Problembericht die Version <0></0>, Ihre Browserversion, ob Sie die Website oder Erweiterung verwendet haben, den Dateityp und die Schritte zur Reproduktion an. Sagen Sie uns, was Sie erwartet haben und was stattdessen passiert ist.",
   "6950597fd437": "Bei einem ungepaarten Element trägt die fehlende Seite null zur Listensumme bei; Dies gibt keinen Hinweis auf die Menge der Waren oder darauf, ob sie geliefert wurden. Die ursprünglichen Mengen- und Preiswerte finden Sie in den folgenden Dokumenten.",
   "71f4f346a7fd": "Für einen nicht gepaarten Artikel bedeutet Null, dass kein Beitrag zur Listensumme vorhanden ist, keine Menge oder keine Lieferbestätigung vorliegt.",
   "b6d0d96a817d": "Zum Beispiel: Was hat sich im Text geändert?",
@@ -2168,5 +2168,14 @@
   "f01711bf73bd": "{0}: CSV, TSV und XLS/XLSX werden unterstützt. Speichern Sie die Arbeitsmappe unter dem Namen XLSX.",
   "7208e54b5a60": "{0}: Eine XLS-Arbeitsmappe im Format Excel 97–2003 wird erwartet. Öffnen Sie die Datei in Excel oder LibreOffice und speichern Sie sie als XLSX.",
   "97c0a7ed2af5": "{0}: Kennwortgeschützte XLS-Arbeitsmappen können nicht verglichen werden.",
-  "0541847f12bc": "Dokumentvergleich öffnen"
+  "0541847f12bc": "Dokumentvergleich öffnen",
+  "62932077ca3f": "PDF mit Ersatzschrift herunterladen",
+  "3607efb0668d": "Der Vergleich des Haupttexts ist schreibgeschützt. Word-Kommentare und die Namen ihrer Verfasser bleiben in den Originaldateien erhalten und werden vom Vergleich ausgenommen.",
+  "9d2c04a4e64c": "DOCX: Wählen Sie „Vergleichen Sie Dokumente“, um den Haupttext zu prüfen. Dateien mit Word-Kommentaren lassen sich nicht bearbeiten.",
+  "549319d3c5dd": "DOCX: Der Dokumentteil für Kommentare ist ungültig.",
+  "54b50369d74b": "DOCX: Ungültiger Kommentar oder doppelte Kommentar-ID.",
+  "99816043f744": "DOCX: Die Verknüpfung mit dem Kommentarteil ist ungültig.",
+  "c2973c4a81a3": "DOCX: Die Verknüpfung mit dem Kommentarteil fehlt.",
+  "6d61b741c442": "DOCX: Die Verankerung des Kommentars wird nicht unterstützt.",
+  "deaa84ddc746": "DOCX: Die Verankerung des Kommentars ist unvollständig."
 }

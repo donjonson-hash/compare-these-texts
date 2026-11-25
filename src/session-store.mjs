@@ -1,4 +1,5 @@
 /* One local review, with transaction-level ownership across extension tabs. */
+import {isCsvDelimiter} from './csv-delimiters.mjs';
 import {isValidEncodedSource} from './file-limits.mjs';
 const DB_NAME = 'kristina-review-session', STORE = 'session', KEY = 'current';
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -54,7 +55,7 @@ export function validateSessionPayload(payload) {
   }
   } else {
     if (report.kind !== undefined || report.status !== 'complete' || !object(report.sources) || !object(report.rules) || payload.review.kind !== 'sheet') invalid();
-    if (!Array.isArray(report.rules.key) || report.rules.key.length !== 2 || !Array.isArray(report.rules.fields) || report.rules.fields.length > 200 || ![',',';','\t'].includes(report.rules.delimiter)) invalid();
+    if (!Array.isArray(report.rules.key) || report.rules.key.length !== 2 || !Array.isArray(report.rules.fields) || report.rules.fields.length > 200 || !isCsvDelimiter(report.rules.delimiter)) invalid();
     const secondKey = report.rules.second_key;
     if (secondKey !== undefined && (!Array.isArray(secondKey) || secondKey.length !== 2)) invalid();
     for (const [index, side] of ['left','right'].entries()) {

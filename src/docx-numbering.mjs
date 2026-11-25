@@ -36,7 +36,10 @@ function styles(doc) {
   for(const n of elements(root)) {
     if(is(n,'docDefaults'))defaults=child(child(n,'pPrDefault'),'pPr');
     if(!is(n,'style'))continue;
-    const id=attr(n,'styleId');if(!id||map.has(id))fail("ambiguous style IDs.");map.set(id,n);
+    const id=attr(n,'styleId');
+    // An anonymous character style cannot supply a paragraph's list settings.
+    if (!id && attr(n,'type') === 'character') continue;
+    if(!id||map.has(id))fail("ambiguous style IDs.");map.set(id,n);
     if(attr(n,'type')==='paragraph'&&['1','true','on'].includes(attr(n,'default'))) {if(defaultId!==null)fail("multiple default paragraph styles.");defaultId=id;}
   }
   return {map,defaultId,defaults};

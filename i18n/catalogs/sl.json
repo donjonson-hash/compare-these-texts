@@ -714,7 +714,7 @@
   "08859a601ce5": "Za Windows namizje ali vse organizacije, uporabite proces uvajanja, ki ga podpira vaš administrator. Zgoraj navedena spletna pot je najenostavnejši začetni pilot; ta stran ne namesti programske opreme na vaš računalnik.",
   "1e8ea60da5c1": "Za DOCX dokument izberite <0>Beseda (.docx)</0> za prenos urejene Word datoteke. Če želite pretvoriti, izberite <1>PDF (.pdf) → Predogled PDF → Prenesi PDF</1>. Predogled pred prenosom. Vključene so podprte glave besedila, noge in številke strani.",
   "1a762c0501d0": "Za PDF Odpri v & Uredi izvoz, uporabi <0>Prenesi PDF</0>. Če se prenos ne zažene, izberite <1>Shrani PDF na računalnik</1> Ko bo datoteka pripravljena. <2>Natisni</2> odpre potek dela tiskanja. Za preglednico, PDF opcija izvozi izbrani list.",
-  "39412d1f2128": "Za poročilo o problemu, vključno z različico <0>0.37.8</0>, različico brskalnika, ali ste uporabili spletno stran ali razširitev, vrsto datoteke in korake za njeno reprodukcijo. Povejte nam, kaj ste pričakovali in kaj se je zgodilo namesto tega.",
+  "c37e98cda9bf": "Za poročilo o problemu, vključno z različico <0></0>, različico brskalnika, ali ste uporabili spletno stran ali razširitev, vrsto datoteke in korake za njeno reprodukcijo. Povejte nam, kaj ste pričakovali in kaj se je zgodilo namesto tega.",
   "6950597fd437": "Za neparno postavko manjkajoča stran prispeva nič k skupnemu seznamu; to ne pomeni količine blaga ali ali je bilo dobavljeno. Izvirna količina in vrednosti cene so navedene v spodnjih dokumentih.",
   "71f4f346a7fd": "Za neparno postavko nič pomeni, da ni prispevka k skupnemu seznamu, ne pa ničelne količine ali potrditve dobave.",
   "b6d0d96a817d": "Na primer: kaj se je spremenilo v besedilu?",
@@ -2165,5 +2165,14 @@
   "f01711bf73bd": "{0}: podprte so oblike CSV, TSV, XLS in XLSX. Shranite delovni zvezek v obliki XLSX.",
   "7208e54b5a60": "{0}: pričakovan je delovni zvezek programa Excel 97–2003 v obliki XLS. Odprite datoteko v Excelu ali LibreOfficeu in jo shranite v obliki XLSX.",
   "97c0a7ed2af5": "{0}: delovnih zvezkov XLS, zaščitenih z geslom, ni mogoče primerjati.",
-  "0541847f12bc": " Primerjava odprtih dokumentov"
+  "0541847f12bc": " Primerjava odprtih dokumentov",
+  "62932077ca3f": "Prenesi PDF z nadomestno pisavo",
+  "3607efb0668d": "Primerjava glavnega besedila je na voljo le za branje. Wordovi komentarji in imena njihovih avtorjev ostanejo v izvirnih datotekah in so izvzeti iz primerjave.",
+  "9d2c04a4e64c": "DOCX: Za pregled glavnega besedila izberite »Primerjaj dokumente«. Datotek z Wordovimi komentarji ni mogoče urejati.",
+  "549319d3c5dd": "DOCX: Del dokumenta s komentarji ni veljaven.",
+  "54b50369d74b": "DOCX: Neveljaven komentar ali podvojen identifikator komentarja.",
+  "99816043f744": "DOCX: Povezava z delom dokumenta s komentarji ni veljavna.",
+  "c2973c4a81a3": "DOCX: Manjka povezava z delom dokumenta s komentarji.",
+  "6d61b741c442": "DOCX: Način sidranja komentarja ni podprt.",
+  "deaa84ddc746": "DOCX: Sidranje komentarja je nepopolno."
 }

@@ -1,10 +1,10 @@
 /** Deterministic, offline tabular engine. No network, storage, or model access. */
+import {CSV_DELIMITERS, delimiterForSide, isCsvDelimiter} from './csv-delimiters.mjs';
 import {readWorkbook} from './xlsx-source.mjs';
 import {MAX_FILE_BYTES, maxEncodedLength, decodeBase64Bytes} from './file-limits.mjs';
 export const MAX_SOURCE_BYTES = MAX_FILE_BYTES;
 export const MAX_REPORT_BYTES = 16 * 1024 * 1024;
 const MAX_RECORDS = 5000, MAX_COLUMNS = 200, MAX_FIELD_CHARS = 131072, MAX_ISSUES = 100;
-const DELIMITERS = [',', ';', '\t'];
 const NUMBER = /^[+-]?[0-9]+(?:\.[0-9]+)?(?![\s\S])/;
 // Python str.strip differs from JS trim: Python includes U+001C–001F and
 // U+0085, but does not strip U+FEFF. Preserve that contract for identifiers.
@@ -57,7 +57,7 @@ function bounded(result) {
 async function inputs(payload, auto = false) {
   if (!object(payload)) fail('Expected a JSON object');
   const delimiter = own(payload, 'delimiter') ? payload.delimiter : auto ? 'auto' : ',';
-  if (![...DELIMITERS, ...(auto ? ['auto'] : [])].includes(delimiter)) fail('delimiter must be comma, semicolon, or tab');
+  if (!isCsvDelimiter(delimiter) && !(auto && delimiter === 'auto')) fail('delimiter must be comma, semicolon, or tab');
   const sources = {};
   for (const side of ['left', 'right']) {
     const item = payload[side];
@@ -147,27 +147,58 @@ function source(input, delimiter) {
 }
 
 function parseSources(sources, delimiter) {
-  const parse = d => Object.fromEntries(Object.entries(sources).map(([side, input]) => [side, source(input, d)]));
-  if (Object.values(sources).every(input => input.workbook)) return {delimiter: delimiter === 'auto' ? ',' : delimiter, parsed: parse(',')};
-  if (delimiter !== 'auto') return {delimiter, parsed: parse(delimiter)};
-  const candidates = [];
-  for (const d of DELIMITERS) {
-    try { candidates.push({delimiter: d, parsed: parse(d)}); } catch { /* Another supported separator may fit. */ }
+  const sides = ['left', 'right'];
+  if (delimiter !== 'auto') {
+    const parsed = Object.fromEntries(sides.map(side => [side, source(sources[side], delimiterForSide(delimiter, side))]));
+    return {delimiter, parsed};
   }
-  const structured = candidates.filter(item => Object.values(item.parsed).every(s => s.meta.headers.length > 1));
-  if (structured.length === 1) return structured[0];
-  // Identical interpretation across all separators is valid for one-column CSV.
-  if (!structured.length && candidates.length === 3) {
-    const first = candidates[0].parsed;
-    const identical = item => ['left', 'right'].every(side => {
-      const a = first[side], b = item.parsed[side];
-      return a.meta.headers.length === b.meta.headers.length && a.meta.headers.every((h, i) => h === b.meta.headers[i])
-        && a.rows.length === b.rows.length && a.rows.every((row, i) => a.meta.headers.every(h => row.values[h] === b.rows[i].values[h]));
+  const candidates = {};
+  for (const side of sides) {
+    const input = sources[side];
+    const choices = new Map();
+    for (const separator of CSV_DELIMITERS) {
+      try { choices.set(separator, source(input, separator)); } catch { /* Try the other supported separators. */ }
+    }
+    if (!choices.size) fail("Could not read the CSV. Check the UTF-8 encoding and row structure, and select a delimiter in settings.");
+    // TSV writers may leave literal commas and semicolons unquoted. Prefer a
+    // valid tabular interpretation when the filename explicitly identifies TSV.
+    if (/\.tsv$/i.test(input.name) && choices.get('\t')?.meta.headers.length > 1) {
+      candidates[side] = new Map([['\t', choices.get('\t')]]);
+    } else {
+      candidates[side] = choices;
+    }
+  }
+  const structured = side => [...candidates[side].keys()].filter(separator => candidates[side].get(separator).meta.headers.length > 1);
+  const left = structured('left'), right = structured('right');
+  const shared = left.filter(separator => right.includes(separator));
+  // Preserve a unique shared interpretation when one file alone is ambiguous.
+  if (shared.length === 1) {
+    const separator = shared[0];
+    return {delimiter: separator, parsed: {left: candidates.left.get(separator), right: candidates.right.get(separator)}};
+  }
+  const selected = {};
+  for (const side of sides) {
+    const choices = candidates[side], wide = side === 'left' ? left : right;
+    if (wide.length === 1) { selected[side] = wide[0]; continue; }
+    const first = choices.values().next().value;
+    // A workbook has no CSV dialect. A genuine one-column file can have
+    // identical interpretations, including quoted or multiline values.
+    const singleColumn = !wide.length && choices.size === CSV_DELIMITERS.length && [...choices.values()].every(parsed => {
+      const [header] = first.meta.headers;
+      return parsed.meta.headers[0] === header && parsed.rows.length === first.rows.length &&
+        parsed.rows.every((row, i) => row.values[header] === first.rows[i].values[header]);
     });
-    if (candidates.every(identical)) return candidates[0];
+    if (singleColumn && /\.tsv$/i.test(sources[side].name)) selected[side] = '\t';
+    if (sources[side].workbook || singleColumn) continue;
+    fail("Could not determine a shared CSV delimiter. Select a delimiter in settings; both files must use it.");
   }
-  if (!candidates.length) fail("Could not read the CSV. Check the UTF-8 encoding and row structure, and select a delimiter in settings.");
-  fail("Could not determine a shared CSV delimiter. Select a delimiter in settings; both files must use it.");
+  for (const side of sides) {
+    selected[side] ??= selected[side === 'left' ? 'right' : 'left'] || (/\.tsv$/i.test(sources[side].name) ? '\t' : ',');
+  }
+  return {
+    delimiter: selected.left === selected.right ? selected.left : selected,
+    parsed: Object.fromEntries(sides.map(side => [side, candidates[side].get(selected[side])])),
+  };
 }
 
 function mapHeaders(left, right) {
@@ -190,7 +221,7 @@ function mapHeaders(left, right) {
 export async function inspect(payload) {
   const {sources, delimiter} = await inputs(payload);
   return bounded(Object.fromEntries(Object.entries(sources).map(([side, input]) => {
-    const parsed = source(input, delimiter);
+    const parsed = source(input, delimiterForSide(delimiter, side));
     return [side, {...parsed.meta, preview: parsed.rows.slice(0, 5)}];
   })));
 }
@@ -276,7 +307,7 @@ export async function compare(payload) {
   const secondKey = payload.second_key ?? null;
   validateRules(key, secondKey, fields, trim);
   const keys = [key, secondKey].filter(Boolean);
-  const left = source(sources.left, delimiter), right = source(sources.right, delimiter);
+  const left = source(sources.left, delimiterForSide(delimiter, 'left')), right = source(sources.right, delimiterForSide(delimiter, 'right'));
   const result = {schema_version: 1, status: 'needs_clarification', sources: {left: left.meta, right: right.meta}, rules: {key, ...(secondKey && {second_key: secondKey}), fields, strip: trim, delimiter}, questions: [], issues: [], summary: null, matched: [], changed: [], only_left: [], only_right: []};
   const questionSet = new Set(); let suppressed = 0;
   function issue(code, message, details = {}) {

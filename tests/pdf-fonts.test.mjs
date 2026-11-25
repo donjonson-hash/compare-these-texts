@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {writeFileSync} from 'node:fs';
-import {PDFDocument, fontkit} from '../dist/pdf-vendor.mjs';
+import {PDFDocument, PDFName, fontkit, beginText, endText, setFontAndSize, setTextMatrix, showText} from '../dist/pdf-vendor.mjs';
 import {readTextSource} from '../dist/text-source.mjs';
 import {openPdfVisual, renderPdfRevision, measurePdfBlockFont} from '../dist/pdf-visual.mjs';
 import {renderPreservedPdf} from '../dist/pdf-layout.mjs';
@@ -78,8 +78,23 @@ test('mixed and unsupported custom fonts never silently become another font',asy
  const doc=await PDFDocument.create();doc.registerFontkit(fontkit);const page=doc.addPage([400,500]),regular=await doc.embedFont('Times-Roman'),bold=await doc.embedFont('Times-Bold');
  page.drawText('Regular ',{x:40,y:450,size:14,font:regular});page.drawText('bold',{x:40+regular.widthOfTextAtSize('Regular ',14),y:450,size:14,font:bold});
  const custom=await doc.embedFont(Buffer.from(boldFont,'base64'),{subset:true});page.drawText('Custom heading',{x:40,y:400,size:14,font:custom});
+ // A narrow source run can fit at the right edge even if its substitute is wider.
+ const edge='Reference number', scale=0.45, size=14;
+ const key=page.node.newFontDictionary('NarrowSource',custom.ref);
+ page.pushOperators(beginText(),setFontAndSize(key,size),
+   setTextMatrix(scale,0,0,1,399-custom.widthOfTextAtSize(edge,size)*scale,350),showText(custom.encodeText(edge)),endText());
  const input=source(await doc.save()),{blocks}=await readTextSource(input),viewer=await openPdfVisual(input);
- try {assert.equal(blocks.length,2);await assert.rejects(()=>viewer.editFont(blocks[0],'New wording'),/different fonts/);await assert.rejects(()=>viewer.editFont(blocks[1],'New heading'),/not supported for editing/);}finally{await viewer.dispose();}
+ try {assert.equal(blocks.length,3);await assert.rejects(()=>viewer.editFont(blocks[0],'New wording'),/different fonts/);await assert.rejects(()=>viewer.editFont(blocks[1],'New heading'),/not supported for editing/);}finally{await viewer.dispose();}
+ // Keep custom fonts strict by default. Only the explicit download may substitute one.
+ const edit={block:blocks[1],text:'Новый текст'};
+ await assert.rejects(renderPdfRevision(input,[edit],{blocks}),{code:'PDF_FONT_UNAVAILABLE'});
+ const output=await renderPdfRevision(input,[edit],{blocks,allowReplacementFont:true});
+ const restored=await readTextSource(source(output));
+ assert.equal(restored.meta.page_count,1);
+ assert.deepEqual(restored.blocks.map(b=>b.text),[blocks[0].text,edit.text,edge]);
+ const pageAfter=(await PDFDocument.load(output)).getPages()[0];
+ assert.deepEqual(pageAfter.getSize(),page.getSize());
+ assert.ok(pageAfter.node.Resources().lookup(PDFName.of('XObject')).keys().length,'The original page artwork is embedded');
  const grouped=await fixture(['Times-Roman','Times-Bold']),groupedRead=await readTextSource(grouped),groupedBlocks=groupedRead.blocks.map(b=>({...b,key:'group'}));
  await assert.rejects(()=>renderPreservedPdf(grouped,[{key:'group',record:1,text:'A combined replacement'}],{blocks:groupedBlocks}),/combines different fonts/);
 });

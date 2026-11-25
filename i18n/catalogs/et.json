@@ -963,7 +963,7 @@
   "08859a601ce5": "Windows töölaua- või organisatsiooniüleseks juurutamiseks kasutage oma administraatori toetatud lisandmooduli juurutusprotsessi. Ülaltoodud veebimarsruut on kõige lihtsam esialgne piloot; see leht ei installi teie arvutisse tarkvara.",
   "1e8ea60da5c1": "DOCX dokumendi puhul valige redigeeritud Wordi faili allalaadimiseks <0>Word (.docx)</0>. Selle teisendamiseks valige <1>PDF (.pdf) → PDF eelvaade → Laadi alla PDF</1>. Enne allalaadimist vaadake eelvaade üle. Kaasas on toetatud tekstipäised, jalused ja leheküljenumbrid.",
   "1a762c0501d0": "Redigeerimise ja eksportimise kaudu avatud PDF jaoks kasutage käsku <0>Laadi alla PDF</0>. Kui allalaadimine ei käivitu, valige <1>Salvesta PDF arvutisse</1>, kui fail on valmis. <2>Prindi</2> avab printimise töövoo. Arvutustabeli puhul ekspordib suvand PDF valitud lehe.",
-  "39412d1f2128": "Probleemiaruande jaoks lisage versioon <0>0.37.8</0>, brauseri versioon, kas kasutasite veebisaiti või laiendust, failitüüp ja selle taasesitamise toimingud. Rääkige meile, mida ootasite ja mis selle asemel juhtus.",
+  "c37e98cda9bf": "Probleemiaruande jaoks lisage versioon <0></0>, brauseri versioon, kas kasutasite veebisaiti või laiendust, failitüüp ja selle taasesitamise toimingud. Rääkige meile, mida ootasite ja mis selle asemel juhtus.",
   "20cd55ff9540": "DOCX: {0}",
   "9406abdb65c2": "Andmekirjed A",
   "9ecde9a229a0": "Andmekirjed B",
@@ -2168,5 +2168,14 @@
   "f01711bf73bd": "{0}: toetatakse CSV, TSV ja XLS/XLSX. Salvestage töövihik nimega XLSX.",
   "7208e54b5a60": "{0}: oodati Exceli 97–2003 XLS-töövihikut. Avage fail Excelis või LibreOffice’is ja salvestage see XLSX-vormingus.",
   "97c0a7ed2af5": "{0}: parooliga kaitstud XLS-töövihikuid ei saa võrrelda.",
-  "0541847f12bc": "Ava dokumentide võrdlus"
+  "0541847f12bc": "Ava dokumentide võrdlus",
+  "62932077ca3f": "Laadi PDF alla asendusfondiga",
+  "3607efb0668d": "Põhiteksti võrdlus on kirjutuskaitstud. Wordi kommentaarid ja nende autorite nimed säilivad algfailides ning jäetakse võrdlusest välja.",
+  "9d2c04a4e64c": "DOCX: Põhiteksti läbivaatamiseks vali „Võrdle dokumente“. Wordi kommentaaridega faile ei saa muuta.",
+  "549319d3c5dd": "DOCX: Kommentaaride osa on vigane.",
+  "54b50369d74b": "DOCX: Vigane kommentaar või korduv kommentaari ID.",
+  "99816043f744": "DOCX: Seos kommentaaride osaga on vigane.",
+  "c2973c4a81a3": "DOCX: Seos kommentaaride osaga puudub.",
+  "6d61b741c442": "DOCX: Kommentaari ankurdusviis pole toetatud.",
+  "deaa84ddc746": "DOCX: Kommentaari ankurdusandmed on puudulikud."
 }

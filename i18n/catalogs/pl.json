@@ -715,7 +715,7 @@
   "08859a601ce5": "Dla Windows desktop lub szeroko zakrojony system organizacyjny, użyj wspieranego przez administratora procesu add- in. Powyższa trasa internetowa jest najprostszym początkowym pilotem; ta strona nie instaluje oprogramowania na komputerze.",
   "1e8ea60da5c1": "Dla dokumentu DOCX wybierz <0> Word (.docx </0>, aby pobrać edytowany plik Word. Aby go przekonwertować, wybierz <1> PDF (.pdf) → Podgląd PDF → Pobierz PDF </1>. Przejrzyj podgląd przed pobraniem. Obsługiwane nagłówki tekstu, podpowiedzi i numery stron są włączone.",
   "1a762c0501d0": "Dla PDF otwarty w Edycja & eksport, używać <0> Pobierz PDF </0>. Jeśli pobieranie nie rozpocznie się, wybierz <1> Zapisz PDF do komputera </1> kiedy plik jest gotowy. <2> Drukuj </2> otwiera przepływ wydruku. Dla arkusza kalkulacyjnego, opcja PDF eksportuje wybrany arkusz.",
-  "39412d1f2128": "Dla raportu problemu, to m.in. wersja <0> 0.37.8 </0>, Twoja wersja przeglądarki, czy użyłeś strony internetowej czy rozszerzenia, typ pliku i kroki, aby go odtworzyć. Powiedz nam, czego oczekiwałeś i co się stało zamiast tego.",
+  "c37e98cda9bf": "Dla raportu problemu, to m.in. wersja <0></0>, Twoja wersja przeglądarki, czy użyłeś strony internetowej czy rozszerzenia, typ pliku i kroki, aby go odtworzyć. Powiedz nam, czego oczekiwałeś i co się stało zamiast tego.",
   "6950597fd437": "Dla pozycji niesparowanej brakująca strona wnosi zero do całkowitej listy; nie wskazuje to na ilość towarów lub czy zostały dostarczone. Pierwotna ilość i wartości cen znajdują się w poniższych dokumentach.",
   "71f4f346a7fd": "Dla pozycji niesparowanej zero oznacza brak wkładu do listy ogółem, nie jest to ilość zerowa lub potwierdzenie dostawy.",
   "b6d0d96a817d": "Na przykład: co zmieniło się w tekście?",
@@ -2167,5 +2167,14 @@
   "f01711bf73bd": "{0}: obsługiwane formaty to CSV, TSV, XLS i XLSX. Zapisz skoroszyt w formacie XLSX.",
   "7208e54b5a60": "{0}: oczekiwano skoroszytu programu Excel 97–2003 w formacie XLS. Otwórz plik w Excelu lub LibreOffice i zapisz go jako XLSX.",
   "97c0a7ed2af5": "{0}: nie można porównywać skoroszytów XLS chronionych hasłem.",
-  "0541847f12bc": " Porównanie otwartych dokumentów "
+  "0541847f12bc": " Porównanie otwartych dokumentów ",
+  "62932077ca3f": "Pobierz PDF z czcionką zastępczą",
+  "3607efb0668d": "Porównanie tekstu głównego jest dostępne tylko do odczytu. Komentarze programu Word i nazwiska ich autorów pozostają w plikach źródłowych i są pomijane w porównaniu.",
+  "9d2c04a4e64c": "DOCX: Aby przejrzeć tekst główny, wybierz „Porównaj dokumenty”. Plików z komentarzami programu Word nie można edytować.",
+  "549319d3c5dd": "DOCX: Nieprawidłowa część dokumentu zawierająca komentarze.",
+  "54b50369d74b": "DOCX: Nieprawidłowy komentarz lub powtórzony identyfikator komentarza.",
+  "99816043f744": "DOCX: Nieprawidłowa relacja z częścią zawierającą komentarze.",
+  "c2973c4a81a3": "DOCX: Brak relacji z częścią zawierającą komentarze.",
+  "6d61b741c442": "DOCX: Nieobsługiwany sposób zakotwiczenia komentarza.",
+  "deaa84ddc746": "DOCX: Niekompletne dane zakotwiczenia komentarza."
 }

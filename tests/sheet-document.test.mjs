@@ -18,6 +18,20 @@ test('CSV round trip preserves exact strings, quoting, delimiter, multiline fiel
  const src=source('a.csv','\ufeffsku;amount;note\r\n001;1.00;"line 1\nline 2"\r\n002;2.00;"say ""hello"""\r\n');
  const doc=await openSheetDocument(src,{headers:['sku','amount','note']},';');doc.edit('C2','new; "quoted"\nline','text');const bytes=doc.export(),text=new TextDecoder().decode(bytes);assert.deepEqual([...bytes.slice(0,3)],[239,187,191]);assert.ok(text.endsWith('\r\n'));assert.deepEqual(parseCsv(text,';'),[['sku','amount','note'],['001','1.00','new; "quoted"\nline'],['002','2.00','say "hello"']]);doc.undo();assert.deepEqual(doc.export(),new Uint8Array(Buffer.from(src.data,'base64')));
 });
+test('mixed CSV dialects survive session validation and an explicit delimiter still overrides detection', async () => {
+  const left = source('a.csv', 'sku,price\nX,20\n');
+  const right = source('b.csv', 'sku;price\nX;21\n');
+  const setup = await handleRequest('/api/prepare', {left, right, delimiter:'auto'});
+  assert.deepEqual(setup.delimiter, {left:',', right:';'});
+  const {report} = await handleRequest('/api/compare', {left, right, delimiter:setup.delimiter, ...setup.rules});
+  const payload = {version:1, sources:{left, right}, report, review:{kind:'sheet', version:1}};
+  assert.deepEqual(validateSessionPayload(payload).report.rules.delimiter, setup.delimiter);
+  assert.throws(() => validateSessionPayload({...payload, report:{...report, rules:{...report.rules, delimiter:{left:',', right:'|'}}}}));
+  const forced = await handleRequest('/api/prepare', {left, right, delimiter:','});
+  assert.equal(forced.delimiter, ',');
+  assert.deepEqual(forced.right.headers, ['sku;price']);
+});
+
 test('table sessions validate without changing the legacy text session format',async()=>{
  const left=source('a.csv','sku,price\nX,10\n'),right=source('b.csv','sku,price\nX,12\n');const {report}=await handleRequest('/api/compare',{left,right,delimiter:',',key:['sku','sku'],fields:[['price','price','number']],strip:false});
  const payload={version:1,sources:{left,right},report,review:{kind:'sheet',version:1}};assert.equal(validateSessionPayload(payload).report.status,'complete');assert.throws(()=>validateSessionPayload({...payload,review:{}}));

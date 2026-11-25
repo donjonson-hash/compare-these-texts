@@ -1070,7 +1070,7 @@
   "08859a601ce5": "Windows darbvirsmas vai visas organizācijas izvietošanai izmantojiet administratora atbalstīto pievienojumprogrammu izvietošanas procesu. Iepriekš minētais tīmekļa maršruts ir vienkāršākais sākotnējais izmēģinājums; šī lapa neinstalē programmatūru jūsu datorā.",
   "1e8ea60da5c1": "DOCX dokumentam izvēlieties <0>Word (.docx)</0>, lai lejupielādētu rediģēto Word failu. Lai to pārveidotu, izvēlieties <1>PDF (.pdf) → Priekšskatījums PDF → Lejupielādēt PDF</1>. Pirms lejupielādes pārskatiet priekšskatījumu. Ir iekļautas atbalstītās teksta galvenes, kājenes un lappušu numuri.",
   "1a762c0501d0": "PDF, kas atvērts sadaļā Rediģēšana un eksportēšana, izmantojiet <0>Lejupielādēt PDF</0>. Ja lejupielāde nesākas, atlasiet <1>Saglabāt PDF datorā</1>, kad fails ir gatavs. <2>Drukāt</2> tiek atvērta drukas darbplūsma. Izklājlapai opcija PDF eksportē atlasīto lapu.",
-  "39412d1f2128": "Lai ziņotu par problēmu, iekļaujiet versiju <0>0.37.8</0>, pārlūkprogrammas versiju, to, vai izmantojāt vietni vai paplašinājumu, faila veidu un darbības, lai to reproducētu. Pastāstiet mums, ko gaidījāt un kas notika tā vietā.",
+  "c37e98cda9bf": "Lai ziņotu par problēmu, iekļaujiet versiju <0></0>, pārlūkprogrammas versiju, to, vai izmantojāt vietni vai paplašinājumu, faila veidu un darbības, lai to reproducētu. Pastāstiet mums, ko gaidījāt un kas notika tā vietā.",
   "20cd55ff9540": "DOCX: {0}",
   "9406abdb65c2": "Datu ieraksti A",
   "9ecde9a229a0": "Datu ieraksti B",
@@ -2167,5 +2167,14 @@
   "f01711bf73bd": "{0}: tiek atbalstīti CSV, TSV un XLS/XLSX. Saglabājiet darbgrāmatu kā XLSX.",
   "7208e54b5a60": "{0}: bija paredzēta Excel 97–2003 XLS darbgrāmata. Atveriet failu programmā Excel vai LibreOffice un saglabājiet to XLSX formātā.",
   "97c0a7ed2af5": "{0}: ar paroli aizsargātas XLS darbgrāmatas nevar salīdzināt.",
-  "0541847f12bc": "Atvērt dokumentu salīdzināšanu"
+  "0541847f12bc": "Atvērt dokumentu salīdzināšanu",
+  "62932077ca3f": "Lejupielādēt PDF ar aizstājējfontu",
+  "3607efb0668d": "Pamatteksta salīdzinājums ir tikai lasāms. Word komentāri un to autoru vārdi saglabājas sākotnējos failos un netiek iekļauti salīdzinājumā.",
+  "9d2c04a4e64c": "DOCX: Lai pārskatītu pamattekstu, izvēlieties “Salīdziniet dokumentus”. Failus ar Word komentāriem nevar rediģēt.",
+  "549319d3c5dd": "DOCX: Dokumenta komentāru daļa nav derīga.",
+  "54b50369d74b": "DOCX: Nederīgs komentārs vai dublēts komentāra identifikators.",
+  "99816043f744": "DOCX: Saite uz komentāru daļu nav derīga.",
+  "c2973c4a81a3": "DOCX: Trūkst saites uz komentāru daļu.",
+  "6d61b741c442": "DOCX: Komentāra piesaistes veids netiek atbalstīts.",
+  "deaa84ddc746": "DOCX: Komentāra piesaistes dati ir nepilnīgi."
 }
