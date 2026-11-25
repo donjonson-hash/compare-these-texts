@@ -103,7 +103,7 @@ test('mixed and unsupported custom fonts never silently become another font',asy
  await assert.rejects(()=>renderPreservedPdf(grouped,[{key:'group',record:1,text:'A combined replacement'}],{blocks:groupedBlocks}),/combines different fonts/);
 });
 
-test('custom-font PDFs keep copied and typed text in Document view and in the download', async t => {
+function reviewEnvironment(t) {
   canvasEnvironment(t);
   window.KristinaTextEditor = editor;
   window.Element.prototype.scrollIntoView = () => {};
@@ -112,6 +112,19 @@ test('custom-font PDFs keep copied and typed text in Document view and in the do
   t.mock.method(URL, 'createObjectURL', blob => { downloads.push(blob); return 'blob:edited-pdf'; });
   t.mock.method(URL, 'revokeObjectURL', () => {});
   t.mock.method(window.HTMLAnchorElement.prototype, 'click', () => {});
+  return {root, downloads};
+}
+
+async function waitFor(condition, message) {
+  for (let i = 0; i < 250; i++) {
+    if (condition()) return;
+    await delay(20);
+  }
+  assert.fail(message);
+}
+
+test('custom-font PDFs keep copied and typed text in Document view and in the download', async t => {
+  const {root, downloads} = reviewEnvironment(t);
 
   async function makePdf(text, color) {
     const pdf = await PDFDocument.create();
@@ -121,13 +134,6 @@ test('custom-font PDFs keep copied and typed text in Document view and in the do
     page.drawRectangle({x: 20, y: 450, width: 40, height: 30, color});
     page.drawText(text, {x: 45, y: 360, size: 16, font});
     return source(await pdf.save());
-  }
-  async function waitFor(condition, message) {
-    for (let i = 0; i < 250; i++) {
-      if (condition()) return;
-      await delay(20);
-    }
-    assert.fail(message);
   }
   const labels = {left: 'Contract fee 1200', right: 'Contract fee 1400'};
   const sources = {
@@ -206,6 +212,50 @@ test('custom-font PDFs keep copied and typed text in Document view and in the do
     await waitFor(() => downloads.length === 1, 'No PDF downloaded while the edit field was open');
     const reopened = await readTextSource(source(new Uint8Array(await downloads.pop().arrayBuffer())));
     assert.deepEqual(reopened.blocks.map(block => block.text), [latest]);
+  } finally {
+    view.dispose();
+  }
+});
+
+test('typing into a transferred PDF paragraph updates its on-page text and download before Done', async t => {
+  const {root, downloads} = reviewEnvironment(t);
+  const before = 'Contract starts.', fee = 'Monthly fee 120 USD.', after = 'Contract ends.';
+  async function documentWith(lines) {
+    const pdf = await PDFDocument.create();
+    const page = pdf.addPage([500, 700]);
+    for (const [index, line] of lines.entries()) page.drawText(line, {x: 40, y: 640 - index * 55, size: 14});
+    return source(await pdf.save());
+  }
+  const sources = {left: await documentWith([before, fee, after]), right: await documentWith([before, after])};
+  const {report} = await handleRequest('/api/compare', sources);
+  assert.deepEqual(report.only_left.map(group => group.row.text), [fee]);
+  const key = report.only_left[0].key;
+  const view = await mountVisualReview(root, {sources, report});
+  try {
+    await view.select(key, 'right');
+    const field = root.querySelector('[data-edit-side="right"]');
+    const save = root.querySelector('[data-save-side="right"]');
+    const column = save.closest('.visual-column');
+    root.querySelector('[data-copy-to="right"]').click();
+    const hotspot = () => [...column.querySelectorAll('.visual-hotspot')].find(hit => hit.dataset.group === key);
+    await waitFor(() => hotspot() && !save.disabled, 'Transferred paragraph did not acquire a target layout');
+    const edits = ['Monthly fee 95 USD.', 'Monthly fee 90 USD.'];
+    for (const value of edits) {
+      field.value = value;
+      field.dispatchEvent(new window.Event('input', {bubbles: true}));
+      const lines = [...column.querySelectorAll('.visual-pdf-page .pdf-typing-line')];
+      assert.equal(lines.map(line => line.textContent).join(''), value);
+      assert.equal(lines[0].style.top, hotspot().style.top);
+      assert.equal(lines[0].style.left, hotspot().style.left);
+    }
+    await waitFor(() => !column.querySelector('.pdf-typing-preview') && !save.disabled, 'Final PDF render did not complete');
+    assert.equal(view.drafts.left.get(key), fee);
+    assert.equal(root.querySelector('.visual-inspector').hidden, false);
+    save.click();
+    await waitFor(() => downloads.length === 1, 'No updated PDF downloaded');
+    const bytes = new Uint8Array(await downloads.pop().arrayBuffer());
+    const reopened = await readTextSource(source(bytes));
+    assert.equal(reopened.blocks.map(block => block.text).join(' '), [before, edits.at(-1), after].join(' '));
   } finally {
     view.dispose();
   }

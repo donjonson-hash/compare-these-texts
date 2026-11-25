@@ -537,3 +537,27 @@ test('final check commits visible spreadsheet input and retains honest kept and 
  q('[data-sheet-undo]').click();assert.equal(state(),'stale');action('check').click();assert.equal(state(),'kept');
  q('[data-side="right"][data-cell="B2"]').click();q('[aria-label="Cell type in B"]').value='number';q('[data-edit-side="right"]').value='invalid number';q('[data-edit-side="right"]').dispatchEvent(new p.dom.window.Event('input'));action('check').click();assert.equal(state(),'stale');assert.match(q('.visual-notice').textContent,/Enter a number/);assert.equal(q('[data-side="right"][data-cell="B2"]').textContent,'12');
 });
+
+test('A/B compares only body text of a threaded Word document and downloads both original files', async t => {
+  const {annotatedWord} = await import('./fixtures/docx-modern-comments.mjs');
+  const p = await page(t, 'web', false, true);
+  const files = {left:annotatedWord('Price 100 USD'), right:annotatedWord('Price 120 USD')};
+  for (const [side, bytes] of Object.entries(files)) {
+    const input = p.$('home-' + side + '-file');
+    Object.defineProperty(input, 'files', {configurable:true, value:[new File([bytes], side + '.docx')]});
+    input.dispatchEvent(new p.dom.window.Event('change', {bubbles:true}));
+  }
+  p.$('start-new-compare').click();
+  await p.result();
+  assert.equal(p.$('visual-review').hidden, true);
+  assert.equal(p.$('text-editor').hidden, true);
+  assert.match(p.$('result-context').textContent, /Read-only comparison/);
+  assert.match(p.$('result-rows').textContent, /100/);
+  assert.match(p.$('result-rows').textContent, /120/);
+  assert.doesNotMatch(p.$('result-rows').textContent, /PRIVATE/);
+  for (const button of p.$('result-context').querySelectorAll('button')) button.click();
+  assert.deepEqual(p.downloads.map(item => item.name), ['left.docx', 'right.docx']);
+  for (const {name, blob} of p.downloads) {
+    assert.deepEqual(new Uint8Array(await blob.arrayBuffer()), files[name.split('.')[0]]);
+  }
+});

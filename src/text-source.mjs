@@ -39,12 +39,68 @@ function parseXml(raw, name) {
   return doc;
 }
 
+// Modern Word stores thread status, identities and author metadata in separate
+// parts. These are inspected for comparison only and never projected into body text.
+const WORD_2012 = 'http://schemas.microsoft.com/office/word/2012/wordml';
+const commentMetadata = new Map([
+  ['commentsExtended', {ns:WORD_2012, root:'commentsEx', item:'commentEx', relYear:'2011'}],
+  ['commentsIds', {ns:'http://schemas.microsoft.com/office/word/2016/wordml/cid', root:'commentsIds', item:'commentId', relYear:'2016/09'}],
+  ['commentsExtensible', {ns:'http://schemas.microsoft.com/office/word/2018/wordml/cex', root:'commentsExtensible', item:'commentExtensible', relYear:'2018/08'}],
+  ['people', {ns:WORD_2012, root:'people', item:'person', relYear:'2011'}],
+]);
+const commentsRels = 'word/_rels/comments.xml.rels';
+
+function readCommentMetadata(docs, comments, types) {
+  const parts = new Set(), replies = new Map(), byPara = new Map();
+  for (const [type, spec] of commentMetadata) {
+    const path = `word/${type}.xml`, root = docs.get(path)?.documentElement;
+    if (!root) continue;
+    const invalid = () => fail('DOCX: invalid comments part.');
+    const overrides = elements(types).filter(node => node.getAttribute('PartName') === '/' + path);
+    if (!comments || root.namespaceURI !== spec.ns || root.localName !== spec.root || root.textContent.trim() ||
+        overrides.length !== 1 || overrides[0].getAttribute('ContentType') !== `application/vnd.openxmlformats-officedocument.wordprocessingml.${type}+xml`) invalid();
+    parts.add(path);
+    if (type === 'commentsExtended') {
+      for (const comment of elements(comments)) {
+        const last = Array.from(comment.getElementsByTagNameNS('*', 'p')).filter(node => w(node, 'p')).at(-1);
+        const para = last?.getAttributeNS('http://schemas.microsoft.com/office/word/2010/wordml', 'paraId')?.toUpperCase();
+        if (para) {
+          if (byPara.has(para)) invalid();
+          byPara.set(para, wordAttribute(comment, 'id'));
+        }
+      }
+    }
+    for (const item of elements(root)) {
+      if (item.namespaceURI !== spec.ns || item.localName !== spec.item) invalid();
+      const children = elements(item);
+      if (children.some(child => type !== 'people' || child.namespaceURI !== spec.ns || child.localName !== 'presenceInfo' || elements(child).length)) invalid();
+      if (type === 'commentsExtended' && item.hasAttributeNS(spec.ns, 'paraIdParent')) {
+        const id = byPara.get(item.getAttributeNS(spec.ns, 'paraId')?.toUpperCase());
+        const parent = byPara.get(item.getAttributeNS(spec.ns, 'paraIdParent').toUpperCase());
+        if (!id || !parent || replies.has(id)) invalid();
+        replies.set(id, parent);
+      }
+    }
+  }
+  // A reply may have no body anchor, but its parent chain must end in a
+  // top-level comment (whose anchor is verified with the document below).
+  const resolved = new Set();
+  for (let id of replies.keys()) {
+    const chain = new Set();
+    while (replies.has(id) && !resolved.has(id)) {
+      if (chain.has(id)) fail('DOCX: invalid comments part.');
+      chain.add(id); id = replies.get(id);
+    }
+    for (const child of chain) resolved.add(child);
+  }
+  return {parts, replies};
+}
+
 function checkPackage(entries, comparisonOnly) {
   for (const required of ['[Content_Types].xml', '_rels/.rels', 'word/document.xml']) if (!entries.has(required)) fail("DOCX: required package parts are missing.");
   const docs = new Map();
   for (const [name, bytes] of entries) {
     if (/vba|embeddings|activeX|altChunk|glossary/i.test(name)) fail("The DOCX contains embedded, graphical, or additional data. Only standard text paragraphs are supported.");
-    if (/word\/comments/i.test(name) && name !== 'word/comments.xml') fail("The DOCX contains comments. Prepare a copy with their text in the main paragraphs.");
     if (/\.xml$|\.rels$/i.test(name)) docs.set(name, parseXml(bytes, name));
     else if (!name.endsWith('/') && !/^docProps\/thumbnail\.(?:jpeg|jpg|png|wmf)$/i.test(name) && !/^word\/media\/[^/]+\.(?:png|jpe?g)$/i.test(name)) fail(`DOCX: unsupported package part ${name}.`);
   }
@@ -63,6 +119,8 @@ function checkPackage(entries, comparisonOnly) {
       commentIds.set(id, {start:false, end:false, reference:false});
     }
   }
+  const metadata = readCommentMetadata(docs, comments, contentTypes);
+  const metadataRelationships = new Set();
   let hasCommentsRelationship = false;
   const emptyNotes = validateEmptyNotes(docs);
   const emptyBibliography = validateBibliography(docs);
@@ -79,7 +137,17 @@ function checkPackage(entries, comparisonOnly) {
       const type = rel.getAttribute('Type').split('/').pop(), target = rel.getAttribute('Target'), id = rel.getAttribute('Id');
       if (!id || ids.has(id)) fail("DOCX: duplicate or empty relationship ID."); ids.add(id);
       if (name === '_rels/.rels' && type === 'officeDocument') { if (target !== 'word/document.xml' || rel.getAttribute('TargetMode') === 'External') fail("DOCX: unsupported main document."); foundMain = true; }
-      else if (['header', 'footer'].includes(type)) {
+      else if (name === commentsRels) {
+        // Annotation hyperlinks and images are never opened or rendered.
+        const localImage = type === 'image' && /^media\/[^/]+\.(?:png|jpe?g)$/i.test(target) && entries.has('word/' + target);
+        if (!commentIds.size || type !== 'hyperlink' && !localImage) fail('DOCX: invalid comments relationship.');
+      } else if (commentMetadata.has(type)) {
+        const path = 'word/' + target;
+        const relationshipType = `http://schemas.microsoft.com/office/${commentMetadata.get(type).relYear}/relationships/${type}`;
+        if (name !== 'word/_rels/document.xml.rels' || rel.getAttribute('Type') !== relationshipType ||
+            target !== type + '.xml' || !metadata.parts.has(path) || metadataRelationships.has(path)) fail('DOCX: invalid comments relationship.');
+        metadataRelationships.add(path);
+      } else if (['header', 'footer'].includes(type)) {
         if (name !== 'word/_rels/document.xml.rels' || !new RegExp(`^${type}[0-9]*\\.xml$`).test(target) || !headersFooters.some(part => part.path === `word/${target}` && part.kind === type)) fail('DOCX: invalid header or footer relationship.');
         peripheralRelationships.set(id, {kind:type, path:`word/${target}`});
       } else if (['footnotes','endnotes'].includes(type)) {
@@ -104,8 +172,13 @@ function checkPackage(entries, comparisonOnly) {
     }
   }
   if (!foundMain) fail("DOCX: the relationship to the main document is missing.");
+  if (metadata.parts.size !== metadataRelationships.size || metadata.parts.size && !hasCommentsRelationship) fail('DOCX: invalid comments relationship.');
   // Unknown Word parts could contain user-visible text, so never silently drop.
-  for (const name of entries.keys()) if (name.startsWith('word/') && !name.endsWith('/') && !/^word\/(?:(?:header|footer)[0-9]*\.xml|document\.xml|comments\.xml|footnotes\.xml|endnotes\.xml|styles\.xml|stylesWithEffects\.xml|settings\.xml|webSettings\.xml|fontTable\.xml|numbering\.xml|theme\/theme\d+\.xml|_rels\/document\.xml\.rels|media\/[^/]+\.(?:png|jpe?g))$/i.test(name)) fail(`DOCX: additional part ${name} is not supported.`);
+  for (const name of entries.keys()) {
+    if (!name.startsWith('word/') || name.endsWith('/') || metadata.parts.has(name) || name === commentsRels && commentIds.size) continue;
+    if (/^word\/comments/i.test(name) && name !== 'word/comments.xml') fail("The DOCX contains comments. Prepare a copy with their text in the main paragraphs.");
+    if (!/^word\/(?:(?:header|footer)[0-9]*\.xml|document\.xml|comments\.xml|footnotes\.xml|endnotes\.xml|styles\.xml|stylesWithEffects\.xml|settings\.xml|webSettings\.xml|fontTable\.xml|numbering\.xml|theme\/theme\d+\.xml|_rels\/document\.xml\.rels|media\/[^/]+\.(?:png|jpe?g))$/i.test(name)) fail(`DOCX: additional part ${name} is not supported.`);
+  }
   for (const name of entries.keys()) if (!name.startsWith('word/') && !name.startsWith('customXml/') && !name.endsWith('/') && !['[Content_Types].xml', '_rels/.rels', 'docProps/core.xml', 'docProps/app.xml', 'docProps/custom.xml'].includes(name) && !/^docProps\/thumbnail\.(?:jpeg|jpg|png|wmf)$/i.test(name)) fail(`DOCX: additional part ${name} is not supported.`);
   for (const node of walkElements(docs.get('word/document.xml').documentElement)) {
     if (!w(node,'headerReference') && !w(node,'footerReference')) continue;
@@ -128,7 +201,8 @@ function checkPackage(entries, comparisonOnly) {
       comment[role] = true;
       node.parentNode.removeChild(node);
     }
-    for (const comment of commentIds.values()) {
+    for (const [id, comment] of commentIds) {
+      if (metadata.replies.has(id) && !comment.start && !comment.end && !comment.reference) continue;
       if (!comment.reference || comment.start !== comment.end) fail('DOCX: incomplete comment anchor.');
     }
   }

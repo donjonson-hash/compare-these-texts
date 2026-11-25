@@ -101,6 +101,33 @@ test('typing in either version updates the open document and survives reopening 
   }
 });
 
+for (const side of ['left', 'right']) test(`editing unique text on the ${side} updates its transfer button and preserves unrelated paragraphs`, async t => {
+  const other = side === 'left' ? 'right' : 'left';
+  const left = ['Delivery in 5 days.', 'Reference number A.', 'Shared end.'];
+  const right = ['Delivery in 10 days.', 'Reference number A.', 'Shared end.'];
+  const original = 'Please transfer 120 USD.', edited = 'Please transfer 90 USD.';
+  (side === 'left' ? left : right).splice(2, 0, original);
+  const p = await harness(t, left.join('\n'), right.join('\n'));
+  const key = p.report[`only_${side}`][0].key;
+  await p.view.select(key, side);
+  const add = p.root.querySelector(`[data-missing-key="${key}"]`);
+  const before = [...p.paragraphs(side)];
+  const otherDifference = before[0].querySelector('mark');
+  assert.ok(otherDifference);
+  assert.equal(add.textContent, '＋ ' + original);
+  const field = p.root.querySelector(`[data-edit-side="${side}"]`);
+  field.value = edited; field.dispatchEvent(new p.dom.window.Event('input'));
+  assert.equal(add.textContent, '＋ ' + edited);
+  assert.ok(before.every((node, i) => node === p.paragraphs(side)[i]));
+  assert.equal(before[0].querySelector('mark'), otherDifference);
+  assert.equal(before[2].textContent, edited);
+  assert.ok(before[2].getAttribute('aria-label').includes(edited));
+  add.click();
+  assert.equal(p.view.drafts[other].get(key), edited);
+  assert.ok([...p.paragraphs(other)].some(node => node.textContent === edited));
+  assert.equal(p.root.querySelector(`[data-missing-key="${key}"]`), null);
+});
+
 for (const format of ['txt', 'docx']) test(`copied multi-block groups keep correct ranges in ${format.toUpperCase()} paragraphs`, async t => {
   const original = 'Shared words old', left = format === 'docx' ? docx([original]) : original;
   const p = await harness(t, left, 'Shared words\nnew\nextra', {leftName: `A.${format}`, aggregate: true});

@@ -84,3 +84,22 @@ test('classic Word comments compare in a read-only projection, with the package 
  await assert.rejects(readTextSource(make(markers.replace('commentReference w:id="0"', 'commentReference w:id="99"'))),/comment anchor/);
  await assert.rejects(readTextSource(make(markers,rel.replace('Target="comments.xml"', 'Target="other.xml"'))),/comments relationship/);
 });
+
+test('modern Word comment replies need a valid parent and supported local metadata', async () => {
+  const {annotatedWord} = await import('./fixtures/docx-modern-comments.mjs');
+  const file = source(annotatedWord());
+  const parsed = await readTextSource(file);
+  assert.deepEqual(parsed.blocks.map(b => b.text), ['Price 100 USD']);
+  assert.equal(parsed.meta.comment_count, 2);
+  await assert.rejects(writeDocxVisual(file, [{record:1, text:'Edited'}]), /Editing is unavailable/);
+  const rejects = [
+    parts => { delete parts['word/commentsExtended.xml']; },
+    parts => { parts['word/commentsExtended.xml'] = parts['word/commentsExtended.xml'].replace('paraIdParent="00000011"', 'paraIdParent="00000012"'); },
+    parts => { parts['word/commentsExtended.xml'] = parts['word/commentsExtended.xml'].replace('paraIdParent="00000011"', 'paraIdParent="00000099"'); },
+    parts => { parts['word/commentsIds.xml'] = '<wrong/>'; },
+    parts => { parts['word/people.xml'] = parts['word/people.xml'].replace('presenceInfo', 'unexpected'); },
+    parts => { parts['word/_rels/document.xml.rels'] = parts['word/_rels/document.xml.rels'].replace('Target="commentsIds.xml"', 'TargetMode="External" Target="commentsIds.xml"'); },
+    parts => { parts['word/commentsUnknown.xml'] = '<extra/>'; },
+  ];
+  for (const change of rejects) await assert.rejects(readTextSource(source(annotatedWord('Body', change))), /comments|external relationships/i);
+});
