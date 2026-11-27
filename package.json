@@ -15,7 +15,7 @@
     "check:compact": "node scripts/check_compact_browser.mjs"
   },
   "devDependencies": {
-    "@napi-rs/canvas": "1.1.0",
+    "@napi-rs/canvas": "1.2.0",
     "acorn": "8.19.0",
     "esbuild": "0.28.2",
     "jsdom": "31.0.1",
