@@ -21,7 +21,7 @@
     "jsdom": "31.0.1",
     "playwright": "1.65.0",
     "playwright-webkit-check": "npm:playwright@1.63.0",
-    "terser": "5.51.2"
+    "terser": "5.51.4"
   },
   "version": "0.37.13",
   "engines": {
