@@ -104,6 +104,7 @@ try {
   assert.ok(await modal.locator('.ocr-correction-layer svg path').count()>0);
   await modal.locator('.ocr-confirm').click();await modal.locator('.ocr-use').click();
   await page.locator('.ocr-document img').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.getElementById('document-name')?.textContent==='two-page-scan.pdf' && !document.getElementById('scanner-file').disabled);
   assert.equal(await page.locator('.ocr-document-page option').count(),2);
   await page.locator('.ocr-document-page').selectOption('1');
   await page.waitForFunction(()=>document.querySelectorAll('.ocr-document-corrections svg path').length>0);

@@ -22,6 +22,7 @@ jobs:
           python-version: '3.12'
       - run: npm ci --ignore-scripts
       - run: python3 standalone-scanner/build.py
+      - run: sha256sum standalone-scanner/artifacts/document-scanner-chrome-0.1.1.zip
       - run: node --experimental-vm-modules --test standalone-scanner/tests/*.test.mjs
       - run: node --experimental-vm-modules --test tests/ocr-document.test.mjs tests/ocr-review.test.mjs tests/ocr-pdf-export.test.mjs tests/ocr-pdf-input.test.mjs tests/ocr-runtime.test.mjs tests/ocr-layout.test.mjs tests/ocr-enhance.test.mjs tests/ocr-image-input.test.mjs
       - run: npx playwright install --with-deps chromium
