@@ -128,6 +128,40 @@ test('PDF original pages, readable reflow export, clicked-revision capture and r
  root.querySelector('[data-pdf-continue="right"]').click();await delay(20);assert.equal(document.activeElement,root.querySelector('[data-edit-side="right"]'));
  const beforeFallback=downloads.length;root.querySelector('[data-pdf-fallback="right"]').click();await until(()=>downloads.length===beforeFallback+1);const fallback=await readTextSource(source('fallback.pdf',new Uint8Array(await downloads.at(-1).arrayBuffer())));assert.match(fallback.blocks[0].text,/Text below the photo/);assert.deepEqual(view.drafts.right.snapshot(),failedDraft,'Text-only download does not change the working document');
  root.querySelector('[data-pdf-undo="right"]').click();await until(()=>!root.querySelector('[data-save-side="right"]').disabled&&root.querySelectorAll('.visual-column')[1].querySelector('[data-pdf-layout="original"]'));assert.equal(root.querySelectorAll('.pdf-recovery')[1].hidden,true);assert.equal(root.querySelectorAll('.pdf-export-state')[1].textContent,'');assert.equal(view.drafts.right.changed,false);view.dispose();
+ // PDF.js inserts invisible spacing between table cells, including over the column rule.
+ // Those gaps must not become paint areas when reopening a downloaded PDF.
+ const tableDoc=await PDFDocument.create();tableDoc.registerFontkit(fontkit);
+ const tableFont=await tableDoc.embedFont(Buffer.from(fontBase64,'base64'),{subset:true});
+ tableDoc.addPage([500,700]).drawText('Amount: 1200',{x:50,y:600,size:14,font:tableFont});
+ const tablePage=tableDoc.addPage([500,700]);
+ for(const [text,x] of [['Europe',50],['18,540',200],['$154.8M',350]])tablePage.drawText(text,{x,y:600,size:12,font:tableFont});
+ for(const x of [40,180,330,460])tablePage.drawLine({start:{x,y:580},end:{x,y:620},thickness:1,color:rgb(.1,.1,.1)});
+ for(const y of [580,620])tablePage.drawLine({start:{x:40,y},end:{x:460,y},thickness:1,color:rgb(.1,.1,.1)});
+ const tableSource=source('table.pdf',await tableDoc.save()),tableBlocks=(await readTextSource(tableSource)).blocks;
+ assert.equal(tableBlocks.find(b=>b.text.startsWith('18,540')).text,'18,540 ','Fixture has a synthetic spacing run across the next column');
+ const tableExport=await renderPdfRevision(tableSource,[],{blocks:tableBlocks,allowReplacementFont:true});
+ const exportedSource=source('downloaded.pdf',tableExport),reopenedSources={left:exportedSource,right:exportedSource};
+ const reopenedReport=(await handleRequest('/api/compare',reopenedSources)).report;
+ view=await mountVisualReview(root,{report:reopenedReport,sources:reopenedSources});
+ for(const [before,after,page] of [['Amount: 1200','Amount: 1300',1],['18,540 ','18,450 ',2],['$154.8M','$158.4M',2]]){
+  const reopenedGroup=reopenedReport.matched.find(g=>g.right.text===before);
+  await view.select(reopenedGroup.key);
+  const reopenedInput=root.querySelector('[data-edit-side="right"]');reopenedInput.value=after;reopenedInput.dispatchEvent(new window.Event('input'));
+  await delay(220);
+  await until(()=>root.querySelectorAll('.visual-scroll')[1].getAttribute('aria-busy')==='false');
+  assert.equal(root.querySelectorAll('.pdf-recovery')[1].hidden,true,root.querySelectorAll('.pdf-export-state')[1].textContent);
+  assert.equal(view.snapshot().pages.right,page,'Selection stays on the edited page after reopening a download');
+  assert.ok(root.querySelectorAll('.visual-column')[1].querySelector('.visual-pdf-page canvas'));
+ }
+ const beforeReopenedDownload=downloads.length;root.querySelector('[data-save-side="right"]').click();await until(()=>downloads.length===beforeReopenedDownload+1);
+ const twiceEditedSource=source('twice-edited.pdf',new Uint8Array(await downloads.at(-1).arrayBuffer()));
+ const twiceEdited=await readTextSource(twiceEditedSource);
+ assert.deepEqual(twiceEdited.blocks.map(b=>b.text.trim()),['Amount: 1300','Europe','18,450','$158.4M']);
+ assert.equal(Math.max(...twiceEdited.blocks.map(b=>b.visual.page)),2);
+ const tableViewer=await openPdfVisual(twiceEditedSource),tableCanvas=document.createElement('canvas');
+ await tableViewer.renderPage(2,tableCanvas,{scale:2});await tableViewer.dispose();
+ const rulePixels=tableCanvas.getContext('2d').getImageData(659,170,2,60).data;
+ assert.ok(rulePixels.filter((value,index)=>index%4===0&&value<80).length>80,'The column rule stays visible beside the edited numbers');view.dispose();
  // New sections retain their own keys rather than their anchor key.
  const inserted=[...blocks.map(b=>({key:b.key,record:b.record,text:b.text}))];inserted.splice(1,0,{key:'inserted',text:'New line'});let insertedLayout;await renderPreservedPdf(artSource,inserted,{blocks,onLayout:rects=>{insertedLayout=rects;}});assert.ok(insertedLayout.some(r=>r.key==='inserted'));
  // The erased text box may not contain a picture, even when the picture is wholly enclosed.
