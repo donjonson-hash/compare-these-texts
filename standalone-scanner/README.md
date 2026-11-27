@@ -1,4 +1,4 @@
-# Document Scanner 0.1.0
+# Document Scanner 0.1.1
 
 Independent Chrome extension pilot. Its package has its own identity, interface
 and encrypted local draft; it does not contain the Compare Two Texts interface,
@@ -14,7 +14,7 @@ python3 standalone-scanner/build.py
 node --experimental-vm-modules --test standalone-scanner/tests/*.test.mjs
 ```
 
-Extract `standalone-scanner/artifacts/document-scanner-0.1.0.zip` to a permanent
+Extract `standalone-scanner/artifacts/document-scanner-chrome-0.1.1.zip` to a permanent
 folder. In `chrome://extensions`, enable Developer mode, choose **Load unpacked**,
 and select that folder (the folder containing `manifest.json`). Pin Document
 Scanner and click its icon to reopen it. Keep the extracted folder in place so
@@ -46,3 +46,7 @@ not a published Chrome Web Store listing.
 CI installs the actual unpacked extension in Chromium and checks manual correction,
 local recognition, export, saved resume, cancellation and the absence of external requests.
 The archived package includes component licenses and source hashes in `provenance.json`.
+
+## Release 0.1.1
+
+Rebuild of the standalone Chrome pilot with Russian installation instructions, deterministic ZIP packaging, and expanded offline browser coverage for Russian OCR and multipage PDFs. OCR engine and document behavior remain unchanged. Firefox is not included in this release.

@@ -2,7 +2,7 @@ name: Standalone Document Scanner
 on:
   workflow_dispatch:
   push:
-    branches: ['feat/standalone-document-scanner']
+    branches: ['feat/standalone-document-scanner', 'feat/document-scanner-release-0.1.1']
   pull_request:
     paths: ['standalone-scanner/**', 'src/ocr-*', 'src/session-*', 'src/pdf-*', 'scripts/build_ocr_assets.py', 'package*.json', '.github/workflows/document-scanner.yml']
 permissions:
@@ -23,12 +23,13 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: python3 standalone-scanner/build.py
       - run: node --experimental-vm-modules --test standalone-scanner/tests/*.test.mjs
+      - run: node --experimental-vm-modules --test tests/ocr-document.test.mjs tests/ocr-review.test.mjs tests/ocr-pdf-export.test.mjs tests/ocr-pdf-input.test.mjs tests/ocr-runtime.test.mjs tests/ocr-layout.test.mjs tests/ocr-enhance.test.mjs tests/ocr-image-input.test.mjs
       - run: npx playwright install --with-deps chromium
       - run: node standalone-scanner/check-browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: document-scanner-0.1.0
+          name: document-scanner-0.1.1
           path: |
-            standalone-scanner/artifacts/document-scanner-0.1.0.zip
+            standalone-scanner/artifacts/document-scanner-chrome-0.1.1.zip
             standalone-scanner/test-output/

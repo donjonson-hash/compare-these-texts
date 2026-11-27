@@ -59,7 +59,7 @@ test('scanner draft validation preserves corrections and rejects comparison, unc
 });
 test('packaged extension has an independent identity and only local scanner assets',()=>{
   const dist=new URL('../dist/',import.meta.url),manifest=JSON.parse(readFileSync(new URL('manifest.json',dist)));
-  assert.equal(manifest.version,'0.1.0');assert.match(manifest.name,/Document Scanner/);assert.ok(manifest.description.length<=132);
+  assert.equal(manifest.version,'0.1.1');assert.match(manifest.name,/Document Scanner/);assert.ok(manifest.description.length<=132);
   for(const key of ['key','permissions','host_permissions','content_scripts','externally_connectable','update_url'])assert.equal(manifest[key],undefined);
   assert.match(manifest.content_security_policy.extension_pages,/wasm-unsafe-eval/);
   const html=readFileSync(new URL('index.html',dist),'utf8');assert.doesNotMatch(html,/https?:|start-new-compare|home-left-file|home-right-file/);

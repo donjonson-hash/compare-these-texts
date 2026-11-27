@@ -12,6 +12,7 @@ import zlib
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "standalone-scanner"
 OUT = APP / "dist"
+VERSION = "0.1.1"
 sys.path.insert(0, str(ROOT / "scripts"))
 from build_ocr_assets import build_ocr_assets
 
@@ -53,6 +54,8 @@ def build():
     OUT.mkdir()
     for name in SHELL:
         shutil.copyfile(APP / name, OUT / name)
+    (OUT / "index.html").write_text((OUT / "index.html").read_text().replace("__VERSION__", VERSION))
+    shutil.copyfile(APP / "INSTALL-RU.md", OUT / "INSTALL-RU.md")
     for name in MODULES + ["ocr-review.css", "ocr-document.css"]:
         text = (ROOT / "src" / name).read_text()
         if "vendor" not in name and name != "pdf-font.mjs":
@@ -68,7 +71,7 @@ def build():
     shutil.copyfile(ROOT / "LICENSE", OUT / "LICENSE.txt")
     for name in LICENSES:
         shutil.copyfile(ROOT / "src" / name, OUT / name)
-    (OUT / "NOTICE.txt").write_text("Document Scanner 0.1.0\n\nIndependent extension using the reviewed OCR components developed in Compare Two Texts.\nApplication terms: LICENSE.txt.\nPDF rendering: PDF-READER-LICENSE.txt and PDF-READER-SOURCE.md.\nPDF creation and bundled DejaVu font: PDF-LICENSES.txt and PDF-SOURCE.md.\nOCR runtime, engines and language data: ocr-assets/licenses/ and ocr-assets/provenance.json.\nNo document-comparison interface or Chrome Web Store identity is included.\n")
+    (OUT / "NOTICE.txt").write_text(f"Document Scanner {VERSION}\n\nIndependent extension using the reviewed OCR components developed in Compare Two Texts.\nApplication terms: LICENSE.txt.\nPDF rendering: PDF-READER-LICENSE.txt and PDF-READER-SOURCE.md.\nPDF creation and bundled DejaVu font: PDF-LICENSES.txt and PDF-SOURCE.md.\nOCR runtime, engines and language data: ocr-assets/licenses/ and ocr-assets/provenance.json.\nNo document-comparison interface or Chrome Web Store identity is included.\n")
     assets = build_ocr_assets(OUT)
     (OUT / "icons").mkdir()
     for size in [16, 32, 48, 128]:
@@ -77,7 +80,7 @@ def build():
         "manifest_version": 3,
         "name": "Document Scanner — Local OCR & PDF",
         "short_name": "Document Scanner",
-        "version": "0.1.0",
+        "version": VERSION,
         "description": "Recognize English and Russian scans locally. Review and correct text, improve images, and export a searchable PDF.",
         "minimum_chrome_version": "120",
         "icons": {str(n): f"icons/{n}.png" for n in [16, 32, 48, 128]},
@@ -92,17 +95,20 @@ def build():
         for name in re.findall(r"['\"]\./([^'\"]+\.(?:mjs|js))['\"]", path.read_text()):
             if not (OUT / name).is_file():
                 raise RuntimeError(f"Missing local module {name} in {path.name}")
-    provenance = {"product": "Document Scanner", "version": "0.1.0", "ocr_assets": assets,
+    provenance = {"product": "Document Scanner", "version": VERSION, "ocr_assets": assets,
                   "source_sha256": {name: hashlib.sha256((ROOT / "src" / name).read_bytes()).hexdigest() for name in MODULES},
                   "standalone_files_sha256": {name: hashlib.sha256((APP / name).read_bytes()).hexdigest() for name in SHELL}}
     (OUT / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
     artifacts = APP / "artifacts"
     artifacts.mkdir(exist_ok=True)
-    archive = artifacts / "document-scanner-0.1.0.zip"
+    archive = artifacts / f"document-scanner-chrome-{VERSION}.zip"
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as package:
         for path in sorted(OUT.rglob("*")):
             if path.is_file():
-                package.write(path, path.relative_to(OUT))
+                info = zipfile.ZipInfo(path.relative_to(OUT).as_posix(), (2026, 11, 6, 0, 0, 0))
+                info.compress_type = zipfile.ZIP_DEFLATED
+                info.external_attr = 0o100644 << 16
+                package.writestr(info, path.read_bytes(), compresslevel=6)
     print(json.dumps({"directory": str(OUT), "archive": str(archive), "bytes": archive.stat().st_size, "files": len(list(OUT.rglob('*')))}))
 
 
