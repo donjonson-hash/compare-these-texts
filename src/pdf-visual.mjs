@@ -192,7 +192,9 @@ export async function openPdfVisual(source, {signal, generated = false, allowRep
     }, allowReplacementFont);
     return {pageCount: doc.numPages, rects: pdfBlockRects, dispose, editFont,
       async refineBlocks(blocks) {
-        let result=allowReplacementFont ? blocks.map(trimPdfSpacingRuns) : blocks.slice();
+        // Synthetic spaces between table cells have no ink even when the PDF
+        // already embeds an editable font, as in a previously downloaded file.
+        let result=blocks.map(trimPdfSpacingRuns);
         for(const number of new Set(blocks.filter(b=>b.visual?.rasterBoundsVersion!==2).map(b=>b.visual.page))){
           abort(signal); const canvas=document.createElement('canvas');
           try {const {width,height,images}=await this.renderPage(number,canvas,{scale:2,trackImages:true});
